@@ -1,0 +1,49 @@
+{
+  "name": "iobroker.fullcalendar",
+  "description": "This adapter allows planing with calendar.",
+  "version": "0.1.0",
+  "author": {
+    "name": "bluefox",
+    "email": "dogafox@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "bluefox",
+      "email": "dogafox@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/ioBroker/ioBroker.fullcalendar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ioBroker/ioBroker.fullcalendar"
+  },
+  "licenses": [
+    {
+      "type": "CC-BY-NC-4.0",
+      "url": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/LICENSE"
+    }
+  ],
+  "keywords": [
+    "ioBroker",
+    "fullcalendar",
+    "calendar",
+	"schedule"
+  ],
+  "dependencies": {
+    "later": "^1.2.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-replace": "^0.9.3",
+    "mocha": "^2.3.4",
+    "chai": "^3.4.1"
+  },
+  "bugs": {
+    "url": "https://github.com/ioBroker/ioBroker.fullcalendar/issues"
+  },
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha"
+  },
+  "license": "CC-BY-NC-4.0"
+}

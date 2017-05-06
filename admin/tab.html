@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+<!--link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/-->
+<link rel="stylesheet" type="text/css" href="lib/fullcalendar.min.css"  />
+	<link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css"/>
+<!--link rel="stylesheet" type="text/css" href="lib/gentleSelect/jquery-gentleSelect.css" /-->
+<!--link rel="stylesheet" type="text/css" href="lib/cron/jquery-cron.css" /-->
+
+<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+
+<!--script type="text/javascript" src="lib/gentleSelect/jquery-gentleSelect.js"></script-->
+<!--script type="text/javascript" src="lib/cron/jquery-cron.js"></script-->
+
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery.fancytree-all.min.js"></script>
+<script type="text/javascript" src="../../js/selectID.js"></script>
+<script type="text/javascript" src="../../lib/js/loStorage.js"></script>
+<script type="text/javascript" src="words.js"></script>
+<script type="text/javascript" >var noConfigDialog = true;</script><!-- Deactivate buttons -->
+<script type="text/javascript" src="adapter-settings.js"></script>
+
+<script type="text/javascript" src="lib/moment.min.js"></script>
+<script type="text/javascript" src="lib/fullcalendar.min.js"></script>
+<script type="text/javascript" src="lib/locale-all.js"></script>
+<script type="text/javascript" src="lib/later.min.js"></script>
+<script type="text/javascript" src="utils.js"></script>
+<script>
+
+	var config = {};
+	var events = {};
+	instance = instance || '';
+	if (typeof instance === 'string') {
+	    var ppp = instance.split('=');
+	    if (ppp.length > 1) {
+            instance = parseInt(ppp[1], 10);
+		} else {
+            instance = parseInt(instance, 10);
+		}
+	}
+	var selectId;
+	var objects;
+	var states;
+	var copyKey = false;
+
+	var texts = [];
+
+	function addDelta(event, delta) {
+		if (event.native.cron) {
+			var cron = cron2obj(event.native.cron);
+			var i;
+			if (delta._days !== 0) {
+				if (cron.dates !== '*' && cron.dates !== '?') {
+					for (i = 0; i < cron.dates.length; i++) {
+						cron.dates[i] += delta._days;
+						while (cron.dates[i] < 1)  cron.dates[i] += 31;
+						while (cron.dates[i] > 31) cron.dates[i] -= 31;
+					}
+					cron.dates.sort(sortNumbers);
+				}
+				if (cron.dows !== '*' && cron.dows !== '?') {
+					for (i = 0; i < cron.dows.length; i++) {
+						cron.dows[i] += delta._days;
+						while (cron.dows[i] < 0) cron.dows[i] += 7;
+						cron.dows[i] = cron.dows[i] % 7;
+					}
+					cron.dows.sort(sortNumbers);
+				}
+			}
+			if (delta._milliseconds !== 0) {
+				var hours   = parseInt(Math.floor(delta._milliseconds / 3600000), 10);
+				var minutes = parseInt(Math.floor(delta._milliseconds / 60000) % 60, 10);
+				var seconds = parseInt(Math.floor(delta._milliseconds / 1000) % 60, 10);
+				if (hours !== 0 && cron.hours !== '*' && cron.hours !== '?') {
+					for (i = 0; i < cron.hours.length; i++) {
+						cron.hours[i] += hours;
+						while (cron.hours[i] < 0) cron.hours[i] += 24;
+						cron.hours[i] = cron.hours[i] % 24;
+					}
+					cron.hours.sort(sortNumbers);
+				}
+				if (minutes !== 0 && cron.minutes !== '*' && cron.minutes !== '?') {
+					for (i = 0; i < cron.minutes.length; i++) {
+						cron.minutes[i] += minutes;
+						while (cron.minutes[i] < 0) cron.minutes[i] += 60;
+						cron.minutes[i] = cron.minutes[i] % 60;
+					}
+					cron.minutes.sort(sortNumbers);
+				}
+				if (seconds !== 0 && cron.seconds !== '*' && cron.seconds !== '?' && !(cron.seconds.length === 1 && cron.seconds[0] === 0)) {
+					for (i = 0; i < cron.seconds.length; i++) {
+						cron.seconds[i] += seconds;
+						while (cron.seconds[i] < 0) cron.seconds[i] += 60;
+						cron.seconds[i] = cron.seconds[i] % 60;
+					}
+					cron.seconds.sort(sortNumbers);
+				}
+			}
+			if (delta._months !== 0) {
+				if (cron.months !== '*' && cron.months !== '?') {
+					for (i = 0; i < cron.months.length; i++) {
+						cron.months[i] += delta._months;
+						while (cron.months[i] < 1)  cron.months[i] += 12;
+						while (cron.months[i] > 12) cron.months[i] -= 12;
+					}
+					cron.months.sort(sortNumbers);
+				}
+			}
+			event.native.cron = obj2cron(cron);
+		} else {
+			var date = parseISOLocal(event.native.start);
+			// date
+			if (delta._days !== 0) {
+				date.setDate(date.getDate(delta._days));
+			}
+			if (delta._milliseconds !== 0) {
+				date.setMinutes(date.getMinutes() + Math.round(delta._milliseconds / 60000));
+			}
+			if (delta._months !== 0) {
+				date.setMonth(date.getMonth() + delta._months);
+			}
+			event.native.start = toLocalTime(date);
+		}
+	}
+
+    function addDeltaToDuration(event, delta) {
+        if (delta._milliseconds !== 0) {
+            // daily
+            event.native.duration = event.native.duration || 0;
+            event.native.duration += delta._milliseconds / 1000;
+        }
+    }
+
+    function saveConfig(attr, value) {
+		if (attr) config[attr] = value;
+
+		if (typeof storage !== 'undefined') {
+			storage.set('calenderConfig', JSON.stringify(config));
+		}
+	}
+
+	function showHideEventType() {
+		var type = $('#dialog_event_type').val();
+		if (type === 'single') {
+			$('#tr_dialog_event_end_value').hide();
+			$('#dialog_event_start_value_title').html(_('Set value'));
+			$('#tr_dialog_event_duration').hide();
+		} else if (type === 'double') {
+			$('#tr_dialog_event_duration').show();
+			$('#tr_dialog_event_end_value').show();
+			$('#dialog_event_start_value_title').html(_('Start value'));
+			$('#dialog_event_end_value_title').html(_('End value'));
+		} else if (type === 'toggle') {
+			$('#tr_dialog_event_duration').show();
+			$('#tr_dialog_event_end_value').hide();
+			$('#dialog_event_start_value_title').html(_('Firts value'));
+			$('#dialog_event_end_value_title').html(_('Second value'));
+		}
+
+		type = $('#dialog_event_period').val();
+
+		if (type === 'cron') {
+			$('#dialog_event_cron').show();
+			$('#dialog_event_interval').hide();
+			$('#dialog_event_daily').hide();
+            $('#dialog_event_monthly').hide();
+		} else if (type === 'once') {
+			$('#dialog_event_cron').hide();
+			$('#dialog_event_daily').hide();
+			$('#dialog_event_interval').hide();
+            $('#dialog_event_monthly').hide();
+		} else if (type === 'daily') {
+			$('#dialog_event_daily').show();
+			$('#dialog_event_interval').hide();
+			$('#dialog_event_cron').hide();
+            $('#dialog_event_monthly').hide();
+		} else if (type === 'monthly') {
+            $('#dialog_event_daily').hide();
+            $('#dialog_event_interval').hide();
+            $('#dialog_event_cron').hide();
+            $('#dialog_event_monthly').show();
+        } else if (type === 'interval') {
+			$('#dialog_event_cron').hide();
+			$('#dialog_event_interval').show();
+			$('#dialog_event_daily').hide();
+            $('#dialog_event_monthly').hide();
+		}
+
+        checkOidType();
+	}
+
+	function sortNumbers(a, b) {
+		return a - b;
+	}
+
+	function checkTime(timeStr) {
+		var time = timeStr.split(':');
+		if (time.length > 3) {
+			return _('Invalid time');
+		}
+		time[0] = parseInt(time[0], 10);
+		if (time[0] < 0 || time[0] > 23) {
+			return _('Invalid hours');
+		}
+		time[1] = parseInt(time[1], 10);
+		if (time[1] < 0 || time[1] > 59) {
+			return _('Invalid minutes');
+		}
+		if (time[2] !== undefined) {
+			time[2] = parseInt(time[2], 10);
+			if (time[2] < 0 || time[2] > 59) {
+				return _('Invalid seconds');
+			}
+		}
+		return time;
+	}
+
+	function onEditFinished() {
+		var $dialog = $('#dialog_event');
+		var event        = $dialog.data('event');
+		var callback     = $dialog.data('callback');
+		var period       = $dialog.find('#dialog_event_period').val();
+		// var pos;
+
+		event.native.oid        = $dialog.find('#dialog_event_id').val();
+
+        if ($dialog.find('#dialog_event_start_value_checkbox').is(':visible')) {
+            event.native.startValue = $dialog.find('#dialog_event_start_value_checkbox').prop('checked');
+        } else if ($dialog.find('#dialog_event_start_value').is(':visible')) {
+            event.native.startValue = $dialog.find('#dialog_event_start_value').val();
+        }  else if ($dialog.find('#dialog_event_start_value_select').is(':visible')) {
+            event.native.startValue = $dialog.find('#dialog_event_start_value_select').val();
+        } else {
+            event.native.startValue = $dialog.find('#dialog_event_start_value').val();
+        }
+        if (event.native.type !== 'single') {
+            if ($dialog.find('#dialog_event_end_value_checkbox').is(':visible')) {
+                event.native.endValue = $dialog.find('#dialog_event_end_value_checkbox').prop('checked');
+            } else if ($dialog.find('#dialog_event_end_value').is(':visible')) {
+                event.native.endValue = $dialog.find('#dialog_event_end_value').val();
+            }  else if ($dialog.find('#dialog_event_end_value_select').is(':visible')) {
+                event.native.endValue = $dialog.find('#dialog_event_end_value_select').val();
+            } else {
+                event.native.endValue = $dialog.find('#dialog_event_end_value').val();
+            }
+		} else {
+            if (event.native.endValue !== undefined) delete event.native.endValue;
+		}
+
+		event.native.type       = $dialog.find('#dialog_event_type').val();
+		event.common.enabled    = $dialog.find('#dialog_event_enabled').prop('checked');
+
+		if (event.native.type !== 'single') {
+			event.native.duration = parseInt($dialog.find('#dialog_event_duration').val(), 10) * 60;
+		} else {
+			if (event.native.duration !== undefined) delete event.native.duration;
+		}
+
+		event.common.name = $dialog.find('#dialog_event_title').val();
+
+		// extract time
+		var time = checkTime($dialog.find('#dialog_event_time').val());
+		if (typeof time === 'string') {
+			callback && callback(time);
+			return;
+		}
+
+		if (period === 'daily') {
+			//if (event.native.months) delete event.native.months;
+			var dows = [];
+
+			/*// fix start
+			pos = event.native.start.indexOf('T');
+			if (pos !== -1) {
+				event.native.start = event.native.start.substring(pos + 1).replace(/.\d\d\dZ$/, '');
+			}*/
+
+			$dialog.find('.dialog-event-dow').each(function () {
+				if ($(this).prop('checked')) {
+					dows.push($(this).data('value'));
+				}
+			});
+			dows.sort(sortNumbers);
+			var cron = cron2obj(event.native.cron || '* * * * *', event.native.start);
+			if (event.native.start !== undefined) delete event.native.start;
+			cron.hours = [time[0]];
+			cron.minutes = [time[1]];
+			cron.seconds = [time[2] || 0];
+			cron.dates = '?';
+			cron.months = '*';
+
+			cron.dows = dows;
+			event.native.cron = obj2cron(cron);
+		} else if (period === 'monthly') {
+			var months = [];
+
+			$dialog.find('.dialog-event-month').each(function () {
+				if ($(this).prop('checked')) {
+					months.push($(this).data('value'));
+				}
+			});
+			months.sort(sortNumbers);
+			var cron = cron2obj(event.native.cron || '* * * * *', event.native.start);
+			cron.hours = [time[0]];
+			cron.minutes = [time[1]];
+			cron.seconds = [time[2] || 0];
+			if (event.native.start !== undefined) delete event.native.start;
+			cron.months = months;
+			cron.dows = '?';
+			event.native.cron = obj2cron(cron);
+		} else {
+			if (event.native.cron) delete event.native.cron;
+			if (!event.native.start) {
+				// cron to time
+				var cron = later.parse.cron(event.native.cron);
+				var dates = later.schedule(cron).next(1);
+				event.native.start = toLocalTime(dates || new Date());
+			}
+
+			var b = event.native.start.split(/\D/);
+			b[3] = padding(time[0]);
+			b[4] = padding(time[1]);
+			b[5] = padding(time[2] || '00');
+			event.native.start = b[0] + '-' + b[1] + '-' + b[2] + 'T' + b[3] + ':' + b[4] + ':' + b[5];
+		}
+
+		callback && callback(null, event);
+
+		return $dialog;
+	}
+
+    function initEditDialog() {
+        var $dialog = $('#dialog_event');
+        if (!$dialog.data('inited')) {
+            $dialog.data('inited', true);
+            $dialog.dialog({
+                autoOpen:   false,
+                modal:      true,
+                width:      750,
+                height:     491,
+                buttons: [
+                    {
+                        id:   'dialog_event_button_delete',
+                        text: _('Delete'),
+                        icon: 'ui-icon-trash',
+                        click: function () {
+							var callback     = $dialog.data('callback');
+                            callback && callback('delete', $dialog.data('event'));
+							$dialog.data('event', null);
+                            $dialog.dialog('close');
+                        }
+                    },
+                    {
+                        id:   'dialog_event_button_save',
+                        text: _('Save'),
+                        icon: 'ui-icon-check',
+                        click: function () {
+							onEditFinished()
+								.data('event', null)
+                            	.dialog('close');
+                        }
+                    },
+                    {
+                        id:   'dialog_event_button_cancel',
+                        text: _('Cancel'),
+                        icon: 'ui-icon-cross',
+                        click: function () {
+							$dialog.data('event', null);
+                            $dialog.dialog('close');
+                        }
+                    }
+                ],
+				open: function (event, ui) {
+					$(event.target).parent().find('.ui-dialog-titlebar-close .ui-button-text').html('');
+				},
+                close: function (event) {
+                    //that.main.saveConfig('object-edit-active',  $('#object-tabs').tabs('option', 'active'));
+                    $dialog.data('callback', null);
+					saveConfig('dialog_event_width',  $(this).parent().width());
+					saveConfig('dialog_event_height', $(this).parent().height() + 10);
+                },
+                resize: function () {
+                    saveConfig('dialog_event_width',  $(this).parent().width());
+                    saveConfig('dialog_event_height', $(this).parent().height() + 10);
+                }
+            });
+
+            $dialog.find('#dialog_event_type').change(showHideEventType);
+            $dialog.find('#dialog_event_period').change(function () {
+                if ($(this).val() === 'daily') {
+                    $dialog.find('.dialog-event-dow').each(function () {
+                        $(this).prop('checked', true);
+                    });
+                } else if ($(this).val() === 'monthly') {
+                    $dialog.find('.dialog-event-month').each(function () {
+                        $(this).prop('checked', true);
+                    });
+                }
+                showHideEventType();
+            });
+			$dialog.find('#dialog_event_id_btn').click(function () {
+				var sid = initSelectId();
+				sid.selectId('show', $dialog.find('#dialog_event_id').val(), function (newId) {
+					$dialog.find('#dialog_event_id').val(newId).trigger('change');
+				});
+			});
+			$dialog.find('#dialog_event_title').change(function () {
+				if ($(this).val()) {
+					$(this).data('changed', true);
+				} else {
+					$(this).data('changed', false);
+				}
+			}).keyup(function () {
+				$(this).trigger('change');
+			});
+			function updateName() {
+				if (!$dialog.find('#dialog_event_title').data('changed')) {
+					$dialog.find('#dialog_event_title').val(getEventName({
+						common: {
+
+						},
+						native: {
+							oid: $dialog.find('#dialog_event_id').val(),
+							startValue: $dialog.find('#dialog_event_start_value').val()
+						}
+					}, true));
+				}
+			}
+
+			$dialog.find('#dialog_event_id').change(function () {
+			    updateName();
+                checkOidType();
+            }).keyup(function () {
+				$(this).trigger('change');
+			});
+			$dialog.find('#dialog_event_start_value').change(updateName).keyup(function () {
+				$(this).trigger('change');
+			});
+        }
+
+        return $dialog;
+    }
+
+	function oneCron2Array(str) {
+		if (str === '*' || str === '?' || str === '') return str;
+
+		var parts = str.split(',');
+		var result = [];
+		for (var p = 0; p < parts.length; p++) {
+			var m = parts[p].match(/(\d+)-(\d+)/);
+			if (m) {
+				for (var mm = parseInt(m[1], 10); mm <= parseInt(m[2], 10); mm++) {
+					result.push(mm);
+				}
+			} else {
+				result.push(parseInt(parts[p], 10));
+			}
+		}
+
+		return result;
+	}
+
+	function cron2obj(str, date) {
+		var cron = {};
+		// date can be 2016-08-07T45:45:35
+		if (date) {
+			var b = date.split(/\D/);
+			cron.seconds     = [parseInt(b[5], 10)]; // 0 - 59
+			cron.minutes     = [parseInt(b[4], 10)]; // 0 - 59
+			cron.hours       = [parseInt(b[3], 10)]; // 0 - 23
+			cron.dates       = [parseInt(b[2], 10)]; // 1 - 31
+			cron.months      = [parseInt(b[1], 10)]; // 1 - 12
+			cron.dows        = '?'; // 0 - 6
+		} else {
+			var parts = str.replace(/\s\s/g, ' ').replace(/\s\s/g, ' ').split(' ');
+			if (parts.length === 6) {
+				cron.seconds = oneCron2Array(parts[0]); // 0 - 59
+				cron.minutes = oneCron2Array(parts[1]); // 0 - 59
+				cron.hours   = oneCron2Array(parts[2]); // 0 - 23
+				cron.dates   = oneCron2Array(parts[3]); // 1 - 31
+				cron.months  = oneCron2Array(parts[4]); // 1 - 12
+				cron.dows    = oneCron2Array(parts[5]); // 0 - 6
+			} else {
+				cron.seconds = [0];                     // 0 - 59
+				cron.minutes = oneCron2Array(parts[0]); // 0 - 59
+				cron.hours   = oneCron2Array(parts[1]); // 0 - 23
+				cron.dates   = oneCron2Array(parts[2]); // 1 - 31
+				cron.months  = oneCron2Array(parts[3]); // 1 - 12
+				cron.dows    = oneCron2Array(parts[4]); // 0 - 6
+			}
+		}
+
+		return cron;
+	}
+
+	function array2oneCron(obj) {
+		if (obj === '*' || obj === '?') return obj;
+		if (typeof obj === 'string') obj = parseInt(obj, 10);
+		if (typeof obj !== 'object') obj = [obj];
+		obj.sort(sortNumbers);
+		if (obj.length < 3) return obj.join(',');
+
+		var newObj = [];
+		var start = obj[0];
+		var end = obj[0];
+
+		for (var i = 1; i < obj.length; i++) {
+			if (obj[i] === end + 1) {
+				end++;
+			} else {
+				if (start !== end) {
+					if (start + 1 === end) {
+						newObj.push(start + ',' + end);
+					} else {
+						newObj.push(start + '-' + end);
+					}
+				} else {
+					newObj.push(start);
+				}
+				start = obj[i];
+				end = obj[i];
+			}
+		}
+		if (start !== end) {
+			if (start + 1 === end) {
+				newObj.push(start + ',' + end);
+			} else {
+				newObj.push(start + '-' + end);
+			}
+		} else {
+			newObj.push(start);
+		}
+
+		return newObj.join(',');
+	}
+
+	function obj2cron(cron) {
+		var parts = ['*', '*', '*', '*', '*', '?'];
+		if (cron.seconds) {
+			parts[0] = array2oneCron(cron.seconds);
+		}
+		parts[1] = array2oneCron(cron.minutes);
+		parts[2] = array2oneCron(cron.hours);
+		parts[3] = array2oneCron(cron.dates);
+		parts[4] = array2oneCron(cron.months);
+		parts[5] = array2oneCron(cron.dows);
+		if (parts[0] === '0') parts.shift();
+		return parts.join(' ');
+	}
+
+	// 9 => 09
+	function padding(timeStr) {
+		if (timeStr.toString().length < 2) return '0' + timeStr;
+		return timeStr;
+	}
+
+	function checkOidType(valStart, valEnd, $dialog) {
+	    var isJustShow = valStart === undefined && valEnd === undefined && $dialog === undefined;
+        $dialog = $dialog || $('#dialog_event');
+	    var oid = $dialog.find('#dialog_event_id').val();
+	    var type = $dialog.find('#dialog_event_type').val();
+
+	    if (oid && objects[oid] && objects[oid].common && objects[oid].common.type) {
+	        if (objects[oid].common.type === 'boolean') {
+                if (isJustShow) {
+                    $dialog.find('#dialog_event_start_value_checkbox').show();
+				} else {
+                    if (valStart === undefined) valStart = true;
+                    if (valStart === 'true'  || valStart === '1') valStart = true;
+                    if (valStart === 'false' || valStart === '0') valStart = false;
+                    $dialog.find('#dialog_event_start_value_checkbox').show().prop('checked', valStart);
+				}
+                $dialog.find('#dialog_event_start_value').hide();
+                $dialog.find('#dialog_event_start_value_select').hide();
+
+                if (type === 'double') {
+                    if (isJustShow) {
+                        $dialog.find('#dialog_event_end_value_checkbox').show();
+                    } else {
+                        if (valEnd === undefined) valEnd = !valStart;
+                        if (valEnd === 'true'  || valEnd === '1') valEnd = true;
+                        if (valEnd === 'false' || valEnd === '0') valEnd = false;
+                        $dialog.find('#dialog_event_end_value_checkbox').show().prop('checked', valEnd);
+                    }
+                    $dialog.find('#dialog_event_end_value').hide();
+                    $dialog.find('#dialog_event_end_value_select').hide();
+				} else {
+                    $dialog.find('#dialog_event_end_value_checkbox').hide();
+                    $dialog.find('#dialog_event_end_value').hide();
+                    $dialog.find('#dialog_event_end_value_select').hide();
+                }
+			} else if (objects[oid].common.states && objects[oid].common.min === undefined) {
+	            var text = '';
+	            for (var i in objects[oid].common.states) {
+	                if (objects[oid].common.states.hasOwnProperty(i) && i !== 'length') {
+                        if (valStart === undefined) valStart = i;
+                        if (valEnd   === undefined) valEnd   = i;
+                        text = '<option value="' + i + '">' + objects[oid].common.states[i] + '</option>';
+					}
+				}
+                if (isJustShow) {
+                    $dialog.find('#dialog_event_start_value_select').show();
+                } else {
+                    $dialog.find('#dialog_event_start_value_select').html(text).val(valStart);
+                }
+
+                $dialog.find('#dialog_event_start_value_checkbox').hide();
+                $dialog.find('#dialog_event_start_value').hide();
+
+                if (type === 'double') {
+                    if (isJustShow) {
+                        $dialog.find('#dialog_event_end_value_select').show();
+                    } else {
+                        $dialog.find('#dialog_event_end_value_select').html(text).val(valEnd).show();
+                	}
+                    $dialog.find('#dialog_event_end_value_checkbox').hide();
+                    $dialog.find('#dialog_event_end_value').hide();
+                } else {
+                    $dialog.find('#dialog_event_end_value_checkbox').hide();
+                    $dialog.find('#dialog_event_end_value').hide();
+                    $dialog.find('#dialog_event_end_value_select').hide();
+                }
+ 			} else {
+				if (isJustShow) {
+					$dialog.find('#dialog_event_start_value').show();
+				} else {
+                    if (valStart === undefined) valStart = 1;
+                    $dialog.find('#dialog_event_start_value').show().val(valStart);
+                }
+                $dialog.find('#dialog_event_start_value_checkbox').hide();
+                $dialog.find('#dialog_event_start_value_select').hide();
+
+                if (type === 'double') {
+                    if (isJustShow) {
+                        $dialog.find('#dialog_event_end_value').show();
+                    } else {
+                        if (valEnd === undefined) valEnd = valStart ? 0 : 1;
+                        $dialog.find('#dialog_event_end_value').show().val(valEnd);
+                    }
+                    $dialog.find('#dialog_event_end_value_checkbox').hide();
+                    $dialog.find('#dialog_event_end_value_select').hide();
+                } else {
+                    $dialog.find('#dialog_event_end_value_checkbox').hide();
+                    $dialog.find('#dialog_event_end_value').hide();
+                    $dialog.find('#dialog_event_end_value_select').hide();
+                }
+			}
+		} else {
+            if (isJustShow) {
+                $dialog.find('#dialog_event_start_value').show();
+            } else {
+                if (valStart === undefined) valStart = $dialog.find('#dialog_event_start_value').val();
+                $dialog.find('#dialog_event_start_value').show().val(valStart);
+            }
+            $dialog.find('#dialog_event_start_value_checkbox').hide();
+            $dialog.find('#dialog_event_start_value_select').hide();
+
+            if (type === 'double') {
+                if (isJustShow) {
+                    $dialog.find('#dialog_event_end_value').show();
+                } else {
+                    if (valEnd === undefined) valEnd = !valStart;
+                    $dialog.find('#dialog_event_end_value').show().val(valEnd);
+                }
+                $dialog.find('#dialog_event_end_value_checkbox').hide();
+                $dialog.find('#dialog_event_end_value_select').hide();
+            } else {
+                $dialog.find('#dialog_event_end_value_checkbox').hide();
+                $dialog.find('#dialog_event_end_value').hide();
+                $dialog.find('#dialog_event_end_value_select').hide();
+            }
+		}
+	}
+
+	function showEditDialog(event, callback) {
+        var $dialog = initEditDialog();
+        $dialog.data('event', event);
+
+		var width  = 870;
+		var height = 450;
+
+		$dialog.data('callback', callback);
+		if (config.dialog_event_width)  width  = config.dialog_event_width;
+		if (config.dialog_event_height) height = config.dialog_event_height;
+
+		$dialog.dialog('option', 'title', _('Configure event'));
+
+		$dialog.find('#dialog_event_id').val(event.native.oid || '');
+        $dialog.find('#dialog_event_type').val(event.native.type || 'single');
+
+        checkOidType(event.native.startValue || '', event.native.endValue || '', $dialog);
+
+		$dialog.find('#dialog_event_enabled').prop('checked', event.common.enabled);
+
+		event.common.name = event.common.name || getEventName(event, true);
+
+        $dialog.find('#dialog_event_title').val(event.common.name || '').data('changed',
+				event.common.name !== getEventName(event, true) && texts.indexOf(event.common.name) === -1);
+
+		$dialog.find('#dialog_event_interval').val(event.native.interval || '1');
+		$dialog.find('#dialog_event_interval_unit').val(event.native.unit || 'h');
+
+        $dialog.find('#dialog_event_duration').val((event.native.duration || 1800) / 60);
+
+		if (event.native.cron) {
+			var cron = cron2obj(event.native.cron);
+
+			if (typeof cron.dows === 'object') {
+				$dialog.find('#dialog_event_period').val('daily');
+				$dialog.find('.dialog-event-dow').each(function () {
+					var val = parseInt($(this).data('value'), 10);
+					if (cron.dows.indexOf(val) !== -1) {
+						$(this).prop('checked', true);
+					}
+				});
+			} else if (typeof cron.months === 'object') {
+				$dialog.find('#dialog_event_period').val('monthly');
+				$dialog.find('.dialog-event-month').each(function () {
+					var val = parseInt($(this).data('value'), 10);
+					if (cron.months.indexOf(val) !== -1) {
+						$(this).prop('checked', true);
+					}
+				});
+			}
+			$dialog.find('#dialog_event_time').val(padding(cron.hours[0]) + ':' + padding(cron.minutes[0]) + (cron.seconds[0] !== 0 ? ':' + padding(cron.seconds[0]) : ''));
+		} else {
+			if (!event.native.start) {
+				event.native.start = toLocalTime(new Date());
+			}
+			var b = event.native.start.split(/\D/);
+			$dialog.find('#dialog_event_period').val('once');
+			$dialog.find('#dialog_event_time').val(b[3] + ':' + b[4] + (b[5] !== '00' ? ':' + b[5] : ''));
+		}
+
+		$dialog.find('#dialog_event_period_type').val(event.native.periodType || 'daily');
+
+		showHideEventType();
+
+		$dialog
+				.dialog('option', 'width',  width)
+				.dialog('option', 'height', height)
+				.dialog('open');
+	}
+
+	function getEventName(event, ignoreExisting) {
+		if (!ignoreExisting && event.common.name) {
+			return event.common.name;
+		} else  {
+			var common = objects[event.native.oid] ? objects[event.native.oid].common : {};
+			if (event.native.oid && event.native.startValue !== '') {
+				return _('Set %s to %s', common.name || event.native.oid, event.native.startValue + (common.unit || ''));
+			} else if (event.native.oid) {
+				return _('Set %s', common.name || event.native.oid);
+			} else if (event.native.startValue !== '' && event.native.startValue !== undefined && event.native.startValue !== null) {
+				return _('Set to %s', event.native.startValue);
+			} else {
+				return _('No action');
+			}
+		}
+	}
+
+	function generateEvents(event, start, end) {
+		var result    = [];
+		var startDate = new Date(start.toISOString());
+		var endDate   = new Date(end.toISOString());
+		var _start;
+        var _end;
+
+        // if daily
+		if (event.native.cron) {
+			var cron = later.parse.cron(event.native.cron);
+			var dates = later.schedule(cron).next(1000, startDate, endDate);
+			if (dates) {
+				for (var r = 0; r < dates.length; r++) {
+					_start = new Date(dates[r]);
+					_end   = new Date(_start);
+					if (event.native.type === 'single' && event.native.duration) delete event.native.duration;
+					_end.setSeconds(_end.getSeconds() + (event.native.duration || 1800));
+					result.push({
+						id: 	event.native.id,
+						start: 	toLocalTime(dates[r]),
+						end:	toLocalTime(_end),
+						allDay: false,
+						durationEditable: event.native.type !== 'single',
+						title: 	getEventName(event),
+						enabled: event.common.enabled
+					});
+				}
+			}
+		} else {
+			_start = parseISOLocal(event.native.start);
+            _end = new Date(_start);
+            _end.setSeconds(_end.getSeconds() + (event.native.duration || 1800));
+
+			if ((        startDate.getTime() <= _start.getTime() && _start.getTime() < endDate.getTime()) ||
+				(_end && startDate.getTime() <= _end.getTime()   && _end.getTime()   < endDate.getTime())
+            ) {
+				result.push({
+					id: 	          event.native.id,
+					start: 	          event.native.start,
+                    end:	          toLocalTime(_end),
+					allDay:           false,
+					durationEditable: event.native.type !== 'single',
+					title: 	          getEventName(event),
+					enabled: event.common.enabled
+				});
+			}
+		}
+		return result;
+	}
+
+    function getEventById(id) {
+        for (var e in events) {
+            if (events.hasOwnProperty(e) && events[e].native.id === id) {
+				return events[e];
+            }
+        }
+        return null;
+    }
+
+	function readSchedules(callback) {
+		socket.emit('getObjectView', 'schedule', 'schedule', {startkey: 'fullcalendar.' + instance + '.', endkey: 'fullcalendar.' + instance + '.\u9999'}, function (err, res) {
+			if (!err && res) {
+				var _res = {};
+				for (var i = 0; i < res.rows.length; i++) {
+					if (res.rows[i].id === 'schedules') continue;
+					_res[res.rows[i].value._id] = res.rows[i].value;
+				}
+				if (callback) callback(null, _res);
+			} else {
+				if (callback) callback(err, []);
+			}
+		});
+	}
+
+	function initSelectId (callback) {
+		if (selectId) return selectId;
+		selectId = $('#dialog-select-member').selectId('init',  {
+			objects: 		objects,
+			states:  		states,
+			noMultiselect: 	true,
+			imgPath: 		'../../lib/css/fancytree/',
+			filter: 		{type: 'state'},
+			readyCallback: 	callback,
+			texts: {
+				select:   	_('Select'),
+				cancel:   	_('Cancel'),
+				all:      	_('All'),
+				id:       	_('ID'),
+				name:     	_('Name'),
+				role:     	_('Role'),
+				room:     	_('Room'),
+				value:    	_('Value'),
+				selectid: 	_('Select ID'),
+				from:     	_('From'),
+				lc:       	_('Last changed'),
+				ts:       	_('Time stamp'),
+				wait:     	_('Processing...'),
+				ack:      	_('Acknowledged')
+			},
+			columns: 		['image', 'name', 'role', 'room', 'value']
+		});
+		return selectId;
+	}
+
+	function deleteSchedule(event, callback) {
+		socket.emit('delObject', event._id, callback);
+	}
+
+	function writeSchedule(event, callback) {
+		//var id = name2id(event);
+
+		socket.emit('getObject', event._id, function (err, obj) {
+			if (obj) {
+				obj.native = JSON.parse(JSON.stringify(event.native));
+				obj.common.enabled = event.common.enabled;
+                obj.common.name    = event.common.name;
+			} else {
+				obj = JSON.parse(JSON.stringify(event));
+			}
+			socket.emit('setObject', obj._id, obj, callback);
+		});
+	}
+
+	function readAllObjects(callback) {
+		socket.emit('getObjects', function (err, _objects) {
+			objects = _objects;
+			socket.emit('getStates', function (err, _states) {
+				states = _states;
+
+				if (objects) {
+					var reg = new RegExp('^fullcalendar\\.' + instance + '\\.');
+					for (var id in objects) {
+						if (objects.hasOwnProperty(id) && reg.test(id)) {
+							events[id] = objects[id];
+						}
+					}
+				} else {
+					objects = {};
+				}
+
+				socket.on('stateChange', function (id, state) {
+					if (!id) return;
+					if (!state) {
+						if (states[id]) delete states[id];
+					} else {
+						states[id] = state;
+					}
+
+					if (selectId) selectId.selectId('state', id, state);
+				});
+				socket.on('objectChange', function (id, obj) {
+					if (!id) return;
+					if (!obj) {
+						if (objects[id]) delete objects[id];
+					} else {
+						objects[id] = obj;
+					}
+
+					if (selectId) selectId.selectId('object', id, obj);
+				});
+				callback && callback();
+			});
+		});
+	}
+
+	function getNewEventName(fcEventID) {
+        var name = 'fullcalendar.' + instance + '.' + toLocalTime(new Date(fcEventID)).replace(/:/g, '_');
+        var num = '';
+        var found;
+        do {
+            found = false;
+            for (var e in events) {
+                if (events.hasOwnProperty(e) && events[e]._id === name + num) {
+                    found = true;
+                    break;
+                }
+            }
+            if (num === '') {
+                num = 1;
+            } else {
+                num++;
+            }
+        } while(found);
+
+        return name + num;
+	}
+
+	$(document).ready(function() {
+		later.date.localTime();
+
+		loadSystemConfig(function () {
+			if (typeof translateAll === 'function') translateAll();
+			readSchedules(function (err, _events) {
+				events = _events;
+				readAllObjects(function () {
+					var $calendar = $('#calendar');
+					var viewName = config.view_name;
+					var viewDate = config.view_date;
+
+					texts.push(_('Single event'));
+					texts.push(_('Double event'));
+					texts.push(_('Toggle event'));
+
+					$calendar.fullCalendar({
+						header: {
+							left: 'prev,next today',
+							center: 'title',
+							right: 'month,agendaWeek,agendaDay,listMonth'
+						},
+						timezone: 'local',
+						locale: 'de',
+						allDaySlot: false,
+						allDayDefault: false,
+						editable: true,
+						events: function(start, end, timezone, callback) {
+							var result = [];
+							for (var e in events) {
+								if (!events.hasOwnProperty(e)) continue;
+								var evs = generateEvents(events[e], start, end);
+								for (var r = 0; r < evs.length; r++) {
+									result.push(evs[r]);
+								}
+							}
+							callback(result);
+						},
+						viewRender: function (view, element)  {
+							var start = new Date(view.start.toISOString());
+							var end   = new Date(view.end.toISOString());
+							var now   = new Date();
+							if (now >= start && now < end) {
+								saveConfig('view_date', 0);
+							} else {
+								saveConfig('view_date', view.start.toISOString() + '/' + view.end.toISOString());
+							}
+							saveConfig('view_name', view.name);
+						},
+						droppable: true, // this allows things to be dropped onto the calendar
+						dayClick: function(date, jsEvent, view) {
+							var $calendar = $('#calendar');
+							if ($calendar.fullCalendar('getView').name === 'month') {
+								$calendar.fullCalendar('gotoDate',date);
+								$calendar.fullCalendar('changeView', 'agendaDay');
+							}
+						},
+						eventAfterRender: function (fcEvent, element, view) {
+							element.data('fcEventId', fcEvent.id);
+
+							element.addClass('fc-event-exist').on('click', function() {
+								var touchtime = $(this).data('touchtime');
+								if (!touchtime) {
+									$(this).data('touchtime', new Date().getTime());
+								} else {
+									//compare first click to this click and see if they occurred within double click threshold
+									if (((new Date().getTime()) - touchtime) < 800) {
+										showEditDialog(getEventById($(this).data('fcEventId')), function (err, event) {
+											if (err === 'delete') {
+												delete events[event._id];
+												deleteSchedule(event, function (err) {
+													$('#calendar').fullCalendar('refetchEvents');
+												});
+											} else if (event) {
+												writeSchedule(event, function (err) {
+													$('#calendar').fullCalendar('refetchEvents');
+												});
+											}
+										});
+									} else {
+										//not a double click so set as a new first click
+										$(this).data('touchtime', new Date().getTime());
+									}
+								}
+							});
+							if (!fcEvent.enabled) element.addClass('fc-event-disabled')
+						},
+						eventDrop: function (fcEvent, delta, revertFunc, jsEvent, ui, view) {
+							var event = getEventById(fcEvent.id);
+                            addDelta(event, delta, true);
+                            writeSchedule(event, function () {
+                                if (copyKey) {
+                                    copyKey = false;
+                                    $('#calendar').fullCalendar('refetchEvents');
+                                }
+							});
+						},
+                        eventDragStart: function (fcEvent, element, ui, view) {
+                            if (!element.altKey) return;
+                            var event = getEventById(fcEvent.id);
+							event = JSON.parse(JSON.stringify(event));
+							event.native.id = new Date().getTime();
+							event._id = getNewEventName(event.native.id);
+							events[event._id] = event;
+
+                            var eClone = {
+                                id:    		event.native.id,
+                                start: 		moment(fcEvent.start),
+                                end:   		moment(fcEvent.end),
+                                allDay: 	false,
+                                durationEditable: event.native.type !== 'single',
+                                title: 		fcEvent.title,
+                                enabled: 	event.common.enabled
+                            };
+                            copyKey = true;
+                            //$('#calendar').fullCalendar('renderEvent', eClone);
+                        },
+						eventResize: function (fcEvent, delta, revertFunc, jsEvent, ui, view) {
+							var event = getEventById(fcEvent.id);
+							addDeltaToDuration(event, delta);
+							writeSchedule(event);
+						},
+						eventReceive: function (fcEvent) {
+							//event.start.hours(8);
+							var $calendar = $('#calendar');
+
+							// create unique ID
+							fcEvent.id = new Date().getTime();
+
+							// add time for allday events. we have no all day events
+							if ($calendar.fullCalendar('getView').name === 'month') {
+								var m = fcEvent.start.get('month') + 1;
+								var d = fcEvent.start.get('date');
+								if (m < 10) m = '0' + m;
+								if (d < 10) d = '0' + d;
+
+								fcEvent.start = $.fullCalendar.moment(fcEvent.start.get('year') + '-' + m + '-' + d + 'T08:00:00');
+
+								if (fcEvent.type !== 'single') {
+									fcEvent.end = $.fullCalendar.moment(fcEvent.start).add(2, 'h');
+									fcEvent.durationEditable = true;
+								} else {
+									fcEvent.durationEditable = false;
+									fcEvent.end = $.fullCalendar.moment(fcEvent.start).add(30, 'm');
+								}
+							} else {
+								if (fcEvent.type === 'single') {
+									fcEvent.durationEditable = false;
+									fcEvent.end = $.fullCalendar.moment(fcEvent.start).add(30, 'm');
+								} else {
+									fcEvent.end = $.fullCalendar.moment(fcEvent.start).add(2, 'h');
+									fcEvent.durationEditable = true;
+								}
+							}
+
+							var event = {
+								_id: getNewEventName(fcEvent.id),
+								common: {
+									name: fcEvent.title,
+									enabled: true
+								},
+								native: {
+									id: 			  fcEvent.id,
+									start: 			  toLocalTime(new Date(fcEvent.start.toISOString())),
+									duration: 		  Math.round((new Date(fcEvent.end.toISOString()).getTime() - new Date(fcEvent.start.toISOString()).getTime()) / 1000),
+									type: 			  fcEvent.type,
+									durationEditable: fcEvent.durationEditable
+								},
+								type: 'schedule'
+							};
+							events[event._id] = event;
+							fcEvent.enabled = true;
+							writeSchedule(event, function () {
+								$calendar.fullCalendar('updateEvent', fcEvent);
+							});
+						}
+					});
+
+					if (viewName) {
+						$calendar.fullCalendar('changeView', viewName, viewDate ? {
+							start: viewDate.split('/')[0],
+							end: viewDate.split('/')[1]
+						} : undefined);
+					}
+				});
+			});
+		});
+
+		// load config
+		if (typeof storage !== 'undefined') {
+			try {
+				config = storage.get('calenderConfig');
+				if (config) {
+					config = JSON.parse(config);
+				} else {
+					config = {};
+				}
+			} catch (e) {
+				console.log('Cannot load edit config');
+				config = {};
+			}
+		}
+
+		/* initialize the external events
+		-----------------------------------------------------------------*/
+
+		$('#external-events .fc-event').each(function() {
+
+			if ($(this).data('type') === 'single') {
+				// store data so the calendar knows to render an event upon drop
+				$(this).data('event', {
+					durationEditable: false,
+					defaultTimedEventDuration: '00:30:00',
+					title: $.trim($(this).text()), // use the element's text as the event title
+					stick: true, // maintain when user navigates (see docs on the renderEvent method),
+					type: 'single',
+					allDay: false
+				});
+			} else {
+				// store data so the calendar knows to render an event upon drop
+				$(this).data('event', {
+					title: $.trim($(this).text()), // use the element's text as the event title
+					stick: true, // maintain when user navigates (see docs on the renderEvent method),
+					type: $(this).data('type'),
+					allDay: false
+				});
+			}
+
+			// make the event draggable using jQuery UI
+			$(this).draggable({
+				zIndex: 999,
+				revert: true,      // will cause the event to go back to its
+				revertDuration: 0  // original position after the drag
+			});
+		});
+
+		$('#events_bin').hide();
+		/*$('#events_bin').droppable({
+			accept: '.fc-event-exist',
+			drop: function (uiEvent, ui) {
+				console.log('a');
+				var event = ui.helper.data('event');
+				$('#calendar').fullCalendar('removeEvents', event.id);
+				ui.helper.data('event', null);
+				ui.draggable.remove();
+			}
+		});*/
+
+		/* initialize the calendar
+		-----------------------------------------------------------------*/
+
+		/*
+		 {"id":"1","playingfield_id":"1",
+		 "dow":null,
+		 "when":null,
+		 "start":"10:00:00",
+		 "end":"14:00:00",
+
+		 rendering:"background"},
+		 {"id":"2","playingfield_id":"1","dow":"6","when":null,"start":"14:00:00","end":"15:00:00", rendering:"background"},
+		 {"id":"3","playingfield_id":"1",
+		 "dow":null,
+		 "when":"2015-05-05",
+		 "start":"15:00:00",
+		 "end":"16:00:00",
+		 rendering:"background"}
+
+		 */
+
+
+	});
+
+</script>
+<style>
+
+	body {
+		margin-top: 40px;
+		font-size: 14px;
+		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+	}
+	#wrap {
+		text-align: center;
+	}
+	.dialog-event-input {
+		width: 80px;
+	}
+	#wrap {
+		width: calc(80% - 200px);/*1200px;*/
+		margin: 0 auto;
+	}
+	.fc-event-trash {
+		background: red;
+		width: 16px;
+		height: 12px;
+		position: absolute;
+		top: 2px;
+		right: 2px;
+	}
+	.fc-event-disabled {
+		opacity: 0.5;
+	}
+	#flow-tab {
+		float: left;
+		width: 150px;
+		padding: 0 10px;
+		height: 280px;
+		border: 1px solid #ccc;
+		background: #eee;
+		text-align: left;
+	}
+
+	#flow-tab h4 {
+		font-size: 16px;
+		margin-top: 0;
+		padding-top: 1em;
+	}
+
+	#flow-tab .fc-event {
+		margin: 10px 0;
+		width: 100%;
+		cursor: pointer;
+	}
+
+	#flow-tab p {
+		margin: 1.5em 0;
+		font-size: 11px;
+		color: #666;
+	}
+
+	#flow-tab p input {
+		margin: 0;
+		vertical-align: middle;
+	}
+
+	#calendar {
+		float: right;
+		width: calc(100% - 200px);
+	}
+
+	#events_bin {
+		width: 100%;
+		height: 100%;
+		background: gray;
+	}
+	.ui-dialog-buttonset {
+		width: 100%;
+	}
+	#dialog_event_button_cancel, #dialog_event_button_save {
+		float: right;
+	}
+	#dialog_event_button_delete {
+		float: left;
+	}
+
+</style>
+</head>
+<body>
+	<div id="wrap">
+
+		<div id="flow-tab">
+			<table style="width: 100%; height: 200px">
+				<tr><td id="external-events" style="width: 100%">
+					<h4 class="translate">Events</h4>
+					<div class="fc-event translate" data-type="single">Single event</div>
+					<div class="fc-event translate" data-type="double">Double event</div>
+					<div class="fc-event translate" data-type="toggle">Toggle event</div>
+				</td></tr>
+				<!--tr><td style="width: 100%; height: 100px">
+					<h4 class="translate" style="padding-top: 20px">Bin</h4>
+					<div id="events_bin">
+						<label>drop here to delete</label>
+					</div>
+				</td></tr-->
+			</table>
+		</div>
+
+		<div id='calendar'></div>
+
+		<div style='clear: both'></div>
+	</div>
+	<div id="dialog_event" style="display: none; text-align: left;">
+		<h1></h1>
+		<table style="width: 100%">
+			<tr>
+				<td><label class="translate" for="dialog_event_enabled">Active</label></td>
+				<td><input id="dialog_event_enabled" type="checkbox"/></td>
+			</tr>
+			<tr>
+				<td><label class="translate" for="dialog_event_time">Time</label></td>
+				<td><input id="dialog_event_time" class="dialog-event-input" type="text" maxlength="8"/></td>
+			</tr>
+			<tr>
+				<td><label class="translate" for="dialog_event_type">Event type</label></td>
+				<td><select id="dialog_event_type" class="dialog-event-input" >
+					<option value="single" class="translate">single</option>
+					<option value="double" class="translate">double</option>
+					<option value="toggle" class="translate">toggle</option>
+				</select></td>
+			</tr>
+			<tr id="tr_dialog_event_duration">
+				<td><label class="translate" for="dialog_event_duration">Duration</label></td>
+				<td><input id="dialog_event_duration" class="dialog-event-input" size="2"/><span style="margin-left: 10px">minutes</span></td>
+			</tr>
+			<tr>
+				<td><label class="translate" for="dialog_event_id">Object ID</label></td>
+				<td><input size="60" id="dialog_event_id"  style="width: calc(100% - 41px)"/><button id="dialog_event_id_btn" style="margin-left: 5px">...</button></td>
+			</tr>
+			<tr>
+				<td><label class="translate" for="dialog_event_start_value" id="dialog_event_start_value_title">Start value</label></td>
+				<td>
+					<input size="20" id="dialog_event_start_value" style="width: 100%" />
+					<input id="dialog_event_start_value_checkbox" type="checkbox" />
+					<select id="dialog_event_start_value_select"></select>
+				</td>
+			</tr>
+			<tr id="tr_dialog_event_end_value">
+				<td><label class="translate" for="dialog_event_end_value" id="dialog_event_end_value_title">End value</label></td>
+				<td>
+					<input size="20" id="dialog_event_end_value" style="width: 100%" />
+					<input id="dialog_event_end_value_checkbox" type="checkbox" />
+					<select id="dialog_event_end_value_select"></select>
+				</td>
+			</tr>
+			<tr>
+				<td><label class="translate" for="dialog_event_period">Period</label></td>
+				<td>
+					<select id="dialog_event_period" style="display: inline-block;">
+						<option value="once" class="translate">once</option>
+						<!--option value="interval" class="translate">interval</option-->
+						<option value="daily" class="translate">daily</option>
+						<option value="monthly" class="translate">monthly</option>
+						<!--option value="yearly" class="translate">yearly</option-->
+					</select>
+				</td>
+			</tr>
+			<tr id="dialog_event_daily">
+				<td></td>
+				<td>
+					<table>
+						<tr>
+							<td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" data-value="1" class="dialog-event-dow"></td>
+							<td><input type="checkbox" data-value="2" class="dialog-event-dow"></td>
+							<td><input type="checkbox" data-value="3" class="dialog-event-dow"></td>
+							<td><input type="checkbox" data-value="4" class="dialog-event-dow"></td>
+							<td><input type="checkbox" data-value="5" class="dialog-event-dow"></td>
+							<td><input type="checkbox" data-value="6" class="dialog-event-dow"></td>
+							<td><input type="checkbox" data-value="0" class="dialog-event-dow"></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr id="dialog_event_monthly">
+				<td></td>
+				<td>
+					<table>
+						<tr>
+							<td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
+						</tr>
+						<tr>
+                            <td><input type="checkbox" data-value="1"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="2"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="3"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="4"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="5"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="6"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="7"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="8"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="9"  class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="10" class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="11" class="dialog-event-month" /></td>
+							<td><input type="checkbox" data-value="12" class="dialog-event-month" /></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td><label class="translate" for="dialog_event_title">Description</label></td>
+				<td><input id="dialog_event_title" style="width: 100%" /></td>
+			</tr>
+			<!--tr id="dialog_event_cron">
+				<td></td>
+				<td>
+					<div id="dialog_event_selector"></div>
+				</td>
+			</tr>
+			<tr id="dialog_event_interval">
+				<td></td>
+				<td>
+					<span class="translate" style="display: inline-block;">Every</span>
+					<input id="dialog_event_interval" size="3" type="number" style="display: inline-block; width: 50px;"/>
+					<select id="dialog_event_interval_unit" style="display: inline-block;">
+						<option value="s" class="translate">seconds</option>
+						<option value="m" class="translate">minutes</option>
+						<option value="h" class="translate">hours</option>
+						<option value="d" class="translate">days</option>
+					</select>
+				</td>
+			</tr-->
+		</table>
+	</div>
+	<div id="dialog-select-member" style="display: none"></div>
+</body>
+</html>

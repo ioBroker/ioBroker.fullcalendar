@@ -1,0 +1,9 @@
+Gruntfile.js
+tasks
+www/lib/js/jquery.flot.js
+.idea
+node_modules
+.git
+test
+.travis.yml
+appveyor.yml
