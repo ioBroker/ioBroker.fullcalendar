@@ -14,13 +14,11 @@ var nextTimer;
 adapter.on('objectChange', function (id, obj) {
     if (!id) return;
 
-    if (!obj) {
-        if (events[id]) {
-            stopEvent(events[id]);
-            delete events[id];
-        }
-    } else {
+    if (events[id]) {
         stopEvent(events[id]);
+        delete events[id];
+    }
+    if (obj) {
         events[id] = checkEvent(obj);
     }
     calculateNext();

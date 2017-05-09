@@ -33,7 +33,7 @@
 
 	var config = {};
 	var events = {};
-	instance = instance || '';
+	instance = instance || 0;
 	if (typeof instance === 'string') {
 	    var ppp = instance.split('=');
 	    if (ppp.length > 1) {
@@ -355,16 +355,6 @@
                         }
                     },
                     {
-                        id:   'dialog_event_button_save',
-                        text: _('Save'),
-                        icon: 'ui-icon-check',
-                        click: function () {
-							onEditFinished()
-								.data('event', null)
-                            	.dialog('close');
-                        }
-                    },
-                    {
                         id:   'dialog_event_button_cancel',
                         text: _('Cancel'),
                         icon: 'ui-icon-cross',
@@ -372,10 +362,33 @@
 							$dialog.data('event', null);
                             $dialog.dialog('close');
                         }
-                    }
+                    },
+					{
+						id:   'dialog_event_button_save',
+						text: _('Save'),
+						icon: 'ui-icon-check',
+						click: function () {
+							onEditFinished()
+									.data('event', null)
+									.dialog('close');
+						}
+					}
                 ],
 				open: function (event, ui) {
 					$(event.target).parent().find('.ui-dialog-titlebar-close .ui-button-text').html('');
+
+					var $btn = $('#dialog_event_button_delete');
+					if (!$btn.data('inited')) {
+						$btn.data('inited', true);
+						$btn
+								.prepend('<span style="float: left; margin-top: 10px;" class="ui-icon ui-icon-trash"></span>');
+
+						$btn = $('#dialog_event_button_cancel')
+								.prepend('<span style="float: left; margin-top: 10px;" class="ui-icon ui-icon-cancel"></span>');
+
+						$btn = $('#dialog_event_button_save')
+								.prepend('<span style="float: left; margin-top: 10px;" class="ui-icon ui-icon-check"></span>');
+					}
 				},
                 close: function (event) {
                     //that.main.saveConfig('object-edit-active',  $('#object-tabs').tabs('option', 'active'));
@@ -977,6 +990,7 @@
 						allDaySlot: false,
 						allDayDefault: false,
 						editable: true,
+						selectable: false,
 						events: function(start, end, timezone, callback) {
 							var result = [];
 							for (var e in events) {
@@ -1008,6 +1022,8 @@
 							}
 						},
 						eventAfterRender: function (fcEvent, element, view) {
+							$('<input />', { type: 'checkbox', id: 'cb' + fcEvent.id, value: fcEvent.id }).appendTo(element);
+							
 							element.data('fcEventId', fcEvent.id);
 
 							element.addClass('fc-event-exist').on('click', function() {
@@ -1042,30 +1058,23 @@
                             addDelta(event, delta, true);
                             writeSchedule(event, function () {
                                 if (copyKey) {
-                                    copyKey = false;
-                                    $('#calendar').fullCalendar('refetchEvents');
+									writeSchedule(copyKey, function () {
+										copyKey = null;
+										$('#calendar').fullCalendar('refetchEvents');
+									});
                                 }
 							});
 						},
                         eventDragStart: function (fcEvent, element, ui, view) {
                             if (!element.altKey) return;
+							var $uiE = $(element.target).parent();
+							$uiE.clone().insertAfter($uiE);
                             var event = getEventById(fcEvent.id);
 							event = JSON.parse(JSON.stringify(event));
 							event.native.id = new Date().getTime();
 							event._id = getNewEventName(event.native.id);
 							events[event._id] = event;
-
-                            var eClone = {
-                                id:    		event.native.id,
-                                start: 		moment(fcEvent.start),
-                                end:   		moment(fcEvent.end),
-                                allDay: 	false,
-                                durationEditable: event.native.type !== 'single',
-                                title: 		fcEvent.title,
-                                enabled: 	event.common.enabled
-                            };
-                            copyKey = true;
-                            //$('#calendar').fullCalendar('renderEvent', eClone);
+                            copyKey = event;
                         },
 						eventResize: function (fcEvent, delta, revertFunc, jsEvent, ui, view) {
 							var event = getEventById(fcEvent.id);
@@ -1187,39 +1196,6 @@
 		});
 
 		$('#events_bin').hide();
-		/*$('#events_bin').droppable({
-			accept: '.fc-event-exist',
-			drop: function (uiEvent, ui) {
-				console.log('a');
-				var event = ui.helper.data('event');
-				$('#calendar').fullCalendar('removeEvents', event.id);
-				ui.helper.data('event', null);
-				ui.draggable.remove();
-			}
-		});*/
-
-		/* initialize the calendar
-		-----------------------------------------------------------------*/
-
-		/*
-		 {"id":"1","playingfield_id":"1",
-		 "dow":null,
-		 "when":null,
-		 "start":"10:00:00",
-		 "end":"14:00:00",
-
-		 rendering:"background"},
-		 {"id":"2","playingfield_id":"1","dow":"6","when":null,"start":"14:00:00","end":"15:00:00", rendering:"background"},
-		 {"id":"3","playingfield_id":"1",
-		 "dow":null,
-		 "when":"2015-05-05",
-		 "start":"15:00:00",
-		 "end":"16:00:00",
-		 rendering:"background"}
-
-		 */
-
-
 	});
 
 </script>
@@ -1255,7 +1231,7 @@
 		float: left;
 		width: 150px;
 		padding: 0 10px;
-		height: 280px;
+		height: 300px;
 		border: 1px solid #ccc;
 		background: #eee;
 		text-align: left;
@@ -1289,6 +1265,16 @@
 		width: calc(100% - 200px);
 	}
 
+	#dialog_event_button_delete {
+		background: #ff8383;
+		color: #212121;
+	}
+
+	#dialog_event_button_save {
+		background: #53bf76;
+		color: #212121;
+	}
+
 	#events_bin {
 		width: 100%;
 		height: 100%;
@@ -1310,7 +1296,7 @@
 	<div id="wrap">
 
 		<div id="flow-tab">
-			<table style="width: 100%; height: 200px">
+			<table style="width: 100%; height: 100%">
 				<tr><td id="external-events" style="width: 100%">
 					<h4 class="translate">Events</h4>
 					<div class="fc-event translate" data-type="single">Single event</div>
@@ -1323,6 +1309,10 @@
 						<label>drop here to delete</label>
 					</div>
 				</td></tr-->
+				<tr style="width: 100%"><td>
+
+				</td></tr>
+				<tr><td class="translate">Instruction</td></tr>
 			</table>
 		</div>
 
