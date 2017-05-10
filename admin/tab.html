@@ -25,7 +25,7 @@
 <script type="text/javascript" src="adapter-settings.js"></script>
 
 <script type="text/javascript" src="lib/moment.min.js"></script>
-<script type="text/javascript" src="lib/fullcalendar.min.js"></script>
+<script type="text/javascript" src="lib/fullcalendar.js"></script>
 <script type="text/javascript" src="lib/locale-all.js"></script>
 <script type="text/javascript" src="lib/later.min.js"></script>
 <script type="text/javascript" src="utils.js"></script>
@@ -130,8 +130,18 @@
     function addDeltaToDuration(event, delta) {
         if (delta._milliseconds !== 0) {
             // daily
-            event.native.duration = event.native.duration || 0;
-            event.native.duration += delta._milliseconds / 1000;
+			if (!event.native.intervals) {
+				event.native.intervals = [
+					{
+						timeOffset: event.native.duration || 1800,
+						value: event.native.endValue || null
+					}
+				];
+				delete event.native.endValue;
+				delete event.native.duration;
+			}
+            event.native.intervals[0].timeOffset = event.native.intervals[0].timeOffset || 0;
+			event.native.intervals[0].timeOffset += delta._milliseconds;
         }
     }
 
@@ -237,28 +247,33 @@
         } else {
             event.native.startValue = $dialog.find('#dialog_event_start_value').val();
         }
+		var endValue = null;
         if (event.native.type !== 'single') {
             if ($dialog.find('#dialog_event_end_value_checkbox').is(':visible')) {
-                event.native.endValue = $dialog.find('#dialog_event_end_value_checkbox').prop('checked');
+                endValue = $dialog.find('#dialog_event_end_value_checkbox').prop('checked');
             } else if ($dialog.find('#dialog_event_end_value').is(':visible')) {
-                event.native.endValue = $dialog.find('#dialog_event_end_value').val();
+                endValue = $dialog.find('#dialog_event_end_value').val();
             }  else if ($dialog.find('#dialog_event_end_value_select').is(':visible')) {
-                event.native.endValue = $dialog.find('#dialog_event_end_value_select').val();
+                endValue = $dialog.find('#dialog_event_end_value_select').val();
             } else {
-                event.native.endValue = $dialog.find('#dialog_event_end_value').val();
+                endValue = $dialog.find('#dialog_event_end_value').val();
             }
+			event.native.intervals = [
+				{
+					timeOffset: parseInt($dialog.find('#dialog_event_duration').val(), 10) * 60000,
+					value: endValue
+				}
+			];
 		} else {
-            if (event.native.endValue !== undefined) delete event.native.endValue;
+			if (event.native.intervals !== undefined) delete event.native.intervals;
 		}
 
 		event.native.type       = $dialog.find('#dialog_event_type').val();
 		event.common.enabled    = $dialog.find('#dialog_event_enabled').prop('checked');
 
-		if (event.native.type !== 'single') {
-			event.native.duration = parseInt($dialog.find('#dialog_event_duration').val(), 10) * 60;
-		} else {
-			if (event.native.duration !== undefined) delete event.native.duration;
-		}
+		// compatibility
+		if (event.native.duration !== undefined) delete event.native.duration;
+		if (event.native.endValue !== undefined) delete event.native.endValue;
 
 		event.common.name = $dialog.find('#dialog_event_title').val();
 
@@ -717,7 +732,7 @@
 		$dialog.find('#dialog_event_interval').val(event.native.interval || '1');
 		$dialog.find('#dialog_event_interval_unit').val(event.native.unit || 'h');
 
-        $dialog.find('#dialog_event_duration').val((event.native.duration || 1800) / 60);
+        $dialog.find('#dialog_event_duration').val((getEventDuration(event) || 1800) / 60);
 
 		if (event.native.cron) {
 			var cron = cron2obj(event.native.cron);
@@ -776,6 +791,13 @@
 		}
 	}
 
+	function getEventDuration(event) {
+		if (event.native.intervals && event.native.intervals.length) {
+			return event.native.intervals[event.native.intervals.length - 1].timeOffset;
+		} else {
+			return 0;
+		}
+	}
 	function generateEvents(event, start, end) {
 		var result    = [];
 		var startDate = new Date(start.toISOString());
@@ -791,8 +813,8 @@
 				for (var r = 0; r < dates.length; r++) {
 					_start = new Date(dates[r]);
 					_end   = new Date(_start);
-					if (event.native.type === 'single' && event.native.duration) delete event.native.duration;
-					_end.setSeconds(_end.getSeconds() + (event.native.duration || 1800));
+					if (event.native.type === 'single' && event.native.intervals) delete event.native.intervals;
+					_end.setSeconds(_end.getSeconds() + ((getEventDuration(event) / 1000) || 1800));
 					result.push({
 						id: 	event.native.id,
 						start: 	toLocalTime(dates[r]),
@@ -807,7 +829,7 @@
 		} else {
 			_start = parseISOLocal(event.native.start);
             _end = new Date(_start);
-            _end.setSeconds(_end.getSeconds() + (event.native.duration || 1800));
+            _end.setSeconds(_end.getSeconds() + ((getEventDuration(event) / 1000) || 1800));
 
 			if ((        startDate.getTime() <= _start.getTime() && _start.getTime() < endDate.getTime()) ||
 				(_end && startDate.getTime() <= _end.getTime()   && _end.getTime()   < endDate.getTime())
@@ -968,6 +990,41 @@
 
 		loadSystemConfig(function () {
 			if (typeof translateAll === 'function') translateAll();
+
+
+			/* initialize the external events
+			 ----------------------------------------------------------------- */
+			$('#external-events .fc-event').each(function() {
+
+				if ($(this).data('type') === 'single') {
+					// store data so the calendar knows to render an event upon drop
+					$(this).data('event', {
+						durationEditable: false,
+						defaultTimedEventDuration: '00:30:00',
+						title: _($.trim($(this).text())), // use the element's text as the event title
+						stick: true, // maintain when user navigates (see docs on the renderEvent method),
+						type: 'single',
+						allDay: false
+					});
+				} else {
+					// store data so the calendar knows to render an event upon drop
+					$(this).data('event', {
+						title: _($.trim($(this).text())), // use the element's text as the event title
+						defaultTimedEventDuration: '00:30:00',
+						stick: true, // maintain when user navigates (see docs on the renderEvent method),
+						type: $(this).data('type'),
+						allDay: false
+					});
+				}
+
+				// make the event draggable using jQuery UI
+				$(this).draggable({
+					zIndex: 999,
+					revert: true,      // will cause the event to go back to its
+					revertDuration: 0  // original position after the drag
+				});
+			});
+
 			readSchedules(function (err, _events) {
 				events = _events;
 				readAllObjects(function () {
@@ -986,7 +1043,7 @@
 							right: 'month,agendaWeek,agendaDay,listMonth'
 						},
 						timezone: 'local',
-						locale: 'de',
+						locale: systemLang,
 						allDaySlot: false,
 						allDayDefault: false,
 						editable: true,
@@ -1022,9 +1079,10 @@
 							}
 						},
 						eventAfterRender: function (fcEvent, element, view) {
-							$('<input />', { type: 'checkbox', id: 'cb' + fcEvent.id, value: fcEvent.id }).appendTo(element);
+							//$('<input />', { type: 'checkbox', id: 'cb' + fcEvent.id, value: fcEvent.id }).appendTo(element);
 							
 							element.data('fcEventId', fcEvent.id);
+							element.data('fcEvent_Id', fcEvent._id);
 
 							element.addClass('fc-event-exist').on('click', function() {
 								var touchtime = $(this).data('touchtime');
@@ -1033,10 +1091,13 @@
 								} else {
 									//compare first click to this click and see if they occurred within double click threshold
 									if (((new Date().getTime()) - touchtime) < 800) {
+										var $div = $(this);
 										showEditDialog(getEventById($(this).data('fcEventId')), function (err, event) {
 											if (err === 'delete') {
 												delete events[event._id];
 												deleteSchedule(event, function (err) {
+													$('#calendar').fullCalendar('removeEvents', [$div.data('fcEvent_Id')]);
+													$div.remove();
 													$('#calendar').fullCalendar('refetchEvents');
 												});
 											} else if (event) {
@@ -1123,7 +1184,12 @@
 								native: {
 									id: 			  fcEvent.id,
 									start: 			  toLocalTime(new Date(fcEvent.start.toISOString())),
-									duration: 		  Math.round((new Date(fcEvent.end.toISOString()).getTime() - new Date(fcEvent.start.toISOString()).getTime()) / 1000),
+									intervals: 		  [
+										{
+											timeOffset: new Date(fcEvent.end.toISOString()).getTime() - new Date(fcEvent.start.toISOString()).getTime(),
+											value: null
+										}
+									],
 									type: 			  fcEvent.type,
 									durationEditable: fcEvent.durationEditable
 								},
@@ -1162,39 +1228,6 @@
 			}
 		}
 
-		/* initialize the external events
-		-----------------------------------------------------------------*/
-
-		$('#external-events .fc-event').each(function() {
-
-			if ($(this).data('type') === 'single') {
-				// store data so the calendar knows to render an event upon drop
-				$(this).data('event', {
-					durationEditable: false,
-					defaultTimedEventDuration: '00:30:00',
-					title: $.trim($(this).text()), // use the element's text as the event title
-					stick: true, // maintain when user navigates (see docs on the renderEvent method),
-					type: 'single',
-					allDay: false
-				});
-			} else {
-				// store data so the calendar knows to render an event upon drop
-				$(this).data('event', {
-					title: $.trim($(this).text()), // use the element's text as the event title
-					stick: true, // maintain when user navigates (see docs on the renderEvent method),
-					type: $(this).data('type'),
-					allDay: false
-				});
-			}
-
-			// make the event draggable using jQuery UI
-			$(this).draggable({
-				zIndex: 999,
-				revert: true,      // will cause the event to go back to its
-				revertDuration: 0  // original position after the drag
-			});
-		});
-
 		$('#events_bin').hide();
 	});
 
@@ -1210,7 +1243,7 @@
 		text-align: center;
 	}
 	.dialog-event-input {
-		width: 80px;
+		width: 100px;
 	}
 	#wrap {
 		width: calc(80% - 200px);/*1200px;*/

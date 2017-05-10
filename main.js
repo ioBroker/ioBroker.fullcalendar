@@ -40,7 +40,7 @@ function executeEvent(event, now) {
             adapter.log.warn('Object "' + event.native.oid + '" does not exist!');
             return;
         }
-        if (event.native.type !== 'single') {
+        if (event.native.type !== 'single' && event.native.intervals && event.native.intervals.length) {
             event.timer = setTimeout(function (_event, _obj) {
                 if (_event.native.type === 'toggle') {
                     var value = _event.native.startValue;
@@ -64,33 +64,33 @@ function executeEvent(event, now) {
                     adapter.setForeignState(_obj._id, value);
                 } else {
                     if (_obj.common.type === 'number') {
-                        if (_event.native.endValue !== 'number') {
-                            _event.native.endValue = parseFloat(_event.native.endValue);
+                        if (typeof event.native.intervals[0].value !== 'number') {
+                            event.native.intervals[0].value = parseFloat(_event.native.endValue);
                         }
                     } else if (obj.common.type === 'boolean') {
-                        if (_event.native.endValue !== 'boolean') {
-                            _event.native.endValue = _event.native.endValue === 'true' || _event.native.endValue === '1' || _event.native.endValue === 1 || _event.native.endValue === 'on' || _event.native.endValue === 'ON';
+                        if (typeof _event.native.intervals[0].value !== 'boolean') {
+                            event.native.intervals[0].value = event.native.intervals[0].value === 'true' || event.native.intervals[0].value === '1' || event.native.intervals[0].value === 1 || event.native.intervals[0].value === 'on' || event.native.intervals[0].value === 'ON';
                         }
                     } else if (obj.common.type === 'string') {
-                        if (_event.native.endValue !== 'string') {
-                            _event.native.endValue = _event.native.endValue.toString();
+                        if (typeof event.native.intervals[0].value !== 'string') {
+                            event.native.intervals[0].value = event.native.intervals[0].value.toString();
                         }
                     }
-                    adapter.setForeignState(_obj._id, _event.native.endValue);
+                    adapter.setForeignState(_obj._id, event.native.intervals[0].value);
                 }
-            }, parseFloat(event.native.duration) * 1000, event, obj)
+            }, parseInt(event.native.intervals[0].timeOffset, 10), event, obj)
         }
 
         if (obj.common.type === 'number') {
-            if (event.native.startValue !== 'number') {
+            if (typeof event.native.startValue !== 'number') {
                 event.native.startValue = parseFloat(event.native.startValue);
             }
         } else if (obj.common.type === 'boolean') {
-            if (event.native.startValue !== 'boolean') {
+            if (typeof event.native.startValue !== 'boolean') {
                 event.native.startValue = event.native.startValue === 'true' || event.native.startValue === '1' || event.native.startValue === 1 || event.native.startValue === 'on' || event.native.startValue === 'ON';
             }
         } else if (obj.common.type === 'string') {
-            if (event.native.startValue !== 'string') {
+            if (typeof event.native.startValue !== 'string') {
                 event.native.startValue = event.native.startValue.toString();
             }
         }
