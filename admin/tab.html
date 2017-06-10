@@ -5,7 +5,7 @@
 <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
 <!--link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/-->
 <link rel="stylesheet" type="text/css" href="lib/fullcalendar.min.css"  />
-	<link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css"/>
 <!--link rel="stylesheet" type="text/css" href="lib/gentleSelect/jquery-gentleSelect.css" /-->
 <!--link rel="stylesheet" type="text/css" href="lib/cron/jquery-cron.css" /-->
 
@@ -25,7 +25,7 @@
 <script type="text/javascript" src="adapter-settings.js"></script>
 
 <script type="text/javascript" src="lib/moment.min.js"></script>
-<script type="text/javascript" src="lib/fullcalendar.js"></script>
+<script type="text/javascript" src="lib/fullcalendar.min.js"></script>
 <script type="text/javascript" src="lib/locale-all.js"></script>
 <script type="text/javascript" src="lib/later.min.js"></script>
 <script type="text/javascript" src="utils.js"></script>
@@ -328,13 +328,14 @@
 			cron.dows = '?';
 			event.native.cron = obj2cron(cron);
 		} else {
-			if (event.native.cron) delete event.native.cron;
 			if (!event.native.start) {
 				// cron to time
 				var cron = later.parse.cron(event.native.cron);
 				var dates = later.schedule(cron).next(1);
 				event.native.start = toLocalTime(dates || new Date());
 			}
+			
+            if (event.native.cron) delete event.native.cron;
 
 			var b = event.native.start.split(/\D/);
 			b[3] = padding(time[0]);
