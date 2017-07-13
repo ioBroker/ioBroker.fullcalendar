@@ -1,8 +1,13 @@
 {
     "common": {
         "name":         "fullcalendar",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "news": {
+            "0.1.1": {
+                "en": "fix double event by creation",
+                "de": "Korrigiert Doppel-Event",
+                "ru": "Исправлено появление 2х событий"
+            },
             "0.1.0": {
               "en": "initial commit",
               "de": "initial Commit",
