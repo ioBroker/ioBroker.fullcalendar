@@ -29,6 +29,7 @@
 <script type="text/javascript" src="lib/locale-all.js"></script>
 <script type="text/javascript" src="lib/later.min.js"></script>
 <script type="text/javascript" src="utils.js"></script>
+<script type="text/javascript" src="suncalc.js"></script>
 <script>
 
 	var config = {};
@@ -71,6 +72,7 @@
 					cron.dows.sort(sortNumbers);
 				}
 			}
+
 			if (delta._milliseconds !== 0) {
 				var hours   = parseInt(Math.floor(delta._milliseconds / 3600000), 10);
 				var minutes = parseInt(Math.floor(delta._milliseconds / 60000) % 60, 10);
@@ -113,9 +115,16 @@
 			event.native.cron = obj2cron(cron);
 		} else {
 			var date = parseISOLocal(event.native.start);
+			var originalDate;
+
+			if (event.native.astro) {
+                originalDate = getAstroTime(event.native.astro, event.native.offset, date);
+                date = new Date(originalDate);
+            }
+
 			// date
 			if (delta._days !== 0) {
-				date.setDate(date.getDate(delta._days));
+				date.setDate(date.getDate() + delta._days);
 			}
 			if (delta._milliseconds !== 0) {
 				date.setMinutes(date.getMinutes() + Math.round(delta._milliseconds / 60000));
@@ -123,7 +132,13 @@
 			if (delta._months !== 0) {
 				date.setMonth(date.getMonth() + delta._months);
 			}
-			event.native.start = toLocalTime(date);
+            event.native.start = toLocalTime(date);
+            if (event.native.astro) {
+                var offset = Math.round(((date.getTime() - originalDate.getTime()) % (360000 * 24)) / 60000);
+                event.native.offset += offset;
+                event.native.start = event.native.start.replace(/T\d\d:\d\d:\d\d$/, 'T00:00:00');
+                return !!offset;
+            }
 		}
 	}
 
@@ -279,8 +294,8 @@
         var time;
 		if ($dialog.find('#dialog_event_time_type').val() === 'astro') {
             event.native.astro = $dialog.find('#dialog_event_time_astro').val();
-            event.native.offset = $dialog.find('#dialog_event_time').val();
-            time = '00:00';
+            event.native.offset = parseInt($dialog.find('#dialog_event_time').val(), 10) || 0;
+            time = ['00', '00'];
         } else {
 		    delete event.native.astro;
 		    delete event.native.offset;
@@ -357,6 +372,27 @@
 
 		return $dialog;
 	}
+
+	function showAstroTime() {
+        var $dialog = $('#dialog_event');
+	    if ($dialog.find('#dialog_event_time_type').val() === 'astro') {
+            var event = $dialog.data('event');
+            var astro = $dialog.find('#dialog_event_time_astro').val();
+            var offset = $dialog.find('#dialog_event_time').val();
+            var date;
+            if (event.native.cron) {
+                date = new Date($dialog.data('date'));
+                date.setHours(0);
+                date.setMinutes(0);
+                date.setSeconds(0);
+                date.setMilliseconds(0);
+            } else {
+                date = parseISOLocal(event.native.start);
+            }
+            var time = getAstroTime(astro, parseInt(offset, 10) || 0, date);
+            $dialog.find('#dialog_event_time_astro_value').text(time.toLocaleTimeString());
+        }
+    }
 
     function initEditDialog() {
         var $dialog = $('#dialog_event');
@@ -480,14 +516,32 @@
 			});
 			$dialog.find('#dialog_event_time_type').change(function () {
 			    var val = $(this).val();
+			    var $time = $('#dialog_event_time');
                 if (val === 'astro') {
                     $dialog.find('#dialog_event_time_astro').show();
                     $dialog.find('#dialog_event_time_astro_label').show();
+                    $dialog.find('#dialog_event_time_astro_value').show();
+                    if (!$time.data('val')) {
+                        $time.data('val', $time.val());
+                    }
+
+                    $time.val(0);
+                    showAstroTime();
                 } else {
+                    if ($time.data('val')) {
+                        $time.val($time.data('val'));
+                    } else {
+                        $time.val('09:00');
+                    }
                     $dialog.find('#dialog_event_time_astro').hide();
                     $dialog.find('#dialog_event_time_astro_label').hide();
+                    $dialog.find('#dialog_event_time_astro_value').hide();
                 }
             });
+            $dialog.find('#dialog_event_time').change(showAstroTime).keyup(function () {
+                $(this).trigger('change');
+            });
+            $dialog.find('#dialog_event_time_astro').change(showAstroTime);
         }
 
         return $dialog;
@@ -724,9 +778,10 @@
 		}
 	}
 
-	function showEditDialog(event, callback) {
+	function showEditDialog(event, date, callback) {
         var $dialog = initEditDialog();
         $dialog.data('event', event);
+        $dialog.data('date', date);
 
 		var width  = 870;
 		var height = 450;
@@ -753,6 +808,8 @@
 		$dialog.find('#dialog_event_interval_unit').val(event.native.unit || 'h');
 
         $dialog.find('#dialog_event_duration').val((getEventDuration(event) || 1800) / 60);
+        // prepare
+        $dialog.find('#dialog_event_time').data('val', null);
 
 		if (event.native.cron) {
 			var cron = cron2obj(event.native.cron);
@@ -776,8 +833,10 @@
 			}
 
 			if (event.native.astro) {
+                $dialog.find('#dialog_event_time_astro').val(event.native.astro);
 			    $dialog.find('#dialog_event_time_type').val('astro').trigger('change');
                 $dialog.find('#dialog_event_time').val(event.native.offset || 0);
+                showAstroTime();
             } else {
                 $dialog.find('#dialog_event_time_type').val('time').trigger('change');
                 $dialog.find('#dialog_event_time').val(padding(cron.hours[0]) + ':' + padding(cron.minutes[0]) + (cron.seconds[0] !== 0 ? ':' + padding(cron.seconds[0]) : ''));
@@ -789,13 +848,17 @@
 			var b = event.native.start.split(/\D/);
 			$dialog.find('#dialog_event_period').val('once');
             if (event.native.astro) {
+                $dialog.find('#dialog_event_time_astro').val(event.native.astro);
                 $dialog.find('#dialog_event_time_type').val('astro').trigger('change');
                 $dialog.find('#dialog_event_time').val(event.native.offset || 0);
+                showAstroTime();
             } else {
                 $dialog.find('#dialog_event_time_type').val('time').trigger('change');
                 $dialog.find('#dialog_event_time').val(b[3] + ':' + b[4] + (b[5] !== '00' ? ':' + b[5] : ''));
             }
 		}
+        // set to 0 after init of value
+        $dialog.find('#dialog_event_time').data('val', null);
 
 		$dialog.find('#dialog_event_period_type').val(event.native.periodType || 'daily');
 
@@ -808,20 +871,27 @@
 	}
 
 	function getEventName(event, ignoreExisting) {
+	    var name = '';
 		if (!ignoreExisting && event.common.name) {
-			return event.common.name;
+            name = event.common.name;
 		} else  {
 			var common = objects[event.native.oid] ? objects[event.native.oid].common : {};
 			if (event.native.oid && event.native.startValue !== '') {
-				return _('Set %s to %s', common.name || event.native.oid, event.native.startValue + (common.unit || ''));
+                name = _('Set %s to %s', common.name || event.native.oid, event.native.startValue + (common.unit || ''));
 			} else if (event.native.oid) {
-				return _('Set %s', common.name || event.native.oid);
+                name = _('Set %s', common.name || event.native.oid);
 			} else if (event.native.startValue !== '' && event.native.startValue !== undefined && event.native.startValue !== null) {
-				return _('Set to %s', event.native.startValue);
+                name = _('Set to %s', event.native.startValue);
 			} else {
-				return _('No action');
+                name = _('No action');
 			}
 		}
+
+		if (event.native.astro) {
+            name += ' [' + _(event.native.astro) + (event.native.offset ? ' ' + (event.native.offset > 0 ? '+' : '') + event.native.offset : '') + ']';
+        }
+
+		return name;
 	}
 
 	function getEventDuration(event) {
@@ -831,6 +901,16 @@
 			return 0;
 		}
 	}
+
+	function getAstroTime(astro, offset, date) {
+        date.setMinutes(-date.getTimezoneOffset());
+        var times = SunCalc.getTimes(date, systemConfig.common.latitude, systemConfig.common.longitude);
+        date = times[astro];
+        if (offset) {
+            date.setMinutes(date.getMinutes() + offset);
+        }
+        return date;
+    }
 
 	function generateEvents(event, start, end) {
 		var result    = [];
@@ -846,12 +926,17 @@
 			if (dates) {
 				for (var r = 0; r < dates.length; r++) {
 					_start = new Date(dates[r]);
+
+                    if (event.native.astro) {
+                        _start = getAstroTime(event.native.astro, event.native.offset, _start);
+                    }
+
 					_end   = new Date(_start);
 					if (event.native.type === 'single' && event.native.intervals) delete event.native.intervals;
 					_end.setSeconds(_end.getSeconds() + ((getEventDuration(event) / 1000) || 1800));
 					result.push({
 						id: 	event.native.id,
-						start: 	toLocalTime(dates[r]),
+						start: 	toLocalTime(_start),
 						end:	toLocalTime(_end),
 						allDay: false,
 						durationEditable: event.native.type !== 'single',
@@ -862,6 +947,9 @@
 			}
 		} else {
 			_start = parseISOLocal(event.native.start);
+			if (event.native.astro) {
+                _start = getAstroTime(event.native.astro, event.native.offset, _start);
+            }
             _end = new Date(_start);
             _end.setSeconds(_end.getSeconds() + ((getEventDuration(event) / 1000) || 1800));
 
@@ -870,7 +958,7 @@
             ) {
 				result.push({
 					id: 	          event.native.id,
-					start: 	          event.native.start,
+					start: 	          toLocalTime(_start),
                     end:	          toLocalTime(_end),
 					allDay:           false,
 					durationEditable: event.native.type !== 'single',
@@ -1025,10 +1113,9 @@
 		loadSystemConfig(function () {
 			if (typeof translateAll === 'function') translateAll();
 
-
 			/* initialize the external events
 			 ----------------------------------------------------------------- */
-			$('#external-events .fc-event').each(function() {
+			$('#external-events').find('.fc-event').each(function() {
 
 				if ($(this).data('type') === 'single') {
 					// store data so the calendar knows to render an event upon drop
@@ -1117,6 +1204,7 @@
 							
 							element.data('fcEventId', fcEvent.id);
 							element.data('fcEvent_Id', fcEvent._id);
+							element.data('date', fcEvent._start.toDate().toISOString());
 
 							element.addClass('fc-event-exist').on('click', function() {
 								var touchtime = $(this).data('touchtime');
@@ -1126,7 +1214,7 @@
 									//compare first click to this click and see if they occurred within double click threshold
 									if (((new Date().getTime()) - touchtime) < 800) {
 										var $div = $(this);
-										showEditDialog(getEventById($(this).data('fcEventId')), function (err, event) {
+										showEditDialog(getEventById($div.data('fcEventId')), $div.data('date'), function (err, event) {
 										    var $calendar = $('#calendar');
 											if (err === 'delete') {
 												delete events[event._id];
@@ -1152,13 +1240,16 @@
 						},
 						eventDrop: function (fcEvent, delta, revertFunc, jsEvent, ui, view) {
 							var event = getEventById(fcEvent.id);
-                            addDelta(event, delta, true);
+                            var isUpdate = addDelta(event, delta, true);
                             writeSchedule(event, function () {
                                 if (copyKey) {
 									writeSchedule(copyKey, function () {
 										copyKey = null;
-										$('#calendar').fullCalendar('refetchEvents');
+                                        $('#calendar').fullCalendar('removeEvents').fullCalendar('refetchEvents');
 									});
+                                } else if (isUpdate) {
+                                    fcEvent.title = getEventName(event);
+                                    $('#calendar').fullCalendar('updateEvent', fcEvent);
                                 }
 							});
 						},
@@ -1399,7 +1490,7 @@
 			<tr>
 				<td><label class="translate" for="dialog_event_time">Time</label></td>
 				<td>
-                    <!--select id="dialog_event_time_type">
+                    <select id="dialog_event_time_type">
                         <option value="time" class="translate">time</option>
                         <option value="astro" class="translate">astro</option>
                     </select>
@@ -1419,8 +1510,9 @@
                         <option value="dawn"          class="translate">dawn</option>
                         <option value="nadir"         class="translate">nadir</option>
                     </select>
-                    <span id="dialog_event_time_astro_label">Offset</span-->
+                    <span id="dialog_event_time_astro_label">Offset</span>
                     <input id="dialog_event_time" class="dialog-event-input" type="text" maxlength="8"/>
+                    <span id="dialog_event_time_astro_value"></span>
                 </td>
 			</tr>
 			<tr>

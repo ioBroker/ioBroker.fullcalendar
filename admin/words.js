@@ -13,7 +13,7 @@ var systemDictionary = {
     "Start value":      {"en": "Start value",   "de": "Startwert",              "ru": "Значение"},
     "End value":        {"en": "End value",     "de": "Endwert",                "ru": "Конечное значение"},
     "Period":           {"en": "Period",        "de": "Period",                 "ru": "Повтор"},
-    "once":             {"en": "once",          "de": "einmalig",               "ru": "единожды"},
+    "once":             {"en": "once",          "de": "einmalig",               "ru": "один раз"},
     "daily":            {"en": "daily",         "de": "taglich",                "ru": "ежедневно"},
     "monthly":          {"en": "monthly",       "de": "monatlich",              "ru": "ежемесячно"},
     "Instruction":      {

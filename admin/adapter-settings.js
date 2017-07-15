@@ -146,7 +146,7 @@ function saveSettings(native, common, callback) {
 function loadSystemConfig(callback) {
     socket.emit('getObject', 'system.config', function (err, res) {
         if (!err && res && res.common) {
-            systemLang = res.common.language || systemLang;
+            systemLang   = res.common.language || systemLang;
             systemConfig = res;
         }
         socket.emit('getObject', 'system.certificates', function (err, res) {
@@ -154,7 +154,7 @@ function loadSystemConfig(callback) {
                 if (res.native && res.native.certificates) {
                     certs = [];
                     for (var c in res.native.certificates) {
-                        if (!res.native.certificates[c]) continue;
+                        if (res.native.certificates.hasOwnProperty(c) && !res.native.certificates[c]) continue;
                         var _cert = {
                             name: c,
                             type: (res.native.certificates[c].substring(0, '-----BEGIN RSA PRIVATE KEY'.length) === '-----BEGIN RSA PRIVATE KEY' || res.native.certificates[c].substring(0, '-----BEGIN PRIVATE KEY'.length) === '-----BEGIN PRIVATE KEY') ? 'private' : 'public'
