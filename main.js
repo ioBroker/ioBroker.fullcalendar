@@ -8,11 +8,25 @@ var utils     = require(__dirname + '/lib/utils'); // Get common adapter utils
 var timeUtils = require(__dirname + '/admin/utils.js');
 var adapter   = new utils.Adapter('fullcalendar');
 var later     = require('later');
+var SunCalc   = require(__dirname + '/admin/suncalc.js');
 var events;
 var nextTimer;
+var systemConfig;
 
 adapter.on('objectChange', function (id, obj) {
     if (!id) return;
+
+    if (id === 'system.config') {
+        if (obj) systemConfig = obj;
+
+        if (systemConfig.common.latitude  === undefined || systemConfig.common.latitude  === null ||
+            systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
+            adapter.log.warn('Please specify longitude and latitude in system settings, elsewise astro events will not work');
+        }
+
+        calculateNext();
+        return;
+    }
 
     if (events[id]) {
         stopEvent(events[id]);
@@ -34,6 +48,7 @@ function stopEvent(event) {
 }
 
 function executeEvent(event, now) {
+    adapter.log.debug('executeEvent[' + event.common.name + ']: ' + JSON.stringify(event.native));
     event.lastExec = now || new Date().getTime();
     adapter.getForeignObject(event.native.oid, function (err, obj) {
         if (!obj) {
@@ -119,12 +134,22 @@ function calculateNext() {
         // if daily
         if (event.native.cron) {
             if (!event.parsed) {
-                event.parsed = later.parse.cron(event.native.cron);
+                if (event.native.astro) {
+                    // take last second of this day
+                    event.parsed = later.parse.cron(event.native.cron.replace(/^\d\d? \d\d? /, '59 59 23 '), true);
+                } else {
+                    event.parsed = later.parse.cron(event.native.cron);
+                }
             }
             var date = later.schedule(event.parsed).next();
 
+            if (event.native.astro) {
+                date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig);
+            }
+
             if (date) {
-                if (date.getTime() - nowTick < 2000) {
+                diff = date.getTime() - nowTick;
+                if (diff >= -2000 && diff < 2000) {
                     executeEvent(event, nowTick);
                     date = later.schedule(event.parsed).next(1, new Date(nowTick + 2000));
                 }
@@ -139,10 +164,25 @@ function calculateNext() {
             }
         } else { // once
             // expected 2017-09-12T12:12:00
-            if (event.native.start === nowStr && (!event.lastExec || nowTick - event.lastExec > 1999)) {
+            var time;
+            if (event.native.astro) {
+                time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig);
+            } else {
+                time = timeUtils.parseISOLocal(event.native.start);
+            }
+
+            if (!time) continue;
+
+            if (nowObj.getFullYear() === time.getFullYear() &&
+                nowObj.getMonth()    === time.getMonth()    &&
+                nowObj.getDate()     === time.getDate()     &&
+                nowObj.getHours()    === time.getHours()    &&
+                nowObj.getMinutes()  === time.getMinutes()  &&
+                (Math.abs(nowObj.getSeconds() - time.getSeconds()) < 2) &&
+                (!event.lastExec || nowTick - event.lastExec > 1999)) {
                 executeEvent(event, nowTick);
             } else {
-                var time = timeUtils.parseISOLocal(event.native.start).getTime();
+                time = time.getTime();
 
                 diff = time - nowTick;
                 if (diff > 0 && (timeout === null || diff < timeout)) {
@@ -186,7 +226,16 @@ function main() {
                 events[res.rows[i].value._id] = checkEvent(res.rows[i].value);
             }
         }
-        adapter.subscribeObjects('*');
-        calculateNext();
+        adapter.getForeignObject('system.config', function (err, obj) {
+            systemConfig = obj;
+            if (systemConfig.common.latitude  === undefined || systemConfig.common.latitude  === null ||
+                systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
+                adapter.log.warn('Please specify longitude and latitude in system settings, elsewise astro events will not work');
+            }
+
+            adapter.subscribeObjects('*');
+            adapter.subscribeForeignObjects('system.config');
+            calculateNext();
+        });
     });
 }

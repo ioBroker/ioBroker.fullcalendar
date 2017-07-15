@@ -31,5 +31,24 @@ var systemDictionary = {
     "Set value":        {"en": "Set value",     "de": "Setze Wert",             "ru": "Установить значение"},
     "Set %s":           {"en": "Set %s",        "de": "Setze %s",               "ru": "Установить %s"},
     "Set %s to %s":     {"en": "Set %s to %s",  "de": "Setze %s zu %s",         "ru": "Установить %s в/на %s"},
-    "Set to %s":        {"en": "Set to %s",     "de": "Setze zu %s",            "ru": "Установить в/на %s"}
+    "Set to %s":        {"en": "Set to %s",     "de": "Setze zu %s",            "ru": "Установить в/на %s"},
+
+    "sunrise":          {'en': 'sunrise',       "de": 'Sonnenaufgang',          'ru': 'восход солнца'},
+    "sunriseEnd":       {'en': 'sunrise end',   "de": 'Sonnenaufgang-Ende',     'ru': 'конец восхода'},
+    "goldenHourEnd":    {'en': 'golden hour end',"de": '"Golden hour"-Ende',    'ru': 'конец золотого часа'},
+    "solarNoon":        {'en': 'solar noon',    "de": 'Sonnenmittag',           'ru': 'солнечеый полдень'},
+    "goldenHour":       {'en': 'golden hour',   "de": '"Golden hour"',          'ru': 'золотой час'},
+    "sunsetStart":      {'en': 'sunset start',  "de": 'Sonnenuntergang-Anfang', 'ru': 'начало захода солнца'},
+    "sunset":           {'en': 'sunset',        "de": 'Sonnenuntergang',        'ru': 'конец захода солнца'},
+    "dusk":             {'en': 'dusk',          "de": 'Abenddämmerung',         'ru': 'сумерки'},
+    "nauticalDusk":     {'en': 'nautical dusk', "de": 'Nautische Abenddämmerung', 'ru': 'навигационные сумерки'},
+    "night":            {'en': 'night',         "de": 'Nacht',                  'ru': 'ночь'},
+    "nightEnd":         {'en': 'night end',     "de": 'Nachtsende',             'ru': 'конец ночи'},
+    "nauticalDawn":     {'en': 'nautical dawn', "de": 'Nautische Morgendämmerung','ru': 'навигационный рассвет'},
+    "dawn":             {'en': 'dawn',          "de": 'Morgendämmerung',        'ru': 'рассвет'},
+    "nadir":            {'en': 'nadir',         "de": 'Nadir',                  'ru': 'надир'},
+
+    "time":             {"en": "time",          "de": "Zeit",                   "ru": "время"},
+    "astro":            {"en": "astro",         "de": "astro",                  "ru": "астро"},
+    "Offset":           {"en": "Offset in minutes", "de": "Offset in Minuten",   "ru": "Сдвиг в минутах"}
 };

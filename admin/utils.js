@@ -87,6 +87,26 @@ function getTime(date, time) {
 
     return date.getFullYear() + '-' + m + '-' + d + 'T' + time;
 }
+function getAstroTime(astro, offset, date, _SunCalc, _systemConfig) {
+    var _date = new Date(date);
+    _date.setHours(0);
+    _date.setMilliseconds(0);
+    _date.setSeconds(0);
+    _date.setMinutes(-_date.getTimezoneOffset());
+    _systemConfig = _systemConfig || systemConfig;
+
+    if (_systemConfig.common.latitude  === undefined || _systemConfig.common.latitude === null ||
+        _systemConfig.common.longitude === undefined || _systemConfig.common.longitude === null) {
+        return null;
+    }
+
+    var times = (_SunCalc || SunCalc).getTimes(_date, _systemConfig.common.latitude, _systemConfig.common.longitude);
+    _date = times[astro];
+    if (offset) {
+        _date.setMinutes(_date.getMinutes() + offset);
+    }
+    return _date;
+}
 
 if (typeof module !== 'undefined' && module.parent) {
     module.exports = {
@@ -96,6 +116,7 @@ if (typeof module !== 'undefined' && module.parent) {
         secondsToTime:     secondsToTime,
         getTime:           getTime,
         isTimeString:      isTimeString,
-        toLocalTimeString: toLocalTimeString
+        toLocalTimeString: toLocalTimeString,
+        getAstroTime:      getAstroTime
     };
 }
