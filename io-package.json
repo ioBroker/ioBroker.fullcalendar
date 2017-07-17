@@ -27,6 +27,7 @@
         "icon":         "fullcalendar.png",
         "mode":         "daemon",
         "keywords":     ["schedule", "calendar"],
+        "messagebox":   true,
         "extIcon":      "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
         "readme":       "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
         "loglevel":     "info",
@@ -37,11 +38,57 @@
         },
         "enabled":      true,
 		"type":         "script",
-        "noConfig":     true
+        "noConfig":     false,
+        "preserveSettings": "custom",
+        "supportCustoms":   true
     },
     "native": {
-
+        "debounce":  1000,
+        "changesRelogInterval":      0,
+        "ackType": "any",
+        "changesMinDelta": 0,
+        "allEventsEnabled": false,
+        "allEventsMax": 1000,
+        "allEventsSaveOnDisk": false,
+        "eventsPath": "calendar/",
+        "cfgEventsEnabled": true,
+        "cfgEventsMax": 1000,
+        "cfgEventsSaveOnDisk": false
     },
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.lastConfiguredEvent",
+            "type": "state",
+            "common": {
+                "role": "state",
+                "name": "Last configured event",
+                "type": "json",
+                "read": true,
+                "write": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.lastEvent",
+            "type": "state",
+            "common": {
+                "role": "state",
+                "name": "Any last event",
+                "type": "json",
+                "read": true,
+                "write": false
+            },
+            "native": {}
+        }
+    ],
     "objects": [
         {
             "_id":        "_design/schedule",
@@ -49,6 +96,15 @@
             "views": {
                 "schedule": {
                     "map": "function(doc) { if (doc.type === 'schedule') emit(doc.common.name, doc); }"
+                }
+            }
+        },
+        {
+            "_id": "_design/custom",
+            "language": "javascript",
+            "views": {
+                "state": {
+                    "map": "function (doc) { if (doc.type === 'state' && doc.common && doc.common.custom) emit(doc._id, doc.common.custom) }"
                 }
             }
         }
