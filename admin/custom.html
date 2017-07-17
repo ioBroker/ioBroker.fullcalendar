@@ -1,0 +1,100 @@
+<script type="text/x-iobroker" data-template-name="sql">
+    <div class="form-row">
+        <table style="font-size: 12px">
+            <tr>
+                <td class="translate">enabled</td>
+                <!-- this field is mandatory, just to find out if to include this settings or not -->
+                <td><input type="checkbox" data-field="enabled" data-default="false"></td>
+                <td style="width: 40px">&nbsp;</td>
+                <td class="translate">log changes only</td>
+                <td><input type="checkbox" data-field="changesOnly" data-default="true"></td>
+                <td class="translate">De-bounce interval(ms)</td>
+                <td><input type="number" data-field="debounce" min="500" max="86400000" data-default="10000"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="translate">log changes interval(s)</td>
+                <td><input type="number" data-field="changesRelogInterval" min="0" max="86400000" data-default="0"></td>
+                <td class="translate">0 = disable</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="translate">log changes minimal delta</td>
+                <td><input type="number" step="any" data-field="changesMinDelta" min="0" max="86400000" data-default="0"></td>
+                <td class="translate">0 = disable delta check</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="translate">Ack type:</td>
+                <td>
+                    <select data-field="ackType" data-default="31536000">
+                        <option value="any"         class="translate">any</option>
+                        <option value="false"       class="translate">command</option>
+                        <option value="true"        class="translate">update</option>
+                    </select>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</script>
+
+<!-- translations -->
+<script type="text/javascript">
+    systemDictionary = $.extend(systemDictionary, {
+        "enabled":                {"en": "enabled",               "de": "Aktiviert",                    "ru": "активно"},
+        "De-bounce interval(ms)": {"en": "De-bounce interval(ms)", "de": "Entprellzeit(ms)",            "ru": "Минимальный интервал(ms)"},
+        "log changes interval(s)": {
+            "en": "Log unchanged values any(s)",
+            "de": "Gleiche Werte aufzeichnen(s)",
+            "ru": "Запись неизменённых значений каждые (сек)"
+        },
+        "log changes minimal delta": {
+            "en": "Minimum difference from last value to log",
+            "de": "Minimale Abweichung vom letzten Wert für Aufzeichnung",
+            "ru": "Минимальная разница с последним записанным значением"
+        },
+        "0 = disable delta check": {
+            "en": "0 = disable delta check",
+            "de": "0 = Abweichungsprüfung deaktivieren",
+            "ru": "0 = не проверять минимальное изменение"
+        },
+        "log changes only":       {"en": "log changes only",      "de": "Nur Änderungen aufzeichnen",   "ru": "Только изменения"},
+        "0 = disable": {
+            "en": "0 = disable",
+            "de": "0 = Deaktivieren",
+            "ru": "0 = не активно"
+        },
+        "maximum datapoint count in RAM": {
+            "en": "maximum datapoint count in RAM",
+            "de": "maximale Anzahl Datenpunkte in RAM",
+            "ru": "макс. кол-во значений в RAM памяти"
+        }
+    });
+    // There are two ways how to predefine default settings:
+    // - with attribute "data-default" (content independent)
+    // - with function in global variable "defaults". Function name is equal with adapter name.
+    //   as input function receives object with all information concerning it
+    if (typeof defaults !== 'undefined') {
+        defaults.fullcalendar = function (obj, instanceObj) {
+            return {
+                enabled:              false,
+                changesOnly:          true,
+                debounce:             instanceObj.native.debounce,
+                ackType:              instanceObj.native.ackType,
+                changesRelogInterval: instanceObj.native.changesRelogInterval,
+                changesMinDelta:      instanceObj.native.changesMinDelta
+            };
+        }
+    }
+
+</script>
