@@ -1,4 +1,4 @@
-<script type="text/x-iobroker" data-template-name="sql">
+<script type="text/x-iobroker" data-template-name="fullcalendar">
     <div class="form-row">
         <table style="font-size: 12px">
             <tr>
@@ -33,14 +33,12 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td class="translate">Ack type:</td>
-                <td>
-                    <select data-field="ackType" data-default="31536000">
-                        <option value="any"         class="translate">any</option>
-                        <option value="false"       class="translate">command</option>
-                        <option value="true"        class="translate">update</option>
-                    </select>
-                </td>
+                <td class="translate">Ack type</td>
+                <td><select data-field="ackType" data-default="any">
+                    <option value="any"   class="translate">any</option>
+                    <option value="false" class="translate">command</option>
+                    <option value="true"  class="translate">update</option>
+                </select></td>
                 <td></td>
                 <td></td>
             </tr>
@@ -78,6 +76,26 @@
             "en": "maximum datapoint count in RAM",
             "de": "maximale Anzahl Datenpunkte in RAM",
             "ru": "макс. кол-во значений в RAM памяти"
+        },
+        "Ack type": {
+            "en": "Acknowledge type",
+            "de": "Bestätigungstyp",
+            "ru": "Команда или обновление"
+        },
+        "any": {
+            "en": "any",
+            "de": "beliebig",
+            "ru": "любая"
+        },
+        "command": {
+            "en": "command",
+            "de": "Kommando",
+            "ru": "Команда"
+        },
+        "update": {
+            "en": "update",
+            "de": "Update",
+            "ru": "Обновление"
         }
     });
     // There are two ways how to predefine default settings:
@@ -87,12 +105,12 @@
     if (typeof defaults !== 'undefined') {
         defaults.fullcalendar = function (obj, instanceObj) {
             return {
-                enabled:              false,
-                changesOnly:          true,
-                debounce:             instanceObj.native.debounce,
-                ackType:              instanceObj.native.ackType,
+                enabled:     false,
+                changesOnly: true,
+                ackType: instanceObj.native.ackType,
+                debounce:    instanceObj.native.debounce,
                 changesRelogInterval: instanceObj.native.changesRelogInterval,
-                changesMinDelta:      instanceObj.native.changesMinDelta
+                changesMinDelta: instanceObj.native.changesMinDelta
             };
         }
     }
