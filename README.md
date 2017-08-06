@@ -14,6 +14,9 @@ Schedules with [fullcalendar](https://fullcalendar.io)
 You can control your events with calender and plan to control them periodically.
 
 ## Changelog
+### 0.2.0 (2017-08-06)
+* (bluefox) Support of new admin
+
 ### 0.1.1 (2017-07-13)
 * (bluefox) fix double event by creation
 

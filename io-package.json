@@ -1,8 +1,13 @@
 {
     "common": {
         "name":         "fullcalendar",
-        "version": "0.1.1",
+        "version": "0.2.0",
         "news": {
+            "0.2.0": {
+                "en": "Support of new admin",
+                "de": "Unterstützung von neuen Admin",
+                "ru": "Поддержка нового admin"
+            },
             "0.1.1": {
                 "en": "fix double event by creation",
                 "de": "Korrigiert Doppel-Event",
@@ -36,6 +41,7 @@
             "name":                 "Calendar",
             "fa-icon":              "fa-calendar"
         },
+        "dependencies":             [{"admin": ">=2.0.0"}],
         "enabled":      true,
 		"type":         "script",
         "noConfig":     false,
