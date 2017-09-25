@@ -7,13 +7,18 @@ ioBroker.fullcalendar
 
 [![NPM](https://nodei.co/npm/iobroker.fullcalendar.png?downloads=true)](https://nodei.co/npm/iobroker.fullcalendar/)
 
-Schedules with [fullcalendar](https://fullcalendar.io)
+Schedules with [fullcalendar](https://fullcalendar.io).
+
+You must not use any external resources, the scheduling is processed only in ioBroker and will be not combined with any external services like "google calender" or "iTunes".
 
 ![Example](img/example.png)
 
-You can control your events with calender and plan to control them periodically.
+You can control your events with calender and can plan to control them periodically.
 
 ## Changelog
+### 0.2.1 (2017-09-25)
+* (bluefox) Fixed error
+
 ### 0.2.0 (2017-08-06)
 * (bluefox) Support of new admin
 

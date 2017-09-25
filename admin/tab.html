@@ -4,7 +4,7 @@
 <meta charset='utf-8' />
 <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/default/jquery-ui.min.css"/>
 <!--link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/-->
-<link rel="stylesheet" type="text/css" href="lib/fullcalendar.min.css"  />
+<link rel="stylesheet" type="text/css" href="lib/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css"/>
 <!--link rel="stylesheet" type="text/css" href="lib/gentleSelect/jquery-gentleSelect.css" /-->
 <!--link rel="stylesheet" type="text/css" href="lib/cron/jquery-cron.css" /-->
@@ -28,12 +28,14 @@
 <script type="text/javascript" src="lib/fullcalendar.min.js"></script>
 <script type="text/javascript" src="lib/locale-all.js"></script>
 <script type="text/javascript" src="lib/later.min.js"></script>
+<script type="text/javascript" src="lib/jscolor.min.js"></script>
 <script type="text/javascript" src="utils.js"></script>
 <script type="text/javascript" src="suncalc.js"></script>
 <script>
 
     var config = {};
     var events = {};
+    var DEFAULT_EVENT_COLOR = '#3A87AD';
     instance = instance || 0;
     if (typeof instance === 'string') {
         var ppp = instance.split('=');
@@ -51,6 +53,7 @@
     var realEvents = [];
     var redraw = 0;
     var $calendar = null;
+    var adapterConfig = null;
 
     var texts = [];
 
@@ -125,7 +128,7 @@
             }
             event.native.cron = obj2cron(cron);
             return result;
-        } else {
+        } else if (event.native.start) {
             var date = parseISOLocal(event.native.start);
             var originalDate;
 
@@ -306,6 +309,7 @@
 
 		event.native.type       = $dialog.find('#dialog_event_type').val();
 		event.common.enabled    = $dialog.find('#dialog_event_enabled').prop('checked');
+        event.native.color      = '#' + $dialog.find('#dialog_event_color').val();
 
         // compatibility
         if (event.native.duration !== undefined) delete event.native.duration;
@@ -407,8 +411,10 @@
                 date.setMinutes(0);
                 date.setSeconds(0);
                 date.setMilliseconds(0);
-            } else {
+            } else if (event.native.start) {
                 date = parseISOLocal(event.native.start);
+            } else {
+                return;
             }
             var time = getAstroTime(astro, parseInt(offset, 10) || 0, date);
             $dialog.find('#dialog_event_time_astro_value').text(time ? time.toLocaleTimeString() : '??:??');
@@ -484,7 +490,11 @@
                 }
             });
 
-            $dialog.find('#dialog_event_type').change(showHideEventType);
+            $dialog.find('#dialog_event_type').change(function () {
+                showHideEventType();
+                setTypeDescription($dialog);
+            });
+
             $dialog.find('#dialog_event_period').change(function () {
                 if ($(this).val() === 'daily') {
                     $dialog.find('.dialog-event-dow').each(function () {
@@ -799,6 +809,11 @@
         }
     }
 
+    function setTypeDescription($dialog) {
+        var type = $dialog.find('#dialog_event_type').val();
+        $dialog.find('#dialog_event_description').html(_('notice_' + type));
+    }
+
     function showEditDialog(event, date, callback) {
         var $dialog = initEditDialog();
         $dialog.data('event', event);
@@ -808,6 +823,7 @@
         var height = 450;
 
         $dialog.data('callback', callback);
+
 		if (config.dialog_event_width)  width  = config.dialog_event_width;
         if (config.dialog_event_height) height = config.dialog_event_height;
 
@@ -815,6 +831,9 @@
 
         $dialog.find('#dialog_event_id').val(event.native.oid || '');
         $dialog.find('#dialog_event_type').val(event.native.type || 'single');
+        var color = (event.native.color || DEFAULT_EVENT_COLOR).replace(/^#/, '');
+        $dialog.find('#dialog_event_color')[0].jscolor.fromString(color);
+        setTypeDescription($dialog);
 
         checkOidType(event.native.startValue || '', event.native.endValue || '', $dialog);
 
@@ -949,11 +968,12 @@
                         allDay: false,
                         durationEditable: event.native.type !== 'single',
 						title: 	getEventName(event),
-                        enabled: event.common.enabled
+                        enabled: event.common.enabled,
+                        color:  event.native.color || DEFAULT_EVENT_COLOR
                     });
                 }
             }
-        } else {
+        } else if (event.native.start) {
             _start = parseISOLocal(event.native.start);
             if (event.native.astro) {
                 _start = getAstroTime(event.native.astro, event.native.offset, _start);
@@ -973,7 +993,8 @@
                         allDay:           false,
                         durationEditable: event.native.type !== 'single',
                         title: 	          getEventName(event),
-                        enabled: event.common.enabled
+                        enabled: event.common.enabled,
+                        color:  event.native.color || DEFAULT_EVENT_COLOR
                     });
                 }
             }
@@ -1140,25 +1161,62 @@
         };
     }
 
-    function loadRealEvents(callback) {
-        if (filter === 'all') {
-            socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastConfiguredEvent');
-            socket.emit('subscribe', 'fullcalendar.' + instance + '.info.lastEvent');
-            sendTo(null, 'getAll', null, function (events) {
-                callback && callback(events);
-            });
-        } else if (filter === 'configured') {
-            socket.emit('subscribe', 'fullcalendar.' + instance + '.info.lastConfiguredEvent');
-            socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastEvent');
-            sendTo(null, 'getConfigured', null, function (events) {
-                callback && callback(events);
-            });
-        } else {
-            socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastConfiguredEvent');
-            socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastEvent');
-            callback && callback([]);
+    function readInstanceConfig(callback) {
+        socket.emit('getObject', 'system.adapter.fullcalendar.' + instance, function (err, res) {
+            if (!err && res && res.native) {
+                adapterConfig = res.native;
+            }
+            if (typeof callback === 'function') {
+                callback(adapterConfig);
+            }
+        });
+    }
 
-        }
+    function loadRealEvents(callback) {
+        getIsAdapterAlive(function (isAlive) {
+            readInstanceConfig(function (config) {
+                var $filter = $('#show_filter');
+
+                if (isAlive && !config.allEventsEnabled) {
+                    $filter.find('option[value="all"]').remove();
+                    if (filter === 'all') {
+                        $filter.val('configured');
+                        filter = 'configured';
+                    }
+                }
+                if (isAlive && !config.cfgEventsEnabled) {
+                    $filter.find('option[value="configured"]').remove();
+                    if (filter === 'configured') {
+                        $filter.val('scheduled');
+                        filter = 'scheduled';
+                    }
+                }
+
+                if (filter === 'all' && isAlive) {
+                    socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastConfiguredEvent');
+                    socket.emit('subscribe', 'fullcalendar.' + instance + '.info.lastEvent');
+                    sendTo(null, 'getAll', null, function (events) {
+                        callback && callback(events);
+                    });
+                } else if (filter === 'configured' && isAlive) {
+                    socket.emit('subscribe', 'fullcalendar.' + instance + '.info.lastConfiguredEvent');
+                    socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastEvent');
+                    sendTo(null, 'getConfigured', null, function (events) {
+                        callback && callback(events);
+                    });
+                } else {
+                    socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastConfiguredEvent');
+                    socket.emit('unsubscribe', 'fullcalendar.' + instance + '.info.lastEvent');
+                    callback && callback([]);
+                }
+
+                if (!isAlive) {
+                    $filter.val('scheduled');
+                }
+                $filter.prop('disabled', !isAlive);
+
+            });
+        });
     }
 
     $(document).ready(function () {
@@ -1539,6 +1597,7 @@
         margin: 10px 0;
         width: 100%;
         cursor: pointer;
+        padding-left: 5px;
     }
 
     #flow-tab p {
@@ -1605,6 +1664,21 @@
         float: left;
     }
 
+    #dialog_event_description {
+        font-size: small;
+        font-style: italic;
+    }
+
+    .dialog-event-month-title {
+        border-left: 1px solid lightgray;
+        text-align: center;
+        padding-left: 3px;
+    }
+    .dialog-event-month-value {
+        border-left: 1px solid lightgray;
+        text-align: center;
+    }
+
 </style>
 </head>
 <body>
@@ -1614,7 +1688,7 @@
         <table style="width: 100%; height: 100%">
             <tr>
                 <td id="live-events" style="width: 100%">
-                    <h4 class="translate"><label for="show_filter">Live Events</label></h4>
+                    <h4><label for="show_filter" class="translate">Live Events</label></h4>
                     <div><select id="show_filter">
                         <option value="scheduled" class="translate">scheduled</option>
                         <option value="configured" class="translate">configured</option>
@@ -1694,6 +1768,10 @@
                 <option value="toggle" class="translate">toggle</option>
             </select></td>
         </tr>
+        <tr>
+            <td></td>
+            <td id="dialog_event_description"></td>
+        </tr>
         <tr id="tr_dialog_event_duration">
             <td><label class="translate" for="dialog_event_duration">Duration</label></td>
             <td><input id="dialog_event_duration" class="dialog-event-input" size="2"/><span style="margin-left: 10px">minutes</span>
@@ -1701,13 +1779,12 @@
         </tr>
         <tr>
             <td><label class="translate" for="dialog_event_id">Object ID</label></td>
-            <td><input size="60" id="dialog_event_id" style="width: calc(100% - 41px)"/>
+            <td><input size="60" id="dialog_event_id" style="width: calc(100% - 60px)"/>
                 <button id="dialog_event_id_btn" style="margin-left: 5px">...</button>
             </td>
         </tr>
         <tr>
-            <td><label class="translate" for="dialog_event_start_value" id="dialog_event_start_value_title">Start
-                value</label></td>
+            <td><label class="translate" for="dialog_event_start_value" id="dialog_event_start_value_title">Start value</label></td>
             <td>
                 <input size="20" id="dialog_event_start_value" style="width: 100%"/>
                 <input id="dialog_event_start_value_checkbox" type="checkbox"/>
@@ -1715,8 +1792,7 @@
             </td>
         </tr>
         <tr id="tr_dialog_event_end_value">
-            <td><label class="translate" for="dialog_event_end_value" id="dialog_event_end_value_title">End
-                value</label></td>
+            <td><label class="translate" for="dialog_event_end_value" id="dialog_event_end_value_title">End value</label></td>
             <td>
                 <input size="20" id="dialog_event_end_value" style="width: 100%"/>
                 <input id="dialog_event_end_value_checkbox" type="checkbox"/>
@@ -1740,22 +1816,22 @@
             <td>
                 <table>
                     <tr>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>4</td>
-                        <td>5</td>
-                        <td>6</td>
-                        <td>7</td>
+                        <td class="translate dialog-event-month-title">Mo</td>
+                        <td class="translate dialog-event-month-title">Tu</td>
+                        <td class="translate dialog-event-month-title">We</td>
+                        <td class="translate dialog-event-month-title">Th</td>
+                        <td class="translate dialog-event-month-title">Fr</td>
+                        <td class="translate dialog-event-month-title">Sa</td>
+                        <td class="translate dialog-event-month-title">Su</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" data-value="1" class="dialog-event-dow"></td>
-                        <td><input type="checkbox" data-value="2" class="dialog-event-dow"></td>
-                        <td><input type="checkbox" data-value="3" class="dialog-event-dow"></td>
-                        <td><input type="checkbox" data-value="4" class="dialog-event-dow"></td>
-                        <td><input type="checkbox" data-value="5" class="dialog-event-dow"></td>
-                        <td><input type="checkbox" data-value="6" class="dialog-event-dow"></td>
-                        <td><input type="checkbox" data-value="0" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="1" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="2" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="3" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="4" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="5" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="6" class="dialog-event-dow"></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="0" class="dialog-event-dow"></td>
                     </tr>
                 </table>
             </td>
@@ -1765,32 +1841,32 @@
             <td>
                 <table>
                     <tr>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>4</td>
-                        <td>5</td>
-                        <td>6</td>
-                        <td>7</td>
-                        <td>8</td>
-                        <td>9</td>
-                        <td>10</td>
-                        <td>11</td>
-                        <td>12</td>
+                        <td class="translate dialog-event-month-title">Jan</td>
+                        <td class="translate dialog-event-month-title">Feb</td>
+                        <td class="translate dialog-event-month-title">Mar</td>
+                        <td class="translate dialog-event-month-title">Apr</td>
+                        <td class="translate dialog-event-month-title">May</td>
+                        <td class="translate dialog-event-month-title">Jun</td>
+                        <td class="translate dialog-event-month-title">Jul</td>
+                        <td class="translate dialog-event-month-title">Aug</td>
+                        <td class="translate dialog-event-month-title">Sep</td>
+                        <td class="translate dialog-event-month-title">Oct</td>
+                        <td class="translate dialog-event-month-title">Nov</td>
+                        <td class="translate dialog-event-month-title">Dec</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" data-value="1" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="2" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="3" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="4" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="5" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="6" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="7" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="8" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="9" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="10" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="11" class="dialog-event-month"/></td>
-                        <td><input type="checkbox" data-value="12" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="1" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="2" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="3" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="4" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="5" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="6" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="7" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="8" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="9" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="10" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="11" class="dialog-event-month"/></td>
+                        <td class="dialog-event-month-value"><input type="checkbox" data-value="12" class="dialog-event-month"/></td>
                     </tr>
                 </table>
             </td>
@@ -1801,6 +1877,10 @@
         <tr>
             <td><label class="translate" for="dialog_event_title">Description</label></td>
             <td><input id="dialog_event_title" style="width: 100%"/></td>
+        </tr>
+        <tr>
+            <td><label class="translate" for="dialog_event_color">Color</label></td>
+            <td><input id="dialog_event_color" class="jscolor" type="text" style="width: 100px"/></td>
         </tr>
         <!--tr id="dialog_event_cron">
             <td></td>

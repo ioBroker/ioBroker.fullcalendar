@@ -1,8 +1,13 @@
 {
     "common": {
         "name":         "fullcalendar",
-        "version": "0.2.0",
+        "version": "0.2.1",
         "news": {
+            "0.2.1": {
+                "en": "Fixed error",
+                "de": "Fehler gefixt",
+                "ru": "Исправлена ошибка"
+            },
             "0.2.0": {
                 "en": "Support of new admin",
                 "de": "Unterstützung von neuen Admin",
