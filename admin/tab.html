@@ -148,7 +148,7 @@
 
             // date
             if (delta._days !== 0) {
-                date.setDate(date.getDate() + delta._days);
+				date.setDate(date.getDate() + delta._days);
             }
             if (delta._milliseconds !== 0) {
                 date.setMinutes(date.getMinutes() + Math.round(delta._milliseconds / 60000));
@@ -163,8 +163,8 @@
                 event.native.start = event.native.start.replace(/T\d\d:\d\d:\d\d$/, 'T00:00:00');
                 return !!offset;
             }
-        }
-    }
+		}
+	}
 
     function addDeltaToDuration(event, delta) {
         if (delta._milliseconds !== 0) {
@@ -938,6 +938,16 @@
         }
     }
 
+    function getAstroTime(astro, offset, date) {
+        date.setMinutes(-date.getTimezoneOffset());
+        var times = SunCalc.getTimes(date, systemConfig.common.latitude, systemConfig.common.longitude);
+        date = times[astro];
+        if (offset) {
+            date.setMinutes(date.getMinutes() + offset);
+        }
+        return date;
+    }
+
     function generateEvents(event, start, end) {
 		var result    = [];
         var startDate = new Date(start.toISOString());
@@ -1359,7 +1369,8 @@
                                             //compare first click to this click and see if they occurred within double click threshold
                                             if (((new Date().getTime()) - touchtime) < 800) {
                                                 var $div = $(this);
-                                                showEditDialog(getEventById($div.data('fcEventId')), $div.data('date'), function (err, event) {
+						showEditDialog(getEventById($div.data('fcEventId')), $div.data('date'), function (err, event) {
+						    var $calendar = $('#calendar');
                                                     if (err === 'delete') {
                                                         delete events[event._id];
                                                         deleteSchedule(event, function (err) {
