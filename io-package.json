@@ -1,6 +1,6 @@
 {
     "common": {
-        "name":         "fullcalendar",
+        "name": "fullcalendar",
         "version": "0.2.1",
         "news": {
             "0.2.1": {
@@ -19,13 +19,13 @@
                 "ru": "Исправлено появление 2х событий"
             },
             "0.1.0": {
-              "en": "initial commit",
-              "de": "initial Commit",
-              "ru": "Первая версия"
+                "en": "initial commit",
+                "de": "initial Commit",
+                "ru": "Первая версия"
             }
         },
-        "title":        "Calendar schedule",
-        "desc":         {
+        "title": "Calendar schedule",
+        "desc": {
             "en": "This adapter allows planing with calendar",
             "de": "Adapter benutzt Kalender für Planung",
             "ru": "Драйвер позволяет планировать с помощью календаря"
@@ -33,27 +33,34 @@
         "authors": [
             "bluefox <dogafox@gmail.com>"
         ],
-        "platform":     "javascript/Node.js",
-        "icon":         "fullcalendar.png",
-        "mode":         "daemon",
-        "keywords":     ["schedule", "calendar"],
-        "messagebox":   true,
-        "extIcon":      "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
-        "readme":       "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
-        "loglevel":     "info",
+        "platform": "javascript/Node.js",
+        "icon": "fullcalendar.png",
+        "mode": "daemon",
+        "keywords": [
+            "schedule",
+            "calendar"
+        ],
+        "messagebox": true,
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
+        "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
+        "loglevel": "info",
         "adminTab": {
-            "singleton":            false,
-            "name":                 "Calendar",
-            "fa-icon":              "fa-calendar"
+            "singleton": false,
+            "name": "Calendar",
+            "fa-icon": "fa-calendar"
         },
-        "dependencies":             [{"admin": ">=2.0.0"}],
-        "enabled":      true,
-		"type":         "script",
-        "noConfig":     false
+        "dependencies": [
+            {
+                "admin": ">=2.0.0"
+            }
+        ],
+        "enabled": true,
+        "type": "date-and-time",
+        "noConfig": false
     },
     "native": {
-        "debounce":  1000,
-        "changesRelogInterval":      0,
+        "debounce": 1000,
+        "changesRelogInterval": 0,
         "ackType": "any",
         "changesMinDelta": 0,
         "allEventsEnabled": false,
@@ -100,8 +107,8 @@
     ],
     "objects": [
         {
-            "_id":        "_design/schedule",
-            "language":   "javascript",
+            "_id": "_design/schedule",
+            "language": "javascript",
             "views": {
                 "schedule": {
                     "map": "function(doc) { if (doc.type === 'schedule') emit(doc.common.name, doc); }"
