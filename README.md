@@ -31,3 +31,9 @@ You can control your events with calender and can plan to control them periodica
 
 ### 0.1.0 (2017-03-20)
 * (bluefox) initial commit
+
+
+## License
+CC BY-NC 4.0
+
+Copyright (c) 2017 bluefox <dogafox@gmail.com>
