@@ -847,7 +847,7 @@
         $dialog.find('#dialog_event_interval').val(event.native.interval || '1');
         $dialog.find('#dialog_event_interval_unit').val(event.native.unit || 'h');
 
-        $dialog.find('#dialog_event_duration').val((getEventDuration(event) || 1800) / 60);
+        $dialog.find('#dialog_event_duration').val((getEventDuration(event) || 1800) / 60000);
         // prepare
         $dialog.find('#dialog_event_time').data('val', null);
 
@@ -1343,9 +1343,8 @@
 
                                 element.data('fcEventId', fcEvent.id);
                                 element.data('fcEvent_Id', fcEvent._id);
-                                element.data('date', fcEvent._start.toDate().toISOString());
+                                element.data('date', fcEvent.start.toDate().toISOString());
 
-                               
                                 if (fcEvent.real) {
                                     element.addClass('fc-event-real');
                                     element.data('event', fcEvent.event);
@@ -1369,17 +1368,17 @@
                                             //compare first click to this click and see if they occurred within double click threshold
                                             if (((new Date().getTime()) - touchtime) < 800) {
                                                 var $div = $(this);
-						showEditDialog(getEventById($div.data('fcEventId')), $div.data('date'), function (err, event) {
-						    var $calendar = $('#calendar');
+                                                showEditDialog(getEventById($div.data('fcEventId')), $div.data('date'), function (err, event) {
+                                                    var $calendar = $('#calendar');
                                                     if (err === 'delete') {
                                                         delete events[event._id];
-                                                        deleteSchedule(event, function (err) {
+                                                        deleteSchedule(event, function (/* err */) {
                                                             $calendar.fullCalendar('removeEvents', [$div.data('fcEvent_Id')]);
                                                             $div.remove();
                                                             $calendar.fullCalendar('refetchEvents');
                                                         });
                                                     } else if (event) {
-                                                        writeSchedule(event, function (err) {
+                                                        writeSchedule(event, function (/* err */) {
                                                             $calendar.fullCalendar('removeEvents');
                                                             $calendar.fullCalendar('refetchEvents');
                                                         });

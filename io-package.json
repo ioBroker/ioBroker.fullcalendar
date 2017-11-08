@@ -1,8 +1,13 @@
 {
     "common": {
         "name": "fullcalendar",
-        "version": "0.2.1",
+        "version": "0.2.2",
         "news": {
+            "0.2.2": {
+                "en": "Fix interval settings\nUpdate fullcalendar library",
+                "de": "Korrigiere Intervalleinstellungen\nUpdate fullcalendar library",
+                "ru": "Исправлена ошибка с интервалом\nОбновлена библиотека fullcalendar"
+            },
             "0.2.1": {
                 "en": "Fixed error",
                 "de": "Fehler gefixt",

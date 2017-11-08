@@ -16,6 +16,10 @@ You must not use any external resources, the scheduling is processed only in ioB
 You can control your events with calender and can plan to control them periodically.
 
 ## Changelog
+### 0.2.2 (2017-11-08)
+* (bluefox) Fix interval settings
+* (bluefox) Update fullcalendar library
+
 ### 0.2.1 (2017-09-25)
 * (bluefox) Fixed error
 
