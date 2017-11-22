@@ -2,7 +2,9 @@
 <html>
 <head>
 <meta charset='utf-8' />
-<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/default/jquery-ui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.structure.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.theme.min.css"/>
 <!--link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/-->
 <link rel="stylesheet" type="text/css" href="lib/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css"/>
@@ -11,7 +13,7 @@
 
 <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
-<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery-ui.min.js"></script>
 
 <!--script type="text/javascript" src="lib/gentleSelect/jquery-gentleSelect.js"></script-->
 <!--script type="text/javascript" src="lib/cron/jquery-cron.js"></script-->
@@ -313,7 +315,12 @@
 
         // compatibility
         if (event.native.duration !== undefined) delete event.native.duration;
-        if (event.native.endValue !== undefined) delete event.native.endValue;
+
+        if (event.native.type === 'double') {
+            event.native.endValue = endValue;
+        } else if (event.native.endValue !== undefined){
+            delete event.native.endValue;
+        }
 
         event.common.name = $dialog.find('#dialog_event_title').val();
         var time;
@@ -469,13 +476,13 @@
                     if (!$btn.data('inited')) {
                         $btn.data('inited', true);
                         $btn
-                            .prepend('<span style="float: left; margin-top: 10px;" class="ui-icon ui-icon-trash"></span>');
+                            .prepend('<span class="ui-icon ui-icon-trash dialog-button-icon"></span>');
 
                         $btn = $('#dialog_event_button_cancel')
-                            .prepend('<span style="float: left; margin-top: 10px;" class="ui-icon ui-icon-cancel"></span>');
+                            .prepend('<span class="ui-icon ui-icon-cancel dialog-button-icon"></span>');
 
                         $btn = $('#dialog_event_button_save')
-                            .prepend('<span style="float: left; margin-top: 10px;" class="ui-icon ui-icon-check"></span>');
+                            .prepend('<span class="ui-icon ui-icon-check dialog-button-icon"></span>');
                     }
                 },
                 close: function (event) {
@@ -1666,6 +1673,14 @@
         width: 100%;
     }
 
+    #dialog_event_button_cancel span.ui-button-text,
+    #dialog_event_button_save  span.ui-button-text,
+    #dialog_event_button_delete  span.ui-button-text {
+        display: inline;
+        line-height: 2em;
+    }
+
+
     #dialog_event_button_cancel, #dialog_event_button_save {
         float: right;
     }
@@ -1687,6 +1702,10 @@
     .dialog-event-month-value {
         border-left: 1px solid lightgray;
         text-align: center;
+    }
+    .dialog-button-icon {
+        float: left;
+        margin-top: 6px;
     }
 
 </style>
