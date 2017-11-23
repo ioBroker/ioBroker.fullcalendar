@@ -5,7 +5,7 @@
         "news": {
             "0.2.3": {
                 "en": "Fix interval settings\nUpdate fullcalendar library",
-                "de": "Korrigiere Intervalleinstellungen\nUpdate fullcalendar library",
+                "de": "Intervalleinstellungen korrigiert\nUpdate fullcalendar library",
                 "ru": "Исправлена ошибка с интервалом\nОбновлена библиотека fullcalendar"
             },
             "0.2.1": {
@@ -32,7 +32,7 @@
         "title": "Calendar schedule",
         "desc": {
             "en": "This adapter allows planing with calendar",
-            "de": "Adapter benutzt Kalender für Planung",
+            "de": "Adapter für geplante Aktionen in ioBroker mittels Kalender",
             "ru": "Драйвер позволяет планировать с помощью календаря"
         },
         "authors": [
