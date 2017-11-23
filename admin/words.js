@@ -12,14 +12,16 @@ var systemDictionary = {
     "Object ID":        {"en": "Object ID:",    "de": "Objekt ID:",             "ru": "ID объекта:"},
     "Start value":      {"en": "Start value:",  "de": "Startwert:",             "ru": "Значение:"},
     "End value":        {"en": "End value:",    "de": "Endwert:",               "ru": "Конечное значение:"},
-    "Period":           {"en": "Period:",       "de": "Period:",                "ru": "Повтор:"},
+    "First value":      {"en": "First value:",  "de": "Erstes Wert:",           "ru": "Первое значение:"},
+    "Second value":     {"en": "Second value:", "de": "Zweites Wert:",          "ru": "Второе значение:"},
+    "Period":           {"en": "Period:",       "de": "Periode:",               "ru": "Повтор:"},
     "Color":            {"en": "Color:",        "de": "Farbe:",                 "ru": "Цвет:"},
     "once":             {"en": "once",          "de": "einmalig",               "ru": "один раз"},
-    "daily":            {"en": "daily",         "de": "taglich",                "ru": "ежедневно"},
+    "daily":            {"en": "daily",         "de": "täglich",                "ru": "ежедневно"},
     "monthly":          {"en": "monthly",       "de": "monatlich",              "ru": "ежемесячно"},
     "Instruction":      {
         "en": "Drag and drop the events above to create a new one.<hr>Use ALT by dragging it to copy the events.",
-        "de": "Schiebe die Ereignisse oben auf Kalendar um neue Ereignise zu erzeugen.<hr>Halt ALT beim schieben um die Ereignisse zu kopieren.",
+        "de": "Schiebe die Ereignisse oben auf Kalendar um neue Ereignise zu erzeugen.<hr>Halte die ALT-Taste beim verschieben gedrückt um die Ereignisse zu kopieren.",
         "ru": "Что бы создать новые события, перетащите события сверху на календарь.<hr>Что бы скопировать событие удерживайте ALT при перетаскивании."
     },
     "Active":           {"en": "Active:",       "de": "Aktiviert:",             "ru": "Активно:"},
@@ -78,13 +80,13 @@ var systemDictionary = {
     "Nov":              {"en": "Nov",           "de": "Nov",                    "ru": "Ноя"},
     "Dec":              {"en": "Dec",           "de": "Dez",                    "ru": "Дек"},
     "notice_single":    {
-        "en": "Will be triggered only once for one time event. Please provide the <b>Object ID</b> and <b>value</b>",
-        "de": "Wird nur einmal für zeitliches Ereignis ausgelöst. Bitte geben Sie die <b>Objekt ID</b> und <b>Wert</b> an",
+        "en": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the <b>Object ID</b>, <b>start</b> and <b>end value</b>.",
+        "de": "Wird zweimal für einmaliges Ereignis ausgelöst. Einmal beim Start und einmal nach dem definierten Intervall. Bitte geben Sie die <b> Objekt ID </b>, <b>Start-</b> und <b>Endwert</b> an.",
         "ru": "Будет срабатывать только один раз для временного события. Укажите <b>ID объекта</b> и <b>значение</b>, которое будет присвоено."
     },
     "notice_double":    {
         "en": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the <b>Object ID</b>, <b>start</b> and <b>end values</b>.",
-        "de": "Wird zweimal für einmaliges Ereignis ausgelöst. Einmal beim Start und einmal nach definiertes Intervall. Bitte geben Sie die <b> Objekt ID </b>, <b>Start-</b> und <b>End-werte</b> an.",
+        "de": "Wird zweimal für einmaliges Ereignis ausgelöst. Einmal beim Start und einmal nach dem definierte Intervall. Bitte geben Sie die <b>Objekt ID</b> und <b>Startwert</b> an. Der Endwert wird automatisch berechnet.",
         "ru": "Будет срабатывать дважды для одного временного события. Один раз в начале и один раз после установленного интервала. Укажите <b>ID объекта</b>, <b>начальное</b> и <b>конечные значения</b>."
     },
     "notice_toggle":    {

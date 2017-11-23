@@ -1,7 +1,7 @@
 {
   "name": "iobroker.fullcalendar",
   "description": "This adapter allows planing with calendar.",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": {
     "name": "bluefox",
     "email": "dogafox@gmail.com"

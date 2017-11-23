@@ -24,7 +24,13 @@
 </style>
 <!-- you have to define 2 functions in the global scope: -->
 <script type="text/javascript">
-    // the function loadSettings has to exist ...
+    var systemDictionary = {
+        "note": {
+            "en": "No setup needed, just add the calendar tab to your admin view.",
+            "de": "Kein Setup notwendig, füge einfach das Kalendar Tab deinem Admin View hinzu.",
+            "ru": "Не требуется настройка, просто добавьте вкладку календаря в admin."
+        }
+    };
     function load(settings, onChange) {
         onChange(false);
     }
@@ -41,10 +47,10 @@
 
     <table><tr>
         <td><img src="fullcalendar.png"></td>
-        <td style="padding-top: 20px;padding-left: 10px"><h3><a target="_blank" href="http://www.fullcalendarcharts.org/">fullcalendar</a> <span  class="translate">charts adapter settings</span></h3></td>
+        <td style="padding-top: 20px;padding-left: 10px"><h3><a target="_blank" href="https://fullcalendar.io/">fullcalendar</a> <span  class="translate">charts adapter settings</span></h3></td>
     </tr></table>
 
 
-    <div class="translate">There is nothing to setup</div>
+    <div class="translate">note</div>
 </div>
 </html>
