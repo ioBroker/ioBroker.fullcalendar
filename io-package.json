@@ -57,7 +57,7 @@
         "adminTab": {
             "singleton": false,
             "name": "Calendar",
-            "fa-icon": "fa-calendar"
+            "fa-icon": "calendar_today"
         },
         "dependencies": [
             {
