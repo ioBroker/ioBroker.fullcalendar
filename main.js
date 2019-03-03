@@ -4,7 +4,7 @@
 'use strict';
 
 // you have to require the utils module and call adapter function
-var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
+var utils = require('@iobroker/adapter-core'); // Get common adapter utils
 var timeUtils = require(__dirname + '/admin/utils.js');
 var adapter = new utils.Adapter('fullcalendar');
 var later = require('later');
