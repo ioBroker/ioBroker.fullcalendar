@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "fullcalendar",
-        "version": "0.2.4",
+        "version": "1.0.0",
         "news": {
+            "1.0.0": {
+                "en": "Support of compact mode added",
+                "de": "Unterstützung des Kompaktmodus hinzugefügt",
+                "ru": "Добавлена поддержка компактного режима",
+                "pt": "Adicionado suporte ao modo compacto",
+                "nl": "Ondersteuning van compacte modus toegevoegd",
+                "fr": "Prise en charge du mode compact ajouté",
+                "it": "Supporto della modalità compatta aggiunto",
+                "es": "Soporte de modo compacto agregado",
+                "pl": "Dodano obsługę trybu kompaktowego",
+                "zh-cn": "支持紧凑模式"
+            },
             "0.2.4": {
                 "en": "Translations",
                 "de": "Übersetzungen",
@@ -12,33 +24,32 @@
                 "en": "Fix interval settings\nUpdate fullcalendar library",
                 "de": "Intervalleinstellungen korrigiert\nUpdate fullcalendar library",
                 "ru": "Исправлена ошибка с интервалом\nОбновлена библиотека fullcalendar"
-            },
-            "0.2.1": {
-                "en": "Fixed error",
-                "de": "Fehler gefixt",
-                "ru": "Исправлена ошибка"
-            },
-            "0.2.0": {
-                "en": "Support of new admin",
-                "de": "Unterstützung von neuen Admin",
-                "ru": "Поддержка нового admin"
-            },
-            "0.1.1": {
-                "en": "fix double event by creation",
-                "de": "Korrigiert Doppel-Event",
-                "ru": "Исправлено появление 2х событий"
-            },
-            "0.1.0": {
-                "en": "initial commit",
-                "de": "initial Commit",
-                "ru": "Первая версия"
             }
         },
         "title": "Calendar schedule",
+        "titleLang": {
+            "en": "Calendar schedule",
+            "de": "Kalender Zeitplan",
+            "ru": "Календарное расписание",
+            "pt": "Agenda do calendário",
+            "nl": "Kalender schema",
+            "fr": "Calendrier calendrier",
+            "it": "Calendario",
+            "es": "Calendario calendario",
+            "pl": "Harmonogram kalendarza",
+            "zh-cn": "日历时间表"
+        },
         "desc": {
             "en": "This adapter allows planing with calendar",
             "de": "Adapter für geplante Aktionen in ioBroker mittels Kalender",
-            "ru": "Драйвер позволяет планировать с помощью календаря"
+            "ru": "Драйвер позволяет планировать с помощью календаря",
+            "pt": "Este adaptador permite aplainar com calendário",
+            "nl": "Met deze adapter kunt u schaven met kalender",
+            "fr": "Cet adaptateur permet de planifier avec calendrier",
+            "it": "Questo adattatore consente la piallatura con calendario",
+            "es": "Este adaptador permite planear con calendario",
+            "pl": "Ten adapter umożliwia struganie za pomocą kalendarza",
+            "zh-cn": "该适配器允许日历计划"
         },
         "authors": [
             "bluefox <dogafox@gmail.com>"
@@ -47,10 +58,12 @@
         "platform": "javascript/Node.js",
         "icon": "fullcalendar.png",
         "mode": "daemon",
+        "compact": true,
         "keywords": [
             "schedule",
             "calendar"
         ],
+        "materialize": true,
         "messagebox": true,
         "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
         "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",

@@ -305,8 +305,8 @@
                     value: endValue
                 }
             ];
-        } else {
-            if (event.native.intervals !== undefined) delete event.native.intervals;
+        } else if (event.native.intervals !== undefined) {
+            delete event.native.intervals;
         }
 
 		event.native.type       = $dialog.find('#dialog_event_type').val();
@@ -831,8 +831,12 @@
 
         $dialog.data('callback', callback);
 
-		if (config.dialog_event_width)  width  = config.dialog_event_width;
-        if (config.dialog_event_height) height = config.dialog_event_height;
+		if (config.dialog_event_width)  {
+		    width  = config.dialog_event_width;
+        }
+        if (config.dialog_event_height) {
+            height = config.dialog_event_height;
+        }
 
         $dialog.dialog('option', 'title', _('Configure event'));
 
@@ -908,7 +912,7 @@
         showHideEventType();
 
         $dialog
-				.dialog('option', 'width',  width)
+			.dialog('option', 'width',  width)
             .dialog('option', 'height', height)
             .dialog('open');
     }
@@ -1033,17 +1037,19 @@
             if (!err && res) {
                 var _res = {};
                 for (var i = 0; i < res.rows.length; i++) {
-                    if (res.rows[i].id === 'schedules') continue;
+                    if (res.rows[i].id === 'schedules'){
+                        continue;
+                    }
                     _res[res.rows[i].value._id] = res.rows[i].value;
                 }
-                if (callback) callback(null, _res);
+                callback && callback(null, _res);
             } else {
-                if (callback) callback(err, []);
+                callback && callback(err, []);
             }
         });
     }
 
-	function initSelectId (callback) {
+	function initSelectId(callback) {
         if (selectId) return selectId;
 		selectId = $('#dialog-select-member').selectId('init',  {
 			objects: 		objects,

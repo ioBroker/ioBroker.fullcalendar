@@ -1,0 +1,64 @@
+<html>
+<head>
+<!-- these 4 files always have to be included -->
+<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
+<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+
+<script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+
+<!-- these files always have to be included -->
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../lib/js/materialize.js"></script>
+<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+<script type="text/javascript" src="words.js"></script>
+
+<script type="text/javascript">
+    var systemDictionary = {
+        "No setup needed, just add the calendar tab to your admin view.": {
+            "en": "No setup needed, just add the calendar tab to your admin view.",
+            "de": "Es ist kein Setup erforderlich. Fügen Sie einfach die Registerkarte \"Kalender\" zu Ihrer Administratoransicht hinzu.",
+            "ru": "Никаких настроек не требуется, просто добавьте вкладку календаря admin.",
+            "pt": "Nenhuma configuração é necessária, basta adicionar a guia Calendário à sua visualização de administrador.",
+            "nl": "Geen installatie nodig, voeg gewoon het agendatabblad toe aan uw admin-weergave.",
+            "fr": "Aucune configuration requise, ajoutez simplement l'onglet Calendrier à votre vue administrateur.",
+            "it": "Nessuna configurazione richiesta, basta aggiungere la scheda del calendario alla vista di amministrazione.",
+            "es": "No se necesita configuración, solo agregue la pestaña de calendario a su vista de administrador.",
+            "pl": "Nie wymaga konfiguracji, wystarczy dodać kartę kalendarza do widoku administratora.",
+            "zh-cn": "无需设置，只需将日历标签添加到您的管理员视图即可。"
+        }
+    };
+
+    function load(settings, onChange) {
+        if (!settings) {
+           return;
+        }
+
+        onChange(false);
+    }
+
+    function save(callback) {
+        var obj = {};
+        callback(obj);
+    }
+</script>
+</head>
+<body>
+<div class="m adapter-container">
+    <div class="row">
+        <div class="col s12">
+            <div class="row">
+                <div class="col s6">
+                    <img src="fullcalendar.png" alt="logo" class="logo">
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <div class="translate">No setup needed, just add the calendar tab to your admin view.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -4,76 +4,143 @@
 'use strict';
 
 // you have to require the utils module and call adapter function
-var utils = require('@iobroker/adapter-core'); // Get common adapter utils
-var timeUtils = require(__dirname + '/admin/utils.js');
-var adapter = new utils.Adapter('fullcalendar');
-var later = require('later');
-var SunCalc = require(__dirname + '/admin/suncalc.js');
-var events;
-var nextTimer;
-var systemConfig;
+const utils = require('@iobroker/adapter-core'); // Get common adapter utils
+const adapterName  = require('./package.json').name.split('.').pop();
+const timeUtils = require('./admin/utils.js');
+const later = require('later');
+const SunCalc = require('./admin/suncalc.js');
+let adapter;
 
-var configuredEvents  = [];
-var cfgEventsSettings = {};
-var allEvents         = [];
-var names             = {};
-var rooms             = {};
-var funcs             = {};
+let events;
+let nextTimer;
+let systemConfig;
 
-adapter.on('objectChange', function (id, obj) {
-    if (!id) return;
+const configuredEvents  = [];
+const cfgEventsSettings = {};
+const allEvents         = [];
+const names             = {};
+let rooms               = {};
+let funcs               = {};
 
-    if (id === 'system.config') {
-        if (obj) systemConfig = obj;
+function startAdapter(options) {
+    options = options || {};
+    options = Object.assign({}, options, {name: adapterName});
 
-        if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
-            systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
-            adapter.log.warn('Please specify longitude and latitude in system settings, elsewise astro events will not work');
+    adapter = new utils.Adapter(options);
+    adapter.on('stateChange', (id, state) => {
+        if (id && state) {
+            if (id.match('^system\.')) return;
+            if (adapter.config.allEventsEnabled || adapter.config.cfgEventsEnabled) {
+                getStateName(id, state, (name, id, state) => {
+                    if (adapter.config.allEventsEnabled) {
+                        if (adapter.config.ackType === 'true' && !state.ack) {
+                            return;
+                        }
+                        if (adapter.config.ackType === 'false' && state.ack) {
+                            return;
+                        }
+                        const cfgA = {id: id, val: state.val, ack: state.ack, ts: state.ts, name: name};
+                        allEvents.push(cfgA);
+                        if (allEvents.length > adapter.config.allEventsMax) {
+                            allEvents.slice(allEvents.length - adapter.config.allEventsMax);
+                        }
+                        adapter.setState('info.lastEvent', JSON.stringify(cfgA), true);
+                    }
+
+                    if (adapter.config.cfgEventsEnabled) {
+                        if (cfgEventsSettings[id]) {
+                            if (cfgEventsSettings[id].ackType === 'true' && !state.ack) {
+                                return;
+                            }
+                            if (cfgEventsSettings[id].ackType === 'false' && state.ack) {
+                                return;
+                            }
+                            const cfgE = {id: id, val: state.val, ack: state.ack, ts: state.ts, name: name};
+                            configuredEvents.push(cfgE);
+                            if (configuredEvents.length > adapter.config.cfgEventsMax) {
+                                configuredEvents.slice(configuredEvents.length - adapter.config.cfgEventsMax);
+                            }
+                            adapter.setState('info.lastConfiguredEvent', JSON.stringify(cfgE), true);
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    adapter.on('ready', () => main(adapter));
+
+    adapter.on('message', obj => {
+        if (obj && obj.callback) {
+            switch (obj.command) {
+                case 'getAll':
+                    adapter.sendTo(obj.from, obj.command, allEvents, obj.callback);
+                    break;
+
+                case 'getConfigured':
+                    adapter.sendTo(obj.from, obj.command, configuredEvents, obj.callback);
+                    break;
+            }
+        }
+    });
+
+    adapter.on('objectChange', (id, obj) => {
+        if (!id) return;
+
+        if (id === 'system.config') {
+            if (obj) systemConfig = obj;
+
+            if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
+                systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
+                adapter.log.warn('Please specify longitude and latitude in system settings, elsewise astro events will not work');
+            }
+
+            calculateNext();
+            return;
         }
 
-        calculateNext();
-        return;
-    }
 
+        if (id.substring(0, adapter.namespace.length + 1) !== adapter.namespace + '.') return;
 
-    if (id.substring(0, adapter.namespace.length + 1) !== adapter.namespace + '.') return;
+        if (events[id]) {
+            stopEvent(events[id]);
+            delete events[id];
+        }
 
-    if (events[id]) {
-        stopEvent(events[id]);
-        delete events[id];
-    }
+        if (names[id]) {
+            delete names[id];
+            if (obj) {
+                getStateName(id);
+            }
+        }
 
-    if (names[id]) {
-        delete names[id];
         if (obj) {
-            getStateName(id);
+            events[id] = checkEvent(obj);
         }
-    }
+        calculateNext();
+    });
 
-    if (obj) {
-        events[id] = checkEvent(obj);
-    }
-    calculateNext();
-});
+    return adapter;
+}
 
 function getStateName(id, state, callback) {
     if (names[id]) {
-        var name = names[id];
+        let name = names[id];
         if (state) {
             name += ' = ' + state.val;
         }
 
         callback && callback(names[id], id, state);
     } else {
-        adapter.getForeignState(id, function (err, obj) {
-            var enums = getRoomFunc(id);
+        adapter.getForeignState(id, (err, obj) => {
+            const enums = getRoomFunc(id);
             if (enums.func && enums.room) {
                 names[id] = enums.func + ' / ' + enums.room;
             } else if (obj && obj.common && obj.common.name) {
                 names[id] = obj.common.name;
             }
 
-            name = names[id] || id;
+            let name = names[id] || id;
             if (state) {
                 name += ' = ' + state.val;
                 // generate for window/door/light/dimmer automatically opened/closed/set to
@@ -82,63 +149,6 @@ function getStateName(id, state, callback) {
         });
     }
 }
-
-adapter.on('stateChange', function (id, state) {
-    if (id && state) {
-        if (id.match('^system\.')) return;
-        if (adapter.config.allEventsEnabled || adapter.config.cfgEventsEnabled) {
-            getStateName(id, state, function (name, id, state) {
-                if (adapter.config.allEventsEnabled) {
-                    if (adapter.config.ackType === 'true' && !state.ack) {
-                        return;
-                    }
-                    if (adapter.config.ackType === 'false' && state.ack) {
-                        return;
-                    }
-                    var cfgA = {id: id, val: state.val, ack: state.ack, ts: state.ts, name: name};
-                    allEvents.push(cfgA);
-                    if (allEvents.length > adapter.config.allEventsMax) {
-                        allEvents.slice(allEvents.length - adapter.config.allEventsMax);
-                    }
-                    adapter.setState('info.lastEvent', JSON.stringify(cfgA), true);
-                }
-
-                if (adapter.config.cfgEventsEnabled) {
-                    if (cfgEventsSettings[id]) {
-                        if (cfgEventsSettings[id].ackType === 'true' && !state.ack) {
-                            return;
-                        }
-                        if (cfgEventsSettings[id].ackType === 'false' && state.ack) {
-                            return;
-                        }
-                        var cfgE = {id: id, val: state.val, ack: state.ack, ts: state.ts, name: name};
-                        configuredEvents.push(cfgE);
-                        if (configuredEvents.length > adapter.config.cfgEventsMax) {
-                            configuredEvents.slice(configuredEvents.length - adapter.config.cfgEventsMax);
-                        }
-                        adapter.setState('info.lastConfiguredEvent', JSON.stringify(cfgE), true);
-                    }
-                }
-            });
-        }
-    }
-});
-
-adapter.on('ready', main);
-
-adapter.on('message', function (obj) {
-    if (obj && obj.callback) {
-        switch (obj.command) {
-            case 'getAll':
-                adapter.sendTo(obj.from, obj.command, allEvents, obj.callback);
-                break;
-
-            case 'getConfigured':
-                adapter.sendTo(obj.from, obj.command, configuredEvents, obj.callback);
-                break;
-        }
-    }
-});
 
 function stopEvent(event) {
     if (event.timer) {
@@ -150,15 +160,15 @@ function stopEvent(event) {
 function executeEvent(event, now) {
     adapter.log.debug('executeEvent[' + event.common.name + ']: ' + JSON.stringify(event.native));
     event.lastExec = now || new Date().getTime();
-    adapter.getForeignObject(event.native.oid, function (err, obj) {
+    adapter.getForeignObject(event.native.oid, (err, obj) => {
         if (!obj) {
             adapter.log.warn('Object "' + event.native.oid + '" does not exist!');
             return;
         }
         if (event.native.type !== 'single' && event.native.intervals && event.native.intervals.length) {
-            event.timer = setTimeout(function (_event, _obj) {
+            event.timer = setTimeout((_event, _obj) => {
                 if (_event.native.type === 'toggle') {
-                    var value = _event.native.startValue;
+                    let value = _event.native.startValue;
                     if (_obj.common.type === 'number' || obj.common.type === 'boolean') {
                         value = !value;
                     } else if (_obj.common.type === 'boolean') {
@@ -213,22 +223,22 @@ function executeEvent(event, now) {
     });
 }
 
-var YYYY_MM_            = 'YYYY_MM_'.length;
-var YYYY_MM_DDTHH_mm    = 'YYYY_MM_DDTHH_mm'.length;
-var YYYY_MM_DDTHH_mm_ss = 'YYYY_MM_DDTHH_mm_ss'.length;
-var DDTHH_mm_ss         = 'DDTHH_mm_ss'.length;
+const YYYY_MM_            = 'YYYY_MM_'.length;
+const YYYY_MM_DDTHH_mm    = 'YYYY_MM_DDTHH_mm'.length;
+const YYYY_MM_DDTHH_mm_ss = 'YYYY_MM_DDTHH_mm_ss'.length;
+const DDTHH_mm_ss         = 'DDTHH_mm_ss'.length;
 
 function calculateNext() {
-    if (nextTimer) clearTimeout(nextTimer);
+    nextTimer && clearTimeout(nextTimer);
 
-    var timeout = null;
-    var nowObj  = new Date();
-    var nowTick = nowObj.getTime();
-    var diff;
+    let timeout = null;
+    const nowObj  = new Date();
+    const nowTick = nowObj.getTime();
+    let diff;
 
-    for (var id in events) {
+    for (const id in events) {
         if (!events.hasOwnProperty(id) || !events[id].common.enabled) continue;
-        var event = events[id];
+        const event = events[id];
 
         // if daily
         if (event.native.cron) {
@@ -240,7 +250,7 @@ function calculateNext() {
                     event.parsed = later.parse.cron(event.native.cron);
                 }
             }
-            var date = later.schedule(event.parsed).next();
+            let date = later.schedule(event.parsed).next();
 
             if (event.native.astro) {
                 date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig);
@@ -254,7 +264,7 @@ function calculateNext() {
                 }
 
                 // build date
-                var nextTick = date.getTime();
+                const nextTick = date.getTime();
 
                 diff = nextTick - nowTick;
                 if (diff > 0 && (timeout === null || diff < timeout)) {
@@ -263,7 +273,7 @@ function calculateNext() {
             }
         } else { // once
             // expected 2017-09-12T12:12:00
-            var time;
+            let time;
             if (event.native.astro) {
                 time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig);
             } else {
@@ -315,15 +325,15 @@ function checkEvent(event) {
 }
 
 function getRoomFunc(id) {
-    var room = '';
-    for (var r in rooms) {
-        if (rooms[r].common.members.indexOf(id) !== -1) {
+    let room = '';
+    for (const r in rooms) {
+        if (room.hasOwnProperty(r) && rooms[r].common.members.indexOf(id) !== -1) {
             room = rooms[r].common.name || r.substring('enum.rooms.'.length);
             break;
         }
     }
-    var func = '';
-    for (var f in funcs) {
+    let func = '';
+    for (const f in funcs) {
         if (funcs[r].common.members.indexOf(id) !== -1) {
             func = funcs[r].common.name || r.substring('enum.functions.'.length);
             break;
@@ -336,9 +346,9 @@ function readEnums(cb) {
     adapter.objects.getObjectView('system', 'enum', {
         startkey: 'enum.rooms.',
         endkey: 'enum.rooms.\u9999'
-    }, function (err, res) {
+    }, (err, res) => {
         rooms = {};
-        for (var r = 0; r < res.rows.length; r++) {
+        for (let r = 0; r < res.rows.length; r++) {
             if (res.rows[r].value && res.rows[r].value.common && res.rows[r].value.members) {
                 rooms[res.rows[r].id] = res.rows[r].value;
             }
@@ -346,9 +356,9 @@ function readEnums(cb) {
         adapter.objects.getObjectView('system', 'enum', {
             startkey: 'enum.functions.',
             endkey: 'enum.functions.\u9999'
-        }, function (err, res) {
+        }, (err, res) => {
             funcs = {};
-            for (var r = 0; r < res.rows.length; r++) {
+            for (let r = 0; r < res.rows.length; r++) {
                 if (res.rows[r].value && res.rows[r].value.common && res.rows[r].value.members) {
                     funcs[res.rows[r].id] = res.rows[r].value;
                 }
@@ -360,34 +370,35 @@ function readEnums(cb) {
 }
 
 function afterMain(count) {
-    readEnums(function () {
+    readEnums(() => {
         adapter.subscribeObjects('*');
         calculateNext();
 
         if (count > 100 || adapter.config.allEventsEnabled) {
             adapter.subscribeForeignStates('*');
         } else {
-            for (var id in cfgEventsSettings) {
-                adapter.subscribeForeignStates(id);
+            for (const id in cfgEventsSettings) {
+                cfgEventsSettings.hasOwnProperty(id) && adapter.subscribeForeignStates(id);
             }
         }
     });
 }
+
 function main() {
     later.date.localTime();
 
     adapter.objects.getObjectView('schedule', 'schedule', {
         startkey: adapter.namespace + '.',
         endkey: adapter.namespace + '.\u9999'
-    }, function (err, res) {
+    }, (err, res) => {
         events = {};
         if (!err && res) {
-            for (var i = 0; i < res.rows.length; i++) {
+            for (let i = 0; i < res.rows.length; i++) {
                 if (res.rows[i].id === 'schedules') continue;
                 events[res.rows[i].value._id] = checkEvent(res.rows[i].value);
             }
         }
-        adapter.getForeignObject('system.config', function (err, obj) {
+        adapter.getForeignObject('system.config', (err, obj) => {
             systemConfig = obj;
             if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
                 systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
@@ -395,10 +406,10 @@ function main() {
             }
 
             if (adapter.config.cfgEventsEnabled) {
-                adapter.objects.getObjectView('custom', 'state', {startkey: '', endkey: '\u9999'}, function (err, res) {
-                    var count = 0;
+                adapter.objects.getObjectView('custom', 'state', {startkey: '', endkey: '\u9999'}, (err, res) => {
+                    let count = 0;
                     if (!err && res) {
-                        for (var i = 0; i < res.rows.length; i++) {
+                        for (let i = 0; i < res.rows.length; i++) {
                             if (res.rows[i].value[adapter.namespace] && res.rows[i].value[adapter.namespace].enabled) {
                                 cfgEventsSettings[res.rows[i].id] = res.rows[i].value;
                                 count++;
@@ -412,4 +423,12 @@ function main() {
             }
         });
     });
+}
+
+// If started as allInOne mode => return function to create instance
+if (module.parent) {
+    module.exports = startAdapter;
+} else {
+    // or start the instance directly
+    startAdapter();
 }
