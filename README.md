@@ -15,6 +15,10 @@ You must not use any external resources, the scheduling is processed only in ioB
 You can control your events with calender and can plan to control them periodically.
 
 ## Changelog
+### 1.1.0 (2019-12-14)
+* (foxriver76) no longer use adapter.objects
+* __requires js-controller v2__
+
 ### 1.0.0 (2019-11-17)
 * (bluefox) Support of compact mode added
 
