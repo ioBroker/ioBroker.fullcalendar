@@ -88,6 +88,9 @@
         "dependencies": [
             {
                 "admin": ">=2.0.0"
+            },
+            {
+                "js-controller": ">=2.0.0"
             }
         ],
         "enabled": true,
