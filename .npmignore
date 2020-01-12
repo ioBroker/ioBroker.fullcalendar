@@ -1,9 +1,10 @@
-Gruntfile.js
+gulpfile.js
 tasks
-www/lib/js/jquery.flot.js
 .idea
 node_modules
 .git
+.github
+.gitignore
 test
 .travis.yml
 appveyor.yml

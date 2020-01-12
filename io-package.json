@@ -3,6 +3,18 @@
         "name": "fullcalendar",
         "version": "1.0.0",
         "news": {
+            "1.0.1": {
+                "en": "Updated to use with js-controller 2.x",
+                "de": "Aktualisiert zur Verwendung mit js-controller 2.x",
+                "ru": "Обновлен для использования с js-controller 2.x",
+                "pt": "Atualizado para uso com o js-controller 2.x",
+                "nl": "Bijgewerkt voor gebruik met js-controller 2.x",
+                "fr": "Mis à jour pour être utilisé avec js-controller 2.x",
+                "it": "Aggiornato per l'uso con js-controller 2.x",
+                "es": "Actualizado para usar con js-controller 2.x",
+                "pl": "Zaktualizowano do użytku z js-kontrolerem 2.x",
+                "zh-cn": "更新为与js-controller 2.x一起使用"
+            },
             "1.0.0": {
                 "en": "Support of compact mode added",
                 "de": "Unterstützung des Kompaktmodus hinzugefügt",

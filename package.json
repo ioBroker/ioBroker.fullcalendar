@@ -1,7 +1,7 @@
 {
   "name": "iobroker.fullcalendar",
   "description": "This adapter allows planing with calendar.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "bluefox",
     "email": "dogafox@gmail.com"
@@ -17,12 +17,6 @@
     "type": "git",
     "url": "https://github.com/ioBroker/ioBroker.fullcalendar"
   },
-  "licenses": [
-    {
-      "type": "CC-BY-NC-4.0",
-      "url": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/LICENSE"
-    }
-  ],
   "keywords": [
     "ioBroker",
     "fullcalendar",
@@ -35,7 +29,7 @@
   },
   "devDependencies": {
     "gulp": "^4.0.2",
-    "mocha": "^6.2.2",
+    "mocha": "^7.0.0",
     "chai": "^4.2.0"
   },
   "bugs": {
