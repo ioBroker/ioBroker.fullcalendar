@@ -343,7 +343,7 @@ function getRoomFunc(id) {
 }
 
 function readEnums(cb) {
-    adapter.objects.getObjectView('system', 'enum', {
+    adapter.getObjectView('system', 'enum', {
         startkey: 'enum.rooms.',
         endkey: 'enum.rooms.\u9999'
     }, (err, res) => {
@@ -353,7 +353,7 @@ function readEnums(cb) {
                 rooms[res.rows[r].id] = res.rows[r].value;
             }
         }
-        adapter.objects.getObjectView('system', 'enum', {
+        adapter.getObjectView('system', 'enum', {
             startkey: 'enum.functions.',
             endkey: 'enum.functions.\u9999'
         }, (err, res) => {
@@ -387,7 +387,7 @@ function afterMain(count) {
 function main() {
     later.date.localTime();
 
-    adapter.objects.getObjectView('schedule', 'schedule', {
+    adapter.getObjectView('schedule', 'schedule', {
         startkey: adapter.namespace + '.',
         endkey: adapter.namespace + '.\u9999'
     }, (err, res) => {
@@ -406,7 +406,7 @@ function main() {
             }
 
             if (adapter.config.cfgEventsEnabled) {
-                adapter.objects.getObjectView('custom', 'state', {startkey: '', endkey: '\u9999'}, (err, res) => {
+                adapter.getObjectView('custom', 'state', {startkey: '', endkey: '\u9999'}, (err, res) => {
                     let count = 0;
                     if (!err && res) {
                         for (let i = 0; i < res.rows.length; i++) {

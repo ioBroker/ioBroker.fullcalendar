@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "fullcalendar",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "news": {
+            "1.1.0": {
+                "en": "we no longer use adapter.objects",
+                "de": "Wir verwenden keine adapter.objects mehr",
+                "ru": "мы больше не используем адаптер.объекты",
+                "pt": "não usamos mais adapter.objects",
+                "nl": "we gebruiken niet langer adapter.objects",
+                "fr": "nous n'utilisons plus adapter.objects",
+                "it": "non usiamo più adapter.objects",
+                "es": "ya no usamos adaptador.objetos",
+                "pl": "nie używamy już adapter.objects",
+                "zh-cn": "我们不再使用adapter.objects"
+            },
             "1.0.0": {
                 "en": "Support of compact mode added",
                 "de": "Unterstützung des Kompaktmodus hinzugefügt",
@@ -76,6 +88,9 @@
         "dependencies": [
             {
                 "admin": ">=2.0.0"
+            },
+            {
+                "js-controller": ">=2.0.0"
             }
         ],
         "enabled": true,
