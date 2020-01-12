@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "fullcalendar",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "news": {
-            "1.0.1": {
+            "1.1.0": {
                 "en": "Updated to use with js-controller 2.x",
                 "de": "Aktualisiert zur Verwendung mit js-controller 2.x",
                 "ru": "Обновлен для использования с js-controller 2.x",
@@ -88,6 +88,9 @@
         "dependencies": [
             {
                 "admin": ">=2.0.0"
+            },
+            {
+                "js-controller": ">=2.0.0"
             }
         ],
         "enabled": true,

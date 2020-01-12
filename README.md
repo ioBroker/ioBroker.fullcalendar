@@ -15,7 +15,7 @@ You must not use any external resources, the scheduling is processed only in ioB
 You can control your events with calender and can plan to control them periodically.
 
 ## Changelog
-### 1.0.1 (2020-01-12)
+### 1.1.0 (2020-01-12)
 * (foxriver76) Updated to use with js-controller 2.x 
 
 ### 1.0.0 (2019-11-17)
