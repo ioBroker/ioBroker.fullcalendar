@@ -8,13 +8,20 @@
 
 Schedules with [fullcalendar](https://fullcalendar.io).
 
-You must not use any external resources, the scheduling is processed only in ioBroker and will be not combined with any external services like "google calender" or "iTunes".
+You must not use any external resources, the scheduling is processed only in ioBroker and will be not combined with any external services like "google calendar" or "iTunes".
 
 ![Example](img/example.png)
 
-You can control your events with calender and can plan to control them periodically.
+You can control your events with calendar and can plan to control them periodically.
 
+<!--
+	Placeholder for the next version (at the beginning of the line):
+	### __WORK IN PROGRESS__
+-->
 ## Changelog
+### __WORK IN PROGRESS__
+* (bluefox) Updated to use with js-controller 3.3 and admin 5
+
 ### 1.1.0 (2020-01-12)
 * (foxriver76) Updated to use with js-controller 2.x 
 
@@ -44,4 +51,4 @@ You can control your events with calender and can plan to control them periodica
 ## License
 CC BY-NC 4.0
 
-Copyright (c) 2017-2020 bluefox <dogafox@gmail.com>
+Copyright (c) 2017-2021 bluefox <dogafox@gmail.com>

@@ -67,7 +67,7 @@
             "bluefox <dogafox@gmail.com>"
         ],
         "license": "CC-BY-NC-4.0",
-        "platform": "javascript/Node.js",
+        "platform": "Javascript/Node.js",
         "icon": "fullcalendar.png",
         "mode": "daemon",
         "compact": true,
@@ -87,15 +87,17 @@
         },
         "dependencies": [
             {
-                "admin": ">=2.0.0"
-            },
-            {
-                "js-controller": ">=2.0.0"
+                "js-controller": ">=3.3.0"
             }
         ],
         "enabled": true,
         "type": "date-and-time",
-        "noConfig": false
+        "noConfig": false,
+        "plugins": {
+            "sentry": {
+                "dsn": "https://89d6f43ab4b5424785f6454d630c3286@sentry.iobroker.net/164"
+            }
+        }
     },
     "native": {
         "debounce": 1000,
@@ -151,15 +153,6 @@
             "views": {
                 "schedule": {
                     "map": "function(doc) { if (doc.type === 'schedule') emit(doc.common.name, doc); }"
-                }
-            }
-        },
-        {
-            "_id": "_design/custom",
-            "language": "javascript",
-            "views": {
-                "state": {
-                    "map": "function (doc) { if (doc.type === 'state' && doc.common && doc.common.custom) emit(doc._id, doc.common.custom) }"
                 }
             }
         }

@@ -4,11 +4,11 @@
 'use strict';
 
 // you have to require the utils module and call adapter function
-const utils = require('@iobroker/adapter-core'); // Get common adapter utils
-const adapterName  = require('./package.json').name.split('.').pop();
-const timeUtils = require('./admin/utils.js');
-const later = require('later');
-const SunCalc = require('./admin/suncalc.js');
+const utils       = require('@iobroker/adapter-core'); // Get common adapter utils
+const adapterName = require('./package.json').name.split('.').pop();
+const timeUtils   = require('./admin/utils.js');
+const later       = require('later');
+const SunCalc     = require('./admin/suncalc.js');
 let adapter;
 
 let events;
@@ -327,19 +327,19 @@ function checkEvent(event) {
 function getRoomFunc(id) {
     let room = '';
     for (const r in rooms) {
-        if (room.hasOwnProperty(r) && rooms[r].common.members.indexOf(id) !== -1) {
+        if (room.hasOwnProperty(r) && rooms[r].common.members.includes(id)) {
             room = rooms[r].common.name || r.substring('enum.rooms.'.length);
             break;
         }
     }
     let func = '';
     for (const f in funcs) {
-        if (funcs[r].common.members.indexOf(id) !== -1) {
+        if (funcs[r].common.members.includes(id)) {
             func = funcs[r].common.name || r.substring('enum.functions.'.length);
             break;
         }
     }
-    return {func: func, room: room};
+    return {func, room};
 }
 
 function readEnums(cb) {
@@ -394,7 +394,9 @@ function main() {
         events = {};
         if (!err && res) {
             for (let i = 0; i < res.rows.length; i++) {
-                if (res.rows[i].id === 'schedules') continue;
+                if (res.rows[i].id === 'schedules') {
+                    continue;
+                }
                 events[res.rows[i].value._id] = checkEvent(res.rows[i].value);
             }
         }
@@ -406,7 +408,7 @@ function main() {
             }
 
             if (adapter.config.cfgEventsEnabled) {
-                adapter.getObjectView('custom', 'state', {startkey: '', endkey: '\u9999'}, (err, res) => {
+                adapter.getObjectView('system', 'custom', {startkey: '', endkey: '\u9999'}, (err, res) => {
                     let count = 0;
                     if (!err && res) {
                         for (let i = 0; i < res.rows.length; i++) {

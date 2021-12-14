@@ -3,7 +3,8 @@ var parts = path.split('/');
 parts.splice(-3);
 
 var socket   = io.connect('/', {path: parts.join('/') + '/socket.io'});
-var instance = window.location.search.slice(1) || 0;
+var query  = (window.location.search || '').replace(/^\?/, '').replace(/#.*$/, '');
+var args   = {};
 var common   = null; // common information of adapter
 var host     = null; // host object on which the adapter runs
 var changed  = false;
@@ -14,11 +15,33 @@ var onChangeSupported = false;
 
 var tmp = window.location.pathname.split('/');
 adapter = tmp[tmp.length - 2];
+
+// parse parameters
+query.trim().split('&').filter(function (t) {return t.trim();}).forEach(function (b, i) {
+    const parts = b.split('=');
+    if (!i && parts.length === 1 && !isNaN(parseInt(b, 10))) {
+        args.instance = parseInt(b,  10);
+    }
+    var name = parts[0];
+    args[name] = parts.length === 2 ? parts[1] : true;
+
+    if (name === 'instance') {
+        args.instance = parseInt( args.instance,  10) || 0;
+    }
+
+    if (args[name] === 'true') {
+        args[name] = true;
+    } else if (args[name] === 'false') {
+        args[name] = false;
+    }
+});
+var instance = args.instance;
+
 var _adapterInstance = 'system.adapter.' + adapter + '.' + instance;
 
 $(document).ready(function () {
     'use strict';
-    
+
     if (typeof noConfigDialog === 'undefined') {
         // Extend dictionary with standard words for adapter
         if (typeof systemDictionary === 'undefined') systemDictionary = {};
@@ -90,7 +113,7 @@ $(document).ready(function () {
             }
         });
     }
-    
+
    // callback if something changed
     function onChange(isChanged) {
         onChangeSupported = true;
@@ -515,7 +538,9 @@ function sendToHost(host, command, message, callback) {
 function fillSelectCertificates(id, type, actualValued) {
     var str = '<option value="">' + _('none') + '</option>';
     for (var i = 0; i < certs.length; i++) {
-        if (certs[i].type != type) continue;
+        if (certs[i].type != type) {
+            continue;
+        }
         str += '<option value="' + certs[i].name + '" ' + ((certs[i].name === actualValued) ? 'selected' : '') + '>' + certs[i].name + '</option>';
     }
 

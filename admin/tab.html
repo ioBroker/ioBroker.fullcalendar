@@ -331,7 +331,7 @@
         } else {
             delete event.native.astro;
             delete event.native.offset;
-		    
+
             // extract time
             time = checkTime($dialog.find('#dialog_event_time').val());
             if (typeof time === 'string') {
@@ -1050,7 +1050,9 @@
     }
 
 	function initSelectId(callback) {
-        if (selectId) return selectId;
+        if (selectId) {
+            return selectId;
+        }
 		selectId = $('#dialog-select-member').selectId('init',  {
 			objects: 		objects,
 			states:  		states,
