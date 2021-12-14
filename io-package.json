@@ -1,160 +1,172 @@
 {
-    "common": {
-        "name": "fullcalendar",
-        "version": "1.1.0",
-        "news": {
-            "1.1.0": {
-                "en": "Updated to use with js-controller 2.x",
-                "de": "Aktualisiert zur Verwendung mit js-controller 2.x",
-                "ru": "Обновлен для использования с js-controller 2.x",
-                "pt": "Atualizado para uso com o js-controller 2.x",
-                "nl": "Bijgewerkt voor gebruik met js-controller 2.x",
-                "fr": "Mis à jour pour être utilisé avec js-controller 2.x",
-                "it": "Aggiornato per l'uso con js-controller 2.x",
-                "es": "Actualizado para usar con js-controller 2.x",
-                "pl": "Zaktualizowano do użytku z js-kontrolerem 2.x",
-                "zh-cn": "更新为与js-controller 2.x一起使用"
-            },
-            "1.0.0": {
-                "en": "Support of compact mode added",
-                "de": "Unterstützung des Kompaktmodus hinzugefügt",
-                "ru": "Добавлена поддержка компактного режима",
-                "pt": "Adicionado suporte ao modo compacto",
-                "nl": "Ondersteuning van compacte modus toegevoegd",
-                "fr": "Prise en charge du mode compact ajouté",
-                "it": "Supporto della modalità compatta aggiunto",
-                "es": "Soporte de modo compacto agregado",
-                "pl": "Dodano obsługę trybu kompaktowego",
-                "zh-cn": "支持紧凑模式"
-            },
-            "0.2.4": {
-                "en": "Translations",
-                "de": "Übersetzungen",
-                "ru": "Поправлен перевод"
-            },
-            "0.2.3": {
-                "en": "Fix interval settings\nUpdate fullcalendar library",
-                "de": "Intervalleinstellungen korrigiert\nUpdate fullcalendar library",
-                "ru": "Исправлена ошибка с интервалом\nОбновлена библиотека fullcalendar"
-            }
-        },
-        "title": "Calendar schedule",
-        "titleLang": {
-            "en": "Calendar schedule",
-            "de": "Kalender Zeitplan",
-            "ru": "Календарное расписание",
-            "pt": "Agenda do calendário",
-            "nl": "Kalender schema",
-            "fr": "Calendrier calendrier",
-            "it": "Calendario",
-            "es": "Calendario calendario",
-            "pl": "Harmonogram kalendarza",
-            "zh-cn": "日历时间表"
-        },
-        "desc": {
-            "en": "This adapter allows planing with calendar",
-            "de": "Adapter für geplante Aktionen in ioBroker mittels Kalender",
-            "ru": "Драйвер позволяет планировать с помощью календаря",
-            "pt": "Este adaptador permite aplainar com calendário",
-            "nl": "Met deze adapter kunt u schaven met kalender",
-            "fr": "Cet adaptateur permet de planifier avec calendrier",
-            "it": "Questo adattatore consente la piallatura con calendario",
-            "es": "Este adaptador permite planear con calendario",
-            "pl": "Ten adapter umożliwia struganie za pomocą kalendarza",
-            "zh-cn": "该适配器允许日历计划"
-        },
-        "authors": [
-            "bluefox <dogafox@gmail.com>"
-        ],
-        "license": "CC-BY-NC-4.0",
-        "platform": "Javascript/Node.js",
-        "icon": "fullcalendar.png",
-        "mode": "daemon",
-        "compact": true,
-        "keywords": [
-            "schedule",
-            "calendar"
-        ],
-        "materialize": true,
-        "messagebox": true,
-        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
-        "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
-        "loglevel": "info",
-        "adminTab": {
-            "singleton": false,
-            "name": "Calendar",
-            "fa-icon": "calendar_today"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=3.3.0"
-            }
-        ],
-        "enabled": true,
-        "type": "date-and-time",
-        "noConfig": false,
-        "plugins": {
-            "sentry": {
-                "dsn": "https://89d6f43ab4b5424785f6454d630c3286@sentry.iobroker.net/164"
-            }
-        }
+  "common": {
+    "name": "fullcalendar",
+    "version": "1.2.0",
+    "news": {
+      "1.2.0": {
+        "en": "Updated to use with js-controller 3.3 and admin 5",
+        "de": "Aktualisiert für die Verwendung mit js-controller 3.3 und admin 5",
+        "ru": "Обновлено для использования с js-controller 3.3 и admin 5",
+        "pt": "Atualizado para usar com js-controller 3.3 e admin 5",
+        "nl": "Bijgewerkt voor gebruik met js-controller 3.3 en admin 5",
+        "fr": "Mis à jour pour être utilisé avec js-controller 3.3 et admin 5",
+        "it": "Aggiornato per l'uso con js-controller 3.3 e admin 5",
+        "es": "Actualizado para usar con js-controller 3.3 y admin 5",
+        "pl": "Zaktualizowano do użycia z js-controller 3.3 i administratorem 5",
+        "zh-cn": "更新为与 js-controller 3.3 和 admin 5 一起使用"
+      },
+      "1.1.0": {
+        "en": "Updated to use with js-controller 2.x",
+        "de": "Aktualisiert zur Verwendung mit js-controller 2.x",
+        "ru": "Обновлен для использования с js-controller 2.x",
+        "pt": "Atualizado para uso com o js-controller 2.x",
+        "nl": "Bijgewerkt voor gebruik met js-controller 2.x",
+        "fr": "Mis à jour pour être utilisé avec js-controller 2.x",
+        "it": "Aggiornato per l'uso con js-controller 2.x",
+        "es": "Actualizado para usar con js-controller 2.x",
+        "pl": "Zaktualizowano do użytku z js-kontrolerem 2.x",
+        "zh-cn": "更新为与js-controller 2.x一起使用"
+      },
+      "1.0.0": {
+        "en": "Support of compact mode added",
+        "de": "Unterstützung des Kompaktmodus hinzugefügt",
+        "ru": "Добавлена поддержка компактного режима",
+        "pt": "Adicionado suporte ao modo compacto",
+        "nl": "Ondersteuning van compacte modus toegevoegd",
+        "fr": "Prise en charge du mode compact ajouté",
+        "it": "Supporto della modalità compatta aggiunto",
+        "es": "Soporte de modo compacto agregado",
+        "pl": "Dodano obsługę trybu kompaktowego",
+        "zh-cn": "支持紧凑模式"
+      },
+      "0.2.4": {
+        "en": "Translations",
+        "de": "Übersetzungen",
+        "ru": "Поправлен перевод"
+      },
+      "0.2.3": {
+        "en": "Fix interval settings\nUpdate fullcalendar library",
+        "de": "Intervalleinstellungen korrigiert\nUpdate fullcalendar library",
+        "ru": "Исправлена ошибка с интервалом\nОбновлена библиотека fullcalendar"
+      }
     },
-    "native": {
-        "debounce": 1000,
-        "changesRelogInterval": 0,
-        "ackType": "any",
-        "changesMinDelta": 0,
-        "allEventsEnabled": false,
-        "allEventsMax": 1000,
-        "allEventsSaveOnDisk": false,
-        "eventsPath": "calendar/",
-        "cfgEventsEnabled": true,
-        "cfgEventsMax": 1000,
-        "cfgEventsSaveOnDisk": false
+    "title": "Calendar schedule",
+    "titleLang": {
+      "en": "Calendar schedule",
+      "de": "Kalender Zeitplan",
+      "ru": "Календарное расписание",
+      "pt": "Agenda do calendário",
+      "nl": "Kalender schema",
+      "fr": "Calendrier calendrier",
+      "it": "Calendario",
+      "es": "Calendario calendario",
+      "pl": "Harmonogram kalendarza",
+      "zh-cn": "日历时间表"
     },
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.lastConfiguredEvent",
-            "type": "state",
-            "common": {
-                "role": "state",
-                "name": "Last configured event",
-                "type": "json",
-                "read": true,
-                "write": false
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.lastEvent",
-            "type": "state",
-            "common": {
-                "role": "state",
-                "name": "Any last event",
-                "type": "json",
-                "read": true,
-                "write": false
-            },
-            "native": {}
-        }
+    "desc": {
+      "en": "This adapter allows planing with calendar",
+      "de": "Adapter für geplante Aktionen in ioBroker mittels Kalender",
+      "ru": "Драйвер позволяет планировать с помощью календаря",
+      "pt": "Este adaptador permite aplainar com calendário",
+      "nl": "Met deze adapter kunt u schaven met kalender",
+      "fr": "Cet adaptateur permet de planifier avec calendrier",
+      "it": "Questo adattatore consente la piallatura con calendario",
+      "es": "Este adaptador permite planear con calendario",
+      "pl": "Ten adapter umożliwia struganie za pomocą kalendarza",
+      "zh-cn": "该适配器允许日历计划"
+    },
+    "authors": [
+      "bluefox <dogafox@gmail.com>"
     ],
-    "objects": [
-        {
-            "_id": "_design/schedule",
-            "language": "javascript",
-            "views": {
-                "schedule": {
-                    "map": "function(doc) { if (doc.type === 'schedule') emit(doc.common.name, doc); }"
-                }
-            }
+    "license": "CC-BY-NC-4.0",
+    "platform": "Javascript/Node.js",
+    "icon": "fullcalendar.png",
+    "mode": "daemon",
+    "compact": true,
+    "keywords": [
+      "schedule",
+      "calendar"
+    ],
+    "materialize": true,
+    "messagebox": true,
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
+    "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
+    "loglevel": "info",
+    "adminTab": {
+      "singleton": false,
+      "name": "Calendar",
+      "fa-icon": "calendar_today"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=3.3.0"
+      }
+    ],
+    "enabled": true,
+    "type": "date-and-time",
+    "noConfig": false,
+    "plugins": {
+      "sentry": {
+        "dsn": "https://89d6f43ab4b5424785f6454d630c3286@sentry.iobroker.net/164"
+      }
+    }
+  },
+  "native": {
+    "debounce": 1000,
+    "changesRelogInterval": 0,
+    "ackType": "any",
+    "changesMinDelta": 0,
+    "allEventsEnabled": false,
+    "allEventsMax": 1000,
+    "allEventsSaveOnDisk": false,
+    "eventsPath": "calendar/",
+    "cfgEventsEnabled": true,
+    "cfgEventsMax": 1000,
+    "cfgEventsSaveOnDisk": false
+  },
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.lastConfiguredEvent",
+      "type": "state",
+      "common": {
+        "role": "state",
+        "name": "Last configured event",
+        "type": "json",
+        "read": true,
+        "write": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.lastEvent",
+      "type": "state",
+      "common": {
+        "role": "state",
+        "name": "Any last event",
+        "type": "json",
+        "read": true,
+        "write": false
+      },
+      "native": {}
+    }
+  ],
+  "objects": [
+    {
+      "_id": "_design/schedule",
+      "language": "javascript",
+      "views": {
+        "schedule": {
+          "map": "function(doc) { if (doc.type === 'schedule') emit(doc.common.name, doc); }"
         }
-    ]
+      }
+    }
+  ]
 }

@@ -19,11 +19,11 @@ You can control your events with calendar and can plan to control them periodica
 	### __WORK IN PROGRESS__
 -->
 ## Changelog
-### __WORK IN PROGRESS__
+### 1.2.0 (2021-12-14)
 * (bluefox) Updated to use with js-controller 3.3 and admin 5
 
 ### 1.1.0 (2020-01-12)
-* (foxriver76) Updated to use with js-controller 2.x 
+* (foxriver76) Updated to use with js-controller 2.x
 
 ### 1.0.0 (2019-11-17)
 * (bluefox) Support of compact mode added
@@ -46,7 +46,6 @@ You can control your events with calendar and can plan to control them periodica
 
 ### 0.1.0 (2017-03-20)
 * (bluefox) initial commit
-
 
 ## License
 CC BY-NC 4.0
