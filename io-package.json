@@ -164,7 +164,7 @@
       "language": "javascript",
       "views": {
         "schedule": {
-          "map": "function(doc) { if (doc.type === 'schedule') emit(doc.common.name, doc); }"
+          "map": "function(doc) { if (doc.type === 'schedule') emit(doc._id, doc); }"
         }
       }
     }
