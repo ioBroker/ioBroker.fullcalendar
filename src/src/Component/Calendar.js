@@ -1,8 +1,11 @@
-import { IconButton, MenuItem, Select } from '@mui/material';
+import {
+    Button, IconButton, MenuItem, Select,
+} from '@mui/material';
 import { NavigateBefore, NavigateNext } from '@mui/icons-material';
 import moment from 'moment';
 import { useState } from 'react';
 import { cron2obj } from './Utils';
+import EventDialog from './EventDialog';
 
 const types = [
     { value: 'day', title: 'День' },
@@ -19,21 +22,33 @@ function getStartWeekMonday(weekDay) {
 
 function Calendar(props) {
     const [type, setType] = useState('month');
-    const [startDate, setStartDate] = useState(new Date(new Date().setHours(0, 0, 0, 0)));
+    const [startDate, setStartDate] = useState(() => {
+        const newDate = new Date();
+        newDate.setDate(1);
+        newDate.setHours(0, 0, 0, 0);
+        return newDate;
+    });
+    const [eventDialog, setEventDialog] = useState(null);
 
     const renderEvents = (from, to) => props.events.filter(event => {
-        console.log(new Date(event.native.start));
-        console.log(new Date(from));
-        console.log(new Date(to));
         if (event.native.cron) {
             console.log(cron2obj(event.native.cron));
+            console.log(new Date(from).getDay());
+            const cronObject = cron2obj(event.native.cron);
+            if (Array.isArray(cronObject.months)) {
+                return cronObject.months.includes(new Date(from).getMonth() + 1);
+            }
+            if (Array.isArray(cronObject.dows)) {
+                return cronObject.dows.includes(new Date(from).getDay());
+            }
+        } else {
+            return new Date(from) <= new Date(event.native.start) && new Date(event.native.start) <= new Date(to);
         }
-        return new Date(from) <= new Date(event.native.start) && new Date(event.native.start) <= new Date(to);
     }).map(event => (
-        <div>
+        <MenuItem onClick={() => setEventDialog(event._id)}>
             <div>{event.common.name}</div>
             <div>{event.native.start}</div>
-        </div>
+        </MenuItem>
     ));
 
     let calendarTable = null;
@@ -164,8 +179,7 @@ function Calendar(props) {
             </table>
         );
     } else if (type === 'month') {
-        const viewStartDate = new Date(startDate.getTime()
-      - getStartWeekMonday(startDate.getDay()) * 24 * 60 * 60 * 1000);
+        const viewStartDate = new Date(startDate.getTime() - getStartWeekMonday(startDate.getDay()) * 24 * 60 * 60 * 1000);
         const weeks = [];
         for (let i = 0; i < 6; i++) {
             const firstDayOfWeek = new Date(viewStartDate.getTime() + i * 7 * 24 * 60 * 60 * 1000);
@@ -243,6 +257,12 @@ function Calendar(props) {
 
     return (
         <div>
+            <EventDialog
+                open={!!eventDialog}
+                event={props.events.find(event => event._id === eventDialog)}
+                onClose={() => setEventDialog(null)}
+                socket={props.socket}
+            />
             <div style={{ flex: 1, paddingLeft: 36 }}>
                 <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24,

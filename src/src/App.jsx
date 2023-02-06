@@ -65,7 +65,7 @@ class App extends GenericApp {
         return <StyledEngineProvider injectFirst>
             <ThemeProvider theme={this.state.theme}>
                 <div style={{ overflow: 'auto', height: '100%' }}>
-                    <Calendar events={this.state.events || []} />
+                    <Calendar events={this.state.events || []} socket={this.socket} />
                     <pre>
                         {JSON.stringify(this.state.events, null, 2)}
                     </pre>
