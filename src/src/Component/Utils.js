@@ -1,3 +1,7 @@
+function sortNumbers(a, b) {
+    return a - b;
+}
+
 function oneCron2Array(str) {
     if (str === '*' || str === '?' || str === '') return str;
 
@@ -105,4 +109,40 @@ function obj2cron(cron) {
     return parts.join(' ');
 }
 
-export { cron2obj, obj2cron };
+function serverDateToClient(dateString, format, serverTimeZone) {
+    if (format === 'cron') {
+        const cronObject = cron2obj(dateString);
+        let date = new Date();
+        console.log(date.getTimezoneOffset());
+        console.log(serverTimeZone);
+        date.setHours(cronObject.hours[0], cronObject.minutes[0]);
+        date = new Date(date.getTime() - (date.getTimezoneOffset() + serverTimeZone) * 60000);
+        return date;
+    }
+    if (format === 'date') {
+        dateString += 'Z';
+        return new Date(new Date(dateString).getTime() - serverTimeZone * 60000);
+    }
+}
+
+function clientDateToServer(date, format, serverTimeZone) {
+    if (format === 'cron') {
+        date = new Date(date.getTime() + (date.getTimezoneOffset() + serverTimeZone) * 60000);
+        const cronObject = {
+            minutes: [date.getMinutes()],
+            hours: [date.getHours()],
+        };
+        return cronObject;
+    }
+    if (format === 'date') {
+        date = new Date(date.getTime() + serverTimeZone * 60000);
+        console.log(date);
+        const dateStr = date.toISOString();
+        console.log(dateStr);
+        return dateStr.substring(0, dateStr.length - 5);
+    }
+}
+
+export {
+    cron2obj, obj2cron, serverDateToClient, clientDateToServer,
+};

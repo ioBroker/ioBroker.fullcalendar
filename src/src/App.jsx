@@ -47,7 +47,12 @@ class App extends GenericApp {
             `fullcalendar.${this.instance}.`,
             `fullcalendar.${this.instance}.\u9999`,
         );
-        this.setState({ events: Object.values(objects) });
+        const serverTimeZone = (await this.socket.getState('fullcalendar.0.info.timeZone')).val;
+        this.setState({ events: Object.values(objects), serverTimeZone });
+    };
+
+    changeEvents = events => {
+        this.setState({ events });
     };
 
     onConnectionReady() {
@@ -65,7 +70,13 @@ class App extends GenericApp {
         return <StyledEngineProvider injectFirst>
             <ThemeProvider theme={this.state.theme}>
                 <div style={{ overflow: 'auto', height: '100%' }}>
-                    <Calendar events={this.state.events || []} socket={this.socket} />
+                    <Calendar
+                        events={this.state.events || []}
+                        socket={this.socket}
+                        changeEvents={this.changeEvents}
+                        updateEvents={this.updateEvents}
+                        serverTimeZone={this.state.serverTimeZone}
+                    />
                     <pre>
                         {JSON.stringify(this.state.events, null, 2)}
                     </pre>

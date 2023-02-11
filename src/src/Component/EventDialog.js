@@ -10,7 +10,9 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import moment from 'moment';
-import { cron2obj } from './Utils';
+import {
+    clientDateToServer, cron2obj, obj2cron, serverDateToClient,
+} from './Utils';
 
 const EventDialog = props => {
     const [idDialog, setIdDialog] = useState(false);
@@ -25,6 +27,17 @@ const EventDialog = props => {
         period = 'monthly';
     } else if (Array.isArray(cronObject?.dows)) {
         period = 'daily';
+    }
+
+    let date;
+
+    if (event) {
+        if (period === 'once') {
+            date = serverDateToClient(event.native.start, 'date', props.serverTimeZone);
+        } else if (period === 'monthly' || period === 'daily') {
+            date = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
+        }
+        console.log(date);
     }
 
     const changeEvent = modify => {
@@ -76,17 +89,22 @@ const EventDialog = props => {
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                     <TimePicker
                         label="Time"
-                        value={event?.native.start}
+                        value={date || null}
                         onChange={date => {
                             if (!date) {
                                 return;
                             }
-                            console.log(date);
                             try {
                                 changeEvent(newEvent => {
-                                    const newDate = new Date(newEvent.native.start);
-                                    newDate.setHours(date.toDate().getHours(), date.toDate().getMinutes(), 0, 0);
-                                    newEvent.native.start = newDate.toISOString();
+                                    if (period === 'once') {
+                                        newEvent.native.start = clientDateToServer(date.toDate(), 'date', props.serverTimeZone);
+                                    } else if (period === 'monthly' || period === 'daily') {
+                                        const newCron = cron2obj(newEvent.native.cron);
+                                        const timeZoneCron = clientDateToServer(date.toDate(), 'cron', props.serverTimeZone);
+                                        newCron.hours = timeZoneCron.hours;
+                                        newCron.minutes = timeZoneCron.minutes;
+                                        newEvent.native.cron = obj2cron(newCron);
+                                    }
                                 });
                             } catch {
                                 //
@@ -157,17 +175,22 @@ const EventDialog = props => {
                             }
                             changeEvent(newEvent => {
                                 if (e.target.value === 'once') {
-                                    const newCronObject = cron2obj(newEvent.native.cron);
                                     delete newEvent.native.cron;
-                                    const time = new Date();
-                                    time.setHours(newCronObject.hours[0], newCronObject.minutes[0], 0, 0);
-                                    newEvent.native.start = time.toISOString();
+                                    newEvent.native.start = clientDateToServer(date, 'date', props.serverTimeZone);
                                 } else if (e.target.value === 'daily') {
                                     delete newEvent.native.start;
-                                    newEvent.native.cron = '0 0 ? * 1-7';
+                                    const newCronObject = cron2obj('0 0 ? * 1-7');
+                                    const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
+                                    newCronObject.hours = timeZoneCron.hours;
+                                    newCronObject.minutes = timeZoneCron.minutes;
+                                    newEvent.native.cron = obj2cron(newCronObject);
                                 } else if (e.target.value === 'monthly') {
                                     delete newEvent.native.start;
-                                    newEvent.native.cron = '0 0 ? 1-12 ?';
+                                    const newCronObject = cron2obj('0 0 ? 1-12 ?');
+                                    const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
+                                    newCronObject.hours = timeZoneCron.hours;
+                                    newCronObject.minutes = timeZoneCron.minutes;
+                                    newEvent.native.cron = obj2cron(newCronObject);
                                 }
                             });
                         }}
@@ -189,6 +212,17 @@ const EventDialog = props => {
                         {new Array(12).fill(null).map((value, i) => <td>
                             <Checkbox
                                 checked={cronObject?.months?.includes(i + 1) || false}
+                                onChange={e => {
+                                    changeEvent(newEvent => {
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (e.target.checked) {
+                                            newCronObject.months.push(i + 1);
+                                        } else {
+                                            newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
+                                    });
+                                }}
                                 size="small"
                             />
                         </td>)}
@@ -208,6 +242,17 @@ const EventDialog = props => {
                         {new Array(7).fill(null).map((value, i) => <td>
                             <Checkbox
                                 checked={cronObject?.dows?.includes(i + 1) || false}
+                                onChange={e => {
+                                    changeEvent(newEvent => {
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (e.target.checked) {
+                                            newCronObject.dows.push(i + 1);
+                                        } else {
+                                            newCronObject.dows = newCronObject.dows.filter(dow => dow !== i + 1);
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
+                                    });
+                                }}
                                 size="small"
                             />
                         </td>)}
@@ -239,8 +284,22 @@ const EventDialog = props => {
             </pre>
         </DialogContent>
         <DialogActions>
-            <Button onClick={props.onClose}>{I18n.t('Delete')}</Button>
-            <Button onClick={props.onClose}>{I18n.t('Save')}</Button>
+            <Button onClick={async () => {
+                await props.socket.delObject(event._id);
+                props.updateEvents();
+                props.onClose();
+            }}
+            >
+                {I18n.t('Delete')}
+            </Button>
+            <Button onClick={async () => {
+                await props.socket.setObject(event._id, event);
+                props.updateEvents();
+                props.onClose();
+            }}
+            >
+                {I18n.t('Save')}
+            </Button>
             <Button onClick={props.onClose}>{I18n.t('Cancel')}</Button>
         </DialogActions>
     </Dialog>;
