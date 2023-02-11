@@ -156,6 +156,19 @@
         "write": false
       },
       "native": {}
+    },
+    {
+      "_id": "info.timeZone",
+      "type": "state",
+      "common": {
+        "role": "state",
+        "name": "Time zone in minutes",
+        "type": "number",
+        "unit": "minutes",
+        "read": true,
+        "write": false
+      },
+      "native": {}
     }
   ],
   "objects": [

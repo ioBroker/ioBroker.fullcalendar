@@ -14,6 +14,7 @@ let adapter;
 let events;
 let nextTimer;
 let systemConfig;
+let timeZoneInterval;
 
 const configuredEvents  = [];
 const cfgEventsSettings = {};
@@ -124,6 +125,12 @@ function startAdapter(options) {
             events[id] = checkEvent(obj);
         }
         calculateNext();
+    });
+
+    adapter.on('unload', callback => {
+        timeZoneInterval && clearInterval(timeZoneInterval);
+        timeZoneInterval = null;
+        callback && callback();
     });
 
     return adapter;
@@ -400,8 +407,16 @@ async function afterMain() {
     }
 }
 
+function setTimeZone() {
+    adapter.setState('info.timeZone', new Date().getTimezoneOffset(), true);
+    // because of winter time, update timezone every 30 minutes
+    timeZoneInterval = timeZoneInterval || setInterval(() => setTimeZone, 30000);
+}
+
 async function main() {
     later.date.localTime();
+
+    setTimeZone();
 
     // fix old design
     const design = await adapter.getForeignObjectAsync('_design/schedule');
