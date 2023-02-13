@@ -4,11 +4,24 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import rrulePlugin from '@fullcalendar/rrule';
 import listPlugin from '@fullcalendar/list';
+import deLocale from '@fullcalendar/core/locales/de';
+import ruLocale from '@fullcalendar/core/locales/ru';
+import ptLocale from '@fullcalendar/core/locales/pt';
+import nlLocale from '@fullcalendar/core/locales/nl';
+import frLocale from '@fullcalendar/core/locales/fr';
+import itLocale from '@fullcalendar/core/locales/it';
+import esLocale from '@fullcalendar/core/locales/es';
+import plLocale from '@fullcalendar/core/locales/pl';
+import ukLocale from '@fullcalendar/core/locales/uk';
+import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
+
 import { useEffect, useRef, useState } from 'react';
-import { Button, MenuItem } from '@mui/material';
+import { Button } from '@mui/material';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { v4 as uuidv4 } from 'uuid';
-import { clientDateToServer, cron2obj, obj2cron, serverDateToClient } from './Utils';
+import {
+    clientDateToServer, cron2obj, obj2cron, serverDateToClient,
+} from './Utils';
 import EventDialog from './EventDialog';
 
 const eventTypes = ['single', 'double', 'toggle'];
@@ -119,6 +132,19 @@ function Calendar(props) {
                         selectMirror
                         dayMaxEvents
                         events={events}
+                        locales={[
+                            deLocale,
+                            ruLocale,
+                            ptLocale,
+                            nlLocale,
+                            frLocale,
+                            itLocale,
+                            esLocale,
+                            plLocale,
+                            ukLocale,
+                            zhCnLocale,
+                        ]}
+                        locale={I18n.getLanguage()}
                         datesSet={date => {
                             localStorage.setItem('calendarStart', date.view.currentStart.getTime());
                             localStorage.setItem('calendarView', date.view.type);

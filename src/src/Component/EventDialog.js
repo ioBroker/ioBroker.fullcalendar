@@ -1,8 +1,8 @@
 import {
-    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, Table, TableCell, TableRow, TextField,
+    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, TextField,
 } from '@mui/material';
 import {
-    ColorPicker, I18n, ObjectBrowser, SelectID,
+    ColorPicker, I18n, SelectID,
 } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 
@@ -17,8 +17,18 @@ import {
 const EventDialog = props => {
     const [idDialog, setIdDialog] = useState(false);
     const [event, setEvent] = useState(props.event);
+    const [object, setObject] = useState(null);
+    const updateObject = async id => {
+        if (id) {
+            setObject(await props.socket.getObject(id));
+        } else {
+            setObject(null);
+        }
+    };
+    console.log(object);
     useEffect(() => {
         setEvent(props.event);
+        updateObject(event?.native.oid);
     }, [props.open]);
 
     const cronObject = event?.native.cron ? cron2obj(event?.native.cron) : null;
@@ -54,6 +64,7 @@ const EventDialog = props => {
                 onOk={id => {
                     changeEvent(newEvent => newEvent.native.oid = id);
                     setIdDialog(false);
+                    updateObject(id);
                 }}
                 onClose={() => setIdDialog(false)}
                 socket={props.socket}
@@ -133,6 +144,7 @@ const EventDialog = props => {
                     value={event?.native.oid}
                     onChange={e => {
                         changeEvent(newEvent => newEvent.native.oid = e.target.value);
+                        updateObject(e.target.value);
                     }}
                     variant="standard"
                     fullWidth

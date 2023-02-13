@@ -123,6 +123,7 @@ function serverDateToClient(dateString, format, serverTimeZone) {
         dateString += 'Z';
         return new Date(new Date(dateString).getTime() - serverTimeZone * 60000);
     }
+    return null;
 }
 
 function clientDateToServer(date, format, serverTimeZone) {
@@ -141,6 +142,7 @@ function clientDateToServer(date, format, serverTimeZone) {
         console.log(dateStr);
         return dateStr.substring(0, dateStr.length - 5);
     }
+    return null;
 }
 
 export {
