@@ -31,7 +31,7 @@ class App extends GenericApp {
         extendedProps.sentryDSN = window.sentryDSN;
 
         if (window.location.port === '3000') {
-            extendedProps.socket = { port: '8082' };
+            extendedProps.socket = { port: '8081' };
         }
         if (window.socketUrl && window.socketUrl.startsWith(':')) {
             window.socketUrl = `${window.location.protocol}//${window.location.hostname}${window.socketUrl}`;
@@ -73,6 +73,7 @@ class App extends GenericApp {
                     <Calendar
                         events={this.state.events || []}
                         socket={this.socket}
+                        instance={this.instance}
                         changeEvents={this.changeEvents}
                         updateEvents={this.updateEvents}
                         serverTimeZone={this.state.serverTimeZone}

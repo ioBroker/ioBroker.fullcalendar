@@ -1,6 +1,7 @@
 import {
     Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, TextField,
 } from '@mui/material';
+import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
     ColorPicker, I18n, SelectID,
 } from '@iobroker/adapter-react-v5';
@@ -25,7 +26,6 @@ const EventDialog = props => {
             setObject(null);
         }
     };
-    console.log(object);
     useEffect(() => {
         setEvent(props.event);
         updateObject(event?.native.oid);
@@ -47,13 +47,54 @@ const EventDialog = props => {
         } else if (period === 'monthly' || period === 'daily') {
             date = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
         }
-        console.log(date);
     }
 
     const changeEvent = modify => {
         const newEvent = JSON.parse(JSON.stringify(event));
         modify(newEvent);
         setEvent(newEvent);
+    };
+
+    const valueField = (field, name) => {
+        if (!object) {
+            return null;
+        }
+        if (object.common.type === 'boolean') {
+            return <FormControlLabel
+                control={<Checkbox
+                    checked={!!event?.native[field]}
+                    onChange={e => {
+                        changeEvent(newEvent => newEvent.native[field] = e.target.checked);
+                    }}
+                />}
+                label={I18n.t(name)}
+            />;
+        } if (object.common.states) {
+            return <FormControl
+                fullWidth
+                variant="standard"
+            >
+                <InputLabel>{I18n.t(name)}</InputLabel>
+                <Select
+                    value={event?.native[field] || ''}
+                    onChange={e => {
+                        changeEvent(newEvent => newEvent.native[field] = e.target.value);
+                    }}
+                >
+                    {Object.keys(object.common.states)
+                        .map(option => <MenuItem key={option} value={option}>{object.common.states[option]}</MenuItem>)}
+                </Select>
+            </FormControl>;
+        }
+        return <TextField
+            label={I18n.t(name)}
+            value={event?.native[field] || ''}
+            onChange={e => {
+                changeEvent(newEvent => newEvent.native[field] = e.target.value);
+            }}
+            variant="standard"
+            fullWidth
+        />;
     };
 
     return <Dialog open={props.open} onClose={props.onClose} fullWidth>
@@ -141,7 +182,7 @@ const EventDialog = props => {
             <div style={{ display: 'flex' }}>
                 <TextField
                     label="Object ID"
-                    value={event?.native.oid}
+                    value={event?.native.oid || ''}
                     onChange={e => {
                         changeEvent(newEvent => newEvent.native.oid = e.target.value);
                         updateObject(e.target.value);
@@ -152,26 +193,10 @@ const EventDialog = props => {
                 <Button onClick={() => setIdDialog(true)}>...</Button>
             </div>
             <div>
-                <TextField
-                    label={I18n.t('Start value')}
-                    value={event?.common.startValue}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.common.startValue = e.target.value);
-                    }}
-                    variant="standard"
-                    fullWidth
-                />
+                {valueField('startValue', event?.native.type === 'toggle' ? 'First value' : 'Start value')}
             </div>
             {event?.native.type === 'double' && <div>
-                <TextField
-                    label={I18n.t('End value')}
-                    value={event?.common.endValue}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.common.endValue = e.target.value);
-                    }}
-                    variant="standard"
-                    fullWidth
-                />
+                {valueField('endValue', 'End value')}
             </div>}
             <div>
                 <FormControl
@@ -295,24 +320,48 @@ const EventDialog = props => {
                 {JSON.stringify(event, null, 2)}
             </pre>
         </DialogContent>
-        <DialogActions>
-            <Button onClick={async () => {
-                await props.socket.delObject(event._id);
-                props.updateEvents();
-                props.onClose();
-            }}
+        <DialogActions style={{
+            justifyContent: 'space-between',
+        }}
+        >
+            <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<Delete />}
+                onClick={async () => {
+                    await props.socket.delObject(event._id);
+                    props.updateEvents();
+                    props.onClose();
+                }}
             >
                 {I18n.t('Delete')}
             </Button>
-            <Button onClick={async () => {
-                await props.socket.setObject(event._id, event);
-                props.updateEvents();
-                props.onClose();
+            <div style={{
+                display: 'flex',
+                gap: 8,
             }}
             >
-                {I18n.t('Save')}
-            </Button>
-            <Button onClick={props.onClose}>{I18n.t('Cancel')}</Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<Save />}
+                    onClick={async () => {
+                        await props.socket.setObject(event._id, event);
+                        props.updateEvents();
+                        props.onClose();
+                    }}
+                >
+                    {I18n.t('Save')}
+                </Button>
+                <Button
+                    variant="contained"
+                    color="grey"
+                    startIcon={<Cancel />}
+                    onClick={props.onClose}
+                >
+                    {I18n.t('Cancel')}
+                </Button>
+            </div>
         </DialogActions>
     </Dialog>;
 };

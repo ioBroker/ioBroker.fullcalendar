@@ -113,8 +113,6 @@ function serverDateToClient(dateString, format, serverTimeZone) {
     if (format === 'cron') {
         const cronObject = cron2obj(dateString);
         let date = new Date();
-        console.log(date.getTimezoneOffset());
-        console.log(serverTimeZone);
         date.setHours(cronObject.hours[0], cronObject.minutes[0]);
         date = new Date(date.getTime() - (date.getTimezoneOffset() + serverTimeZone) * 60000);
         return date;
@@ -137,9 +135,7 @@ function clientDateToServer(date, format, serverTimeZone) {
     }
     if (format === 'date') {
         date = new Date(date.getTime() + serverTimeZone * 60000);
-        console.log(date);
         const dateStr = date.toISOString();
-        console.log(dateStr);
         return dateStr.substring(0, dateStr.length - 5);
     }
     return null;

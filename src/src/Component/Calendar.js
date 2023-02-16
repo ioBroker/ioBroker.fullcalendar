@@ -16,15 +16,20 @@ import ukLocale from '@fullcalendar/core/locales/uk';
 import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@mui/material';
+import {
+    Button, Card, CardContent, Paper,
+} from '@mui/material';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { v4 as uuidv4 } from 'uuid';
+import { withTheme } from '@mui/styles';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
 import EventDialog from './EventDialog';
 
-const eventTypes = ['single', 'double', 'toggle'];
+const eventTypes = [{ type: 'single', name: 'Single event' },
+    { type: 'double', name: 'Double event' },
+    { type: 'toggle', name: 'Toggle event' }];
 
 const DraggableButton = ({ type }) => {
     const ref = useRef(null);
@@ -32,11 +37,11 @@ const DraggableButton = ({ type }) => {
     useEffect(() => {
         const draggable = new Draggable(ref.current, {
             eventData: () => ({
-                id: type,
-                title: I18n.t(type),
+                id: type.type,
+                title: I18n.t(type.name),
                 create: true,
                 extendedProps: {
-                    type,
+                    type: type.type,
                 },
             }),
         });
@@ -45,7 +50,19 @@ const DraggableButton = ({ type }) => {
         };
     }, []);
 
-    return <Button onClick={() => {}} ref={ref}>{I18n.t(type)}</Button>;
+    return <div
+        style={{
+            backgroundColor: 'rgb(58, 135, 178)',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: 14,
+            borderRadius: 4,
+            margin: 10,
+        }}
+        ref={ref}
+    >
+        {I18n.t(type.name)}
+    </div>;
 };
 
 function Calendar(props) {
@@ -54,7 +71,6 @@ function Calendar(props) {
     const events = props.events.map(event => {
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
-            console.log(start);
             const cronObject = cron2obj(event.native.cron);
             start.setFullYear(1970);
             if (Array.isArray(cronObject.months)) {
@@ -80,6 +96,7 @@ function Calendar(props) {
                     start,
                     duration: (event.native.intervals?.[0].timeOffset || 0),
                     allDay: false,
+                    display: 'block',
                     rrule: {
                         dtstart: new Date(start.getTime() - start.getTimezoneOffset() * 60000),
                         freq: 'weekly',
@@ -96,6 +113,7 @@ function Calendar(props) {
         return {
             id: event._id,
             title: event.common.name,
+            display: 'block',
             backgroundColor: event.native.color,
             start: serverDateToClient(event.native.start, 'date', props.serverTimeZone),
             end:  new Date(event.native.start).getTime() + (event.native.intervals?.[0].timeOffset || 0),
@@ -104,6 +122,12 @@ function Calendar(props) {
 
     return (
         <div>
+            <style>
+                {props.theme.palette.mode === 'dark' ? `:root {
+                    --fc-neutral-bg-color: hsla(0,0%,12%);
+                    --fc-list-event-hover-bg-color: hsla(0,0%,12%);
+                ` : null}
+            </style>
             <EventDialog
                 open={!!eventDialog}
                 event={props.events.find(event => event._id === eventDialog)}
@@ -113,106 +137,133 @@ function Calendar(props) {
                 serverTimeZone={props.serverTimeZone}
             />
             <div style={{ display: 'flex' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {eventTypes.map((type, index) =>
-                        <DraggableButton type={type} key={index} index={index} />)}
+                <div style={{ width: 200 }}>
+                    <Paper elevation={4} style={{ margin: 20 }}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '0px 10px',
+                        }}
+                        >
+                            {eventTypes.map((type, index) =>
+                                <DraggableButton
+                                    type={type}
+                                    name={type.name}
+                                    key={type.type}
+                                    index={index}
+                                />)}
+                            <div>{I18n.t('Drag and drop the events above to create a new one.')}</div>
+                            <hr style={{ width: '100%' }} />
+                            <div>{I18n.t('Use ALT by dragging it to copy the events.')}</div>
+                        </div>
+                    </Paper>
                 </div>
                 <div style={{ flex: 1 }}>
-                    <FullCalendar
-                        plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
-                        headerToolbar={{
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
-                        }}
-                        initialView={localStorage.getItem('calendarView') || 'dayGridMonth'}
-                        initialDate={localStorage.getItem('calendarStart') ? new Date(parseInt(localStorage.getItem('calendarStart'))) : new Date()}
-                        editable
-                        selectable
-                        selectMirror
-                        dayMaxEvents
-                        events={events}
-                        locales={[
-                            deLocale,
-                            ruLocale,
-                            ptLocale,
-                            nlLocale,
-                            frLocale,
-                            itLocale,
-                            esLocale,
-                            plLocale,
-                            ukLocale,
-                            zhCnLocale,
-                        ]}
-                        locale={I18n.getLanguage()}
-                        datesSet={date => {
-                            localStorage.setItem('calendarStart', date.view.currentStart.getTime());
-                            localStorage.setItem('calendarView', date.view.type);
-                        }}
-                        // select={this.handleDateSelect}
-                        // eventContent={event => <MenuItem>
-                        //     {event.event.title}
-                        // </MenuItem>}
-                        eventClick={event => setEventDialog(event.event.id)}
-                        eventResize={event => {
-                            const eventData = props.events.find(_event => _event._id === event.event.id);
-                            if (eventData.native.intervals?.[0].timeOffset) {
-                                const newEvent = JSON.parse(JSON.stringify(eventData));
-                                newEvent.native.intervals[0].timeOffset += event.endDelta.milliseconds;
-                                console.log(newEvent);
-                                props.socket.setObject(newEvent._id, newEvent);
-                                props.updateEvents();
-                            } else {
-                                event.revert();
-                            }
-                        }}
-                        eventDrop={async event => {
-                            const eventData = props.events.find(_event => _event._id === event.event.id);
-                            if (eventData.native.cron) {
-                                const newEvent = JSON.parse(JSON.stringify(eventData));
-                                const newCron = cron2obj(newEvent.native.cron);
-                                const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
-                                newCron.hours = timeZoneCron.hours;
-                                newCron.minutes = timeZoneCron.minutes;
-                                newEvent.native.cron = obj2cron(newCron);
-                                console.log(newEvent);
+                    <div style={{ height: '80%' }}>
+                        <FullCalendar
+                            plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
+                            headerToolbar={{
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+                            }}
+                            initialView={localStorage.getItem('calendarView') || 'dayGridMonth'}
+                            initialDate={localStorage.getItem('calendarStart') ? new Date(parseInt(localStorage.getItem('calendarStart'))) : new Date()}
+                            editable
+                            selectable
+                            selectMirror
+                            dayMaxEvents
+                            events={events}
+                            height="80vh"
+                            locales={[
+                                deLocale,
+                                ruLocale,
+                                ptLocale,
+                                nlLocale,
+                                frLocale,
+                                itLocale,
+                                esLocale,
+                                plLocale,
+                                ukLocale,
+                                zhCnLocale,
+                            ]}
+                            locale={I18n.getLanguage()}
+                            datesSet={date => {
+                                localStorage.setItem('calendarStart', date.view.currentStart.getTime());
+                                localStorage.setItem('calendarView', date.view.type);
+                            }}
+                            // select={this.handleDateSelect}
+                            // eventContent={event => <MenuItem>
+                            //     {event.event.title}
+                            // </MenuItem>}
+                            eventClick={event => setEventDialog(event.event.id)}
+                            eventResize={event => {
+                                const eventData = props.events.find(_event => _event._id === event.event.id);
+                                if (eventData.native.intervals?.[0].timeOffset) {
+                                    const newEvent = JSON.parse(JSON.stringify(eventData));
+                                    newEvent.native.intervals[0].timeOffset += event.endDelta.milliseconds;
+                                    props.socket.setObject(newEvent._id, newEvent);
+                                    props.updateEvents();
+                                } else {
+                                    event.revert();
+                                }
+                            }}
+                            eventDrop={async event => {
+                                const eventData = props.events.find(_event => _event._id === event.event.id);
+                                if (eventData.native.cron) {
+                                    const newEvent = JSON.parse(JSON.stringify(eventData));
+                                    if (event.jsEvent.altKey) {
+                                        newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
+                                    }
+                                    const newCron = cron2obj(newEvent.native.cron);
+                                    const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
+                                    newCron.hours = timeZoneCron.hours;
+                                    newCron.minutes = timeZoneCron.minutes;
+                                    newEvent.native.cron = obj2cron(newCron);
+                                    await props.socket.setObject(newEvent._id, newEvent);
+                                    props.updateEvents();
+                                } else {
+                                    const newEvent = JSON.parse(JSON.stringify(eventData));
+                                    if (event.jsEvent.altKey) {
+                                        newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
+                                    }
+                                    newEvent.native.start = clientDateToServer(event.event.start, 'date', props.serverTimeZone);
+                                    await props.socket.setObject(newEvent._id, newEvent);
+                                    props.updateEvents();
+                                }
+                            }}
+                            eventReceive={async event => {
+                                const newEvent = {
+                                    _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
+                                    common: {
+                                        name: event.event.title,
+                                        enabled: true,
+                                    },
+                                    native: {
+                                        id: new Date().getTime(),
+                                        start: clientDateToServer(event.event.start, 'date', props.serverTimeZone),
+                                        type: event.event.extendedProps.type,
+                                        durationEditable: false,
+                                        oid: '',
+                                        startValue: '',
+                                        color: '#3A87AD',
+                                    },
+                                    type: 'schedule',
+                                };
+                                if (event.event.extendedProps.type !== 'single') {
+                                    newEvent.native.intervals = [{
+                                        timeOffset: 30 * 60 * 1000,
+                                    }];
+                                }
                                 await props.socket.setObject(newEvent._id, newEvent);
                                 props.updateEvents();
-                            } else {
-                                const newEvent = JSON.parse(JSON.stringify(eventData));
-                                newEvent.native.start = clientDateToServer(event.event.start, 'date', props.serverTimeZone);
-                                console.log(newEvent);
-                                await props.socket.setObject(newEvent._id, newEvent);
-                                props.updateEvents();
-                            }
-                        }}
-                        eventReceive={async event => {
-                            console.log(event);
-                            const newEvent = {
-                                _id: `fullcalendar.0.event-${uuidv4()}`,
-                                common: {
-                                    name: event.event.title,
-                                    enabled: true,
-                                },
-                                native: {
-                                    id: new Date().getTime(),
-                                    start: clientDateToServer(event.event.start, 'date', props.serverTimeZone),
-                                    type: event.event.extendedProps.type,
-                                    durationEditable: false,
-                                    oid: '',
-                                    startValue: '',
-                                    color: '#3A87AD',
-                                },
-                                type: 'schedule',
-                            };
-                            await props.socket.setObject(newEvent._id, newEvent);
-                            props.updateEvents();
-                        }}
-                    />
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-export default Calendar;
+export default withTheme(Calendar);
