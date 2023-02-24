@@ -6,14 +6,44 @@ import {
     ColorPicker, I18n, SelectID,
 } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import moment from 'moment';
+import { withStyles } from '@mui/styles';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
+
+const typeDescriptions = {
+    single: 'Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end value.',
+    double: 'Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end values.',
+    toggle: 'Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID and start value. End value will be calculated automatically.',
+};
+
+const styles = {
+    field: {
+        padding: '2px 0px',
+    },
+    tableCell: {
+        textAlign: 'center',
+    },
+    dialogActions: {
+        justifyContent: 'space-between',
+    },
+    dialogActionsRight: {
+        display: 'flex',
+        gap: 8,
+    },
+    typeDescription: {
+        fontSize: 12, whiteSpace: 'normal', fontStyle: 'italic',
+    },
+    selectId: {
+        display: 'flex',
+    },
+};
 
 const EventDialog = props => {
     const [idDialog, setIdDialog] = useState(false);
@@ -110,7 +140,7 @@ const EventDialog = props => {
                 onClose={() => setIdDialog(false)}
                 socket={props.socket}
             />}
-            <div>
+            <div className={props.classes.field}>
                 <FormControlLabel
                     control={<Checkbox
                         checked={!!event?.common.enabled}
@@ -121,7 +151,7 @@ const EventDialog = props => {
                     label={I18n.t('Active')}
                 />
             </div>
-            <div>
+            <div className={props.classes.field}>
                 <FormControl
                     fullWidth
                     variant="standard"
@@ -132,27 +162,33 @@ const EventDialog = props => {
                         onChange={e => {
                             changeEvent(newEvent => newEvent.native.type = e.target.value);
                         }}
+                        renderValue={value => I18n.t(value)}
                     >
-                        {['single', 'double', 'toggle'].map(type => <MenuItem key={type} value={type}>{I18n.t(type)}</MenuItem>)}
+                        {['single', 'double', 'toggle'].map(type => <MenuItem key={type} value={type}>
+                            <div>
+                                <div>{I18n.t(type)}</div>
+                                <div className={props.classes.typeDescription}>{I18n.t(typeDescriptions[type])}</div>
+                            </div>
+                        </MenuItem>)}
                     </Select>
                 </FormControl>
             </div>
-            <div>
+            <div className={props.classes.field}>
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                     <TimePicker
                         label="Time"
                         value={date || null}
-                        onChange={date => {
-                            if (!date) {
+                        onChange={_date => {
+                            if (!_date) {
                                 return;
                             }
                             try {
                                 changeEvent(newEvent => {
                                     if (period === 'once') {
-                                        newEvent.native.start = clientDateToServer(date.toDate(), 'date', props.serverTimeZone);
+                                        newEvent.native.start = clientDateToServer(_date.toDate(), 'date', props.serverTimeZone);
                                     } else if (period === 'monthly' || period === 'daily') {
                                         const newCron = cron2obj(newEvent.native.cron);
-                                        const timeZoneCron = clientDateToServer(date.toDate(), 'cron', props.serverTimeZone);
+                                        const timeZoneCron = clientDateToServer(_date.toDate(), 'cron', props.serverTimeZone);
                                         newCron.hours = timeZoneCron.hours;
                                         newCron.minutes = timeZoneCron.minutes;
                                         newEvent.native.cron = obj2cron(newCron);
@@ -167,7 +203,7 @@ const EventDialog = props => {
                     />
                 </LocalizationProvider>
             </div>
-            {event?.native.type !== 'single' && <div>
+            {event?.native.type !== 'single' && <div className={props.classes.field}>
                 <TextField
                     label={I18n.t('Duration')}
                     value={(event?.native.intervals?.[0].timeOffset || 0) / 1000 / 60}
@@ -179,26 +215,28 @@ const EventDialog = props => {
                     endAdornment={<InputAdornment position="end">{I18n.t('minutes')}</InputAdornment>}
                 />
             </div>}
-            <div style={{ display: 'flex' }}>
-                <TextField
-                    label="Object ID"
-                    value={event?.native.oid || ''}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.native.oid = e.target.value);
-                        updateObject(e.target.value);
-                    }}
-                    variant="standard"
-                    fullWidth
-                />
-                <Button onClick={() => setIdDialog(true)}>...</Button>
+            <div className={props.classes.field}>
+                <div className={props.classes.selectId}>
+                    <TextField
+                        label="Object ID"
+                        value={event?.native.oid || ''}
+                        onChange={e => {
+                            changeEvent(newEvent => newEvent.native.oid = e.target.value);
+                            updateObject(e.target.value);
+                        }}
+                        variant="standard"
+                        fullWidth
+                    />
+                    <Button onClick={() => setIdDialog(true)}>...</Button>
+                </div>
             </div>
-            <div>
+            <div className={props.classes.field}>
                 {valueField('startValue', event?.native.type === 'toggle' ? 'First value' : 'Start value')}
             </div>
-            {event?.native.type === 'double' && <div>
+            {event?.native.type === 'double' && <div className={props.classes.field}>
                 {valueField('endValue', 'End value')}
             </div>}
-            <div>
+            <div className={props.classes.field}>
                 <FormControl
                     fullWidth
                     variant="standard"
@@ -216,7 +254,7 @@ const EventDialog = props => {
                                     newEvent.native.start = clientDateToServer(date, 'date', props.serverTimeZone);
                                 } else if (e.target.value === 'daily') {
                                     delete newEvent.native.start;
-                                    const newCronObject = cron2obj('0 0 ? * 1-7');
+                                    const newCronObject = cron2obj('0 0 ? * 0-6');
                                     const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
                                     newCronObject.hours = timeZoneCron.hours;
                                     newCronObject.minutes = timeZoneCron.minutes;
@@ -236,11 +274,11 @@ const EventDialog = props => {
                     </Select>
                 </FormControl>
             </div>
-            {period === 'monthly' && <div>
+            {period === 'monthly' && <div className={props.classes.field}>
                 <table>
                     <tr>
                         {new Array(12).fill(null).map((value, i) => <td
-                            style={{ textAlign: 'center' }}
+                            className={props.classes.tableCell}
                         >
                             {moment().month(i).format('MMM')}
                         </td>)}
@@ -266,26 +304,26 @@ const EventDialog = props => {
                     </tr>
                 </table>
             </div>}
-            {period === 'daily' && <div>
+            {period === 'daily' && <div className={props.classes.field}>
                 <table>
                     <tr>
                         {new Array(7).fill(null).map((value, i) => <td
-                            style={{ textAlign: 'center' }}
+                            className={props.classes.tableCell}
                         >
-                            {moment().day(i + 1).format('ddd')}
+                            {moment().day(i).format('ddd')}
                         </td>)}
                     </tr>
                     <tr>
                         {new Array(7).fill(null).map((value, i) => <td>
                             <Checkbox
-                                checked={cronObject?.dows?.includes(i + 1) || false}
+                                checked={cronObject?.dows?.includes(i) || false}
                                 onChange={e => {
                                     changeEvent(newEvent => {
                                         const newCronObject = cron2obj(newEvent.native.cron);
                                         if (e.target.checked) {
-                                            newCronObject.dows.push(i + 1);
+                                            newCronObject.dows.push(i);
                                         } else {
-                                            newCronObject.dows = newCronObject.dows.filter(dow => dow !== i + 1);
+                                            newCronObject.dows = newCronObject.dows.filter(dow => dow !== i);
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     });
@@ -296,7 +334,7 @@ const EventDialog = props => {
                     </tr>
                 </table>
             </div>}
-            <div>
+            <div className={props.classes.field}>
                 <TextField
                     label="Description"
                     value={event?.common.name}
@@ -307,7 +345,7 @@ const EventDialog = props => {
                     fullWidth
                 />
             </div>
-            <div>
+            <div className={props.classes.field}>
                 <ColorPicker
                     value={event?.native.color}
                     onChange={color => {
@@ -316,14 +354,11 @@ const EventDialog = props => {
                     label="Color"
                 />
             </div>
-            <pre>
+            {/* <pre>
                 {JSON.stringify(event, null, 2)}
-            </pre>
+            </pre> */}
         </DialogContent>
-        <DialogActions style={{
-            justifyContent: 'space-between',
-        }}
-        >
+        <DialogActions className={props.classes.dialogActions}>
             <Button
                 variant="contained"
                 color="secondary"
@@ -336,11 +371,7 @@ const EventDialog = props => {
             >
                 {I18n.t('Delete')}
             </Button>
-            <div style={{
-                display: 'flex',
-                gap: 8,
-            }}
-            >
+            <div className={props.classes.dialogActionsRight}>
                 <Button
                     variant="contained"
                     color="primary"
@@ -366,4 +397,14 @@ const EventDialog = props => {
     </Dialog>;
 };
 
-export default EventDialog;
+EventDialog.propTypes = {
+    classes: PropTypes.object.isRequired,
+    socket: PropTypes.object.isRequired,
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    event: PropTypes.object,
+    updateEvents: PropTypes.func.isRequired,
+    serverTimeZone: PropTypes.number.isRequired,
+};
+
+export default withStyles(styles)(EventDialog);

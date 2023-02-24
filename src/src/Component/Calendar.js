@@ -17,11 +17,11 @@ import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { useEffect, useRef, useState } from 'react';
 import {
-    Button, Card, CardContent, Paper,
+    Paper,
 } from '@mui/material';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { v4 as uuidv4 } from 'uuid';
-import { withTheme } from '@mui/styles';
+import { withStyles, withTheme } from '@mui/styles';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -55,15 +55,43 @@ const DraggableButton = ({ type }) => {
             backgroundColor: 'rgb(58, 135, 178)',
             color: 'white',
             cursor: 'pointer',
-            fontSize: 14,
+            fontSize: '14px',
+            padding: '0px 2px',
             borderRadius: 4,
-            margin: 10,
+            marginBottom: 20,
         }}
         ref={ref}
     >
         {I18n.t(type.name)}
     </div>;
 };
+
+const styles = () => ({
+    container: {
+        display: 'flex',
+    },
+    leftBlock: {
+        width: 200,
+    },
+    calendarBlock: {
+        flex: 1,
+    },
+    calendar: {
+        height: '80%',
+        marginRight: 20,
+    },
+    leftPaper: {
+        margin: 20,
+    },
+    leftContent: {
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '20px 10px',
+    },
+    hr: {
+        width: '100%',
+    },
+});
 
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
@@ -100,7 +128,7 @@ function Calendar(props) {
                     rrule: {
                         dtstart: new Date(start.getTime() - start.getTimezoneOffset() * 60000),
                         freq: 'weekly',
-                        byweekday: cronObject.dows,
+                        byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
                     },
                 };
             }
@@ -136,15 +164,11 @@ function Calendar(props) {
                 updateEvents={props.updateEvents}
                 serverTimeZone={props.serverTimeZone}
             />
-            <div style={{ display: 'flex' }}>
-                <div style={{ width: 200 }}>
-                    <Paper elevation={4} style={{ margin: 20 }}>
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            padding: '0px 10px',
-                        }}
-                        >
+            <div className={props.classes.container}>
+                <div className={props.classes.leftBlock}>
+                    <Paper elevation={4} className={props.classes.leftPaper}>
+                        <div className={props.classes.leftContent}>
+                            <h4>{I18n.t('Events')}</h4>
                             {eventTypes.map((type, index) =>
                                 <DraggableButton
                                     type={type}
@@ -153,13 +177,13 @@ function Calendar(props) {
                                     index={index}
                                 />)}
                             <div>{I18n.t('Drag and drop the events above to create a new one.')}</div>
-                            <hr style={{ width: '100%' }} />
+                            <hr className={props.classes.hr} />
                             <div>{I18n.t('Use ALT by dragging it to copy the events.')}</div>
                         </div>
                     </Paper>
                 </div>
-                <div style={{ flex: 1 }}>
-                    <div style={{ height: '80%' }}>
+                <div className={props.classes.calendarBlock}>
+                    <div className={props.classes.calendar}>
                         <FullCalendar
                             plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
                             headerToolbar={{
@@ -174,7 +198,7 @@ function Calendar(props) {
                             selectMirror
                             dayMaxEvents
                             events={events}
-                            height="80vh"
+                            height="calc(100vh - 20px)"
                             locales={[
                                 deLocale,
                                 ruLocale,
@@ -266,4 +290,4 @@ function Calendar(props) {
     );
 }
 
-export default withTheme(Calendar);
+export default withTheme(withStyles(styles)(Calendar));

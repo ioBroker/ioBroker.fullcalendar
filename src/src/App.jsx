@@ -8,7 +8,7 @@ import {
 } from '@iobroker/adapter-react-v5';
 import Calendar from './Component/Calendar';
 
-const styles = theme => ({
+const styles = () => ({
 
 });
 class App extends GenericApp {
@@ -78,9 +78,9 @@ class App extends GenericApp {
                         updateEvents={this.updateEvents}
                         serverTimeZone={this.state.serverTimeZone}
                     />
-                    <pre>
+                    {/* <pre>
                         {JSON.stringify(this.state.events, null, 2)}
-                    </pre>
+                    </pre> */}
                 </div>
             </ThemeProvider>
         </StyledEngineProvider>;
