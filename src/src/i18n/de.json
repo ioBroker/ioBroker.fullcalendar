@@ -12,7 +12,7 @@
   "Use ALT by dragging it to copy the events.": "Verwenden Sie ALT, indem Sie es ziehen, um die Ereignisse zu kopieren.",
   "daily": "täglich",
   "double_description": "Wird zweimal für ein einmaliges Ereignis ausgelöst. Einmal nach Start und einmal nach definierter Dauer. Bitte geben Sie die Objekt-ID, Start- und Endwerte an.",
-  "minutes": "Protokoll",
+  "minutes": "Minuten",
   "monthly": "monatlich",
   "once": "einmal",
   "single_description": "Wird einmal für ein einmaliges Ereignis ausgelöst. Bitte geben Sie die Objekt-ID und den gewünschten Wert an.",
