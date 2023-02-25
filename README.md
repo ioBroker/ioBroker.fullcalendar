@@ -19,6 +19,9 @@ You can control your events with calendar and can plan to control them periodica
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) New material design
+
 ### 1.2.0 (2021-12-14)
 * (bluefox) Updated to use with js-controller 3.3 and admin 5
 
