@@ -28,12 +28,12 @@
     "@iobroker/adapter-core": "^2.6.7"
   },
   "devDependencies": {
+    "@iobroker/legacy-testing": "^0.1.1",
     "@alcalzone/release-script": "^3.5.9",
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
     "@alcalzone/release-script-plugin-license": "^3.5.9",
     "gulp": "^4.0.2",
-    "mocha": "^10.2.0",
-    "chai": "^4.3.7"
+    "mocha": "^10.2.0"
   },
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.fullcalendar/issues"
@@ -48,6 +48,7 @@
   ],
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha --exit",
+    "build": "gulp",
     "release": "release-script",
     "release-patch": "release-script patch --yes",
     "release-minor": "release-script minor --yes",

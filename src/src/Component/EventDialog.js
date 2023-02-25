@@ -18,9 +18,9 @@ import {
 } from './Utils';
 
 const typeDescriptions = {
-    single: 'Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end value.',
-    double: 'Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end values.',
-    toggle: 'Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID and start value. End value will be calculated automatically.',
+    single: 'single_description',
+    double: 'double_description',
+    toggle: 'toggle_description',
 };
 
 const styles = {
@@ -38,7 +38,9 @@ const styles = {
         gap: 8,
     },
     typeDescription: {
-        fontSize: 12, whiteSpace: 'normal', fontStyle: 'italic',
+        fontSize: 12,
+        whiteSpace: 'normal',
+        fontStyle: 'italic',
     },
     selectId: {
         display: 'flex',
@@ -159,17 +161,17 @@ const EventDialog = props => {
                     <InputLabel>{I18n.t('Event type')}</InputLabel>
                     <Select
                         value={event?.native.type || ''}
-                        onChange={e => {
-                            changeEvent(newEvent => newEvent.native.type = e.target.value);
-                        }}
+                        onChange={e =>
+                            changeEvent(newEvent => newEvent.native.type = e.target.value)}
                         renderValue={value => I18n.t(value)}
                     >
-                        {['single', 'double', 'toggle'].map(type => <MenuItem key={type} value={type}>
-                            <div>
-                                <div>{I18n.t(type)}</div>
-                                <div className={props.classes.typeDescription}>{I18n.t(typeDescriptions[type])}</div>
-                            </div>
-                        </MenuItem>)}
+                        {['single', 'double', 'toggle'].map(type =>
+                            <MenuItem key={type} value={type}>
+                                <div>
+                                    <div>{I18n.t(type)}</div>
+                                    <div className={props.classes.typeDescription}>{I18n.t(typeDescriptions[type])}</div>
+                                </div>
+                            </MenuItem>)}
                     </Select>
                 </FormControl>
             </div>
@@ -212,7 +214,9 @@ const EventDialog = props => {
                     }}
                     variant="standard"
                     fullWidth
-                    endAdornment={<InputAdornment position="end">{I18n.t('minutes')}</InputAdornment>}
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">{I18n.t('minutes')}</InputAdornment>,
+                    }}
                 />
             </div>}
             <div className={props.classes.field}>

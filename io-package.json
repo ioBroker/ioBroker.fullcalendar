@@ -104,7 +104,11 @@
     ],
     "enabled": true,
     "type": "date-and-time",
-    "noConfig": false,
+    "connectionType": "local",
+    "dataSource": "push",
+    "adminUI": {
+      "config": "none"
+    },
     "plugins": {
       "sentry": {
         "dsn": "https://89d6f43ab4b5424785f6454d630c3286@sentry.iobroker.net/164"

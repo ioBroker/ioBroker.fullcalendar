@@ -2,3 +2,5 @@
 node_modules
 nbproject
 package-lock.json
+src/node_modules
+src/build

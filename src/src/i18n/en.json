@@ -14,7 +14,10 @@
   "Delete": "Delete",
   "Save": "Save",
   "Cancel": "Cancel",
-  "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end value.": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end value.",
-  "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end values.": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end values.",
-  "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID and start value. End value will be calculated automatically.": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID and start value. End value will be calculated automatically."
+  "single_description": "Will be triggered once for one time event. Please provide the Object ID and desired value.",
+  "double_description": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID, start and end values.",
+  "toggle_description": "Will be triggered twice for one time event. One time by start and one time after defined duration. Please provide the Object ID and start value. End value will be calculated automatically.",
+  "Single event": "Single event",
+  "Double event": "Double event",
+  "Toggle event": "Toggle event"
 }

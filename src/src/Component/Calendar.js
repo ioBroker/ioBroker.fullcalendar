@@ -27,9 +27,11 @@ import {
 } from './Utils';
 import EventDialog from './EventDialog';
 
-const eventTypes = [{ type: 'single', name: 'Single event' },
+const eventTypes = [
+    { type: 'single', name: 'Single event' },
     { type: 'double', name: 'Double event' },
-    { type: 'toggle', name: 'Toggle event' }];
+    { type: 'toggle', name: 'Toggle event' },
+];
 
 const DraggableButton = ({ type }) => {
     const ref = useRef(null);
@@ -172,7 +174,7 @@ function Calendar(props) {
                             {eventTypes.map((type, index) =>
                                 <DraggableButton
                                     type={type}
-                                    name={type.name}
+                                    name={I18n.t(type.name)}
                                     key={type.type}
                                     index={index}
                                 />)}

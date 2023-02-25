@@ -1,1 +1,23 @@
-{}
+{
+  "Active": "Attivo",
+  "Cancel": "Annulla",
+  "Configure event": "Configura evento",
+  "Delete": "Eliminare",
+  "Drag and drop the events above to create a new one.": "Trascina e rilascia gli eventi qui sopra per crearne uno nuovo.",
+  "Duration": "Durata",
+  "Event type": "Tipo di evento",
+  "Events": "Eventi",
+  "Period": "Periodo",
+  "Save": "Salva",
+  "Use ALT by dragging it to copy the events.": "Usa ALT trascinandolo per copiare gli eventi.",
+  "daily": "quotidiano",
+  "double_description": "Verrà attivato due volte per un evento unico. Una volta all'inizio e una volta dopo la durata definita. Fornisci l'ID oggetto, i valori iniziale e finale.",
+  "minutes": "minuti",
+  "monthly": "mensile",
+  "once": "una volta",
+  "single_description": "Verrà attivato una volta per evento una volta. Fornisci l'ID oggetto e il valore desiderato.",
+  "toggle_description": "Verrà attivato due volte per un evento unico. Una volta all'inizio e una volta dopo la durata definita. Fornisci l'ID oggetto e il valore iniziale. Il valore finale verrà calcolato automaticamente.",
+  "Single event": "Singolo evento",
+  "Double event": "Doppio evento",
+  "Toggle event": "Attiva/disattiva evento"
+}

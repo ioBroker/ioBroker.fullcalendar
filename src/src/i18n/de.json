@@ -1,1 +1,23 @@
-{}
+{
+  "Active": "Aktiv",
+  "Cancel": "Abbrechen",
+  "Configure event": "Ereignis konfigurieren",
+  "Delete": "Löschen",
+  "Drag and drop the events above to create a new one.": "Ziehen Sie die Ereignisse oben per Drag-and-Drop, um ein neues zu erstellen.",
+  "Duration": "Dauer",
+  "Event type": "Ereignistyp",
+  "Events": "Veranstaltungen",
+  "Period": "Zeitraum",
+  "Save": "Speichern",
+  "Use ALT by dragging it to copy the events.": "Verwenden Sie ALT, indem Sie es ziehen, um die Ereignisse zu kopieren.",
+  "daily": "täglich",
+  "double_description": "Wird zweimal für ein einmaliges Ereignis ausgelöst. Einmal nach Start und einmal nach definierter Dauer. Bitte geben Sie die Objekt-ID, Start- und Endwerte an.",
+  "minutes": "Protokoll",
+  "monthly": "monatlich",
+  "once": "einmal",
+  "single_description": "Wird einmal für ein einmaliges Ereignis ausgelöst. Bitte geben Sie die Objekt-ID und den gewünschten Wert an.",
+  "toggle_description": "Wird zweimal für ein einmaliges Ereignis ausgelöst. Einmal nach Start und einmal nach definierter Dauer. Bitte geben Sie die Objekt-ID und den Startwert an. Der Endwert wird automatisch berechnet.",
+  "Single event": "Einzelereignis",
+  "Double event": "Doppelereignis",
+  "Toggle event": "Umschaltung"
+}

@@ -47,7 +47,13 @@ class App extends GenericApp {
             `fullcalendar.${this.instance}.`,
             `fullcalendar.${this.instance}.\u9999`,
         );
-        const serverTimeZone = (await this.socket.getState('fullcalendar.0.info.timeZone')).val;
+        let serverTimeZone = 0;
+        try {
+            const state = await this.socket.getState('fullcalendar.0.info.timeZone');
+            serverTimeZone = state?.val || 0;
+        } catch (e) {
+            // ignore
+        }
         this.setState({ events: Object.values(objects), serverTimeZone });
     };
 
@@ -76,7 +82,7 @@ class App extends GenericApp {
                         instance={this.instance}
                         changeEvents={this.changeEvents}
                         updateEvents={this.updateEvents}
-                        serverTimeZone={this.state.serverTimeZone}
+                        serverTimeZone={this.state.serverTimeZone || 0}
                     />
                     {/* <pre>
                         {JSON.stringify(this.state.events, null, 2)}
