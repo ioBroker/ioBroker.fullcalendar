@@ -19,5 +19,8 @@
   "toggle_description": "一次事件会触发两次。开始时进行一次，在定义的持续时间后进行一次。请提供对象 ID 和起始值。终值将自动计算。",
   "Single event": "单个事件",
   "Double event": "双重事件",
-  "Toggle event": "切换事件"
+  "Toggle event": "切换事件",
+  "single": "一次",
+  "double": "双倍的",
+  "toggle": "切换"
 }

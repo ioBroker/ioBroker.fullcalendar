@@ -58,7 +58,7 @@ const DraggableButton = ({ type }) => {
             color: 'white',
             cursor: 'pointer',
             fontSize: '14px',
-            padding: '0px 2px',
+            padding: '3px 4px 6px 8px',
             borderRadius: 4,
             marginBottom: 20,
         }}
@@ -97,6 +97,7 @@ const styles = () => ({
 
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
+    const [lastDateClick, setLastDateClick] = useState(null);
 
     const events = props.events.map(event => {
         if (event.native.cron) {
@@ -146,129 +147,159 @@ function Calendar(props) {
             display: 'block',
             backgroundColor: event.native.color,
             start: serverDateToClient(event.native.start, 'date', props.serverTimeZone),
-            end:  new Date(event.native.start).getTime() + (event.native.intervals?.[0].timeOffset || 0),
+            end: new Date(event.native.start).getTime() + (event.native.intervals?.[0].timeOffset || 0),
         };
     });
 
-    return (
-        <div>
-            <style>
-                {props.theme.palette.mode === 'dark' ? `:root {
-                    --fc-neutral-bg-color: hsla(0,0%,12%);
-                    --fc-list-event-hover-bg-color: hsla(0,0%,12%);
-                ` : null}
-            </style>
-            <EventDialog
-                open={!!eventDialog}
-                event={props.events.find(event => event._id === eventDialog)}
-                onClose={() => setEventDialog(null)}
-                socket={props.socket}
-                updateEvents={props.updateEvents}
-                serverTimeZone={props.serverTimeZone}
-            />
-            <div className={props.classes.container}>
-                <div className={props.classes.leftBlock}>
-                    <Paper elevation={4} className={props.classes.leftPaper}>
-                        <div className={props.classes.leftContent}>
-                            <h4>{I18n.t('Events')}</h4>
-                            {eventTypes.map((type, index) =>
-                                <DraggableButton
-                                    type={type}
-                                    name={I18n.t(type.name)}
-                                    key={type.type}
-                                    index={index}
-                                />)}
-                            <div>{I18n.t('Drag and drop the events above to create a new one.')}</div>
-                            <hr className={props.classes.hr} />
-                            <div>{I18n.t('Use ALT by dragging it to copy the events.')}</div>
-                        </div>
-                    </Paper>
-                </div>
-                <div className={props.classes.calendarBlock}>
-                    <div className={props.classes.calendar}>
-                        <FullCalendar
-                            plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
-                            headerToolbar={{
-                                left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
-                            }}
-                            initialView={localStorage.getItem('calendarView') || 'dayGridMonth'}
-                            initialDate={localStorage.getItem('calendarStart') ? new Date(parseInt(localStorage.getItem('calendarStart'))) : new Date()}
-                            editable
-                            selectable
-                            selectMirror
-                            dayMaxEvents
-                            events={events}
-                            height="calc(100vh - 20px)"
-                            locales={[
-                                deLocale,
-                                ruLocale,
-                                ptLocale,
-                                nlLocale,
-                                frLocale,
-                                itLocale,
-                                esLocale,
-                                plLocale,
-                                ukLocale,
-                                zhCnLocale,
-                            ]}
-                            locale={I18n.getLanguage()}
-                            datesSet={date => {
-                                localStorage.setItem('calendarStart', date.view.currentStart.getTime());
-                                localStorage.setItem('calendarView', date.view.type);
-                            }}
-                            // select={this.handleDateSelect}
-                            // eventContent={event => <MenuItem>
-                            //     {event.event.title}
-                            // </MenuItem>}
-                            eventClick={event => setEventDialog(event.event.id)}
-                            eventResize={event => {
-                                const eventData = props.events.find(_event => _event._id === event.event.id);
-                                if (eventData.native.intervals?.[0].timeOffset) {
-                                    const newEvent = JSON.parse(JSON.stringify(eventData));
-                                    newEvent.native.intervals[0].timeOffset += event.endDelta.milliseconds;
-                                    props.socket.setObject(newEvent._id, newEvent);
-                                    props.updateEvents();
-                                } else {
-                                    event.revert();
+    return <div>
+        <style>
+            {props.theme.palette.mode === 'dark' ? `:root {
+                --fc-neutral-bg-color: hsla(0,0%,12%);
+                --fc-list-event-hover-bg-color: hsla(0,0%,12%);
+            ` : null}
+        </style>
+        <EventDialog
+            open={!!eventDialog}
+            event={props.events.find(event => event._id === eventDialog)}
+            onClose={() => setEventDialog(null)}
+            socket={props.socket}
+            updateEvents={props.updateEvents}
+            serverTimeZone={props.serverTimeZone}
+        />
+        <div className={props.classes.container}>
+            <div className={props.classes.leftBlock}>
+                <Paper elevation={4} className={props.classes.leftPaper}>
+                    <div className={props.classes.leftContent}>
+                        <h4>{I18n.t('Events')}</h4>
+                        {eventTypes.map((type, index) =>
+                            <DraggableButton
+                                type={type}
+                                name={I18n.t(type.name)}
+                                key={type.type}
+                                index={index}
+                            />)}
+                        <div>{I18n.t('Drag and drop the events above to create a new one.')}</div>
+                        <hr className={props.classes.hr} />
+                        <div>{I18n.t('Use ALT by dragging it to copy the events.')}</div>
+                    </div>
+                </Paper>
+            </div>
+            <div className={props.classes.calendarBlock}>
+                <div className={props.classes.calendar}>
+                    <FullCalendar
+                        plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
+                        headerToolbar={{
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+                        }}
+                        initialView={localStorage.getItem('calendarView') || 'dayGridMonth'}
+                        initialDate={localStorage.getItem('calendarStart') ? new Date(parseInt(localStorage.getItem('calendarStart'))) : new Date()}
+                        editable
+                        selectable
+                        selectMirror
+                        dayMaxEvents
+                        events={events}
+                        height="calc(100vh - 20px)"
+                        locales={[
+                            deLocale,
+                            ruLocale,
+                            ptLocale,
+                            nlLocale,
+                            frLocale,
+                            itLocale,
+                            esLocale,
+                            plLocale,
+                            ukLocale,
+                            zhCnLocale,
+                        ]}
+                        locale={I18n.getLanguage()}
+                        datesSet={date => {
+                            localStorage.setItem('calendarStart', date.view.currentStart.getTime());
+                            localStorage.setItem('calendarView', date.view.type);
+                        }}
+                        // select={this.handleDateSelect}
+                        // eventContent={event => <MenuItem>
+                        //     {event.event.title}
+                        // </MenuItem>}
+                        eventClick={event => setEventDialog(event.event.id)}
+                        eventResize={event => {
+                            const eventData = props.events.find(_event => _event._id === event.event.id);
+                            if (eventData.native.intervals?.[0].timeOffset) {
+                                const newEvent = JSON.parse(JSON.stringify(eventData));
+                                newEvent.native.intervals[0].timeOffset += event.endDelta.milliseconds;
+                                props.socket.setObject(newEvent._id, newEvent);
+                                props.updateEvents();
+                            } else {
+                                event.revert();
+                            }
+                        }}
+                        eventDrop={async event => {
+                            const eventData = props.events.find(_event => _event._id === event.event.id);
+                            if (eventData?.native?.cron) {
+                                const newEvent = JSON.parse(JSON.stringify(eventData));
+                                if (event.jsEvent.altKey) {
+                                    newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
                                 }
-                            }}
-                            eventDrop={async event => {
-                                const eventData = props.events.find(_event => _event._id === event.event.id);
-                                if (eventData.native.cron) {
-                                    const newEvent = JSON.parse(JSON.stringify(eventData));
-                                    if (event.jsEvent.altKey) {
-                                        newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
-                                    }
-                                    const newCron = cron2obj(newEvent.native.cron);
-                                    const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
-                                    newCron.hours = timeZoneCron.hours;
-                                    newCron.minutes = timeZoneCron.minutes;
-                                    newEvent.native.cron = obj2cron(newCron);
-                                    await props.socket.setObject(newEvent._id, newEvent);
-                                    props.updateEvents();
-                                } else {
-                                    const newEvent = JSON.parse(JSON.stringify(eventData));
-                                    if (event.jsEvent.altKey) {
-                                        newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
-                                    }
-                                    newEvent.native.start = clientDateToServer(event.event.start, 'date', props.serverTimeZone);
-                                    await props.socket.setObject(newEvent._id, newEvent);
-                                    props.updateEvents();
+                                const newCron = cron2obj(newEvent.native.cron);
+                                const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
+                                newCron.hours = timeZoneCron.hours;
+                                newCron.minutes = timeZoneCron.minutes;
+                                newEvent.native.cron = obj2cron(newCron);
+                                await props.socket.setObject(newEvent._id, newEvent);
+                                props.updateEvents();
+                            } else {
+                                const newEvent = JSON.parse(JSON.stringify(eventData));
+                                if (event.jsEvent.altKey) {
+                                    newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
                                 }
-                            }}
-                            eventReceive={async event => {
+                                newEvent.native.start = clientDateToServer(event.event.start, 'date', props.serverTimeZone);
+                                await props.socket.setObject(newEvent._id, newEvent);
+                                props.updateEvents();
+                            }
+                        }}
+                        eventReceive={async event => {
+                            const newEvent = {
+                                _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
+                                common: {
+                                    name: event.event.title,
+                                    enabled: true,
+                                },
+                                native: {
+                                    id: Date.now(),
+                                    start: clientDateToServer(event.event.start, 'date', props.serverTimeZone),
+                                    type: event.event.extendedProps.type,
+                                    durationEditable: false,
+                                    oid: '',
+                                    startValue: '',
+                                    color: '#3A87AD',
+                                },
+                                type: 'schedule',
+                            };
+                            if (event.event.extendedProps.type !== 'single') {
+                                newEvent.native.intervals = [{
+                                    timeOffset: 30 * 60 * 1000,
+                                }];
+                            }
+                            await props.socket.setObject(newEvent._id, newEvent);
+                            props.updateEvents();
+                            setTimeout(() => setEventDialog(newEvent._id), 100);
+                        }}
+                        dateClick={async event => {
+                            // detect double click
+                            if (lastDateClick && event.dateStr === lastDateClick.dateStr && Date.now() - lastDateClick.ts < 300) {
+                                setLastDateClick(null);
+
                                 const newEvent = {
                                     _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
                                     common: {
-                                        name: event.event.title,
+                                        name: I18n.t('Single event'),
                                         enabled: true,
                                     },
                                     native: {
-                                        id: new Date().getTime(),
-                                        start: clientDateToServer(event.event.start, 'date', props.serverTimeZone),
-                                        type: event.event.extendedProps.type,
+                                        id: Date.now(),
+                                        start: clientDateToServer(event.date, 'date', props.serverTimeZone),
+                                        type: 'single',
                                         durationEditable: false,
                                         oid: '',
                                         startValue: '',
@@ -276,20 +307,18 @@ function Calendar(props) {
                                     },
                                     type: 'schedule',
                                 };
-                                if (event.event.extendedProps.type !== 'single') {
-                                    newEvent.native.intervals = [{
-                                        timeOffset: 30 * 60 * 1000,
-                                    }];
-                                }
                                 await props.socket.setObject(newEvent._id, newEvent);
                                 props.updateEvents();
-                            }}
-                        />
-                    </div>
+                                setTimeout(() => setEventDialog(newEvent._id), 100);
+                            } else {
+                                setLastDateClick({ dateStr: event.dateStr, ts: Date.now() });
+                            }
+                        }}
+                    />
                 </div>
             </div>
         </div>
-    );
+    </div>;
 }
 
 export default withTheme(withStyles(styles)(Calendar));

@@ -19,5 +19,8 @@
   "toggle_description": "Wordt twee keer geactiveerd voor een eenmalige gebeurtenis. Een keer bij aanvang en een keer na een bepaalde duur. Geef de object-ID en startwaarde op. Eindwaarde wordt automatisch berekend.",
   "Single event": "Eenmalige gebeurtenis",
   "Double event": "Dubbel evenement",
-  "Toggle event": "Toggle evenement"
+  "Toggle event": "Toggle evenement",
+  "single": "eenmaal",
+  "double": "dubbele",
+  "toggle": "schakelaar"
 }

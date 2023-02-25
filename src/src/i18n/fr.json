@@ -19,5 +19,8 @@
   "toggle_description": "Sera déclenché deux fois pour un événement unique. Une fois au début et une fois après une durée définie. Veuillez fournir l'ID d'objet et la valeur de départ. La valeur finale sera calculée automatiquement.",
   "Single event": "Seul événement",
   "Double event": "Double événement",
-  "Toggle event": "Basculer l'événement"
+  "Toggle event": "Basculer l'événement",
+  "single": "une fois",
+  "double": "double",
+  "toggle": "basculer"
 }

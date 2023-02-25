@@ -121,9 +121,8 @@ const EventDialog = props => {
         return <TextField
             label={I18n.t(name)}
             value={event?.native[field] || ''}
-            onChange={e => {
-                changeEvent(newEvent => newEvent.native[field] = e.target.value);
-            }}
+            onChange={e =>
+                changeEvent(newEvent => newEvent.native[field] = e.target.value)}
             variant="standard"
             fullWidth
         />;
@@ -146,9 +145,8 @@ const EventDialog = props => {
                 <FormControlLabel
                     control={<Checkbox
                         checked={!!event?.common.enabled}
-                        onChange={e => {
-                            changeEvent(newEvent => newEvent.common.enabled = e.target.checked);
-                        }}
+                        onChange={e =>
+                            changeEvent(newEvent => newEvent.common.enabled = e.target.checked)}
                     />}
                     label={I18n.t('Active')}
                 />
@@ -209,9 +207,8 @@ const EventDialog = props => {
                 <TextField
                     label={I18n.t('Duration')}
                     value={(event?.native.intervals?.[0].timeOffset || 0) / 1000 / 60}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.native.intervals[0].timeOffset = e.target.value * 1000 * 60);
-                    }}
+                    onChange={e =>
+                        changeEvent(newEvent => newEvent.native.intervals[0].timeOffset = e.target.value * 1000 * 60)}
                     variant="standard"
                     fullWidth
                     InputProps={{
@@ -247,7 +244,7 @@ const EventDialog = props => {
                 >
                     <InputLabel>{I18n.t('Period')}</InputLabel>
                     <Select
-                        value={period}
+                        value={period || 'once'}
                         onChange={e => {
                             if (e.target.value === event.native.cron) {
                                 return;
@@ -341,20 +338,18 @@ const EventDialog = props => {
             <div className={props.classes.field}>
                 <TextField
                     label="Description"
-                    value={event?.common.name}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.common.name = e.target.value);
-                    }}
+                    value={event?.common.name || ''}
+                    onChange={e =>
+                        changeEvent(newEvent => newEvent.common.name = e.target.value)}
                     variant="standard"
                     fullWidth
                 />
             </div>
             <div className={props.classes.field}>
                 <ColorPicker
-                    value={event?.native.color}
-                    onChange={color => {
-                        changeEvent(newEvent => newEvent.native.color = color);
-                    }}
+                    value={event?.native.color || ''}
+                    onChange={color =>
+                        changeEvent(newEvent => newEvent.native.color = color)}
                     label="Color"
                 />
             </div>

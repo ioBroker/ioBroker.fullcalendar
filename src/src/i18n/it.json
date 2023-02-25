@@ -19,5 +19,8 @@
   "toggle_description": "Verrà attivato due volte per un evento unico. Una volta all'inizio e una volta dopo la durata definita. Fornisci l'ID oggetto e il valore iniziale. Il valore finale verrà calcolato automaticamente.",
   "Single event": "Singolo evento",
   "Double event": "Doppio evento",
-  "Toggle event": "Attiva/disattiva evento"
+  "Toggle event": "Attiva/disattiva evento",
+  "single": "una volta",
+  "double": "Doppio",
+  "toggle": "alternare"
 }

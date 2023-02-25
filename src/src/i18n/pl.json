@@ -19,5 +19,8 @@
   "toggle_description": "Zostanie uruchomiony dwa razy dla jednego zdarzenia. Raz na początku i raz po określonym czasie trwania. Podaj identyfikator obiektu i wartość początkową. Wartość końcowa zostanie obliczona automatycznie.",
   "Single event": "Pojedyncze zdarzenie",
   "Double event": "Podwójne wydarzenie",
-  "Toggle event": "Przełącz wydarzenie"
+  "Toggle event": "Przełącz wydarzenie",
+  "single": "raz",
+  "double": "podwójnie",
+  "toggle": "przełącznik"
 }

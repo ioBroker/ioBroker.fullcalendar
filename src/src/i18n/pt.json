@@ -19,5 +19,8 @@
   "toggle_description": "Será acionado duas vezes para um evento de tempo. Uma vez no início e uma vez após a duração definida. Forneça o ID do objeto e o valor inicial. O valor final será calculado automaticamente.",
   "Single event": "Evento único",
   "Double event": "Evento duplo",
-  "Toggle event": "Alternar evento"
+  "Toggle event": "Alternar evento",
+  "single": "uma vez",
+  "double": "dobro",
+  "toggle": "alternar"
 }
