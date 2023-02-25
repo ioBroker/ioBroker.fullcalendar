@@ -19,9 +19,11 @@ import { useEffect, useRef, useState } from 'react';
 import {
     Paper,
 } from '@mui/material';
-import { I18n } from '@iobroker/adapter-react-v5';
 import { v4 as uuidv4 } from 'uuid';
 import { withStyles, withTheme } from '@mui/styles';
+
+import { I18n } from '@iobroker/adapter-react-v5';
+
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -153,10 +155,19 @@ function Calendar(props) {
 
     return <div>
         <style>
-            {props.theme.palette.mode === 'dark' ? `:root {
-                --fc-neutral-bg-color: hsla(0,0%,12%);
-                --fc-list-event-hover-bg-color: hsla(0,0%,12%);
-            ` : null}
+            {props.theme.palette.mode === 'dark' ? `
+:root {
+    --fc-neutral-bg-color: hsla(0,0%,12%);
+    --fc-list-event-hover-bg-color: hsla(0,0%,12%);
+}
+.fc-col-header-cell {
+    background-color: #1e1e1e;
+}                
+` : `
+.fc-col-header-cell {
+    background-color: #EEEEEE;
+}
+`}
         </style>
         <EventDialog
             open={!!eventDialog}
