@@ -18,9 +18,9 @@
   "single_description": "Wird einmal für ein einmaliges Ereignis ausgelöst. Bitte geben Sie die Objekt-ID und den gewünschten Wert an.",
   "toggle_description": "Wird zweimal für ein einmaliges Ereignis ausgelöst. Einmal nach Start und einmal nach definierter Dauer. Bitte geben Sie die Objekt-ID und den Startwert an. Der Endwert wird automatisch berechnet.",
   "Single event": "Einzelereignis",
-  "Double event": "Doppelereignis",
-  "Toggle event": "Umschaltung",
-  "single": "einmal",
-  "double": "doppelt",
-  "toggle": "Umschalten"
+  "Double event": "An/Aus-Ereignis",
+  "Toggle event": "Umschaltereignis",
+  "single": "Einzelereignis",
+  "double": "An/Aus-Ereignis",
+  "toggle": "Umschaltereignis"
 }
