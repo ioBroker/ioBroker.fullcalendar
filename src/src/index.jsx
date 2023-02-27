@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ThemeProvider, StyledEngineProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
 import './index.css';
 import { Utils } from '@iobroker/adapter-react-v5';
