@@ -79,6 +79,19 @@ function buildWidgets() {
 
     fs.writeFileSync(`${__dirname}/src-widgets/package.json`, JSON.stringify(data, null, 4));
 
+    try {
+        // we have bug, that federation requires version number in @mui/material/styles, so we have to change it
+        // read version of @mui/material and write it to @mui/material/styles
+        const muiStyleVersion = JSON.parse(fs.readFileSync(`${__dirname}/src-widgets/node_modules/@mui/material/styles/package.json`).toString('utf8'));
+        if (!muiStyleVersion.version) {
+            const muiVersion = JSON.parse(fs.readFileSync(`${__dirname}/src-widgets/node_modules/@mui/material/package.json`).toString('utf8'));
+            muiStyleVersion.version = muiVersion.version;
+            fs.writeFileSync(`${__dirname}/src-widgets/node_modules/@mui/material/styles/package.json`, JSON.stringify(muiStyleVersion, null, 2));
+        }
+    } catch (e) {
+        console.error(`Cannot read mui version: ${e}`);
+        return Promise.reject(`Cannot read mui version: ${e}`);
+    }
 
     // sync src and src-widgets
     /*sync2files(`${__dirname}/src-widgets/src/components/DayNightSwitcher.js`, `${__dirname}/src/src/components/DayNightSwitcher.js`);
