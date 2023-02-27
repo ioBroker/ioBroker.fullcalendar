@@ -326,6 +326,7 @@ gulp.task('5-copy', () =>
     gulp.src([
         'src/build/*/**',
         'src/build/*',
+        `!src/build/_socket/*.js`,
         `!src/build/static/media/Alarm Systems.*.svg`,
         `!src/build/static/media/Amplifier.*.svg`,
         `!src/build/static/media/Anteroom.*.svg`,
@@ -445,7 +446,6 @@ gulp.task('5-copy', () =>
         `!src/build/static/media/Windscreen.*.svg`,
         `!src/build/static/media/Workshop.*.svg`,
         `!src/build/static/media/Workspace.*.svg`,
-
     ])
         .pipe(gulp.dest('admin/')));
 
