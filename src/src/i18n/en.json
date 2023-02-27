@@ -22,5 +22,7 @@
   "Toggle event": "Toggle event",
   "single": "once",
   "double": "double",
-  "toggle": "toggle"
+  "toggle": "toggle",
+  "Delete event": "Delete event",
+  "All data will be lost. Confirm?": "All data will be lost. Confirm?"
 }

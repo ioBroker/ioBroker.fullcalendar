@@ -3,7 +3,7 @@ import {
 } from '@mui/material';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
-    ColorPicker, I18n, SelectID,
+    ColorPicker, I18n, SelectID, Confirm,
 } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -51,6 +51,7 @@ const EventDialog = props => {
     const [idDialog, setIdDialog] = useState(false);
     const [event, setEvent] = useState(props.event);
     const [object, setObject] = useState(null);
+    const [deleteDialog, setDeleteDialog] = useState(false);
     const updateObject = async id => {
         if (id) {
             setObject(await props.socket.getObject(id));
@@ -362,11 +363,7 @@ const EventDialog = props => {
                 variant="contained"
                 color="secondary"
                 startIcon={<Delete />}
-                onClick={async () => {
-                    await props.socket.delObject(event._id);
-                    props.updateEvents();
-                    props.onClose();
-                }}
+                onClick={() => setDeleteDialog(true)}
             >
                 {I18n.t('Delete')}
             </Button>
@@ -394,6 +391,20 @@ const EventDialog = props => {
                 </Button>
             </div>
         </DialogActions>
+        {deleteDialog && <Confirm
+            title={I18n.t('Delete event')}
+            text={I18n.t('All data will be lost. Confirm?')}
+            suppressQuestionMinutes={5}
+            dialogName="deleteConfirmDialog"
+            onClose={async isYes => {
+                if (isYes) {
+                    await props.socket.delObject(event._id);
+                    props.updateEvents();
+                    props.onClose();
+                }
+                setDeleteDialog(false);
+            }}
+        />}
     </Dialog>;
 };
 
