@@ -319,7 +319,7 @@ function Calendar(props) {
                                     type: 'schedule',
                                 };
                                 await props.socket.setObject(newEvent._id, newEvent);
-                                props.updateEvents();
+                                await props.updateEvents();
                                 setTimeout(() => setEventDialog(newEvent._id), 100);
                             } else {
                                 setLastDateClick({ dateStr: event.dateStr, ts: Date.now() });

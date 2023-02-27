@@ -374,6 +374,7 @@ const EventDialog = props => {
                 <Button
                     variant="contained"
                     color="primary"
+                    disabled={JSON.stringify(props.event) === JSON.stringify(event)}
                     startIcon={<Save />}
                     onClick={async () => {
                         await props.socket.setObject(event._id, event);
