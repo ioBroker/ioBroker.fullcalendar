@@ -1,0 +1,61 @@
+{
+    "name": "iobroker.vis-2-widgets-fullcalendar",
+    "private": true,
+    "version": "0.0.1",
+    "dependencies": {
+        "@emotion/react": "^11.10.6",
+        "@emotion/styled": "^11.10.6",
+        "@fullcalendar/core": "^6.1.1",
+        "@fullcalendar/daygrid": "^6.1.1",
+        "@fullcalendar/interaction": "^6.1.1",
+        "@fullcalendar/list": "^6.1.1",
+        "@fullcalendar/react": "^6.1.2",
+        "@fullcalendar/rrule": "^6.1.1",
+        "@fullcalendar/timegrid": "^6.1.1",
+        "@iobroker/adapter-react-v5": "^4.0.13",
+        "@iobroker/vis-2-widgets-react-dev": "^0.3.11",
+        "@mui/icons-material": "^5.11.9",
+        "@mui/material": "^5.11.10",
+        "@mui/styles": "^5.11.9",
+        "@mui/x-date-pickers": "^5.0.17",
+        "eslint-plugin-eqeqeq-fix": "^1.0.3",
+        "eslint-plugin-only-warn": "^1.1.0",
+        "moment": "^2.29.4",
+        "node-sass": "^8.0.0",
+        "prop-types": "^15.8.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-scripts": "^5.0.1",
+        "@craco/craco": "^7.0.0",
+        "craco-esbuild": "^0.5.2",
+        "craco-module-federation": "^1.1.0",
+        "eslint": "^8.34.0",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-jsx-a11y": "^6.7.1",
+        "eslint-plugin-react": "^7.32.2",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "sass": "^1.58.3",
+        "rrule": "^2.7.1",
+        "uuid": "^9.0.0"
+    },
+    "scripts": {
+        "start": "set PORT=4173 && craco start",
+        "old-start": "set PORT=4173 && react-scripts start",
+        "lint": "eslint --fix --ext .js,.jsx src",
+        "build": "craco build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "i18n": "node node_modules/@iobroker/vis-2-widgets-react-dev/searchI18n vis_2_widgets_gauges"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "homepage": ".",
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
+}
