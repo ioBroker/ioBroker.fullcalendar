@@ -38,6 +38,9 @@ jobs:
       - name: Install Dependencies
         run: npm i
 
+      - name: Build
+        run: npm run build
+
 #      - name: Perform a type check
 #        run: npm run check:ts
 #        env:
@@ -65,12 +68,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Install Dependencies
-        run: npm i
-
-      - name: Build
-        run: npm run build
 
       - name: Run local tests
         run: npm test
@@ -119,9 +116,6 @@ jobs:
           BODY="${BODY//$'\n'/'%0A'}"
           BODY="${BODY//$'\r'/'%0D'}"
           echo "::set-output name=BODY::$BODY"
-
-      - name: Install Dependencies
-        run: npm i
 
 #      - name: Create a clean build
 #        run: npm run build
