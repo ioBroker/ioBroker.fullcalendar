@@ -30,11 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
       - name: Install Dependencies
         run: npm i
 
@@ -42,11 +37,10 @@ jobs:
         run: npm run build
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
-          key: ${{ matrix.os }}-build-${{ matrix.node-version }}
+          key: build
           path: |
-            node_modules/**/*
             admin/**/*
           #  widgets/**/*
 
@@ -73,21 +67,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Restore node modules
-        uses: actions/cache@v3
-        with:
-          key: ${{ matrix.os }}-build-${{ matrix.node-version }}
-          path: |
-            node_modules/**/*
-            admin/**/*
-          #  widgets/**/*
-          restore-keys:
-            ${{ matrix.os }}-build-${{ matrix.node-version }}
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: npm i
 
       - name: Run local tests
         run: npm test
@@ -118,21 +105,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Restore node modules
-        uses: actions/cache@v3
-        with:
-          key: ${{ matrix.os }}-build-${{ matrix.node-version }}
-          path: |
-            node_modules/**/*
-            admin/**/*
-          #  widgets/**/*
-          restore-keys:
-            ${{ matrix.os }}-build-${{ matrix.node-version }}
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Restore web files
+        uses: actions/cache/restore@v3
+        with:
+          key: build
+          path: |
+            admin/**/*
+          # widgets/**/*
+
+      - name: Install Dependencies
+        run: npm i
 
       - name: Extract the version and commit body from the tag
         id: extract_release
