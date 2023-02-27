@@ -29,11 +29,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules/**/*
+            admin/**/*
+            widgets/**/*
+          key: ${{ matrix.os }}-build-${{ matrix.node-version }}
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
 
       - name: Install Dependencies
         run: npm i
@@ -64,6 +72,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules/**/*
+            admin/**/*
+            widgets/**/*
+          key: ${{ matrix.os }}-build-${{ matrix.node-version }}
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -97,6 +114,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules/**/*
+            admin/**/*
+            widgets/**/*
+          key: ${{ matrix.os }}-build-${{ matrix.node-version }}
+
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
