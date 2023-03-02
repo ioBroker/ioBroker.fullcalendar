@@ -200,27 +200,28 @@ async function executeEvent(event, now) {
                 }
                 adapter.setForeignState(_obj._id, value);
             } else {
+                const interval = _event.native.intervals[0] || {};
                 if (_obj.common.type === 'number') {
-                    if (typeof event.native.intervals[0].value !== 'number') {
-                        event.native.intervals[0].value = parseFloat(_event.native.endValue);
+                    if (typeof interval.value !== 'number') {
+                        interval.value = parseFloat(interval.value);
                     }
                 } else if (obj.common.type === 'boolean') {
-                    if (typeof _event.native.intervals[0].value !== 'boolean') {
-                        event.native.intervals[0].value =
-                            event.native.intervals[0].value === 'true' ||
-                            event.native.intervals[0].value === '1' ||
-                            event.native.intervals[0].value === 1 ||
-                            event.native.intervals[0].value === 'on' ||
-                            event.native.intervals[0].value === 'ON';
+                    if (typeof interval.value !== 'boolean') {
+                        interval.value =
+                            interval.value === 'true' ||
+                            interval.value === '1' ||
+                            interval.value === 1 ||
+                            interval.value === 'on' ||
+                            interval.value === 'ON';
                     }
                 } else if (obj.common.type === 'string') {
-                    if (typeof event.native.intervals[0].value !== 'string') {
-                        event.native.intervals[0].value = event.native.intervals[0].value.toString();
+                    if (typeof interval.value !== 'string') {
+                        interval.value = interval.value.toString();
                     }
                 }
-                adapter.setForeignState(_obj._id, event.native.intervals[0].value);
+                adapter.setForeignState(_obj._id, interval.value);
             }
-        }, parseInt(event.native.intervals[0].timeOffset, 10), event, obj);
+        }, parseInt((event.native.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset) || 1000, 10), event, obj);
     }
 
     if (obj.common.type === 'number') {

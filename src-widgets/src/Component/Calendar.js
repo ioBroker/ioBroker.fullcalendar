@@ -1,3 +1,8 @@
+import { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
+import { withStyles, withTheme } from '@mui/styles';
+
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -15,14 +20,8 @@ import plLocale from '@fullcalendar/core/locales/pl';
 import ukLocale from '@fullcalendar/core/locales/uk';
 import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
-import { useEffect, useRef, useState } from 'react';
-import {
-    Paper,
-} from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
-import { withStyles, withTheme } from '@mui/styles';
+import { Paper } from '@mui/material';
 
-import PropTypes from 'prop-types';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -103,9 +102,20 @@ const styles = () => ({
 
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
-    const [lastDateClick, setLastDateClick] = useState(null);
+    const storageName = props.storageName || 'calendar';
+    const ref = useRef(null);
+    const scrollBackTimer = useRef(null);
+    const scrollTimer = useRef(null);
 
+    const initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) ?
+        new Date(parseInt(window.localStorage.getItem(`${storageName}Start`), 10)) :
+        new Date();
+
+    // create events
     const events = props.events.map(event => {
+        // duration in ms
+        const initialDuration = event?.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ? event.native.intervals[0].timeOffset : 0;
+
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
             const cronObject = cron2obj(event.native.cron);
@@ -116,7 +126,7 @@ function Calendar(props) {
                     title: event.common.name,
                     backgroundColor: event.native.color,
                     start,
-                    duration: (event.native.intervals?.[0].timeOffset || 0),
+                    duration: initialDuration,
                     allDay: false,
                     rrule: {
                         dtstart: new Date(start.getTime() - start.getTimezoneOffset() * 60000),
@@ -131,7 +141,7 @@ function Calendar(props) {
                     title: event.common.name,
                     backgroundColor: event.native.color,
                     start,
-                    duration: (event.native.intervals?.[0].timeOffset || 0),
+                    duration: initialDuration,
                     allDay: false,
                     display: 'block',
                     rrule: {
@@ -147,15 +157,44 @@ function Calendar(props) {
                 backgroundColor: event.native.color,
             };
         }
+
         return {
             id: event._id,
             title: event.common.name,
             display: 'block',
-            backgroundColor: event.native.color,
+            backgroundColor: event.common.enabled ? event.native.color : (event.native.color?.startsWith('#') ? `${event.native.color}60` : event.native.color),
             start: serverDateToClient(event.native.start, 'date', props.serverTimeZone),
-            end: new Date(event.native.start).getTime() + (event.native.intervals?.[0].timeOffset || 0),
+            end: serverDateToClient(new Date(new Date(event.native.start).getTime() + initialDuration), 'date', props.serverTimeZone),
         };
     });
+
+    useEffect(() => {
+        // update periodically the time
+        if (props.widget) {
+            const scrollBack = () => {
+                const calendar = ref.current?.getApi();
+                if (calendar) {
+                    console.log('Scroll to now');
+                    calendar.scrollToTime(new Date().getTime());
+                }
+                if (!scrollBackTimer.current) {
+                    scrollTimer.current = setTimeout(() => scrollBack, 1000 * 60 * 5); // 5 minutes
+                } else {
+                    scrollTimer.current = null;
+                }
+            };
+
+            setTimeout(scrollBack, 1000);
+        }
+
+        return () => {
+            scrollTimer.current && clearTimeout(scrollTimer.current);
+            scrollTimer.current = null;
+            scrollBackTimer.current && clearTimeout(scrollBackTimer.current);
+            scrollBackTimer.current = null;
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return <>
         <style>
@@ -173,8 +212,9 @@ function Calendar(props) {
 }
 `}
         </style>
-        <EventDialog
-            open={!!eventDialog}
+        {eventDialog ? <EventDialog
+            widget={props.widget}
+            open={!0}
             event={props.events.find(event => event._id === eventDialog)}
             onClose={() => setEventDialog(null)}
             socket={props.socket}
@@ -182,7 +222,7 @@ function Calendar(props) {
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
             t={props.t}
-        />
+        /> : null}
         <div className={props.classes.container}>
             {!props.hideLeftBlock && !props.readOnly && <div className={props.classes.leftBlock}>
                 <Paper elevation={4} className={props.classes.leftPaper}>
@@ -196,26 +236,28 @@ function Calendar(props) {
                                 key={type.type}
                                 index={index}
                             />)}
-                        <div>{props.t('Drag and drop the events above to create a new one.')}</div>
-                        <hr className={props.classes.hr} />
-                        <div>{props.t('Use ALT by dragging it to copy the events.')}</div>
+                        {props.hideLeftBlockHint ? null : <div>{props.t('Drag and drop the events above to create a new one.')}</div>}
+                        {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
+                        {props.hideLeftBlockHint ? null : <div>{props.t('Use ALT by dragging it to copy the events.')}</div>}
                     </div>
                 </Paper>
             </div>}
             <div className={props.classes.calendarBlock}>
                 <div className={props.classes.calendar}>
                     <FullCalendar
+                        ref={ref}
                         plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
+                        weekends={!props.hideWeekends}
                         headerToolbar={
                             props.hideTopBlock ? false :
                                 {
-                                    left: 'prev,next today',
+                                    left: props.hideTopBlockButtons ? '' : 'prev,next today',
                                     center: 'title',
-                                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+                                    right: props.hideTopBlockButtons ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                                 }
                         }
-                        initialView={props.viewMode || localStorage.getItem('calendarView') || 'dayGridMonth'}
-                        initialDate={localStorage.getItem('calendarStart') ? new Date(parseInt(localStorage.getItem('calendarStart'))) : new Date()}
+                        initialView={props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth'}
+                        initialDate={initialDate}
                         editable={!props.readOnly}
                         selectable
                         selectMirror
@@ -236,8 +278,30 @@ function Calendar(props) {
                         ]}
                         locale={props.language}
                         datesSet={date => {
-                            localStorage.setItem('calendarStart', date.view.currentStart.getTime());
-                            localStorage.setItem('calendarView', date.view.type);
+                            if (!props.widget) {
+                                window.localStorage.setItem(`${storageName}Start`, date.view.currentStart.getTime());
+                                window.localStorage.setItem(`${storageName}View`, date.view.type);
+                            } else {
+                                scrollTimer.current && clearTimeout(scrollTimer.current);
+                                scrollTimer.current = null;
+
+                                scrollBackTimer.current && clearTimeout(scrollBackTimer.current);
+                                scrollBackTimer.current = setTimeout(() => {
+                                    scrollBackTimer.current = null;
+
+                                    const scrollBack = () => {
+                                        const calendar = ref.current?.getApi();
+                                        calendar?.scrollToTime(new Date().getTime());
+                                        if (!scrollBackTimer.current) {
+                                            scrollTimer.current = setTimeout(() => scrollBack, 1000 * 60 * 5); // 5 minutes
+                                        } else {
+                                            scrollTimer.current = null;
+                                        }
+                                    };
+
+                                    scrollBack();
+                                }, 60000);
+                            }
                         }}
                         // select={this.handleDateSelect}
                         // eventContent={event => <MenuItem>
@@ -306,34 +370,39 @@ function Calendar(props) {
                             props.updateEvents();
                             setTimeout(() => setEventDialog(newEvent._id), 100);
                         }}
-                        dateClick={async event => {
-                            // detect double click
-                            if (lastDateClick && event.dateStr === lastDateClick.dateStr && Date.now() - lastDateClick.ts < 300) {
-                                setLastDateClick(null);
+                        select={async selectInfo => {
+                            const calendarApi = selectInfo.view.calendar;
+                            calendarApi.unselect(); // clear date selection
 
-                                const newEvent = {
-                                    _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
-                                    common: {
-                                        name: props.t('Single event'),
-                                        enabled: true,
-                                    },
-                                    native: {
-                                        id: Date.now(),
-                                        start: clientDateToServer(event.date, 'date', props.serverTimeZone),
-                                        type: 'single',
-                                        durationEditable: false,
-                                        oid: '',
-                                        startValue: '',
-                                        color: '#3A87AD',
-                                    },
-                                    type: 'schedule',
-                                };
-                                await props.socket.setObject(newEvent._id, newEvent);
-                                await props.updateEvents();
-                                setTimeout(() => setEventDialog(newEvent._id), 100);
-                            } else {
-                                setLastDateClick({ dateStr: event.dateStr, ts: Date.now() });
+                            if (props.readOnly) {
+                                return;
                             }
+                            console.log('ADD', selectInfo);
+
+                            const newEvent = {
+                                _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
+                                common: {
+                                    name: props.t('Single event'),
+                                    enabled: true,
+                                },
+                                native: {
+                                    id: Date.now(),
+                                    start: clientDateToServer(selectInfo.date || selectInfo.start, 'date', props.serverTimeZone),
+                                    intervals: selectInfo.end ? [{
+                                        value: '',
+                                        timeOffset: (selectInfo.end.getTime() - selectInfo.start.getTime()),
+                                    }] : undefined,
+                                    type: selectInfo.end ? 'double' : 'single',
+                                    durationEditable: !!selectInfo.end,
+                                    oid: '',
+                                    startValue: '',
+                                    color: '#3A87AD',
+                                },
+                                type: 'schedule',
+                            };
+                            await props.socket.setObject(newEvent._id, newEvent);
+                            await props.updateEvents();
+                            setTimeout(() => setEventDialog(newEvent._id), 100);
                         }}
                     />
                 </div>
@@ -349,11 +418,17 @@ Calendar.propTypes = {
     socket: PropTypes.object,
     readOnly: PropTypes.bool,
     hideLeftBlock: PropTypes.bool,
+    hideTopBlock: PropTypes.bool,
+    hideLeftBlockHint: PropTypes.bool,
+    hideTopBlockButtons: PropTypes.bool,
+    hideWeekends: PropTypes.bool,
     viewMode: PropTypes.bool,
     updateEvents: PropTypes.func,
     instance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     t: PropTypes.func.isRequired,
+    widget: PropTypes.bool,
     language: PropTypes.string.isRequired,
+    storageName: PropTypes.string,
 };
 
 export default withTheme(withStyles(styles)(Calendar));

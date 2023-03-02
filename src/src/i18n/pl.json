@@ -22,5 +22,10 @@
   "Toggle event": "Przełącz wydarzenie",
   "single": "raz",
   "double": "podwójnie",
-  "toggle": "przełącznik"
+  "toggle": "przełącznik",
+  "All data will be lost. Confirm?": "Wszystkie dane zostaną utracone. Potwierdzać?",
+  "Delete event": "Usuń wydarzenie",
+  "Start value": "Wartość początkowa",
+  "End value": "Wartość końcowa",
+  "Color": "Kolor"
 }

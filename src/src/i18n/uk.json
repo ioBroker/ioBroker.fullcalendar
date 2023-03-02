@@ -22,5 +22,10 @@
   "Toggle event": "Переключити подію",
   "single": "один раз",
   "double": "подвійний",
-  "toggle": "перемикач"
+  "toggle": "перемикач",
+  "All data will be lost. Confirm?": "Усі дані буде втрачено. Підтвердити?",
+  "Delete event": "Видалити подію",
+  "Start value": "Початкове значення",
+  "End value": "Кінцеве значення",
+  "Color": "колір"
 }

@@ -15,6 +15,7 @@ You must not use any external resources, the scheduling is processed only in ioB
 You can control your events with calendar and can plan to control them periodically.
 
 ## Todo
+- Week and day must scroll to the current time
 - Astro events
 
 <!--

@@ -24,5 +24,8 @@
   "double": "double",
   "toggle": "toggle",
   "Delete event": "Delete event",
-  "All data will be lost. Confirm?": "All data will be lost. Confirm?"
+  "All data will be lost. Confirm?": "All data will be lost. Confirm?",
+  "Start value": "Start value",
+  "End value": "End value",
+  "Color": "Color"
 }

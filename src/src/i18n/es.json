@@ -22,5 +22,10 @@
   "Toggle event": "Alternar evento",
   "single": "una vez",
   "double": "doble",
-  "toggle": "palanca"
+  "toggle": "palanca",
+  "All data will be lost. Confirm?": "Todos los datos se perderán. ¿Confirmar?",
+  "Delete event": "Eliminar evento",
+  "Start value": "Valor inicial",
+  "End value": "valor final",
+  "Color": "Color"
 }

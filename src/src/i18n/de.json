@@ -22,5 +22,10 @@
   "Toggle event": "Umschaltereignis",
   "single": "Einzelereignis",
   "double": "An/Aus-Ereignis",
-  "toggle": "Umschaltereignis"
+  "toggle": "Umschaltereignis",
+  "All data will be lost. Confirm?": "Alle Daten gehen verloren. Bestätigen?",
+  "Delete event": "Ereignis löschen",
+  "Start value": "Startwert",
+  "End value": "Endwert",
+  "Color": "Farbe"
 }

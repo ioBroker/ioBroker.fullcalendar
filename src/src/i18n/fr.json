@@ -22,5 +22,10 @@
   "Toggle event": "Basculer l'événement",
   "single": "une fois",
   "double": "double",
-  "toggle": "basculer"
+  "toggle": "basculer",
+  "All data will be lost. Confirm?": "Toutes les données seront perdues. Confirmer?",
+  "Delete event": "Supprimer l'événement",
+  "Start value": "Valeur de départ",
+  "End value": "Valeur finale",
+  "Color": "Couleur"
 }

@@ -30,13 +30,6 @@ const styles = {
     tableCell: {
         textAlign: 'center',
     },
-    dialogActions: {
-        justifyContent: 'space-between',
-    },
-    dialogActionsRight: {
-        display: 'flex',
-        gap: 8,
-    },
     typeDescription: {
         fontSize: 12,
         whiteSpace: 'normal',
@@ -48,10 +41,15 @@ const styles = {
 };
 
 const EventDialog = props => {
+    const initialDuration = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].timeOffset ? props.event.native.intervals[0].timeOffset / 60000 : 0;
+    const initialEndValue = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].value !== undefined ? props.event.native.intervals[0].value : '';
     const [idDialog, setIdDialog] = useState(false);
     const [event, setEvent] = useState(props.event);
     const [object, setObject] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState(false);
+    const [duration, setDuration] = useState(initialDuration);
+    const [endValue, setEndValue] = useState(initialEndValue);
+
     const updateObject = async id => {
         if (id) {
             setObject(await props.socket.getObject(id));
@@ -83,6 +81,10 @@ const EventDialog = props => {
         }
     }
 
+    const changed = JSON.stringify(props.event) !== JSON.stringify(event) ||
+        duration !== initialDuration ||
+        endValue !== initialEndValue;
+
     const changeEvent = modify => {
         const newEvent = JSON.parse(JSON.stringify(event));
         modify(newEvent);
@@ -113,9 +115,8 @@ const EventDialog = props => {
                 <Select
                     value={event?.native[field] || ''}
                     disabled={props.readOnly}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.native[field] = e.target.value);
-                    }}
+                    onChange={e =>
+                        changeEvent(newEvent => newEvent.native[field] = e.target.value)}
                 >
                     {Object.keys(object.common.states)
                         .map(option => <MenuItem key={option} value={option}>{object.common.states[option]}</MenuItem>)}
@@ -133,10 +134,50 @@ const EventDialog = props => {
         />;
     };
 
+    const endValueField = () => {
+        if (!object) {
+            return null;
+        }
+        if (object.common.type === 'boolean') {
+            return <FormControlLabel
+                control={<Checkbox
+                    checked={!!endValue}
+                    disabled={props.readOnly}
+                    onChange={e => setEndValue(e.target.checked)}
+                />}
+                label={props.t('End value')}
+            />;
+        } if (object.common.states) {
+            return <FormControl
+                fullWidth
+                variant="standard"
+            >
+                <InputLabel>{props.t('End value')}</InputLabel>
+                <Select
+                    value={endValue || ''}
+                    disabled={props.readOnly}
+                    onChange={e => setEndValue(e.target.value)}
+                >
+                    {Object.keys(object.common.states)
+                        .map(option => <MenuItem key={option} value={option}>{object.common.states[option]}</MenuItem>)}
+                </Select>
+            </FormControl>;
+        }
+        return <TextField
+            label={props.t('End value')}
+            value={endValue || ''}
+            disabled={props.readOnly}
+            onChange={e => setEndValue(e.target.value)}
+            variant="standard"
+            fullWidth
+        />;
+    };
+
     return <Dialog open={props.open} onClose={props.onClose} fullWidth>
         <DialogTitle>{props.t('Configure event')}</DialogTitle>
         <DialogContent>
             {idDialog && <SelectID
+                imagePrefix="../.."
                 selected={event?.native.oid}
                 disabled={props.readOnly}
                 onOk={id => {
@@ -215,10 +256,9 @@ const EventDialog = props => {
             {event?.native.type !== 'single' && <div className={props.classes.field}>
                 <TextField
                     label={props.t('Duration')}
-                    value={(event?.native.intervals?.[0].timeOffset || 0) / 1000 / 60}
+                    value={duration}
                     disabled={props.readOnly}
-                    onChange={e =>
-                        changeEvent(newEvent => newEvent.native.intervals[0].timeOffset = e.target.value * 1000 * 60)}
+                    onChange={e => setDuration(e.target.value)}
                     variant="standard"
                     fullWidth
                     InputProps={{
@@ -246,7 +286,7 @@ const EventDialog = props => {
                 {valueField('startValue', event?.native.type === 'toggle' ? 'First value' : 'Start value')}
             </div>
             {event?.native.type === 'double' && <div className={props.classes.field}>
-                {valueField('endValue', 'End value')}
+                {endValueField()}
             </div>}
             <div className={props.classes.field}>
                 <FormControl
@@ -369,43 +409,53 @@ const EventDialog = props => {
                     name={props.t('Color')}
                 />
             </div>
-            {/* <pre>
-                {JSON.stringify(event, null, 2)}
-            </pre> */}
         </DialogContent>
-        <DialogActions className={props.classes.dialogActions}>
-            <Button
+        <DialogActions>
+            {!props.readOnly && !props.widget ? <Button
                 variant="contained"
                 color="secondary"
                 startIcon={<Delete />}
-                disabled={props.readOnly}
                 onClick={() => setDeleteDialog(true)}
             >
                 {props.t('Delete')}
+            </Button> : null}
+            {!props.readOnly && !props.widget ? <div style={{ flex: 1 }} /> : null}
+            {!props.readOnly ? <Button
+                variant="contained"
+                color="primary"
+                disabled={!changed}
+                startIcon={<Save />}
+                onClick={async () => {
+                    if (event.native.type === 'single') {
+                        if (event.native.intervals) {
+                            delete event.native.intervals;
+                        }
+                    } else if (event.native.type === 'double') {
+                        event.native.intervals = event.native.intervals || [];
+                        event.native.intervals[0] = event.native.intervals[0] || {};
+                        event.native.intervals[0].timeOffset = (parseFloat(duration) || 1) * 60000;
+                        event.native.intervals[0].value = endValue;
+                    } else if (event.native.type === 'toggle') {
+                        event.native.intervals = event.native.intervals || [];
+                        event.native.intervals[0] = event.native.intervals[0] || {};
+                        event.native.intervals[0].timeOffset = (parseFloat(duration) || 1) * 60000;
+                    }
+
+                    await props.socket.setObject(event._id, event);
+                    props.updateEvents();
+                    props.onClose();
+                }}
+            >
+                {props.t('Save')}
+            </Button> : null}
+            <Button
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+                onClick={props.onClose}
+            >
+                {props.readOnly ? props.t('Close') : props.t('Cancel')}
             </Button>
-            <div className={props.classes.dialogActionsRight}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={JSON.stringify(props.event) === JSON.stringify(event) || props.readOnly}
-                    startIcon={<Save />}
-                    onClick={async () => {
-                        await props.socket.setObject(event._id, event);
-                        props.updateEvents();
-                        props.onClose();
-                    }}
-                >
-                    {props.t('Save')}
-                </Button>
-                <Button
-                    variant="contained"
-                    color="grey"
-                    startIcon={<Cancel />}
-                    onClick={props.onClose}
-                >
-                    {props.t('Cancel')}
-                </Button>
-            </div>
         </DialogActions>
         {deleteDialog && <Confirm
             title={props.t('Delete event')}
@@ -414,8 +464,13 @@ const EventDialog = props => {
             dialogName="deleteConfirmDialog"
             onClose={async isYes => {
                 if (isYes) {
-                    await props.socket.delObject(event._id);
-                    props.updateEvents();
+                    try {
+                        await props.socket.delObject(event._id);
+                        props.updateEvents();
+                    } catch (e) {
+                        window.alert(`Cannot delete event: ${e}`);
+                    }
+
                     props.onClose();
                 }
                 setDeleteDialog(false);
@@ -430,9 +485,11 @@ EventDialog.propTypes = {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     event: PropTypes.object,
+    readOnly: PropTypes.bool,
     updateEvents: PropTypes.func.isRequired,
     serverTimeZone: PropTypes.number.isRequired,
     t: PropTypes.func.isRequired,
+    widget: PropTypes.bool,
 };
 
 export default withStyles(styles)(EventDialog);

@@ -27,6 +27,7 @@ class FullCalendar extends Generic {
             visSet: 'fullcalendar',
             visWidgetLabel: 'fullcalendar',  // Label of widget
             visSetLabel: 'set_label', // Label of widget set
+            visSetColor: '#112233',
             visName: 'Full calendar',
             visAttrs: [{
                 name: 'common',
@@ -48,6 +49,14 @@ class FullCalendar extends Generic {
                         label: 'hide_left_block',
                         name: 'hideLeftBlock',
                         type: 'checkbox',
+                        hidden: data => data.readOnly,
+                        default: false,
+                    },
+                    {
+                        label: 'hide_left_block_hint',
+                        name: 'hideLeftBlockHint',
+                        type: 'checkbox',
+                        hidden: data => data.readOnly || data.hideLeftBlock,
                         default: false,
                     },
                     {
@@ -57,10 +66,28 @@ class FullCalendar extends Generic {
                         default: false,
                     },
                     {
+                        label: 'hide_top_block_buttons',
+                        name: 'hideTopBlockButtons',
+                        type: 'checkbox',
+                        hidden: data => data.hide_top_block,
+                        default: false,
+                    },
+                    {
+                        label: 'hide_weekends',
+                        name: 'hideWeekends',
+                        type: 'checkbox',
+                        default: false,
+                    },
+                    {
                         label: 'view_mode',
                         name: 'viewMode',
                         type: 'select',
-                        options: ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listMonth'],
+                        options: [
+                            { label: 'full_calendar_dayGridMonth', value: 'dayGridMonth' },
+                            { label: 'full_calendar_timeGridWeek', value: 'timeGridWeek' },
+                            { label: 'full_calendar_timeGridDay', value: 'timeGridDay' },
+                            { label: 'full_calendar_listMonth', value: 'listMonth' },
+                        ],
                         default: 'dayGridMonth',
                     },
                     {
@@ -68,6 +95,7 @@ class FullCalendar extends Generic {
                         name: 'name',
                         tooltip: 'used_only_with_relative',
                         default: '',
+                        hidden: (data, index, style) => style && style.position !== 'relative',
                     },
                 ],
             }],
@@ -95,7 +123,30 @@ class FullCalendar extends Generic {
     }
 
     componentDidMount() {
+        super.componentDidMount();
+        this.props.socket.subscribeObject(`fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+
         this.updateEvents();
+    }
+
+    onEventsChanged = (id, obj) => {
+        const events = JSON.parse(JSON.stringify(this.state.events));
+        const eventPos = events.findIndex(e => e._id === id);
+        if (eventPos !== -1) {
+            if (obj) {
+                events[eventPos] = obj;
+            } else {
+                events.splice(eventPos, 1);
+            }
+        } else {
+            events.push(obj);
+        }
+        this.setState({ events });
+    };
+
+    componentWillUnmount() {
+        this.props.socket.unsubscribeObject(`fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+        super.componentWillUnmount();
     }
 
     onRxDataChanged() {
@@ -140,6 +191,8 @@ class FullCalendar extends Generic {
             ref={this.widgetRef}
         >
             <Calendar
+                widget
+                key={this.state.rxData.viewMode}
                 events={this.state.events || []}
                 socket={this.props.socket}
                 instance={this.state.rxData.instance}
@@ -149,7 +202,11 @@ class FullCalendar extends Generic {
                 readOnly={this.state.rxData.readOnly || false}
                 hideLeftBlock={this.state.rxData.hideLeftBlock || false}
                 hideTopBlock={this.state.rxData.hideTopBlock || false}
+                hideLeftBlockHint={this.state.rxData.hideLeftBlockHint || false}
+                hideTopBlockButtons={this.state.rxData.hideTopBlockButtons || false}
                 viewMode={this.state.rxData.viewMode || null}
+                storageName={`fc_${this.props.id}`}
+                hideWeekends={this.state.rxData.hideWeekends || false}
                 t={FullCalendar.t}
                 language={I18n.getLanguage()}
             />

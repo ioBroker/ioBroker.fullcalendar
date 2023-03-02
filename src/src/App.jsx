@@ -35,6 +35,28 @@ class App extends GenericApp {
         super(props, extendedProps);
     }
 
+    onEventsChanged = (id, obj) => {
+        const events = JSON.parse(JSON.stringify(this.state.events));
+        const eventPos = events.findIndex(e => e._id === id);
+        if (eventPos !== -1) {
+            if (obj) {
+                events[eventPos] = obj;
+            } else {
+                events.splice(eventPos, 1);
+            }
+        } else {
+            events.push(obj);
+        }
+        this.setState({ events });
+    };
+
+    componentWillUnmount() {
+        if (this.subscribed) {
+            this.socket.unsubscribeObject(`fullcalendar.${this.instance}.*`, this.onEventsChanged);
+        }
+        super.componentWillUnmount();
+    }
+
     updateEvents = async () => {
         const objects = await this.socket.getObjectViewCustom(
             'schedule',
@@ -57,6 +79,9 @@ class App extends GenericApp {
     };
 
     onConnectionReady() {
+        this.socket.subscribeObject(`fullcalendar.${this.instance}.*`, this.onEventsChanged);
+        this.subscribed = true;
+
         this.updateEvents();
     }
 
