@@ -3,7 +3,7 @@ import {
 } from '@mui/material';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
-    ColorPicker, I18n, SelectID, Confirm,
+    ColorPicker, SelectID, Confirm,
 } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -62,6 +62,7 @@ const EventDialog = props => {
     useEffect(() => {
         setEvent(props.event);
         updateObject(event?.native.oid);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.open]);
 
     const cronObject = event?.native.cron ? cron2obj(event?.native.cron) : null;
@@ -101,14 +102,14 @@ const EventDialog = props => {
                         changeEvent(newEvent => newEvent.native[field] = e.target.checked);
                     }}
                 />}
-                label={I18n.t(name)}
+                label={props.t(name)}
             />;
         } if (object.common.states) {
             return <FormControl
                 fullWidth
                 variant="standard"
             >
-                <InputLabel>{I18n.t(name)}</InputLabel>
+                <InputLabel>{props.t(name)}</InputLabel>
                 <Select
                     value={event?.native[field] || ''}
                     disabled={props.readOnly}
@@ -122,7 +123,7 @@ const EventDialog = props => {
             </FormControl>;
         }
         return <TextField
-            label={I18n.t(name)}
+            label={props.t(name)}
             value={event?.native[field] || ''}
             disabled={props.readOnly}
             onChange={e =>
@@ -133,7 +134,7 @@ const EventDialog = props => {
     };
 
     return <Dialog open={props.open} onClose={props.onClose} fullWidth>
-        <DialogTitle>{I18n.t('Configure event')}</DialogTitle>
+        <DialogTitle>{props.t('Configure event')}</DialogTitle>
         <DialogContent>
             {idDialog && <SelectID
                 selected={event?.native.oid}
@@ -154,7 +155,7 @@ const EventDialog = props => {
                         onChange={e =>
                             changeEvent(newEvent => newEvent.common.enabled = e.target.checked)}
                     />}
-                    label={I18n.t('Active')}
+                    label={props.t('Active')}
                 />
             </div>
             <div className={props.classes.field}>
@@ -162,19 +163,19 @@ const EventDialog = props => {
                     fullWidth
                     variant="standard"
                 >
-                    <InputLabel>{I18n.t('Event type')}</InputLabel>
+                    <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
                         value={event?.native.type || ''}
                         disabled={props.readOnly}
                         onChange={e =>
                             changeEvent(newEvent => newEvent.native.type = e.target.value)}
-                        renderValue={value => I18n.t(value)}
+                        renderValue={value => props.t(value)}
                     >
                         {['single', 'double', 'toggle'].map(type =>
                             <MenuItem key={type} value={type}>
                                 <div>
-                                    <div>{I18n.t(type)}</div>
-                                    <div className={props.classes.typeDescription}>{I18n.t(typeDescriptions[type])}</div>
+                                    <div>{props.t(type)}</div>
+                                    <div className={props.classes.typeDescription}>{props.t(typeDescriptions[type])}</div>
                                 </div>
                             </MenuItem>)}
                     </Select>
@@ -183,7 +184,7 @@ const EventDialog = props => {
             <div className={props.classes.field}>
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                     <TimePicker
-                        label="Time"
+                        label={props.t('Time')}
                         value={date || null}
                         disabled={props.readOnly}
                         onChange={_date => {
@@ -213,7 +214,7 @@ const EventDialog = props => {
             </div>
             {event?.native.type !== 'single' && <div className={props.classes.field}>
                 <TextField
-                    label={I18n.t('Duration')}
+                    label={props.t('Duration')}
                     value={(event?.native.intervals?.[0].timeOffset || 0) / 1000 / 60}
                     disabled={props.readOnly}
                     onChange={e =>
@@ -221,7 +222,7 @@ const EventDialog = props => {
                     variant="standard"
                     fullWidth
                     InputProps={{
-                        endAdornment: <InputAdornment position="end">{I18n.t('minutes')}</InputAdornment>,
+                        endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
                     }}
                 />
             </div>}
@@ -252,7 +253,7 @@ const EventDialog = props => {
                     fullWidth
                     variant="standard"
                 >
-                    <InputLabel>{I18n.t('Period')}</InputLabel>
+                    <InputLabel>{props.t('Period')}</InputLabel>
                     <Select
                         value={period || 'once'}
                         disabled={props.readOnly}
@@ -282,7 +283,7 @@ const EventDialog = props => {
                             });
                         }}
                     >
-                        {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{I18n.t(type)}</MenuItem>)}
+                        {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{props.t(type)}</MenuItem>)}
                     </Select>
                 </FormControl>
             </div>
@@ -365,7 +366,7 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={color =>
                         changeEvent(newEvent => newEvent.native.color = color)}
-                    label="Color"
+                    name={props.t('Color')}
                 />
             </div>
             {/* <pre>
@@ -380,7 +381,7 @@ const EventDialog = props => {
                 disabled={props.readOnly}
                 onClick={() => setDeleteDialog(true)}
             >
-                {I18n.t('Delete')}
+                {props.t('Delete')}
             </Button>
             <div className={props.classes.dialogActionsRight}>
                 <Button
@@ -394,7 +395,7 @@ const EventDialog = props => {
                         props.onClose();
                     }}
                 >
-                    {I18n.t('Save')}
+                    {props.t('Save')}
                 </Button>
                 <Button
                     variant="contained"
@@ -402,13 +403,13 @@ const EventDialog = props => {
                     startIcon={<Cancel />}
                     onClick={props.onClose}
                 >
-                    {I18n.t('Cancel')}
+                    {props.t('Cancel')}
                 </Button>
             </div>
         </DialogActions>
         {deleteDialog && <Confirm
-            title={I18n.t('Delete event')}
-            text={I18n.t('All data will be lost. Confirm?')}
+            title={props.t('Delete event')}
+            text={props.t('All data will be lost. Confirm?')}
             suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
             onClose={async isYes => {
@@ -431,6 +432,7 @@ EventDialog.propTypes = {
     event: PropTypes.object,
     updateEvents: PropTypes.func.isRequired,
     serverTimeZone: PropTypes.number.isRequired,
+    t: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(EventDialog);

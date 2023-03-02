@@ -92,6 +92,7 @@
     "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
     "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
     "loglevel": "info",
+    "materializeTab": true,
     "adminTab": {
       "singleton": false,
       "name": "Calendar",
@@ -113,7 +114,22 @@
       "sentry": {
         "dsn": "https://89d6f43ab4b5424785f6454d630c3286@sentry.iobroker.net/164"
       }
-    }
+    },
+    "visWidgets": {
+      "i18n": "component",
+      "scheduler": {
+        "name": "fullcalendar",
+        "url": "fullcalendar/customWidgets.js",
+        "url1": "http://localhost:4173/customWidgets.js",
+        "components": [
+          "FullCalendar"
+        ]
+      }
+    },
+    "restartAdapters": [
+      "vis",
+      "vis-2-beta"
+    ]
   },
   "native": {
     "debounce": 1000,

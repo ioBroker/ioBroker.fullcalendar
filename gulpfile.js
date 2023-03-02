@@ -94,11 +94,9 @@ function buildWidgets() {
     }
 
     // sync src and src-widgets
-    /*sync2files(`${__dirname}/src-widgets/src/components/DayNightSwitcher.js`, `${__dirname}/src/src/components/DayNightSwitcher.js`);
-    sync2files(`${__dirname}/src-widgets/src/components/DayOfWeekPanel.js`, `${__dirname}/src/src/components/DayOfWeekPanel.js`);
-    sync2files(`${__dirname}/src-widgets/src/components/Interval.js`, `${__dirname}/src/src/components/Interval.js`);
-    sync2files(`${__dirname}/src-widgets/src/components/Intervals.js`, `${__dirname}/src/src/components/Intervals.js`);
-    sync2files(`${__dirname}/src-widgets/src/components/IntervalsContainer.js`, `${__dirname}/src/src/components/IntervalsContainer.js`);*/
+    sync2files(`${__dirname}/src-widgets/src/Component/Calendar.js`, `${__dirname}/src/src/Component/Calendar.js`);
+    sync2files(`${__dirname}/src-widgets/src/Component/EventDialog.js`, `${__dirname}/src/src/Component/EventDialog.js`);
+    sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src/src/Component/Utils.js`);
 
     return new Promise((resolve, reject) => {
         const options = {
@@ -485,4 +483,4 @@ gulp.task('6-patch', () => new Promise(resolve => {
 
 gulp.task('6-patch-dep',  gulp.series('5-copy-dep', '6-patch'));
 
-gulp.task('default', gulp.series('6-patch-dep'));
+gulp.task('default', gulp.series('6-patch-dep', 'widget-build'));

@@ -1,16 +1,11 @@
 import React from 'react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import { withStyles } from '@mui/styles';
 
 import GenericApp from '@iobroker/adapter-react-v5/GenericApp';
-import {
-    Loader,
-} from '@iobroker/adapter-react-v5';
+import { I18n, Loader } from '@iobroker/adapter-react-v5';
+
 import Calendar from './Component/Calendar';
 
-const styles = () => ({
-
-});
 class App extends GenericApp {
     constructor(props) {
         const extendedProps = { ...props };
@@ -75,7 +70,7 @@ class App extends GenericApp {
         }
         return <StyledEngineProvider injectFirst>
             <ThemeProvider theme={this.state.theme}>
-                <div style={{ overflow: 'auto', height: '100%' }}>
+                <div style={{ overflow: 'auto', height: '100%' }} id="rootDiv">
                     <Calendar
                         events={this.state.events || []}
                         socket={this.socket}
@@ -83,6 +78,8 @@ class App extends GenericApp {
                         changeEvents={this.changeEvents}
                         updateEvents={this.updateEvents}
                         serverTimeZone={this.state.serverTimeZone || 0}
+                        t={I18n.t}
+                        language={I18n.getLanguage()}
                     />
                     {/* <pre>
                         {JSON.stringify(this.state.events, null, 2)}
@@ -93,4 +90,4 @@ class App extends GenericApp {
     }
 }
 
-export default withStyles(styles)(App);
+export default App;

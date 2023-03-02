@@ -80,6 +80,11 @@ class FullCalendar extends Generic {
         };
     }
 
+    static t(key, ...args) {
+        return I18n.t(`full_calendar_${key}`, ...args);
+    }
+
+    // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
         return FullCalendar.getWidgetInfo();
     }
@@ -125,10 +130,10 @@ class FullCalendar extends Generic {
             this.forceUpdate();
         }
 
-        let width = (this.widgetRef.current?.offsetWidth || 0) - (this.state.rxData.hideDow ? 0 : 80);
+        /* let width = (this.widgetRef.current?.offsetWidth || 0) - (this.state.rxData.hideDow ? 0 : 80);
         if (width < 0) {
             width = 0;
-        }
+        } */
 
         const content = <div
             className={this.props.classes.content}
@@ -145,6 +150,8 @@ class FullCalendar extends Generic {
                 hideLeftBlock={this.state.rxData.hideLeftBlock || false}
                 hideTopBlock={this.state.rxData.hideTopBlock || false}
                 viewMode={this.state.rxData.viewMode || null}
+                t={FullCalendar.t}
+                language={I18n.getLanguage()}
             />
         </div>;
 

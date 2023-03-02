@@ -22,8 +22,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { withStyles, withTheme } from '@mui/styles';
 
-import { I18n } from '@iobroker/adapter-react-v5';
-
+import PropTypes from 'prop-types';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -35,14 +34,14 @@ const eventTypes = [
     { type: 'toggle', name: 'Toggle event' },
 ];
 
-const DraggableButton = ({ type }) => {
+const DraggableButton = ({ type, t }) => {
     const ref = useRef(null);
 
     useEffect(() => {
         const draggable = new Draggable(ref.current, {
             eventData: () => ({
                 id: type.type,
-                title: I18n.t(type.name),
+                title: t(type.name),
                 create: true,
                 extendedProps: {
                     type: type.type,
@@ -52,6 +51,7 @@ const DraggableButton = ({ type }) => {
         return () => {
             draggable.destroy();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return <div
@@ -66,7 +66,7 @@ const DraggableButton = ({ type }) => {
         }}
         ref={ref}
     >
-        {I18n.t(type.name)}
+        {t(type.name)}
     </div>;
 };
 
@@ -181,22 +181,24 @@ function Calendar(props) {
             updateEvents={props.updateEvents}
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
+            t={props.t}
         />
         <div className={props.classes.container}>
             {!props.hideLeftBlock && !props.readOnly && <div className={props.classes.leftBlock}>
                 <Paper elevation={4} className={props.classes.leftPaper}>
                     <div className={props.classes.leftContent}>
-                        <h4>{I18n.t('Events')}</h4>
+                        <h4>{props.t('Events')}</h4>
                         {eventTypes.map((type, index) =>
                             <DraggableButton
+                                t={props.t}
                                 type={type}
-                                name={I18n.t(type.name)}
+                                name={props.t(type.name)}
                                 key={type.type}
                                 index={index}
                             />)}
-                        <div>{I18n.t('Drag and drop the events above to create a new one.')}</div>
+                        <div>{props.t('Drag and drop the events above to create a new one.')}</div>
                         <hr className={props.classes.hr} />
-                        <div>{I18n.t('Use ALT by dragging it to copy the events.')}</div>
+                        <div>{props.t('Use ALT by dragging it to copy the events.')}</div>
                     </div>
                 </Paper>
             </div>}
@@ -232,7 +234,7 @@ function Calendar(props) {
                             ukLocale,
                             zhCnLocale,
                         ]}
-                        locale={I18n.getLanguage()}
+                        locale={props.language}
                         datesSet={date => {
                             localStorage.setItem('calendarStart', date.view.currentStart.getTime());
                             localStorage.setItem('calendarView', date.view.type);
@@ -312,7 +314,7 @@ function Calendar(props) {
                                 const newEvent = {
                                     _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
                                     common: {
-                                        name: I18n.t('Single event'),
+                                        name: props.t('Single event'),
                                         enabled: true,
                                     },
                                     native: {
@@ -339,5 +341,19 @@ function Calendar(props) {
         </div>
     </>;
 }
+
+Calendar.propTypes = {
+    events: PropTypes.array,
+    serverTimeZone: PropTypes.number,
+    theme: PropTypes.object,
+    socket: PropTypes.object,
+    readOnly: PropTypes.bool,
+    hideLeftBlock: PropTypes.bool,
+    viewMode: PropTypes.bool,
+    updateEvents: PropTypes.func,
+    instance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    t: PropTypes.func.isRequired,
+    language: PropTypes.string.isRequired,
+};
 
 export default withTheme(withStyles(styles)(Calendar));
