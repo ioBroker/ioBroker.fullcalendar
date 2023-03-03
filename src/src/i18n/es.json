@@ -23,9 +23,9 @@
   "single": "una vez",
   "double": "doble",
   "toggle": "palanca",
-  "All data will be lost. Confirm?": "Todos los datos se perderán. ¿Confirmar?",
   "Delete event": "Eliminar evento",
   "Start value": "Valor inicial",
   "End value": "valor final",
-  "Color": "Color"
+  "Color": "Color",
+  "Event will be deleted. Confirm?": "El evento será eliminado. ¿Confirmar?"
 }

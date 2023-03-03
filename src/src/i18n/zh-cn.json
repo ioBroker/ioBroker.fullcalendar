@@ -23,9 +23,9 @@
   "single": "一次",
   "double": "双倍的",
   "toggle": "切换",
-  "All data will be lost. Confirm?": "所有数据都将丢失。确认？",
   "Delete event": "删除活动",
   "Start value": "起始值",
   "End value": "终值",
-  "Color": "颜色"
+  "Color": "颜色",
+  "Event will be deleted. Confirm?": "事件将被删除。确认？"
 }

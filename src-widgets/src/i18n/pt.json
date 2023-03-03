@@ -1,6 +1,5 @@
 {
   "Active": "Ativo",
-  "All data will be lost. Confirm?": "Todos os dados serão perdidos. Confirme?",
   "Cancel": "Cancelar",
   "Configure event": "Configurar evento",
   "Delete": "Excluir",
@@ -46,5 +45,6 @@
   "listMonth": "Lista",
   "hide_left_block_hint": "Ocultar dica no bloco esquerdo",
   "hide_top_block_buttons": "Ocultar botões no bloco superior",
-  "hide_weekends": "Ocultar fins de semana"
+  "hide_weekends": "Ocultar fins de semana",
+  "Event will be deleted. Confirm?": "O evento será excluído. Confirme?"
 }

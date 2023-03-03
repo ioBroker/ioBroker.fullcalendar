@@ -23,9 +23,9 @@
   "single": "eenmaal",
   "double": "dubbele",
   "toggle": "schakelaar",
-  "All data will be lost. Confirm?": "Alle gegevens gaan verloren. Bevestigen?",
   "Delete event": "Gebeurtenis verwijderen",
   "Start value": "Beginwaarde",
   "End value": "Eindwaarde",
-  "Color": "Kleur"
+  "Color": "Kleur",
+  "Event will be deleted. Confirm?": "Evenement wordt verwijderd. Bevestigen?"
 }

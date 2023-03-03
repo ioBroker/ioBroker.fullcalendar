@@ -411,7 +411,7 @@ const EventDialog = props => {
             </div>
         </DialogContent>
         <DialogActions>
-            {!props.readOnly && !props.widget ? <Button
+            {!props.readOnly ? <Button
                 variant="contained"
                 color="secondary"
                 startIcon={<Delete />}
@@ -459,7 +459,7 @@ const EventDialog = props => {
         </DialogActions>
         {deleteDialog && <Confirm
             title={props.t('Delete event')}
-            text={props.t('All data will be lost. Confirm?')}
+            text={props.t('Event will be deleted. Confirm?')}
             suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
             onClose={async isYes => {

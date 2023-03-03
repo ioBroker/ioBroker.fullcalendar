@@ -23,9 +23,9 @@
   "single": "raz",
   "double": "podwójnie",
   "toggle": "przełącznik",
-  "All data will be lost. Confirm?": "Wszystkie dane zostaną utracone. Potwierdzać?",
   "Delete event": "Usuń wydarzenie",
   "Start value": "Wartość początkowa",
   "End value": "Wartość końcowa",
-  "Color": "Kolor"
+  "Color": "Kolor",
+  "Event will be deleted. Confirm?": "Wydarzenie zostanie usunięte. Potwierdzać?"
 }

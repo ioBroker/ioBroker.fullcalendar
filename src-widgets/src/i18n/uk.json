@@ -1,6 +1,5 @@
 {
   "Active": "Активний",
-  "All data will be lost. Confirm?": "Усі дані буде втрачено. Підтвердити?",
   "Cancel": "Скасувати",
   "Configure event": "Налаштувати подію",
   "Delete": "Видалити",
@@ -46,5 +45,6 @@
   "listMonth": "Список",
   "hide_left_block_hint": "Сховати підказку в лівому блоці",
   "hide_top_block_buttons": "Сховати кнопки у верхньому блоці",
-  "hide_weekends": "Приховати вихідні"
+  "hide_weekends": "Приховати вихідні",
+  "Event will be deleted. Confirm?": "Подію буде видалено. Підтвердити?"
 }

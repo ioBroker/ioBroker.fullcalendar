@@ -23,9 +23,9 @@
   "single": "один раз",
   "double": "двойной",
   "toggle": "переключатель",
-  "All data will be lost. Confirm?": "Все данные будут потеряны. Подтверждать?",
   "Delete event": "Удалить событие",
   "Start value": "Начальное значение",
   "End value": "Конечное значение",
-  "Color": "Цвет"
+  "Color": "Цвет",
+  "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?"
 }

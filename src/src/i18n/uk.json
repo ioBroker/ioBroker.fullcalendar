@@ -23,9 +23,9 @@
   "single": "один раз",
   "double": "подвійний",
   "toggle": "перемикач",
-  "All data will be lost. Confirm?": "Усі дані буде втрачено. Підтвердити?",
   "Delete event": "Видалити подію",
   "Start value": "Початкове значення",
   "End value": "Кінцеве значення",
-  "Color": "колір"
+  "Color": "колір",
+  "Event will be deleted. Confirm?": "Подію буде видалено. Підтвердити?"
 }
