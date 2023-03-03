@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "news": {
+      "2.0.0": {
+        "en": "New material design\nLicense changed to MIT",
+        "de": "Neues Materialdesign\nLizenz geändert in MIT",
+        "ru": "Новый дизайн материала\nЛицензия изменена на MIT",
+        "pt": "Novo design de material\nLicença alterada para MIT",
+        "nl": "Nieuw materiaal\nVerandering van MIT",
+        "fr": "Nouveau design\nLicence changée en MIT",
+        "it": "Nuovo design del materiale\nLicenza modificata in MIT",
+        "es": "Nuevo diseño de materiales\nLa licencia cambió a MIT",
+        "pl": "Nowy projekt\nLicense zmieniła się na MIT",
+        "uk": "Дизайн нового матеріалу\nЛіцензія змінено на MIT",
+        "zh-cn": "新材料设计\n液体变化"
+      },
       "1.2.0": {
         "en": "Updated to use with js-controller 3.3 and admin 5",
         "de": "Aktualisiert für die Verwendung mit js-controller 3.3 und admin 5",
