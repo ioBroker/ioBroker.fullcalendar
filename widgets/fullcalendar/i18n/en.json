@@ -13,7 +13,6 @@
   "Cancel": "Cancel",
   "Close": "Close",
   "Delete event": "Delete event",
-  "All data will be lost. Confirm?": "All data will be lost. Confirm?",
   "fullcalendar": "Calendar",
   "set_label": "FullCalendar",
   "used_only_with_relative": "Used only with relative position",
@@ -46,5 +45,6 @@
   "listMonth": "List",
   "hide_left_block_hint": "Hide hint in left block",
   "hide_top_block_buttons": "Hide buttons in top block",
-  "hide_weekends": "Hide weekends"
+  "hide_weekends": "Hide weekends",
+  "Event will be deleted. Confirm?": "Event will be deleted. Confirm?"
 }

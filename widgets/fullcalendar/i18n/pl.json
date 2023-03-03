@@ -1,6 +1,5 @@
 {
   "Active": "Aktywny",
-  "All data will be lost. Confirm?": "Wszystkie dane zostaną utracone. Potwierdzać?",
   "Cancel": "Anulować",
   "Configure event": "Skonfiguruj wydarzenie",
   "Delete": "Usuwać",
@@ -46,5 +45,6 @@
   "listMonth": "Lista",
   "hide_left_block_hint": "Ukryj podpowiedź w lewym bloku",
   "hide_top_block_buttons": "Ukryj przyciski w górnym bloku",
-  "hide_weekends": "Ukryj weekendy"
+  "hide_weekends": "Ukryj weekendy",
+  "Event will be deleted. Confirm?": "Wydarzenie zostanie usunięte. Potwierdzać?"
 }

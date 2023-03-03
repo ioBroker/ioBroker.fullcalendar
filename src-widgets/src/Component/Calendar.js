@@ -100,6 +100,22 @@ const styles = () => ({
     },
 });
 
+function dimColor(color) {
+    if (color.startsWith('#')) {
+        if (color.length === 4) {
+            return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}50`;
+        }
+        return `${color.substring(0, 7)}50`;
+    }
+    if (color.startsWith('rgb(')) {
+        return color.replace('rgb(', 'rgba(').replace(')', ', 0.3)');
+    }
+    if (color.startsWith('rgba(')) {
+        return color.replace(/,\s?[.\d]+\)$/, ', 0.3)');
+    }
+    return color;
+}
+
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
     const storageName = props.storageName || 'calendar';
@@ -162,7 +178,7 @@ function Calendar(props) {
             id: event._id,
             title: event.common.name,
             display: 'block',
-            backgroundColor: event.common.enabled ? event.native.color : (event.native.color?.startsWith('#') ? `${event.native.color}60` : event.native.color),
+            backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
             start: serverDateToClient(event.native.start, 'date', props.serverTimeZone),
             end: serverDateToClient(new Date(new Date(event.native.start).getTime() + initialDuration), 'date', props.serverTimeZone),
         };
@@ -214,7 +230,6 @@ function Calendar(props) {
         </style>
         {eventDialog ? <EventDialog
             widget={props.widget}
-            open={!0}
             event={props.events.find(event => event._id === eventDialog)}
             onClose={() => setEventDialog(null)}
             socket={props.socket}
@@ -222,6 +237,7 @@ function Calendar(props) {
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
             t={props.t}
+            language={props.language}
         /> : null}
         <div className={props.classes.container}>
             {!props.hideLeftBlock && !props.readOnly && <div className={props.classes.leftBlock}>

@@ -1,6 +1,5 @@
 {
   "Active": "Actief",
-  "All data will be lost. Confirm?": "Alle gegevens gaan verloren. Bevestigen?",
   "Cancel": "Annuleren",
   "Configure event": "Evenement configureren",
   "Delete": "Verwijderen",
@@ -46,5 +45,6 @@
   "listMonth": "Lijst",
   "hide_left_block_hint": "Verberg hint in linkerblok",
   "hide_top_block_buttons": "Verberg knoppen in het bovenste blok",
-  "hide_weekends": "Weekends verbergen"
+  "hide_weekends": "Weekends verbergen",
+  "Event will be deleted. Confirm?": "Evenement wordt verwijderd. Bevestigen?"
 }

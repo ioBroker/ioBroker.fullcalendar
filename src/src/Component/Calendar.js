@@ -230,7 +230,6 @@ function Calendar(props) {
         </style>
         {eventDialog ? <EventDialog
             widget={props.widget}
-            open={!0}
             event={props.events.find(event => event._id === eventDialog)}
             onClose={() => setEventDialog(null)}
             socket={props.socket}
@@ -238,6 +237,7 @@ function Calendar(props) {
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
             t={props.t}
+            language={props.language}
         /> : null}
         <div className={props.classes.container}>
             {!props.hideLeftBlock && !props.readOnly && <div className={props.classes.leftBlock}>

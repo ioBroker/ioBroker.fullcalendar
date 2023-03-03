@@ -20,6 +20,7 @@ module.exports = {
     plugins: [
         'only-warn',
         'react',
+        'react-hooks',
     ],
     rules: {
         'arrow-parens': [1, 'as-needed'],

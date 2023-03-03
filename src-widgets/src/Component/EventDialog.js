@@ -40,6 +40,13 @@ const styles = {
     },
 };
 
+function getText(text, lang) {
+    if (text && typeof text === 'object') {
+        return text[lang] || text.en;
+    }
+    return text;
+}
+
 const EventDialog = props => {
     const initialDuration = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].timeOffset ? props.event.native.intervals[0].timeOffset / 60000 : 0;
     const initialEndValue = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].value !== undefined ? props.event.native.intervals[0].value : '';
@@ -50,20 +57,20 @@ const EventDialog = props => {
     const [duration, setDuration] = useState(initialDuration);
     const [endValue, setEndValue] = useState(initialEndValue);
 
-    const updateObject = async id => {
-        if (id) {
-            setObject(await props.socket.getObject(id));
+    useEffect(() => {
+        if (event.native.oid) {
+            props.socket.getObject(event.native.oid)
+                .then(obj => setObject(obj))
+                .catch(e => {
+                    console.error(`Cannot get object ${event.native.oid}: ${e}`);
+                    setObject(null);
+                });
         } else {
             setObject(null);
         }
-    };
-    useEffect(() => {
-        setEvent(props.event);
-        updateObject(event?.native.oid);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.open]);
+    }, [event.native.oid, props.socket]);
 
-    const cronObject = event?.native.cron ? cron2obj(event?.native.cron) : null;
+    const cronObject = event.native.cron ? cron2obj(event.native.cron) : null;
     let period = 'once';
     if (Array.isArray(cronObject?.months)) {
         period = 'monthly';
@@ -98,7 +105,7 @@ const EventDialog = props => {
         if (object.common.type === 'boolean') {
             return <FormControlLabel
                 control={<Checkbox
-                    checked={!!event?.native[field]}
+                    checked={!!event.native[field]}
                     disabled={props.readOnly}
                     onChange={e => {
                         changeEvent(newEvent => newEvent.native[field] = e.target.checked);
@@ -113,7 +120,7 @@ const EventDialog = props => {
             >
                 <InputLabel>{props.t(name)}</InputLabel>
                 <Select
-                    value={event?.native[field] || ''}
+                    value={event.native[field] || ''}
                     disabled={props.readOnly}
                     onChange={e =>
                         changeEvent(newEvent => newEvent.native[field] = e.target.value)}
@@ -125,10 +132,9 @@ const EventDialog = props => {
         }
         return <TextField
             label={props.t(name)}
-            value={event?.native[field] || ''}
+            value={event.native[field] || ''}
             disabled={props.readOnly}
-            onChange={e =>
-                changeEvent(newEvent => newEvent.native[field] = e.target.value)}
+            onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.value)}
             variant="standard"
             fullWidth
         />;
@@ -173,17 +179,16 @@ const EventDialog = props => {
         />;
     };
 
-    return <Dialog open={props.open} onClose={props.onClose} fullWidth>
+    return <Dialog open={!0} onClose={props.onClose} fullWidth>
         <DialogTitle>{props.t('Configure event')}</DialogTitle>
         <DialogContent>
             {idDialog && <SelectID
                 imagePrefix="../.."
-                selected={event?.native.oid}
+                selected={event.native.oid}
                 disabled={props.readOnly}
                 onOk={id => {
                     changeEvent(newEvent => newEvent.native.oid = id);
                     setIdDialog(false);
-                    updateObject(id);
                 }}
                 onClose={() => setIdDialog(false)}
                 socket={props.socket}
@@ -206,7 +211,7 @@ const EventDialog = props => {
                 >
                     <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
-                        value={event?.native.type || ''}
+                        value={event.native.type || ''}
                         disabled={props.readOnly}
                         onChange={e =>
                             changeEvent(newEvent => newEvent.native.type = e.target.value)}
@@ -253,7 +258,7 @@ const EventDialog = props => {
                     />
                 </LocalizationProvider>
             </div>
-            {event?.native.type !== 'single' && <div className={props.classes.field}>
+            {event.native.type !== 'single' && <div className={props.classes.field}>
                 <TextField
                     label={props.t('Duration')}
                     value={duration}
@@ -270,22 +275,20 @@ const EventDialog = props => {
                 <div className={props.classes.selectId}>
                     <TextField
                         label="Object ID"
-                        value={event?.native.oid || ''}
+                        value={event.native.oid || ''}
                         disabled={props.readOnly}
-                        onChange={e => {
-                            changeEvent(newEvent => newEvent.native.oid = e.target.value);
-                            updateObject(e.target.value);
-                        }}
+                        onChange={e => changeEvent(newEvent => newEvent.native.oid = e.target.value)}
                         variant="standard"
+                        helperText={getText(object?.common.name || '', props.language)}
                         fullWidth
                     />
                     <Button onClick={() => setIdDialog(true)}>...</Button>
                 </div>
             </div>
             <div className={props.classes.field}>
-                {valueField('startValue', event?.native.type === 'toggle' ? 'First value' : 'Start value')}
+                {valueField('startValue', event.native.type === 'toggle' ? 'First value' : 'Start value')}
             </div>
-            {event?.native.type === 'double' && <div className={props.classes.field}>
+            {event.native.type === 'double' && <div className={props.classes.field}>
                 {endValueField()}
             </div>}
             <div className={props.classes.field}>
@@ -402,7 +405,7 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.field}>
                 <ColorPicker
-                    value={event?.native.color || ''}
+                    value={event.native.color || ''}
                     disabled={props.readOnly}
                     onChange={color =>
                         changeEvent(newEvent => newEvent.native.color = color)}
@@ -482,13 +485,13 @@ const EventDialog = props => {
 EventDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     socket: PropTypes.object.isRequired,
-    open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     event: PropTypes.object,
     readOnly: PropTypes.bool,
     updateEvents: PropTypes.func.isRequired,
     serverTimeZone: PropTypes.number.isRequired,
     t: PropTypes.func.isRequired,
+    language: PropTypes.string.isRequired,
     widget: PropTypes.bool,
 };
 

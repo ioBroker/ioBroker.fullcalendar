@@ -1,6 +1,5 @@
 {
   "Active": "Активный",
-  "All data will be lost. Confirm?": "Все данные будут потеряны. Подтверждать?",
   "Cancel": "Отмена",
   "Configure event": "Настроить событие",
   "Delete": "Удалить",
@@ -46,5 +45,6 @@
   "listMonth": "Список",
   "hide_left_block_hint": "Скрыть подсказку в левом блоке",
   "hide_top_block_buttons": "Скрыть кнопки в верхнем блоке",
-  "hide_weekends": "Скрыть выходные"
+  "hide_weekends": "Скрыть выходные",
+  "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?"
 }
