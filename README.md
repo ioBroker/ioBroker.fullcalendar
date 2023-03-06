@@ -23,7 +23,7 @@ You can control your events with calendar and can plan to control them periodica
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 2.0.3 (2023-03-06)
 * (bluefox) New material design
 * (bluefox) License changed to MIT
 * (bluefox) Allowed deletion of events
