@@ -27,5 +27,6 @@
   "Start value": "Початкове значення",
   "End value": "Кінцеве значення",
   "Color": "колір",
-  "Event will be deleted. Confirm?": "Подію буде видалено. Підтвердити?"
+  "Event will be deleted. Confirm?": "Подію буде видалено. Підтвердити?",
+  "Time": "час"
 }

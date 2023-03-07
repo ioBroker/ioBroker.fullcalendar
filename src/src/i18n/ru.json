@@ -27,5 +27,6 @@
   "Start value": "Начальное значение",
   "End value": "Конечное значение",
   "Color": "Цвет",
-  "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?"
+  "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?",
+  "Time": "Время"
 }

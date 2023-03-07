@@ -22,6 +22,8 @@ import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { Paper } from '@mui/material';
 
+import { Utils } from '@iobroker/adapter-react-v5';
+
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -132,8 +134,18 @@ function Calendar(props) {
 
     // create events
     const events = props.events.map(event => {
+        if (!event) {
+            return null;
+        }
         // duration in ms
-        const initialDuration = event?.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ? event.native.intervals[0].timeOffset : 0;
+        const initialDuration = event.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ?
+            event.native.intervals[0].timeOffset : 20;
+
+        const backgroundColor = event.common.enabled ? event.native.color : dimColor(event.native.color);
+        let textColor = Utils.invertColor(event.native.color, true);
+        if (!event.common.enabled) {
+            textColor = dimColor(textColor);
+        }
 
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
@@ -143,7 +155,8 @@ function Calendar(props) {
                 return {
                     id: event._id,
                     title: event.common.name,
-                    backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
+                    backgroundColor,
+                    textColor,
                     start,
                     duration: initialDuration,
                     allDay: false,
@@ -158,7 +171,8 @@ function Calendar(props) {
                 return {
                     id: event._id,
                     title: event.common.name,
-                    backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
+                    backgroundColor,
+                    textColor,
                     start,
                     duration: initialDuration,
                     allDay: false,
@@ -173,7 +187,9 @@ function Calendar(props) {
             return {
                 id: event._id,
                 title: event.common.name,
-                backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
+                duration: initialDuration,
+                backgroundColor,
+                textColor,
             };
         }
 
@@ -181,11 +197,13 @@ function Calendar(props) {
             id: event._id,
             title: event.common.name,
             display: 'block',
-            backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
+            backgroundColor,
+            textColor,
             start: serverDateToClient(event.native.start, 'date', props.serverTimeZone),
             end: serverDateToClient(new Date(new Date(event.native.start).getTime() + initialDuration), 'date', props.serverTimeZone),
         };
-    });
+    })
+        .filter(e => e);
 
     useEffect(() => {
         // update periodically the time
@@ -232,6 +250,7 @@ function Calendar(props) {
 `}
         </style>
         {eventDialog ? <EventDialog
+            systemConfig={props.systemConfig}
             widget={props.widget}
             event={props.events.find(event => event._id === eventDialog)}
             onClose={() => setEventDialog(null)}
@@ -339,6 +358,9 @@ function Calendar(props) {
                                 event.revert();
                             }
                         }}
+                        // eventClassNames={event => {
+                        //    console.log(event);
+                        // }}
                         eventDrop={async event => {
                             const eventData = props.events.find(_event => _event._id === event.event.id);
                             if (eventData?.native?.cron) {
@@ -374,7 +396,6 @@ function Calendar(props) {
                                     id: Date.now(),
                                     start: clientDateToServer(event.event.start, 'date', props.serverTimeZone),
                                     type: event.event.extendedProps.type,
-                                    durationEditable: false,
                                     oid: '',
                                     startValue: '',
                                     color: '#3A87AD',
@@ -412,7 +433,6 @@ function Calendar(props) {
                                         timeOffset: (selectInfo.end.getTime() - selectInfo.start.getTime()),
                                     }] : undefined,
                                     type: selectInfo.end ? 'double' : 'single',
-                                    durationEditable: !!selectInfo.end,
                                     oid: '',
                                     startValue: '',
                                     color: '#3A87AD',
@@ -433,6 +453,7 @@ function Calendar(props) {
 Calendar.propTypes = {
     events: PropTypes.array,
     serverTimeZone: PropTypes.number,
+    systemConfig: PropTypes.object,
     theme: PropTypes.object,
     socket: PropTypes.object,
     readOnly: PropTypes.bool,

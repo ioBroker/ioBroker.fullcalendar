@@ -27,5 +27,6 @@
   "Start value": "Valor inicial",
   "End value": "valor final",
   "Color": "Color",
-  "Event will be deleted. Confirm?": "El evento será eliminado. ¿Confirmar?"
+  "Event will be deleted. Confirm?": "El evento será eliminado. ¿Confirmar?",
+  "Time": "Tiempo"
 }

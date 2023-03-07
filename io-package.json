@@ -3,19 +3,6 @@
     "name": "fullcalendar",
     "version": "2.0.4",
     "news": {
-      "2.0.4": {
-        "en": "New material design\nLicense changed to MIT\nAllowed deletion of events",
-        "de": "Neues Materialdesign\nLizenz geändert in MIT\nErlaubte Löschung von Ereignissen",
-        "ru": "Новый дизайн материала\nЛицензия изменена на MIT\nРазрешено удаление событий",
-        "pt": "Novo design de material\nLicença alterada para MIT\nEliminação permitida de eventos",
-        "nl": "Nieuw materiaal\nVerandering van MIT\nVerwijdering van gebeurtenissen",
-        "fr": "Nouveau design\nLicence changée en MIT\nSuppression autorisée des événements",
-        "it": "Nuovo design del materiale\nLicenza modificata in MIT\nCancellazione degli eventi",
-        "es": "Nuevo diseño de materiales\nLa licencia cambió a MIT\nSupresión de los acontecimientos",
-        "pl": "Nowy projekt\nLicense zmieniła się na MIT\nDelecja zdarzeń",
-        "uk": "Дизайн нового матеріалу\nЛіцензія змінено на MIT\nДозволено видалення заходів",
-        "zh-cn": "新材料设计\n液体变化\n允许删除事件"
-      },
       "1.2.0": {
         "en": "Updated to use with js-controller 3.3 and admin 5",
         "de": "Aktualisiert für die Verwendung mit js-controller 3.3 und admin 5",

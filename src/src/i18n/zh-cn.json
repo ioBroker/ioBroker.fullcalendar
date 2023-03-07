@@ -27,5 +27,6 @@
   "Start value": "起始值",
   "End value": "终值",
   "Color": "颜色",
-  "Event will be deleted. Confirm?": "事件将被删除。确认？"
+  "Event will be deleted. Confirm?": "事件将被删除。确认？",
+  "Time": "时间"
 }

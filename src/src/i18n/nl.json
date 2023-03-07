@@ -27,5 +27,6 @@
   "Start value": "Beginwaarde",
   "End value": "Eindwaarde",
   "Color": "Kleur",
-  "Event will be deleted. Confirm?": "Evenement wordt verwijderd. Bevestigen?"
+  "Event will be deleted. Confirm?": "Evenement wordt verwijderd. Bevestigen?",
+  "Time": "Tijd"
 }

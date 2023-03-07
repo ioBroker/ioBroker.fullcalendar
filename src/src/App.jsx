@@ -93,10 +93,12 @@ class App extends GenericApp {
                 </ThemeProvider>
             </StyledEngineProvider>;
         }
+
         return <StyledEngineProvider injectFirst>
             <ThemeProvider theme={this.state.theme}>
                 <div style={{ overflow: 'auto', height: '100%' }} id="rootDiv">
                     <Calendar
+                        systemConfig={this._systemConfig}
                         events={this.state.events || []}
                         socket={this.socket}
                         instance={this.instance}
