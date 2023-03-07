@@ -365,13 +365,14 @@ const EventDialog = props => {
                 <table>
                     <tr>
                         {new Array(7).fill(null).map((value, i) => <td
+                            key={value}
                             className={props.classes.tableCell}
                         >
                             {moment().day(i).format('ddd')}
                         </td>)}
                     </tr>
                     <tr>
-                        {new Array(7).fill(null).map((value, i) => <td>
+                        {new Array(7).fill(null).map((value, i) => <td key={value}>
                             <Checkbox
                                 checked={cronObject?.dows?.includes(i) || false}
                                 disabled={props.readOnly}
