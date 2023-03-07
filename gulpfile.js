@@ -303,7 +303,9 @@ gulp.task('widget-3-copy', () => Promise.all([
         'src-widgets/build/static/js/vendors-node_modules_mui_material_styles_styled_js-node_modules_mui_material_styles_useTheme*.*',
         'src-widgets/build/static/js/vendors-node_modules_mui_material_Button_Button_js-node_modules_mui_material_DialogActions*.*',
         'src-widgets/build/static/js/vendors-node_modules_react-transition-group_esm_CSSTransition*.*',
-        'src-widgets/build/static/js/vendors-node_modules_date-io*.*'
+        'src-widgets/build/static/js/vendors-node_modules_date-io*.*',
+        'src-widgets/build/static/js/vendors-node_modules_iobroker_vis-2-widgets-react-dev_index_jsx*.*',
+        'src-widgets/build/static/js/vendors-node_modules_babel_runtime_helpers_asyncToGenerator*.*'
     ]).pipe(gulp.dest(`widgets/${adapterName}/static/js`)),
     gulp.src([`src-widgets/src/i18n/*.json`]).pipe(gulp.dest(`widgets/${adapterName}/i18n`)),
     new Promise(resolve =>
