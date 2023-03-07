@@ -12,6 +12,17 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import moment from 'moment';
+import 'moment/locale/de';
+import 'moment/locale/ru';
+import 'moment/locale/zh-cn';
+import 'moment/locale/it';
+import 'moment/locale/fr';
+import 'moment/locale/es';
+import 'moment/locale/nl';
+import 'moment/locale/pl';
+import 'moment/locale/pt';
+import 'moment/locale/uk';
+
 import { withStyles } from '@mui/styles';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
@@ -38,6 +49,21 @@ const styles = {
     selectId: {
         display: 'flex',
     },
+    narrowText: {
+        width: 140,
+        marginLeft: 8,
+    },
+    narrowText2: {
+        minWidth: 150,
+        marginRight: 8,
+    },
+    narrowColor: {
+        width: 200,
+    },
+    dayTable: {
+        marginLeft: 20,
+        display: 'inline-block',
+    },
 };
 
 function getText(text, lang) {
@@ -56,6 +82,8 @@ const EventDialog = props => {
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [duration, setDuration] = useState(initialDuration);
     const [endValue, setEndValue] = useState(initialEndValue);
+
+    moment.locale(props.language);
 
     useEffect(() => {
         if (event.native.oid) {
@@ -104,26 +132,24 @@ const EventDialog = props => {
         }
         if (object.common.type === 'boolean') {
             return <FormControlLabel
+                className={props.classes.narrowText2}
                 control={<Checkbox
                     checked={!!event.native[field]}
                     disabled={props.readOnly}
-                    onChange={e => {
-                        changeEvent(newEvent => newEvent.native[field] = e.target.checked);
-                    }}
+                    onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.checked)}
                 />}
                 label={props.t(name)}
             />;
         } if (object.common.states) {
             return <FormControl
-                fullWidth
+                className={props.classes.narrowText2}
                 variant="standard"
             >
                 <InputLabel>{props.t(name)}</InputLabel>
                 <Select
                     value={event.native[field] || ''}
                     disabled={props.readOnly}
-                    onChange={e =>
-                        changeEvent(newEvent => newEvent.native[field] = e.target.value)}
+                    onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.value)}
                 >
                     {Object.keys(object.common.states)
                         .map(option => <MenuItem key={option} value={option}>{object.common.states[option]}</MenuItem>)}
@@ -131,12 +157,12 @@ const EventDialog = props => {
             </FormControl>;
         }
         return <TextField
+            className={props.classes.narrowText2}
             label={props.t(name)}
             value={event.native[field] || ''}
             disabled={props.readOnly}
             onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.value)}
             variant="standard"
-            fullWidth
         />;
     };
 
@@ -146,6 +172,7 @@ const EventDialog = props => {
         }
         if (object.common.type === 'boolean') {
             return <FormControlLabel
+                className={props.classes.narrowText2}
                 control={<Checkbox
                     checked={!!endValue}
                     disabled={props.readOnly}
@@ -155,7 +182,7 @@ const EventDialog = props => {
             />;
         } if (object.common.states) {
             return <FormControl
-                fullWidth
+                className={props.classes.narrowText2}
                 variant="standard"
             >
                 <InputLabel>{props.t('End value')}</InputLabel>
@@ -175,9 +202,11 @@ const EventDialog = props => {
             disabled={props.readOnly}
             onChange={e => setEndValue(e.target.value)}
             variant="standard"
-            fullWidth
+            className={props.classes.narrowText2}
         />;
     };
+
+    const daysOfWeek = props.systemConfig?.firstDayOfWeek === 'monday' ? [1, 2, 3, 4, 5, 6, 0] : [0, 1, 2, 3, 4, 5, 6];
 
     return <Dialog open={!0} onClose={props.onClose} fullWidth>
         <DialogTitle>{props.t('Configure event')}</DialogTitle>
@@ -206,8 +235,8 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.field}>
                 <FormControl
-                    fullWidth
                     variant="standard"
+                    className={props.classes.narrowText2}
                 >
                     <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
@@ -226,8 +255,6 @@ const EventDialog = props => {
                             </MenuItem>)}
                     </Select>
                 </FormControl>
-            </div>
-            <div className={props.classes.field}>
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                     <TimePicker
                         label={props.t('Time')}
@@ -253,24 +280,22 @@ const EventDialog = props => {
                                 //
                             }
                         }}
-                        renderInput={params => <TextField {...params} variant="standard" fullWidth />}
+                        renderInput={params => <TextField {...params} variant="standard" className={props.classes.narrowText} />}
                         ampm={false}
                     />
                 </LocalizationProvider>
-            </div>
-            {event.native.type !== 'single' && <div className={props.classes.field}>
-                <TextField
+                {event.native.type !== 'single' && <TextField
                     label={props.t('Duration')}
                     value={duration}
                     disabled={props.readOnly}
                     onChange={e => setDuration(e.target.value)}
                     variant="standard"
-                    fullWidth
+                    className={props.classes.narrowText}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
                     }}
-                />
-            </div>}
+                />}
+            </div>
             <div className={props.classes.field}>
                 <div className={props.classes.selectId}>
                     <TextField
@@ -287,13 +312,10 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.field}>
                 {valueField('startValue', event.native.type === 'toggle' ? 'First value' : 'Start value')}
+                {event.native.type === 'double' && endValueField()}
             </div>
-            {event.native.type === 'double' && <div className={props.classes.field}>
-                {endValueField()}
-            </div>}
             <div className={props.classes.field}>
                 <FormControl
-                    fullWidth
                     variant="standard"
                 >
                     <InputLabel>{props.t('Period')}</InputLabel>
@@ -329,67 +351,75 @@ const EventDialog = props => {
                         {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{props.t(type)}</MenuItem>)}
                     </Select>
                 </FormControl>
+                {period === 'daily' && <table className={props.classes.dayTable}>
+                    <thead>
+                        <tr>
+                            {daysOfWeek.map(value => <td
+                                key={value}
+                                className={props.classes.tableCell}
+                            >
+                                {moment().day(value).format('ddd')}
+                            </td>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {daysOfWeek.map(value => <td key={value}>
+                                <Checkbox
+                                    checked={cronObject?.dows?.includes(value) || false}
+                                    disabled={props.readOnly}
+                                    onChange={e => {
+                                        changeEvent(newEvent => {
+                                            const newCronObject = cron2obj(newEvent.native.cron);
+                                            if (e.target.checked) {
+                                                newCronObject.dows.push(value);
+                                            } else {
+                                                newCronObject.dows = newCronObject.dows.filter(dow => dow !== value);
+                                            }
+                                            newEvent.native.cron = obj2cron(newCronObject);
+                                        });
+                                    }}
+                                    size="small"
+                                />
+                            </td>)}
+                        </tr>
+                    </tbody>
+                </table>}
             </div>
             {period === 'monthly' && <div className={props.classes.field}>
                 <table>
-                    <tr>
-                        {new Array(12).fill(null).map((value, i) => <td
-                            className={props.classes.tableCell}
-                        >
-                            {moment().month(i).format('MMM')}
-                        </td>)}
-                    </tr>
-                    <tr>
-                        {new Array(12).fill(null).map((value, i) => <td>
-                            <Checkbox
-                                checked={cronObject?.months?.includes(i + 1) || false}
-                                disabled={props.readOnly}
-                                onChange={e => {
-                                    changeEvent(newEvent => {
-                                        const newCronObject = cron2obj(newEvent.native.cron);
-                                        if (e.target.checked) {
-                                            newCronObject.months.push(i + 1);
-                                        } else {
-                                            newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
-                                        }
-                                        newEvent.native.cron = obj2cron(newCronObject);
-                                    });
-                                }}
-                                size="small"
-                            />
-                        </td>)}
-                    </tr>
-                </table>
-            </div>}
-            {period === 'daily' && <div className={props.classes.field}>
-                <table>
-                    <tr>
-                        {new Array(7).fill(null).map((value, i) => <td
-                            className={props.classes.tableCell}
-                        >
-                            {moment().day(i).format('ddd')}
-                        </td>)}
-                    </tr>
-                    <tr>
-                        {new Array(7).fill(null).map((value, i) => <td>
-                            <Checkbox
-                                checked={cronObject?.dows?.includes(i) || false}
-                                disabled={props.readOnly}
-                                onChange={e => {
-                                    changeEvent(newEvent => {
-                                        const newCronObject = cron2obj(newEvent.native.cron);
-                                        if (e.target.checked) {
-                                            newCronObject.dows.push(i);
-                                        } else {
-                                            newCronObject.dows = newCronObject.dows.filter(dow => dow !== i);
-                                        }
-                                        newEvent.native.cron = obj2cron(newCronObject);
-                                    });
-                                }}
-                                size="small"
-                            />
-                        </td>)}
-                    </tr>
+                    <thead>
+                        <tr>
+                            {new Array(12).fill(null).map((value, i) => <td
+                                key={i}
+                                className={props.classes.tableCell}
+                            >
+                                {moment().month(i).format('MMM')}
+                            </td>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {new Array(12).fill(null).map((value, i) => <td key={i}>
+                                <Checkbox
+                                    checked={cronObject?.months?.includes(i + 1) || false}
+                                    disabled={props.readOnly}
+                                    onChange={e => {
+                                        changeEvent(newEvent => {
+                                            const newCronObject = cron2obj(newEvent.native.cron);
+                                            if (e.target.checked) {
+                                                newCronObject.months.push(i + 1);
+                                            } else {
+                                                newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
+                                            }
+                                            newEvent.native.cron = obj2cron(newCronObject);
+                                        });
+                                    }}
+                                    size="small"
+                                />
+                            </td>)}
+                        </tr>
+                    </tbody>
                 </table>
             </div>}
             <div className={props.classes.field}>
@@ -403,7 +433,7 @@ const EventDialog = props => {
                     fullWidth
                 />
             </div>
-            <div className={props.classes.field}>
+            <div className={props.classes.narrowColor}>
                 <ColorPicker
                     value={event.native.color || ''}
                     disabled={props.readOnly}
@@ -483,6 +513,7 @@ const EventDialog = props => {
 };
 
 EventDialog.propTypes = {
+    systemConfig: PropTypes.object,
     classes: PropTypes.object.isRequired,
     socket: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
