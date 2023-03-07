@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
+import { Card, CardContent } from '@mui/material';
+
 import {
     I18n,
 } from '@iobroker/adapter-react-v5';
@@ -213,7 +215,7 @@ class FullCalendar extends Generic {
         </div>;
 
         if (this.state.rxStyle.position === 'relative') {
-            return this.wrapContent(content, null, { height: 'calc(100% - 24px)', width: 'calc(100% - 24px)' });
+            return this.wrapContent(content, null, { height: 'calc(100% - 24px)', width: 'calc(100% - 24px)' }, null, null, { Card, CardContent });
         }
 
         return content;
