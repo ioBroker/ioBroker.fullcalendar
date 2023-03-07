@@ -421,7 +421,7 @@ async function main() {
 
     // fix old design
     const design = await adapter.getForeignObjectAsync('_design/schedule');
-    if (!design || !design.views || design.views.schedule !== 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }') {
+    if (!design || !design.views || !design.views.schedule || design.views.schedule.map !== 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }') {
         await adapter.setForeignObjectAsync('_design/schedule', {
             language: 'javascript',
             views: {

@@ -101,6 +101,9 @@ const styles = () => ({
 });
 
 function dimColor(color) {
+    if (!color) {
+        return undefined;
+    }
     if (color.startsWith('#')) {
         if (color.length === 4) {
             return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}50`;
@@ -123,7 +126,7 @@ function Calendar(props) {
     const scrollBackTimer = useRef(null);
     const scrollTimer = useRef(null);
 
-    const initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) ?
+    const initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) && false ?
         new Date(parseInt(window.localStorage.getItem(`${storageName}Start`), 10)) :
         new Date();
 
@@ -140,7 +143,7 @@ function Calendar(props) {
                 return {
                     id: event._id,
                     title: event.common.name,
-                    backgroundColor: event.native.color,
+                    backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
                     start,
                     duration: initialDuration,
                     allDay: false,
@@ -155,7 +158,7 @@ function Calendar(props) {
                 return {
                     id: event._id,
                     title: event.common.name,
-                    backgroundColor: event.native.color,
+                    backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
                     start,
                     duration: initialDuration,
                     allDay: false,
@@ -170,7 +173,7 @@ function Calendar(props) {
             return {
                 id: event._id,
                 title: event.common.name,
-                backgroundColor: event.native.color,
+                backgroundColor: event.common.enabled ? event.native.color : dimColor(event.native.color),
             };
         }
 
@@ -277,6 +280,7 @@ function Calendar(props) {
                         editable={!props.readOnly}
                         selectable
                         selectMirror
+                        nowIndicator
                         dayMaxEvents
                         events={events}
                         height="calc(100% - 20px)"
@@ -295,7 +299,7 @@ function Calendar(props) {
                         locale={props.language}
                         datesSet={date => {
                             if (!props.widget) {
-                                window.localStorage.setItem(`${storageName}Start`, date.view.currentStart.getTime());
+                                // window.localStorage.setItem(`${storageName}Start`, date.view.currentStart.getTime());
                                 window.localStorage.setItem(`${storageName}View`, date.view.type);
                             } else {
                                 scrollTimer.current && clearTimeout(scrollTimer.current);
@@ -393,7 +397,6 @@ function Calendar(props) {
                             if (props.readOnly) {
                                 return;
                             }
-                            console.log('ADD', selectInfo);
 
                             const newEvent = {
                                 _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
