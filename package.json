@@ -45,6 +45,7 @@
     "img/",
     "io-package.json",
     "LICENSE",
+    "widgets/",
     "lib/",
     "main.js"
   ],

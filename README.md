@@ -23,6 +23,9 @@ You can control your events with calendar and can plan to control them periodica
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Corrected vis-2 widgets
+
 ### 2.0.5 (2023-03-07)
 * (bluefox) New material design
 * (bluefox) License changed to MIT
