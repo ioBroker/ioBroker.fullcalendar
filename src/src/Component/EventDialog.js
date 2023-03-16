@@ -474,7 +474,7 @@ const EventDialog = props => {
                         event.native.intervals[0].timeOffset = (parseFloat(duration) || 1) * 60000;
                     }
 
-                    await props.socket.setObject(event._id, event);
+                    await props.setEvent(event._id, event);
                     props.updateEvents();
                     props.onClose();
                 }}
@@ -498,7 +498,7 @@ const EventDialog = props => {
             onClose={async isYes => {
                 if (isYes) {
                     try {
-                        await props.socket.delObject(event._id);
+                        await props.deleteEvent(event._id);
                         props.updateEvents();
                     } catch (e) {
                         window.alert(`Cannot delete event: ${e}`);

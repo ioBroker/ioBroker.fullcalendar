@@ -256,6 +256,8 @@ function Calendar(props) {
             onClose={() => setEventDialog(null)}
             socket={props.socket}
             updateEvents={props.updateEvents}
+            setEvent={props.setEvent}
+            deleteEvent={props.deleteEvent}
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
             t={props.t}
@@ -352,7 +354,7 @@ function Calendar(props) {
                             if (eventData.native.intervals?.[0].timeOffset) {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
                                 newEvent.native.intervals[0].timeOffset += event.endDelta.milliseconds;
-                                props.socket.setObject(newEvent._id, newEvent);
+                                props.setEvent(newEvent._id, newEvent);
                                 props.updateEvents();
                             } else {
                                 event.revert();
@@ -366,28 +368,28 @@ function Calendar(props) {
                             if (eventData?.native?.cron) {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
                                 if (event.jsEvent.altKey) {
-                                    newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
+                                    newEvent._id = `${props.calendarPrefix}.event-${uuidv4()}`;
                                 }
                                 const newCron = cron2obj(newEvent.native.cron);
                                 const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
                                 newCron.hours = timeZoneCron.hours;
                                 newCron.minutes = timeZoneCron.minutes;
                                 newEvent.native.cron = obj2cron(newCron);
-                                await props.socket.setObject(newEvent._id, newEvent);
+                                await props.setEvent(newEvent._id, newEvent);
                                 props.updateEvents();
                             } else {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
                                 if (event.jsEvent.altKey) {
-                                    newEvent._id = `fullcalendar.${props.instance}.event-${uuidv4()}`;
+                                    newEvent._id = `${props.calendarPrefix}.event-${uuidv4()}`;
                                 }
                                 newEvent.native.start = clientDateToServer(event.event.start, 'date', props.serverTimeZone);
-                                await props.socket.setObject(newEvent._id, newEvent);
+                                await props.setEvent(newEvent._id, newEvent);
                                 props.updateEvents();
                             }
                         }}
                         eventReceive={async event => {
                             const newEvent = {
-                                _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
+                                _id: `${props.calendarPrefix}.event-${uuidv4()}`,
                                 common: {
                                     name: event.event.title,
                                     enabled: true,
@@ -407,7 +409,7 @@ function Calendar(props) {
                                     timeOffset: 30 * 60 * 1000,
                                 }];
                             }
-                            await props.socket.setObject(newEvent._id, newEvent);
+                            await props.setEvent(newEvent._id, newEvent);
                             props.updateEvents();
                             setTimeout(() => setEventDialog(newEvent._id), 100);
                         }}
@@ -420,7 +422,7 @@ function Calendar(props) {
                             }
 
                             const newEvent = {
-                                _id: `fullcalendar.${props.instance}.event-${uuidv4()}`,
+                                _id: `${props.calendarPrefix}.event-${uuidv4()}`,
                                 common: {
                                     name: props.t('Single event'),
                                     enabled: true,
@@ -439,7 +441,7 @@ function Calendar(props) {
                                 },
                                 type: 'schedule',
                             };
-                            await props.socket.setObject(newEvent._id, newEvent);
+                            await props.setEvent(newEvent._id, newEvent);
                             await props.updateEvents();
                             setTimeout(() => setEventDialog(newEvent._id), 100);
                         }}
