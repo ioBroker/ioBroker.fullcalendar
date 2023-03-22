@@ -8,54 +8,7 @@ const gulp        = require('gulp');
 const fs          = require('fs');
 const cp          = require('child_process');
 const adapterName = require('./package.json').name.replace('iobroker.', '');
-
-function deleteFoldersRecursive(path, exceptions) {
-    if (fs.existsSync(path)) {
-        const files = fs.readdirSync(path);
-        for (const file of files) {
-            const curPath = `${path}/${file}`;
-            if (exceptions && exceptions.find(e => curPath.endsWith(e))) {
-                continue;
-            }
-
-            const stat = fs.statSync(curPath);
-            if (stat.isDirectory()) {
-                deleteFoldersRecursive(curPath);
-                fs.rmdirSync(curPath);
-            } else {
-                fs.unlinkSync(curPath);
-            }
-        }
-    }
-}
-
-function npmInstall(src) {
-    return new Promise((resolve, reject) => {
-        // Install node modules
-        const cwd = `${__dirname.replace(/\\/g, '/')}/${src || 'src'}/`;
-
-        const cmd = `npm install -f`;
-        console.log(`"${cmd} in ${cwd}`);
-
-        // System call used for update of js-controller itself,
-        // because during installation npm packet will be deleted too, but some files must be loaded even during the install process.
-        const child = cp.exec(cmd, {cwd});
-
-        child.stderr.pipe(process.stderr);
-        child.stdout.pipe(process.stdout);
-
-        child.on('exit', (code /* , signal */) => {
-            // code 1 is strange error that cannot be explained. Everything is installed but error :(
-            if (code && code !== 1) {
-                reject(`Cannot install: ${code}`);
-            } else {
-                console.log(`"${cmd} in ${cwd} finished.`);
-                // command succeeded
-                resolve();
-            }
-        });
-    });
-}
+const gulpHelper  = require('@iobroker/vis-2-widgets-react-dev/gulpHelper');
 
 function sync2files(src, dst) {
     const srcTxt = fs.readFileSync(src).toString('utf8');
@@ -72,57 +25,12 @@ function sync2files(src, dst) {
 }
 
 function buildWidgets() {
-    const version = JSON.parse(fs.readFileSync(`${__dirname}/package.json`).toString('utf8')).version;
-    const data    = JSON.parse(fs.readFileSync(`${__dirname}/src-widgets/package.json`).toString('utf8'));
-
-    data.version = version;
-
-    fs.writeFileSync(`${__dirname}/src-widgets/package.json`, JSON.stringify(data, null, 4));
-
-    try {
-        // we have bug, that federation requires version number in @mui/material/styles, so we have to change it
-        // read version of @mui/material and write it to @mui/material/styles
-        const muiStyleVersion = JSON.parse(fs.readFileSync(`${__dirname}/src-widgets/node_modules/@mui/material/styles/package.json`).toString('utf8'));
-        if (!muiStyleVersion.version) {
-            const muiVersion = JSON.parse(fs.readFileSync(`${__dirname}/src-widgets/node_modules/@mui/material/package.json`).toString('utf8'));
-            muiStyleVersion.version = muiVersion.version;
-            fs.writeFileSync(`${__dirname}/src-widgets/node_modules/@mui/material/styles/package.json`, JSON.stringify(muiStyleVersion, null, 2));
-        }
-    } catch (e) {
-        console.error(`Cannot read mui version: ${e}`);
-        return Promise.reject(`Cannot read mui version: ${e}`);
-    }
-
     // sync src and src-widgets
     sync2files(`${__dirname}/src-widgets/src/Component/Calendar.js`, `${__dirname}/src/src/Component/Calendar.js`);
     sync2files(`${__dirname}/src-widgets/src/Component/EventDialog.js`, `${__dirname}/src/src/Component/EventDialog.js`);
     sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src/src/Component/Utils.js`);
 
-    return new Promise((resolve, reject) => {
-        const options = {
-            stdio: 'pipe',
-            cwd: `${__dirname}/src-widgets/`,
-        };
-
-        console.log(options.cwd);
-
-        let script = `${__dirname}/src-widgets/node_modules/@craco/craco/dist/bin/craco.js`;
-        if (!fs.existsSync(script)) {
-            script = `${__dirname}/node_modules/@craco/craco/dist/bin/craco.js`;
-        }
-        if (!fs.existsSync(script)) {
-            console.error(`Cannot find execution file: ${script}`);
-            reject(`Cannot find execution file: ${script}`);
-        } else {
-            const child = cp.fork(script, ['build'], options);
-            child.stdout.on('data', data => console.log(data.toString()));
-            child.stderr.on('data', data => console.log(data.toString()));
-            child.on('close', code => {
-                console.log(`compile process exited with code ${code}`);
-                code ? reject(`Exit code: ${code}`) : resolve();
-            });
-        }
-    });
+    gulpHelper.buildWidgets(__dirname, `${__dirname}/src-widgets/`);
 }
 
 function build() {
@@ -160,12 +68,12 @@ function build() {
 
 // TASKS
 gulp.task('widget-0-clean', done => {
-    deleteFoldersRecursive(`${__dirname}/src-widgets/build`);
-    deleteFoldersRecursive(`${__dirname}/widgets`);
+    gulpHelper.deleteFoldersRecursive(`${__dirname}/src-widgets/build`);
+    gulpHelper.deleteFoldersRecursive(`${__dirname}/widgets`);
     done();
 });
 
-gulp.task('widget-1-npm', async () => npmInstall('src-widgets'));
+gulp.task('widget-1-npm', async () => gulpHelper.npmInstall(`${__dirname}/src-widgets/`));
 
 gulp.task('widget-2-compile', async () => buildWidgets());
 
@@ -175,138 +83,14 @@ gulp.task('widget-3-copy', () => Promise.all([
     gulp.src([`src-widgets/build/*.map`]).pipe(gulp.dest(`widgets/${adapterName}`)),
     gulp.src([
         `src-widgets/build/static/**/*`,
-        `!src-widgets/build/static/js/node_modules*.*`,
-        `!src-widgets/build/static/js/vendors-node_modules*.*`,
-        `!src-widgets/build/static/js/main*.*`,
-        `!src-widgets/build/static/js/src_bootstrap*.*`,
-        `!src-widgets/build/static/media/Alarm Systems.*.svg`,
-        `!src-widgets/build/static/media/Amplifier.*.svg`,
-        `!src-widgets/build/static/media/Anteroom.*.svg`,
-        `!src-widgets/build/static/media/Attic.*.svg`,
-        `!src-widgets/build/static/media/Awnings.*.svg`,
-        `!src-widgets/build/static/media/Balcony.*.svg`,
-        `!src-widgets/build/static/media/Barn.*.svg`,
-        `!src-widgets/build/static/media/Basement.*.svg`,
-        `!src-widgets/build/static/media/Bathroom.*.svg`,
-        `!src-widgets/build/static/media/Battery Status.*.svg`,
-        `!src-widgets/build/static/media/Bedroom.*.svg`,
-        `!src-widgets/build/static/media/Boiler Room.*.svg`,
-        `!src-widgets/build/static/media/Carport.*.svg`,
-        `!src-widgets/build/static/media/Ceiling Spotlights.*.svg`,
-        `!src-widgets/build/static/media/Cellar.*.svg`,
-        `!src-widgets/build/static/media/Chamber.*.svg`,
-        `!src-widgets/build/static/media/Chandelier.*.svg`,
-        `!src-widgets/build/static/media/Climate.*.svg`,
-        `!src-widgets/build/static/media/Coffee Makers.*.svg`,
-        `!src-widgets/build/static/media/Cold Water.*.svg`,
-        `!src-widgets/build/static/media/Computer.*.svg`,
-        `!src-widgets/build/static/media/Consumption.*.svg`,
-        `!src-widgets/build/static/media/Corridor.*.svg`,
-        `!src-widgets/build/static/media/Curtains.*.svg`,
-        `!src-widgets/build/static/media/Dining Area.*.svg`,
-        `!src-widgets/build/static/media/Dining Room.*.svg`,
-        `!src-widgets/build/static/media/Dining.*.svg`,
-        `!src-widgets/build/static/media/Dishwashers.*.svg`,
-        `!src-widgets/build/static/media/Doors.*.svg`,
-        `!src-widgets/build/static/media/Doorstep.*.svg`,
-        `!src-widgets/build/static/media/Dressing Room.*.svg`,
-        `!src-widgets/build/static/media/Driveway.*.svg`,
-        `!src-widgets/build/static/media/Dryer.*.svg`,
-        `!src-widgets/build/static/media/Entrance.*.svg`,
-        `!src-widgets/build/static/media/Equipment Room.*.svg`,
-        `!src-widgets/build/static/media/Fan.*.svg`,
-        `!src-widgets/build/static/media/Floor Lamps.*.svg`,
-        `!src-widgets/build/static/media/Front Yard.*.svg`,
-        `!src-widgets/build/static/media/Gallery.*.svg`,
-        `!src-widgets/build/static/media/Garage Doors.*.svg`,
-        `!src-widgets/build/static/media/Garage.*.svg`,
-        `!src-widgets/build/static/media/Garden.*.svg`,
-        `!src-widgets/build/static/media/Gates.*.svg`,
-        `!src-widgets/build/static/media/Ground Floor.*.svg`,
-        `!src-widgets/build/static/media/Guest Bathroom.*.svg`,
-        `!src-widgets/build/static/media/Guest Room.*.svg`,
-        `!src-widgets/build/static/media/Gym.*.svg`,
-        `!src-widgets/build/static/media/Hairdryer.*.svg`,
-        `!src-widgets/build/static/media/Hall.*.svg`,
-        `!src-widgets/build/static/media/Handle.*.svg`,
-        `!src-widgets/build/static/media/Hanging Lamps.*.svg`,
-        `!src-widgets/build/static/media/Heater.*.svg`,
-        `!src-widgets/build/static/media/Home Theater.*.svg`,
-        `!src-widgets/build/static/media/Hoods.*.svg`,
-        `!src-widgets/build/static/media/Hot Water.*.svg`,
-        `!src-widgets/build/static/media/Humidity.*.svg`,
-        `!src-widgets/build/static/media/Iron.*.svg`,
-        `!src-widgets/build/static/media/Irrigation.*.svg`,
-        `!src-widgets/build/static/media/Kitchen.*.svg`,
-        `!src-widgets/build/static/media/Laundry Room.*.svg`,
-        `!src-widgets/build/static/media/Led Strip.*.svg`,
-        `!src-widgets/build/static/media/Light.*.svg`,
-        `!src-widgets/build/static/media/Lightings.*.svg`,
-        `!src-widgets/build/static/media/Living Area.*.svg`,
-        `!src-widgets/build/static/media/Living Room.*.svg`,
-        `!src-widgets/build/static/media/Lock.*.svg`,
-        `!src-widgets/build/static/media/Locker Room.*.svg`,
-        `!src-widgets/build/static/media/Louvre.*.svg`,
-        `!src-widgets/build/static/media/Mowing Machine.*.svg`,
-        `!src-widgets/build/static/media/Music.*.svg`,
-        `!src-widgets/build/static/media/names.*.txt`,
-        `!src-widgets/build/static/media/Nursery.*.svg`,
-        `!src-widgets/build/static/media/Office.*.svg`,
-        `!src-widgets/build/static/media/Outdoor Blinds.*.svg`,
-        `!src-widgets/build/static/media/Outdoors.*.svg`,
-        `!src-widgets/build/static/media/People.*.svg`,
-        `!src-widgets/build/static/media/Playroom.*.svg`,
-        `!src-widgets/build/static/media/Pool.*.svg`,
-        `!src-widgets/build/static/media/Power Consumption.*.svg`,
-        `!src-widgets/build/static/media/Printer.*.svg`,
-        `!src-widgets/build/static/media/Pump.*.svg`,
-        `!src-widgets/build/static/media/Rear Wall.*.svg`,
-        `!src-widgets/build/static/media/Receiver.*.svg`,
-        `!src-widgets/build/static/media/Sconces.*.svg`,
-        `!src-widgets/build/static/media/Second Floor.*.svg`,
-        `!src-widgets/build/static/media/Security.*.svg`,
-        `!src-widgets/build/static/media/Shading.*.svg`,
-        `!src-widgets/build/static/media/Shed.*.svg`,
-        `!src-widgets/build/static/media/Shutters.*.svg`,
-        `!src-widgets/build/static/media/Sleeping Area.*.svg`,
-        `!src-widgets/build/static/media/SmokeDetector.*.svg`,
-        `!src-widgets/build/static/media/Sockets.*.svg`,
-        `!src-widgets/build/static/media/Speaker.*.svg`,
-        `!src-widgets/build/static/media/Stairway.*.svg`,
-        `!src-widgets/build/static/media/Stairwell.*.svg`,
-        `!src-widgets/build/static/media/Storeroom.*.svg`,
-        `!src-widgets/build/static/media/Stove.*.svg`,
-        `!src-widgets/build/static/media/Summer House.*.svg`,
-        `!src-widgets/build/static/media/Swimming Pool.*.svg`,
-        `!src-widgets/build/static/media/Table Lamps.*.svg`,
-        `!src-widgets/build/static/media/Temperature Sensors.*.svg`,
-        `!src-widgets/build/static/media/Terrace.*.svg`,
-        `!src-widgets/build/static/media/Toilet.*.svg`,
-        `!src-widgets/build/static/media/Tv.*.svg`,
-        `!src-widgets/build/static/media/Upstairs.*.svg`,
-        `!src-widgets/build/static/media/Vacuum Cleaner.*.svg`,
-        `!src-widgets/build/static/media/Ventilation.*.svg`,
-        `!src-widgets/build/static/media/Wardrobe.*.svg`,
-        `!src-widgets/build/static/media/Washing Machines.*.svg`,
-        `!src-widgets/build/static/media/Washroom.*.svg`,
-        `!src-widgets/build/static/media/Water Consumption.*.svg`,
-        `!src-widgets/build/static/media/Water Heater.*.svg`,
-        `!src-widgets/build/static/media/Water.*.svg`,
-        `!src-widgets/build/static/media/Wc.*.svg`,
-        `!src-widgets/build/static/media/Weather.*.svg`,
-        `!src-widgets/build/static/media/Window.*.svg`,
-        `!src-widgets/build/static/media/Windscreen.*.svg`,
-        `!src-widgets/build/static/media/Workshop.*.svg`,
-        `!src-widgets/build/static/media/Workspace.*.svg`,
+        ...gulpHelper.ignoreFiles(`${__dirname}/src-widgets/`),
     ]).pipe(gulp.dest(`widgets/${adapterName}/static`)),
 
     gulp.src([
         'src-widgets/build/static/js/vendors-node_modules_mui_material_styles_styled_js-node_modules_mui_material_styles_useTheme*.*',
         'src-widgets/build/static/js/vendors-node_modules_mui_material_Button_Button_js-node_modules_mui_material_DialogActions*.*',
         'src-widgets/build/static/js/vendors-node_modules_react-transition-group_esm_CSSTransition*.*',
-        'src-widgets/build/static/js/vendors-node_modules_date-io*.*',
-        'src-widgets/build/static/js/node_modules_iobroker_vis*.*',
-        'src-widgets/build/static/js/vendors-node_modules_babel_runtime_helpers_asyncToGenerator*.*'
+        ...gulpHelper.copyFiles(`${__dirname}/src-widgets/`),
     ]).pipe(gulp.dest(`widgets/${adapterName}/static/js`)),
 
     gulp.src([`src-widgets/src/i18n/*.json`]).pipe(gulp.dest(`widgets/${adapterName}/i18n`)),
@@ -326,7 +110,7 @@ gulp.task('widget-3-copy', () => Promise.all([
 gulp.task('widget-build', gulp.series(['widget-0-clean', 'widget-1-npm', 'widget-2-compile', 'widget-3-copy']));
 
 gulp.task('clean', done => {
-    deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png'])
+    gulpHelper.deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png'])
     done();
 });
 
@@ -334,7 +118,7 @@ gulp.task('2-npm', () => {
     if (fs.existsSync(`${__dirname}/src/node_modules`)) {
         return Promise.resolve();
     } else {
-        return npmInstall();
+        return gulpHelper.npmInstall(`${__dirname}/src/`);
     }
 });
 
@@ -349,6 +133,8 @@ gulp.task('5-copy', () =>
         'src/build/*/**',
         'src/build/*',
         `!src/build/_socket/*.js`,
+        // replace it later with
+        // ...gulpHelper.ignoreSvgFiles(`${__dirname}/src/`),
         `!src/build/static/media/Alarm Systems.*.svg`,
         `!src/build/static/media/Amplifier.*.svg`,
         `!src/build/static/media/Anteroom.*.svg`,
