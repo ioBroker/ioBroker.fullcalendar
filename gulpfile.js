@@ -30,7 +30,7 @@ function buildWidgets() {
     sync2files(`${__dirname}/src-widgets/src/Component/EventDialog.js`, `${__dirname}/src/src/Component/EventDialog.js`);
     sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src/src/Component/Utils.js`);
 
-    gulpHelper.buildWidgets(__dirname, `${__dirname}/src-widgets/`);
+    return gulpHelper.buildWidgets(__dirname, `${__dirname}/src-widgets/`);
 }
 
 function build() {
