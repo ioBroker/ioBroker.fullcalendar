@@ -24,6 +24,8 @@ import { Paper } from '@mui/material';
 
 import { Utils } from '@iobroker/adapter-react-v5';
 
+import { RRule } from 'rrule';
+import SunCalc from 'suncalc2';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -74,8 +76,8 @@ const DraggableButton = ({ type, t }) => {
 const styles = () => ({
     container: {
         display: 'flex',
-        height: '100%',
         width: '100%',
+        flex: 1,
     },
     leftBlock: {
         width: 200,
@@ -127,15 +129,20 @@ function Calendar(props) {
     const ref = useRef(null);
     const scrollBackTimer = useRef(null);
     const scrollTimer = useRef(null);
+    const [calendarInterval, setCalendarInterval] = useState({
+        start: null,
+        end: null,
+    });
 
     const initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) && false ?
         new Date(parseInt(window.localStorage.getItem(`${storageName}Start`), 10)) :
         new Date();
 
     // create events
-    const events = props.events.map(event => {
+    const events = [];
+    props.events.forEach(event => {
         if (!event) {
-            return null;
+            return;
         }
         // duration in ms
         const initialDuration = event.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ?
@@ -152,58 +159,80 @@ function Calendar(props) {
             const cronObject = cron2obj(event.native.cron);
             start.setFullYear(1970);
             if (Array.isArray(cronObject.months)) {
-                return {
-                    id: event._id,
-                    title: event.common.name,
-                    backgroundColor,
-                    textColor,
-                    start,
-                    duration: initialDuration,
-                    allDay: false,
-                    rrule: {
-                        dtstart: new Date(start.getTime() - start.getTimezoneOffset() * 60000),
-                        freq: 'daily',
-                        bymonth: cronObject.months,
-                    },
-                };
+                const rule = new RRule({
+                    dtstart: new Date(start.getTime()),
+                    until: calendarInterval.end || new Date(),
+                    freq: RRule.WEEKLY,
+                    bymonth: cronObject.months,
+                });
+                rule.between(
+                    calendarInterval.start || new Date(),
+                    calendarInterval.end || new Date(),
+                ).forEach(rruleTime => {
+                    events.push({
+                        // id: `${event._id}_${rruleTime.getTime()}`,
+                        extendedProps: { eventId: event._id },
+                        title: event.common.name,
+                        backgroundColor,
+                        textColor,
+                        start: rruleTime,
+                        duration: initialDuration,
+                        allDay: false,
+                        display: 'block',
+                    });
+                });
+                return;
             }
             if (Array.isArray(cronObject.dows)) {
-                return {
-                    id: event._id,
-                    title: event.common.name,
-                    backgroundColor,
-                    textColor,
-                    start,
-                    duration: initialDuration,
-                    allDay: false,
-                    display: 'block',
-                    rrule: {
-                        dtstart: new Date(start.getTime() - start.getTimezoneOffset() * 60000),
-                        freq: 'weekly',
-                        byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
-                    },
-                };
+                const rule = new RRule({
+                    dtstart: new Date(start.getTime()),
+                    until: calendarInterval.end || new Date(),
+                    freq: RRule.WEEKLY,
+                    byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
+                });
+                rule.between(
+                    calendarInterval.start || new Date(),
+                    calendarInterval.end || new Date(),
+                ).forEach(rruleTime => {
+                    const time = event.native.astro ?
+                        SunCalc.getTimes(rruleTime, props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
+                        rruleTime;
+                    events.push({
+                        // id: `${event._id}_${rruleTime.getTime()}`,
+                        extendedProps: { eventId: event._id },
+                        title: event.common.name,
+                        backgroundColor,
+                        textColor,
+                        start: time,
+                        duration: initialDuration,
+                        allDay: false,
+                        display: 'block',
+                    });
+                });
+                return;
             }
-            return {
-                id: event._id,
+            events.push({
+                // id: event._id,
+                extendedProps: { eventId: event._id },
                 title: event.common.name,
                 duration: initialDuration,
                 backgroundColor,
                 textColor,
-            };
+            });
+            return;
         }
 
-        return {
-            id: event._id,
+        events.push({
+            // id: event._id,
+            extendedProps: { eventId: event._id },
             title: event.common.name,
             display: 'block',
             backgroundColor,
             textColor,
             start: serverDateToClient(event.native.start, 'date', props.serverTimeZone),
             end: serverDateToClient(new Date(new Date(event.native.start).getTime() + initialDuration), 'date', props.serverTimeZone),
-        };
-    })
-        .filter(e => e);
+        });
+    });
 
     useEffect(() => {
         // update periodically the time
@@ -319,6 +348,12 @@ function Calendar(props) {
                         ]}
                         locale={props.language}
                         datesSet={date => {
+                            if (date.start.toString() !== calendarInterval.start?.toString() || date.end.toString() !== calendarInterval.end?.toString()) {
+                                setCalendarInterval({
+                                    start: date.start,
+                                    end: date.end,
+                                });
+                            }
                             if (!props.widget) {
                                 // window.localStorage.setItem(`${storageName}Start`, date.view.currentStart.getTime());
                                 window.localStorage.setItem(`${storageName}View`, date.view.type);
@@ -348,9 +383,9 @@ function Calendar(props) {
                         // eventContent={event => <MenuItem>
                         //     {event.event.title}
                         // </MenuItem>}
-                        eventClick={event => setEventDialog(event.event.id)}
+                        eventClick={event => setEventDialog(event.event.extendedProps.eventId)}
                         eventResize={event => {
-                            const eventData = props.events.find(_event => _event._id === event.event.id);
+                            const eventData = props.events.find(_event => _event._id === event.event.extendedProps.eventId);
                             if (eventData.native.intervals?.[0].timeOffset) {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
                                 newEvent.native.intervals[0].timeOffset += event.endDelta.milliseconds;
@@ -364,7 +399,7 @@ function Calendar(props) {
                         //    console.log(event);
                         // }}
                         eventDrop={async event => {
-                            const eventData = props.events.find(_event => _event._id === event.event.id);
+                            const eventData = props.events.find(_event => _event._id === event.event.extendedProps.eventId);
                             if (eventData?.native?.cron) {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
                                 if (event.jsEvent.altKey) {

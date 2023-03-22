@@ -3,7 +3,7 @@ import {
 } from '@mui/material';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
-    ColorPicker, SelectID, Confirm,
+    ColorPicker, SelectID, Confirm, I18n,
 } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -65,6 +65,23 @@ const styles = {
         display: 'inline-block',
     },
 };
+
+const astroTypes = [
+    'sunrise',
+    'sunriseEnd',
+    'goldenHourEnd',
+    'solarNoon',
+    'goldenHour',
+    'sunsetStart',
+    'sunset',
+    'dusk',
+    'nauticalDusk',
+    'night',
+    'nadir',
+    'nightEnd',
+    'nauticalDawn',
+    'dawn',
+];
 
 function getText(text, lang) {
     if (text && typeof text === 'object') {
@@ -238,6 +255,78 @@ const EventDialog = props => {
                     variant="standard"
                     className={props.classes.narrowText2}
                 >
+                    <InputLabel>{props.t('Time')}</InputLabel>
+                    <Select
+                        value={event.native.astro ? 'astro' : 'time'}
+                        disabled={props.readOnly}
+                        onChange={e =>
+                            changeEvent(newEvent => {
+                                if (e.target.value === 'astro') {
+                                    newEvent.native.astro = 'sunrise';
+                                } else {
+                                    delete newEvent.native.astro;
+                                }
+                            })}
+                        renderValue={value => props.t(value)}
+                    >
+                        {['time', 'astro'].map(type =>
+                            <MenuItem key={type} value={type}>
+                                <div>
+                                    {props.t(type)}
+                                </div>
+                            </MenuItem>)}
+                    </Select>
+                </FormControl>
+                {event.native.astro ?
+                    <FormControl
+                        className={props.classes.narrowText}
+                        variant="standard"
+                    >
+                        <InputLabel>{I18n.t('Astronomic event')}</InputLabel>
+                        <Select
+                            value={event.native.astro || ''}
+                            onChange={e => changeEvent(newEvent => newEvent.native.astro = e.target.value)}
+                        >
+                            {astroTypes
+                                .map(astroType => <MenuItem key={astroType} value={astroType}>{I18n.t(astroType)}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+
+                    : <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <TimePicker
+                            label={props.t('Time')}
+                            value={date || null}
+                            disabled={props.readOnly}
+                            onChange={_date => {
+                                if (!_date) {
+                                    return;
+                                }
+                                try {
+                                    changeEvent(newEvent => {
+                                        if (period === 'once') {
+                                            newEvent.native.start = clientDateToServer(_date.toDate(), 'date', props.serverTimeZone);
+                                        } else if (period === 'monthly' || period === 'daily') {
+                                            const newCron = cron2obj(newEvent.native.cron);
+                                            const timeZoneCron = clientDateToServer(_date.toDate(), 'cron', props.serverTimeZone);
+                                            newCron.hours = timeZoneCron.hours;
+                                            newCron.minutes = timeZoneCron.minutes;
+                                            newEvent.native.cron = obj2cron(newCron);
+                                        }
+                                    });
+                                } catch {
+                                //
+                                }
+                            }}
+                            renderInput={params => <TextField {...params} variant="standard" className={props.classes.narrowText} />}
+                            ampm={false}
+                        />
+                    </LocalizationProvider>}
+            </div>
+            <div className={props.classes.field}>
+                <FormControl
+                    variant="standard"
+                    className={props.classes.narrowText2}
+                >
                     <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
                         value={event.native.type || ''}
@@ -255,35 +344,6 @@ const EventDialog = props => {
                             </MenuItem>)}
                     </Select>
                 </FormControl>
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                    <TimePicker
-                        label={props.t('Time')}
-                        value={date || null}
-                        disabled={props.readOnly}
-                        onChange={_date => {
-                            if (!_date) {
-                                return;
-                            }
-                            try {
-                                changeEvent(newEvent => {
-                                    if (period === 'once') {
-                                        newEvent.native.start = clientDateToServer(_date.toDate(), 'date', props.serverTimeZone);
-                                    } else if (period === 'monthly' || period === 'daily') {
-                                        const newCron = cron2obj(newEvent.native.cron);
-                                        const timeZoneCron = clientDateToServer(_date.toDate(), 'cron', props.serverTimeZone);
-                                        newCron.hours = timeZoneCron.hours;
-                                        newCron.minutes = timeZoneCron.minutes;
-                                        newEvent.native.cron = obj2cron(newCron);
-                                    }
-                                });
-                            } catch {
-                                //
-                            }
-                        }}
-                        renderInput={params => <TextField {...params} variant="standard" className={props.classes.narrowText} />}
-                        ampm={false}
-                    />
-                </LocalizationProvider>
                 {event.native.type !== 'single' && <TextField
                     label={props.t('Duration')}
                     value={duration}
@@ -442,6 +502,7 @@ const EventDialog = props => {
                     name={props.t('Color')}
                 />
             </div>
+            <pre>{JSON.stringify(event, null, 2)}</pre>
         </DialogContent>
         <DialogActions>
             {!props.readOnly ? <Button

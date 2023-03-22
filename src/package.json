@@ -43,6 +43,7 @@
         "react-scripts": "^5.0.1",
         "rrule": "^2.7.2",
         "sass": "^1.58.3",
+        "suncalc2": "^1.8.1",
         "uuid": "^9.0.0"
     },
     "scripts": {

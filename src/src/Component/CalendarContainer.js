@@ -90,11 +90,11 @@ const CalendarContainer = props => {
                 props.socket.unsubscribeObject(`${props.calendarPrefix}.*`, onEventsChanged);
             }
         };
-    }, [props.calendarPrefix]);
+    }, [props.calendarPrefix, props.isSimulation, props.simulationId]);
 
     return <>
         <Calendar
-            systemConfig={props._systemConfig}
+            systemConfig={props.systemConfig}
             events={events || []}
             socket={props.socket}
             instance={props.instance}
