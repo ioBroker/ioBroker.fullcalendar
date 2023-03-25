@@ -106,6 +106,9 @@ const CalendarContainer = props => {
             serverTimeZone={serverTimeZone}
             t={I18n.t}
             language={I18n.getLanguage()}
+            isSimulation={props.isSimulation}
+            simulationId={props.simulationId}
+            simulation={props.simulation}
         />
         {/* <pre>
             {JSON.stringify(this.state.events, null, 2)}

@@ -10,6 +10,7 @@ const adapterName = require('./package.json').name.split('.').pop();
 const timeUtils   = require('./lib/utils');
 const later       = require('later');
 const SunCalc     = require('suncalc2');
+const uuidv4      = require('uuid').v4;
 let adapter;
 
 let events;
@@ -23,19 +24,43 @@ const allEvents         = [];
 const names             = {};
 let rooms               = {};
 let funcs               = {};
+const simulations = [];
 
 function startAdapter(options) {
     options = options || {};
     options = Object.assign({}, options, {name: adapterName});
 
     adapter = new utils.Adapter(options);
-    adapter.on('stateChange', async (id, state) => {
-        if (id && state) {
-            if (id.startsWith('system.')) {
+    adapter.on('stateChange', async (stateId, state) => {
+        if (stateId && state) {
+            if (stateId.startsWith('system.')) {
                 return;
             }
+            simulations.forEach(async simulation => {
+                const profile = await adapter.getForeignObjectAsync(simulation.id);
+                if (simulation.states.includes(stateId)) {
+                    const dateStr = new Date().toISOString();
+                    profile.native.events.push({
+                        _id: `${simulation.id}.event-${uuidv4()}`,
+                        common: {
+                            name: stateId,
+                            enabled: true,
+                        },
+                        native: {
+                            id: Date.now(),
+                            start: dateStr.substring(0, dateStr.length - 5),
+                            type: 'single',
+                            oid: stateId,
+                            startValue: state.val,
+                            color: '#3A87AD',
+                        },
+                        type: 'schedule',
+                    })
+                }
+                await adapter.setForeignObjectAsync(simulation.id, profile);
+            });
             if (adapter.config.allEventsEnabled || adapter.config.cfgEventsEnabled) {
-                const {name, id} = await getStateName(id, state);
+                const {name, id} = await getStateName(stateId, state);
                 if (adapter.config.allEventsEnabled) {
                     if (adapter.config.ackType === 'true' && !state.ack) {
                         return;
@@ -80,6 +105,44 @@ function startAdapter(options) {
 
                 case 'getConfigured':
                     adapter.sendTo(obj.from, obj.command, configuredEvents, obj.callback);
+                    break;
+                case 'recordSimulation':
+                    adapter.setForeignState(obj.message.id, 'record');
+                    adapter.subscribeForeignStates(obj.message.states)
+                    simulations.push(obj.message);
+                    break;
+                case 'stopRecordSimulation':
+                    const simulation = simulations.find(sim => sim.id === obj.message.id);
+                    if (simulation !== -1) {
+                        simulations.splice(simulations.findIndex(sim => sim.id === obj.message.id), 1);
+                        simulation.states.forEach(state => {
+                            if (simulations.find(sim => sim.states.includes(state))) {
+                                return;
+                            }
+                            adapter.unsubscribeForeignStates(state);
+                        });
+                    }
+                    adapter.setForeignState(obj.message.id, 'stop');
+                    break;
+                case 'playSimulation': {
+                        adapter.setForeignState(obj.message.id, 'play');
+                        const profile = adapter.getForeignObject(obj.message.id);
+                        profile.native.events.forEach(event => {
+                            events[event._id] = event;
+                            names[event._id] = event.common.name;
+                        });
+                    }
+                    break;
+                case 'stopPlaySimulation': {
+                        const profile = adapter.getForeignObject(obj.message.id);
+                        profile.native.events.forEach(event => {
+                            if (events[event._id]) {
+                                stopEvent(events[event._id]);
+                                delete events[event._id];
+                            }
+                        });
+                        adapter.setForeignState(obj.message.id, 'stop');
+                    }
                     break;
             }
         }
@@ -268,7 +331,7 @@ function calculateNext() {
         // if daily
         if (event.native.cron) {
             if (!event.parsed) {
-                if (event.native.astro) {
+                if (event.native.astro && false) {
                     // take last second of this day
                     event.parsed = later.parse.cron(event.native.cron.replace(/^\d\d? \d\d? /, '59 59 23 '), true);
                 } else {
@@ -277,7 +340,7 @@ function calculateNext() {
             }
             let date = later.schedule(event.parsed).next();
 
-            if (event.native.astro) {
+            if (event.native.astro && false) {
                 date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig);
             }
 
@@ -300,7 +363,7 @@ function calculateNext() {
         } else { // once
             // expected 2017-09-12T12:12:00
             let time;
-            if (event.native.astro) {
+            if (event.native.astro && false) {
                 time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig);
             } else {
                 time = timeUtils.parseISOLocal(event.native.start);

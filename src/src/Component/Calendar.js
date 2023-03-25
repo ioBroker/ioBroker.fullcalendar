@@ -24,7 +24,7 @@ import { Paper } from '@mui/material';
 
 import { Utils } from '@iobroker/adapter-react-v5';
 
-import { RRule } from 'rrule';
+import { RRule, datetime } from 'rrule';
 import SunCalc from 'suncalc2';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
@@ -134,9 +134,19 @@ function Calendar(props) {
         end: null,
     });
 
-    const initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) && false ?
+    let initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) && false ?
         new Date(parseInt(window.localStorage.getItem(`${storageName}Start`), 10)) :
         new Date();
+    let initialView = props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth';
+    if (props.isSimulation) {
+        initialDate = new Date();
+        initialView = props.simulation.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek';
+    }
+
+    let _eventTypes = eventTypes;
+    if (props.isSimulation) {
+        _eventTypes = _eventTypes.filter(type => type.type === 'single');
+    }
 
     // create events
     const events = [];
@@ -156,11 +166,12 @@ function Calendar(props) {
 
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
+            console.log(start);
             const cronObject = cron2obj(event.native.cron);
             start.setFullYear(1970);
             if (Array.isArray(cronObject.months)) {
                 const rule = new RRule({
-                    dtstart: new Date(start.getTime()),
+                    dtstart: new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     bymonth: cronObject.months,
@@ -169,13 +180,16 @@ function Calendar(props) {
                     calendarInterval.start || new Date(),
                     calendarInterval.end || new Date(),
                 ).forEach(rruleTime => {
+                    const time = event.native.astro ?
+                        SunCalc.getTimes(rruleTime, props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
+                        rruleTime;
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
                         extendedProps: { eventId: event._id },
                         title: event.common.name,
                         backgroundColor,
                         textColor,
-                        start: rruleTime,
+                        start: new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
                         duration: initialDuration,
                         allDay: false,
                         display: 'block',
@@ -185,7 +199,7 @@ function Calendar(props) {
             }
             if (Array.isArray(cronObject.dows)) {
                 const rule = new RRule({
-                    dtstart: new Date(start.getTime()),
+                    dtstart: new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
@@ -203,7 +217,7 @@ function Calendar(props) {
                         title: event.common.name,
                         backgroundColor,
                         textColor,
-                        start: time,
+                        start: new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
                         duration: initialDuration,
                         allDay: false,
                         display: 'block',
@@ -291,13 +305,16 @@ function Calendar(props) {
             readOnly={props.readOnly}
             t={props.t}
             language={props.language}
+            isSimulation={props.isSimulation}
+            simulationId={props.simulationId}
+            simulation={props.simulation}
         /> : null}
         <div className={props.classes.container}>
             {!props.hideLeftBlock && !props.readOnly && <div className={props.classes.leftBlock}>
                 <Paper elevation={4} className={props.classes.leftPaper}>
                     <div className={props.classes.leftContent}>
                         <h4>{props.t('Events')}</h4>
-                        {eventTypes.map((type, index) =>
+                        {_eventTypes.map((type, index) =>
                             <DraggableButton
                                 t={props.t}
                                 type={type}
@@ -320,12 +337,12 @@ function Calendar(props) {
                         headerToolbar={
                             props.hideTopBlock ? false :
                                 {
-                                    left: props.hideTopBlockButtons ? '' : 'prev,next today',
-                                    center: 'title',
-                                    right: props.hideTopBlockButtons ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+                                    left: props.hideTopBlockButtons || props.isSimulation ? '' : 'prev,next today',
+                                    center: props.isSimulation ? '' : 'title',
+                                    right: props.hideTopBlockButtons || props.isSimulation ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                                 }
                         }
-                        initialView={props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth'}
+                        initialView={initialView}
                         initialDate={initialDate}
                         editable={!props.readOnly}
                         selectable
@@ -443,6 +460,16 @@ function Calendar(props) {
                                 newEvent.native.intervals = [{
                                     timeOffset: 30 * 60 * 1000,
                                 }];
+                            }
+                            if (props.isSimulation) {
+                                delete newEvent.native.start;
+                                const cron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
+                                console.log(event.event.start.getDay());
+                                cron.dows = [event.event.start.getDay()];
+                                cron.dates = ['?'];
+                                cron.months = ['*'];
+                                newEvent.native.cron = obj2cron(cron);
+                                newEvent._id = `${props.simulationId}.event-${uuidv4()}`;
                             }
                             await props.setEvent(newEvent._id, newEvent);
                             props.updateEvents();

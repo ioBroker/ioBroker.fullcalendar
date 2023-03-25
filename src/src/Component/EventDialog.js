@@ -323,7 +323,7 @@ const EventDialog = props => {
                     </LocalizationProvider>}
             </div>
             <div className={props.classes.field}>
-                <FormControl
+                {!props.isSimulation && <FormControl
                     variant="standard"
                     className={props.classes.narrowText2}
                 >
@@ -343,7 +343,7 @@ const EventDialog = props => {
                                 </div>
                             </MenuItem>)}
                     </Select>
-                </FormControl>
+                </FormControl>}
                 {event.native.type !== 'single' && <TextField
                     label={props.t('Duration')}
                     value={duration}
@@ -375,7 +375,7 @@ const EventDialog = props => {
                 {event.native.type === 'double' && endValueField()}
             </div>
             <div className={props.classes.field}>
-                <FormControl
+                {!props.isSimulation && <FormControl
                     variant="standard"
                 >
                     <InputLabel>{props.t('Period')}</InputLabel>
@@ -410,7 +410,7 @@ const EventDialog = props => {
                     >
                         {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{props.t(type)}</MenuItem>)}
                     </Select>
-                </FormControl>
+                </FormControl>}
                 {period === 'daily' && <table className={props.classes.dayTable}>
                     <thead>
                         <tr>
