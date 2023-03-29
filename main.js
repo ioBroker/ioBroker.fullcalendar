@@ -39,7 +39,8 @@ function startAdapter(options) {
             simulations.forEach(async simulation => {
                 const profile = await adapter.getForeignObjectAsync(simulation.id);
                 if (simulation.states.includes(stateId)) {
-                    const dateStr = new Date().toISOString();
+                    const date = new Date();
+                    const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${date.getDay() === 0 ? 7 : date.getDay()}`;
                     profile.native.events.push({
                         _id: `${simulation.id}.event-${uuidv4()}`,
                         common: {
@@ -48,7 +49,7 @@ function startAdapter(options) {
                         },
                         native: {
                             id: Date.now(),
-                            start: dateStr.substring(0, dateStr.length - 5),
+                            cron,
                             type: 'single',
                             oid: stateId,
                             startValue: state.val,
@@ -96,7 +97,7 @@ function startAdapter(options) {
 
     adapter.on('ready', () => main(adapter));
 
-    adapter.on('message', obj => {
+    adapter.on('message', async obj => {
         if (obj && obj.callback) {
             switch (obj.command) {
                 case 'getAll':
@@ -113,7 +114,7 @@ function startAdapter(options) {
                     break;
                 case 'stopRecordSimulation':
                     const simulation = simulations.find(sim => sim.id === obj.message.id);
-                    if (simulation !== -1) {
+                    if (simulation) {
                         simulations.splice(simulations.findIndex(sim => sim.id === obj.message.id), 1);
                         simulation.states.forEach(state => {
                             if (simulations.find(sim => sim.states.includes(state))) {
@@ -126,7 +127,7 @@ function startAdapter(options) {
                     break;
                 case 'playSimulation': {
                         adapter.setForeignState(obj.message.id, 'play');
-                        const profile = adapter.getForeignObject(obj.message.id);
+                        const profile = await adapter.getForeignObjectAsync(obj.message.id);
                         profile.native.events.forEach(event => {
                             events[event._id] = event;
                             names[event._id] = event.common.name;
@@ -134,7 +135,7 @@ function startAdapter(options) {
                     }
                     break;
                 case 'stopPlaySimulation': {
-                        const profile = adapter.getForeignObject(obj.message.id);
+                        const profile = await adapter.getForeignObjectAsync(obj.message.id);
                         profile.native.events.forEach(event => {
                             if (events[event._id]) {
                                 stopEvent(events[event._id]);

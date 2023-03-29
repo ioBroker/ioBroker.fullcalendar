@@ -30,14 +30,17 @@ const CalendarContainer = props => {
         if (props.isSimulation) {
             const _simulationObject = await props.socket.getObject(props.simulationId);
             setSimulationObject(_simulationObject);
-            objects = _simulationObject.native.events;
+            objects = Object.values(_simulationObject.native.events);
         } else {
-            objects = await props.socket.getObjectViewCustom(
+            objects = Object.values(await props.socket.getObjectViewCustom(
                 'schedule',
                 'schedule',
                 `${props.calendarPrefix}.`,
                 `${props.calendarPrefix}.\u9999`,
-            );
+            ));
+            if (props.calendarPrefix.match(/^fullcalendar\.[0-9]+$/)) {
+                objects = objects.filter(o => !o._id.match(/^fullcalendar\.[0-9]\.Calendars/));
+            }
         }
         let _serverTimeZone = 0;
         try {
@@ -46,7 +49,7 @@ const CalendarContainer = props => {
         } catch (e) {
             // ignore
         }
-        setEvents(Object.values(objects));
+        setEvents(objects);
         setServerTimeZone(_serverTimeZone);
     };
 
@@ -90,7 +93,7 @@ const CalendarContainer = props => {
                 props.socket.unsubscribeObject(`${props.calendarPrefix}.*`, onEventsChanged);
             }
         };
-    }, [props.calendarPrefix, props.isSimulation, props.simulationId]);
+    }, [props.calendarPrefix, props.isSimulation, props.simulationId, props.simulations]);
 
     return <>
         <Calendar
@@ -109,6 +112,7 @@ const CalendarContainer = props => {
             isSimulation={props.isSimulation}
             simulationId={props.simulationId}
             simulation={props.simulation}
+            simulations={props.simulations}
         />
         {/* <pre>
             {JSON.stringify(this.state.events, null, 2)}

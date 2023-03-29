@@ -276,6 +276,13 @@ function Calendar(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        if (props.isSimulation) {
+            const calendar = ref.current?.getApi();
+            calendar.changeView(props.simulation.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek', new Date());
+        }
+    }, [props.simulations, props.simulationId]);
+
     return <>
         <style>
             {props.theme.palette.mode === 'dark' ? `
