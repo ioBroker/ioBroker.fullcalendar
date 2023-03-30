@@ -97,7 +97,13 @@ const PlaySimulationDialog = props => {
             <Button onClick={props.onClose} color="primary">
                 {I18n.t('Cancel')}
             </Button>
-            <Button onClick={() => props.playSimulation(props.simulation._id, playSimulation)} color="primary">
+            <Button
+                onClick={() => {
+                    props.playSimulation(props.simulation._id, playSimulation);
+                    props.onClose();
+                }}
+                color="primary"
+            >
                 {I18n.t('Play')}
             </Button>
         </DialogActions>

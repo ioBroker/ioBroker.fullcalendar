@@ -4,10 +4,20 @@ import {
     Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { withStyles } from '@mui/styles';
+import EnumsDialog from './EnumsDialog';
+
+const styles = {
+    field: {
+        display: 'flex',
+    },
+};
 
 const RecordSimulationDialog = props => {
     const [states, setStates] = useState([]);
-    const [idDialog, setIdDialog] = useState(true);
+    const [enums, setEnums] = useState([]);
+    const [idDialog, setIdDialog] = useState(false);
+    const [enumsDialog, setEnumsDialog] = useState(false);
     useEffect(() => {
         setStates([]);
     }, [props.open]);
@@ -26,17 +36,29 @@ const RecordSimulationDialog = props => {
             <DialogContentText>
                 {I18n.t('Record simulation description')}
             </DialogContentText>
-            <div>
+            <div className={props.classes.field}>
                 <TextField
-                    margin="dense"
-                    id="states"
                     label={I18n.t('States')}
-                    type="text"
                     fullWidth
                     value={states.join(', ')}
+                    variant="standard"
                 />
                 <Button
                     onClick={() => setIdDialog(true)}
+                    color="primary"
+                >
+                    ...
+                </Button>
+            </div>
+            <div className={props.classes.field}>
+                <TextField
+                    label={I18n.t('Enums')}
+                    fullWidth
+                    value={enums.join(', ')}
+                    variant="standard"
+                />
+                <Button
+                    onClick={() => setEnumsDialog(true)}
                     color="primary"
                 >
                     ...
@@ -65,7 +87,17 @@ const RecordSimulationDialog = props => {
             onClose={() => setIdDialog(false)}
             socket={props.socket}
         />}
+        <EnumsDialog
+            socket={props.socket}
+            instance={props.instance}
+            open={enumsDialog}
+            selectedEnums={enums}
+            onSelect={ids => {
+                setEnums(ids);
+            }}
+            onClose={() => setEnumsDialog(false)}
+        />
     </Dialog>;
 };
 
-export default RecordSimulationDialog;
+export default withStyles(styles)(RecordSimulationDialog);

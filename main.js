@@ -110,6 +110,19 @@ function startAdapter(options) {
                 case 'recordSimulation':
                     adapter.setForeignState(obj.message.id, 'record');
                     adapter.subscribeForeignStates(obj.message.states)
+                    if (obj.message.enums) {
+                        for (let k in obj.message.enums) {
+                            const enumId = obj.message.enums[k];
+                            const enumObj = await adapter.getForeignObject(enumId);
+                            if (enumObj && enumObj.common && enumObj.common.members) {
+                                enumObj.common.members.forEach(state => {
+                                    if (!obj.message.states.includes(state)) {
+                                        obj.message.states.push(state);
+                                    }
+                                });
+                            }
+                        }
+                    }
                     simulations.push(obj.message);
                     break;
                 case 'stopRecordSimulation':

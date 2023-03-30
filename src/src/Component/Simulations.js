@@ -52,6 +52,12 @@ const Simulations = props => {
         });
         props.socket.subscribeObject(id, refreshSimulations);
     };
+    const playSimulation = (id, options) => {
+        props.socket.sendTo(`fullcalendar.${props.instance}`, 'playSimulation', {
+            id,
+            options,
+        });
+    }
     return <div style={{ display: 'flex', width: '100%', flex: 1 }}>
         <div>
             <SimulationDialog
@@ -73,6 +79,7 @@ const Simulations = props => {
             <PlaySimulationDialog
                 socket={props.socket}
                 instance={props.instance}
+                playSimulation={playSimulation}
                 simulation={simulations.find(s => s._id === dialogSimulationPlay)}
                 open={!!dialogSimulationPlay}
                 onClose={() => setDialogSimulationPlay(null)}
