@@ -166,7 +166,6 @@ function Calendar(props) {
 
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
-            console.log(start);
             const cronObject = cron2obj(event.native.cron);
             start.setFullYear(1970);
             if (Array.isArray(cronObject.months)) {

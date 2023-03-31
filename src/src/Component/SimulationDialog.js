@@ -1,7 +1,8 @@
 import { I18n } from '@iobroker/adapter-react-v5';
+import { Cancel, Save } from '@mui/icons-material';
 import {
     Button,
-    Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, TextField,
+    Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -22,31 +23,48 @@ const SimulationDialog = props => {
                     _simulation.common.name = e.target.value;
                     setSimulation(_simulation);
                 }}
+                variant="standard"
             />
-            <Select
-                label={I18n.t('Interval')}
-                value={simulation.native.interval || ''}
-                onChange={e => {
-                    const _simulation = JSON.parse(JSON.stringify(simulation));
-                    _simulation.native.interval = e.target.value;
-                    setSimulation(_simulation);
-                }}
+            <FormControl
+                variant="standard"
             >
-                {['day', 'week'].map(interval => <MenuItem
-                    value={interval}
-                    key={interval}
+                <InputLabel>{I18n.t('Interval')}</InputLabel>
+                <Select
+                    value={simulation.native.interval || ''}
+                    onChange={e => {
+                        const _simulation = JSON.parse(JSON.stringify(simulation));
+                        _simulation.native.interval = e.target.value;
+                        setSimulation(_simulation);
+                    }}
+                    variant="standard"
                 >
-                    {I18n.t(interval)}
-                </MenuItem>)}
-            </Select>
+                    {['day', 'week'].map(interval => <MenuItem
+                        value={interval}
+                        key={interval}
+                    >
+                        {I18n.t(interval)}
+                    </MenuItem>)}
+                </Select>
+            </FormControl>
         </DialogContent>
         <DialogActions>
-            <Button onClick={props.onClose}>{I18n.t('Cancel')}</Button>
-            <Button onClick={async () => {
-                await props.socket.setObject(simulation._id, simulation);
-                await props.refreshSimulations();
-                props.onClose();
-            }}
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
+            </Button>
+            <Button
+                onClick={async () => {
+                    await props.socket.setObject(simulation._id, simulation);
+                    await props.refreshSimulations();
+                    props.onClose();
+                }}
+                variant="contained"
+                color="primary"
+                startIcon={<Save />}
             >
                 {I18n.t('Save')}
             </Button>

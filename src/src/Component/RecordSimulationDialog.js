@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { withStyles } from '@mui/styles';
+import { Cancel, Check, FiberManualRecord } from '@mui/icons-material';
 import EnumsDialog from './EnumsDialog';
 
 const styles = {
@@ -68,11 +69,18 @@ const RecordSimulationDialog = props => {
         <DialogActions>
             <Button
                 onClick={props.onClose}
-                color="primary"
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
             >
                 {I18n.t('Cancel')}
             </Button>
-            <Button onClick={handleRecord} color="primary">
+            <Button
+                onClick={handleRecord}
+                variant="contained"
+                color="primary"
+                startIcon={<FiberManualRecord />}
+            >
                 {I18n.t('Record')}
             </Button>
         </DialogActions>

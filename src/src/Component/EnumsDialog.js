@@ -1,10 +1,10 @@
 import { I18n } from '@iobroker/adapter-react-v5';
-import { ExpandMore } from '@mui/icons-material';
+import { Cancel, Check, ExpandMore } from '@mui/icons-material';
 import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem,
+    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -43,7 +43,6 @@ const EnumsDialog = props => {
             setSelectedEnums(props.selectedEnums || []);
         })();
     }, [props.open]);
-    console.log(enumsTree);
     const renderEnums = (tree, id = '') => {
         if (tree.object && !Object.values(tree.items).length) {
             return <MenuItem
@@ -59,14 +58,18 @@ const EnumsDialog = props => {
             >
                 <div>
                     <Checkbox checked={selectedEnums.includes(tree.object._id)} size="small" />
-                    {tree.object._id}
+                    {typeof tree.object.common.name === 'string'
+                        ? tree.object.common.name
+                        : tree.object.common.name[I18n.getLanguage()]}
                 </div>
             </MenuItem>;
         }
-        return <div style={{ paddingLeft: 20 }}>
-            <Accordion defaultExpanded>
+        return <div>
+            <Accordion defaultExpanded style={{ paddingLeft: 20 }}>
                 <AccordionSummary expandIcon={<ExpandMore />} style={{ padding: 0, minHeight: 0, margin: 'initial' }}>
-                    {id}
+                    {typeof tree.object.common.name === 'string'
+                        ? tree.object.common.name
+                        : tree.object.common.name[I18n.getLanguage()]}
                 </AccordionSummary>
                 <AccordionDetails style={{ padding: 0 }}>
                     {Object.keys(tree.items).map(key => renderEnums(tree.items[key], key))}
@@ -74,13 +77,20 @@ const EnumsDialog = props => {
             </Accordion>
         </div>;
     };
-    return <Dialog open={props.open} onClose={props.onClose}>
+    return <Dialog open={props.open} onClose={props.onClose} fullWidth>
         <DialogTitle>{I18n.t('Select enums')}</DialogTitle>
         <DialogContent>
-            {renderEnums(enumsTree)}
+            <Paper style={{ paddingRight: 20 }}>
+                {enumsTree.items?.enum && Object.keys(enumsTree.items.enum.items).map(id => renderEnums(enumsTree.items.enum.items[id], id))}
+            </Paper>
         </DialogContent>
         <DialogActions>
-            <Button onClick={props.onClose} color="primary">
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
                 {I18n.t('Cancel')}
             </Button>
             <Button
@@ -88,7 +98,9 @@ const EnumsDialog = props => {
                     props.onSelect(selectedEnums);
                     props.onClose();
                 }}
+                variant="contained"
                 color="primary"
+                startIcon={<Check />}
             >
                 {I18n.t('Ok')}
             </Button>
