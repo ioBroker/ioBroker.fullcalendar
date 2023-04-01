@@ -170,7 +170,7 @@ function Calendar(props) {
             start.setFullYear(1970);
             if (Array.isArray(cronObject.months)) {
                 const rule = new RRule({
-                    dtstart: new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
+                    dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     bymonth: cronObject.months,
@@ -188,7 +188,7 @@ function Calendar(props) {
                         title: event.common.name,
                         backgroundColor,
                         textColor,
-                        start: new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                        start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
                         duration: initialDuration,
                         allDay: false,
                         display: 'block',
@@ -198,7 +198,7 @@ function Calendar(props) {
             }
             if (Array.isArray(cronObject.dows)) {
                 const rule = new RRule({
-                    dtstart: new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
+                    dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
@@ -216,7 +216,7 @@ function Calendar(props) {
                         title: event.common.name,
                         backgroundColor,
                         textColor,
-                        start: new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                        start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
                         duration: initialDuration,
                         allDay: false,
                         display: 'block',
@@ -246,8 +246,6 @@ function Calendar(props) {
             end: serverDateToClient(new Date(new Date(event.native.start).getTime() + initialDuration), 'date', props.serverTimeZone),
         });
     });
-    console.log(props.events);
-    console.log(events);
 
     useEffect(() => {
         // update periodically the time
@@ -472,7 +470,6 @@ function Calendar(props) {
                             if (props.isSimulation) {
                                 delete newEvent.native.start;
                                 const cron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
-                                console.log(event.event.start.getDay());
                                 cron.dows = [event.event.start.getDay()];
                                 cron.dates = ['?'];
                                 cron.months = ['*'];

@@ -66,7 +66,8 @@ const CalendarContainer = props => {
             } else {
                 _simulationObject.native.events.push(event);
             }
-            return props.socket.setObject(props.simulationId, _simulationObject);
+            await props.socket.setObject(props.simulationId, _simulationObject);
+            props.refreshSimulations();
         }
         return props.socket.setObject(id, event);
     };
@@ -77,7 +78,8 @@ const CalendarContainer = props => {
             if (eventPos !== -1) {
                 _simulationObject.native.events.splice(eventPos, 1);
             }
-            return props.socket.setObject(props.simulationId, _simulationObject);
+            await props.socket.setObject(props.simulationId, _simulationObject);
+            props.refreshSimulations();
         }
         return props.socket.delObject(id);
     };

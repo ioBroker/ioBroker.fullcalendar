@@ -211,6 +211,7 @@ const Simulations = props => {
                 t={I18n.t}
                 language={I18n.getLanguage()}
                 readOnly={simulationStates[selectedSimulation] === 'play'}
+                refreshSimulations={refreshSimulations}
             />
         </div>}
     </div>;

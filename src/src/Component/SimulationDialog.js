@@ -82,9 +82,11 @@ const SimulationDialog = props => {
                     const _simulation = JSON.parse(JSON.stringify(simulation));
                     if (_simulation.native.interval !== props.simulation.native.interval) {
                         if (_simulation.native.interval === 'day') {
+                            console.log( _simulation);
                             _simulation.native.events.forEach(event => {
                                 console.log(event.native.cron);
                                 const cron = cron2obj(event.native.cron);
+                                console.log(cron);
                                 cron.dows = [0, 1, 2, 3, 4, 5, 6];
                                 event.native.cron = obj2cron(cron);
                                 console.log(event.native.cron);

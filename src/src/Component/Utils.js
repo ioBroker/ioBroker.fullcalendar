@@ -112,24 +112,25 @@ function obj2cron(cron) {
 function serverDateToClient(dateString, format, serverTimeZone) {
     if (format === 'cron') {
         const cronObject = cron2obj(dateString);
-        let date = new Date();
+        const date = new Date();
         date.setHours(cronObject.hours[0], cronObject.minutes[0]);
-        if (cronObject.dows) {
+        if (Array.isArray(cronObject.dows)) {
             date.setDate(date.getDate() + cronObject.dows[0] - date.getDay());
         }
-        date = new Date(date.getTime() - (date.getTimezoneOffset() - serverTimeZone) * 60000);
+        // date = new Date(date.getTime() - (date.getTimezoneOffset() - serverTimeZone) * 60000);
         return date;
     }
     if (format === 'date') {
-        dateString += 'Z';
-        return new Date(new Date(dateString).getTime() + serverTimeZone * 60000);
+        return new Date(dateString);
+        // dateString += 'Z';
+        // return new Date(new Date(dateString).getTime() + serverTimeZone * 60000);
     }
     return null;
 }
 
 function clientDateToServer(date, format, serverTimeZone) {
     if (format === 'cron') {
-        date = new Date(date.getTime() + (date.getTimezoneOffset() - serverTimeZone) * 60000);
+        date = new Date(date.getTime()/* + (date.getTimezoneOffset() - serverTimeZone) * 60000 */);
         const cronObject = {
             minutes: [date.getMinutes()],
             hours: [date.getHours()],
@@ -137,7 +138,7 @@ function clientDateToServer(date, format, serverTimeZone) {
         return cronObject;
     }
     if (format === 'date') {
-        date = new Date(date.getTime() - serverTimeZone * 60000);
+        date = new Date(date.getTime() - new Date().getTimezoneOffset() * 60000/* - serverTimeZone * 60000 */);
         const dateStr = date.toISOString();
         return dateStr.substring(0, dateStr.length - 5);
     }
