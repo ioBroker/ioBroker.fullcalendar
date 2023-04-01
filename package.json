@@ -25,7 +25,7 @@
   ],
   "dependencies": {
     "later": "^1.2.0",
-    "@iobroker/adapter-core": "^2.6.7",
+    "@iobroker/adapter-core": "^2.6.8",
     "suncalc2": "^1.8.1"
   },
   "devDependencies": {
