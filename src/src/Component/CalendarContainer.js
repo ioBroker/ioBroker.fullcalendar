@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { I18n, Loader } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/adapter-react-v5';
 
 import Calendar from './Calendar';
 
@@ -113,6 +113,7 @@ const CalendarContainer = props => {
             simulationId={props.simulationId}
             simulation={props.simulation}
             simulations={props.simulations}
+            readOnly={props.readOnly}
         />
         {/* <pre>
             {JSON.stringify(this.state.events, null, 2)}

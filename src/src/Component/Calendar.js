@@ -24,7 +24,7 @@ import { Paper } from '@mui/material';
 
 import { Utils } from '@iobroker/adapter-react-v5';
 
-import { RRule, datetime } from 'rrule';
+import { RRule } from 'rrule';
 import SunCalc from 'suncalc2';
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
@@ -246,6 +246,8 @@ function Calendar(props) {
             end: serverDateToClient(new Date(new Date(event.native.start).getTime() + initialDuration), 'date', props.serverTimeZone),
         });
     });
+    console.log(props.events);
+    console.log(events);
 
     useEffect(() => {
         // update periodically the time

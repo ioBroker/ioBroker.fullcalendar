@@ -11,11 +11,10 @@ import 'moment/locale/pt';
 import 'moment/locale/uk';
 import { I18n } from '@iobroker/adapter-react-v5';
 import {
-    Box,
-    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Select, TextField,
+    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { Cancel, Check, Delete, PlayCircle } from '@mui/icons-material';
+import { Cancel, Delete, PlayCircle } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 
 const { LocalizationProvider, DateTimePicker } = require('@mui/x-date-pickers');
@@ -23,7 +22,7 @@ const { AdapterMoment } = require('@mui/x-date-pickers/AdapterMoment');
 
 const styles = {
     field: {
-        '& .MuiFormControl-root': { width: '100%' },
+        '& .MuiFormControl-root': { width: '100%' }, display: 'flex', alignItems: 'end', gap: 20,
     },
     tableCell: {
         textAlign: 'center',

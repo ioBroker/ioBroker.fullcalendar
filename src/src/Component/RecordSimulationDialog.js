@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { withStyles } from '@mui/styles';
-import { Cancel, Check, FiberManualRecord } from '@mui/icons-material';
+import { Cancel, FiberManualRecord } from '@mui/icons-material';
 import EnumsDialog from './EnumsDialog';
 
 const styles = {
@@ -24,7 +24,7 @@ const RecordSimulationDialog = props => {
     }, [props.open]);
 
     const handleRecord = () => {
-        props.recordSimulation(props.simulation._id, states);
+        props.recordSimulation(props.simulation._id, states, enums);
         props.onClose();
     };
 

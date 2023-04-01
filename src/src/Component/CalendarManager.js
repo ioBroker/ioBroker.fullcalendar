@@ -1,13 +1,17 @@
 import { I18n } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
-import { Button, IconButton, MenuItem } from '@mui/material';
+import {
+    IconButton, Tab, Tabs,
+} from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
-import { Delete } from '@mui/icons-material';
+import { Add, Edit } from '@mui/icons-material';
 import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
+import CalendarDialog from './CalendarDialog';
 
 const CalendarManager = props => {
     const [calendarPrefix, setCalendarPrefix] = useState(`fullcalendar.${props.instance}`);
+    const [calendarDialog, setCalendarDialog] = useState(null);
     const [calendars, setCalendars] = useState([]);
     const [isSimulations, setIsSimulations] = useState(false);
 
@@ -33,12 +37,10 @@ const CalendarManager = props => {
         height: '100%',
     }}
     >
-        <Button
-            onClick={() => setIsSimulations(!isSimulations)}
-            variant="contained"
-        >
-            {I18n.t('Simulations')}
-        </Button>
+        <Tabs value={isSimulations ? 1 : 0} onChange={() => setIsSimulations(!isSimulations)}>
+            <Tab label={I18n.t('Calendars')} />
+            <Tab label={I18n.t('Simulations')} />
+        </Tabs>
         {isSimulations ? <Simulations
             systemConfig={props.systemConfig}
             socket={props.socket}
@@ -46,30 +48,27 @@ const CalendarManager = props => {
         /> :
             <>
                 <div style={{ display: 'flex' }}>
-                    <MenuItem
-                        onClick={() => setCalendarPrefix(`fullcalendar.${props.instance}`)}
-                        selected={calendarPrefix === `fullcalendar.${props.instance}`}
-                    >
-                        {I18n.t('Default')}
-                    </MenuItem>
-                    {calendars.map(calendar =>
-                        <div style={{ display: 'flex' }}>
-                            <MenuItem
+                    <Tabs value={calendarPrefix} onChange={(e, value) => setCalendarPrefix(value)}>
+                        <Tab label={I18n.t('Default')} value={`fullcalendar.${props.instance}`} />
+                        {calendars.map(calendar =>
+                            <Tab
                                 key={calendar._id}
-                                onClick={() => setCalendarPrefix(calendar._id)}
-                                selected={calendarPrefix === calendar._id}
-                            >
-                                {calendar.common.name}
-                            </MenuItem>
-                            <IconButton onClick={async () => {
-                                await props.socket.delObject(calendar._id);
-                                updateCalendars();
-                            }}
-                            >
-                                <Delete />
-                            </IconButton>
-                        </div>)}
-                    <Button
+                                label={<div>
+                                    {calendar.common.name}
+                                    <IconButton
+                                        size="small"
+                                        onClick={async e => {
+                                            setCalendarDialog(calendar._id);
+                                            e.stopPropagation();
+                                        }}
+                                    >
+                                        <Edit />
+                                    </IconButton>
+                                </div>}
+                                value={calendar._id}
+                            />)}
+                    </Tabs>
+                    <IconButton
                         onClick={async () => {
                             const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
                             await props.socket.setObject(id, {
@@ -84,8 +83,8 @@ const CalendarManager = props => {
                         }}
                         variant="contained"
                     >
-                        {I18n.t('+ Manual')}
-                    </Button>
+                        <Add />
+                    </IconButton>
                 </div>
                 <CalendarContainer
                     systemConfig={props.systemConfig}
@@ -96,6 +95,16 @@ const CalendarManager = props => {
                     language={I18n.getLanguage()}
                 />
             </>}
+        <CalendarDialog
+            open={!!calendarDialog}
+            onClose={() => setCalendarDialog(null)}
+            calendarPrefix={calendarPrefix}
+            setCalendarPrefix={setCalendarPrefix}
+            calendar={calendars.find(calendar => calendar._id === calendarDialog)}
+            socket={props.socket}
+            instance={props.instance}
+            updateCalendars={updateCalendars}
+        />
     </div>;
 };
 

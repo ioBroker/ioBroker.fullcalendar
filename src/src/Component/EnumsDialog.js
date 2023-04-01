@@ -9,7 +9,6 @@ import {
 import { useEffect, useState } from 'react';
 
 const EnumsDialog = props => {
-    const [enums, setEnums] = useState([]);
     const [enumsTree, setEnumsTree] = useState({
         items: {},
     });
@@ -38,12 +37,11 @@ const EnumsDialog = props => {
                 });
                 currentTree.object = e;
             });
-            setEnums(Object.values(objects));
             setEnumsTree(_enumsTree);
             setSelectedEnums(props.selectedEnums || []);
         })();
     }, [props.open]);
-    const renderEnums = (tree, id = '') => {
+    const renderEnums = tree => {
         if (tree.object && !Object.values(tree.items).length) {
             return <MenuItem
                 key={tree.object._id}
@@ -72,7 +70,7 @@ const EnumsDialog = props => {
                         : tree.object.common.name[I18n.getLanguage()]}
                 </AccordionSummary>
                 <AccordionDetails style={{ padding: 0 }}>
-                    {Object.keys(tree.items).map(key => renderEnums(tree.items[key], key))}
+                    {Object.keys(tree.items).map(key => renderEnums(tree.items[key]))}
                 </AccordionDetails>
             </Accordion>
         </div>;

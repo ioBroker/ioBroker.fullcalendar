@@ -329,7 +329,6 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
                     variant="standard"
-                    className={props.classes.narrowText}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
                     }}
@@ -424,7 +423,12 @@ const EventDialog = props => {
                         {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{props.t(type)}</MenuItem>)}
                     </Select>
                 </FormControl>}
-                {period === 'daily' && <table className={props.classes.dayTable}>
+                {period === 'daily' && <table
+                    className={props.classes.dayTable}
+                    style={
+                        props.isSimulation ? { marginLeft: 0 } : undefined
+                    }
+                >
                     <thead>
                         <tr>
                             {daysOfWeek.map(value => <td

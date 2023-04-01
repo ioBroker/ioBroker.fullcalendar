@@ -40,7 +40,12 @@ function startAdapter(options) {
                 const profile = await adapter.getForeignObjectAsync(simulation.id);
                 if (simulation.states.includes(stateId)) {
                     const date = new Date();
-                    const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${date.getDay() === 0 ? 7 : date.getDay()}`;
+                    let dow = date.getDay() === 0 ? 7 : date.getDay();
+                    if (profile.native.interval === 'day') {
+                        dow = '0-6';
+                    }
+                    const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
+                    console.log(cron);
                     profile.native.events.push({
                         _id: `${simulation.id}.event-${uuidv4()}`,
                         common: {
@@ -109,11 +114,10 @@ function startAdapter(options) {
                     break;
                 case 'recordSimulation':
                     adapter.setForeignState(obj.message.id, 'record');
-                    adapter.subscribeForeignStates(obj.message.states)
                     if (obj.message.enums) {
                         for (let k in obj.message.enums) {
                             const enumId = obj.message.enums[k];
-                            const enumObj = await adapter.getForeignObject(enumId);
+                            const enumObj = await adapter.getForeignObjectAsync(enumId);
                             if (enumObj && enumObj.common && enumObj.common.members) {
                                 enumObj.common.members.forEach(state => {
                                     if (!obj.message.states.includes(state)) {
@@ -123,6 +127,7 @@ function startAdapter(options) {
                             }
                         }
                     }
+                    adapter.subscribeForeignStates(obj.message.states)
                     simulations.push(obj.message);
                     break;
                 case 'stopRecordSimulation':
@@ -142,9 +147,13 @@ function startAdapter(options) {
                         adapter.setForeignState(obj.message.id, 'play');
                         const profile = await adapter.getForeignObjectAsync(obj.message.id);
                         profile.native.events.forEach(event => {
+                            event.simulationStart = obj.message.options.start && new Date(obj.message.options.start);
+                            event.simulationEnd = obj.message.options.end && new Date(obj.message.options.end);
+                            event.simulationDow = obj.message.options.dow;
                             events[event._id] = event;
                             names[event._id] = event.common.name;
                         });
+                        calculateNext();
                     }
                     break;
                 case 'stopPlaySimulation': {
@@ -345,17 +354,34 @@ function calculateNext() {
         // if daily
         if (event.native.cron) {
             if (!event.parsed) {
-                if (event.native.astro && false) {
+                if (event.native.astro) {
                     // take last second of this day
                     event.parsed = later.parse.cron(event.native.cron.replace(/^\d\d? \d\d? /, '59 59 23 '), true);
                 } else {
                     event.parsed = later.parse.cron(event.native.cron);
                 }
             }
+            console.log(JSON.stringify(event.parsed));
             let date = later.schedule(event.parsed).next();
 
-            if (event.native.astro && false) {
+            if (event.native.astro) {
                 date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig);
+            }
+
+            if (date.simulationStart && date.simulationStart.getTime() > date.getTime()) {
+                continue;
+            }
+            if (date.simulationEnd && date.simulationEnd.getTime() < date.getTime()) {
+                continue;
+            }
+            if (date.simulationDow && date.simulationDow.indexOf(date.getDay()) === -1) {
+                continue;
+            }
+            console.log(event)
+            console.log(date);
+
+            if (event.native.timeRandomOffset) {
+                date = new Date(date.getTime() + Math.round(Math.random() * event.native.timeRandomOffset * (Math.random() > 0.5 ? 1 : -1)));
             }
 
             if (date) {
@@ -377,7 +403,7 @@ function calculateNext() {
         } else { // once
             // expected 2017-09-12T12:12:00
             let time;
-            if (event.native.astro && false) {
+            if (event.native.astro) {
                 time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig);
             } else {
                 time = timeUtils.parseISOLocal(event.native.start);
@@ -533,7 +559,7 @@ async function main() {
     }
 
     try {
-        const systemConfig = await adapter.getForeignObjectAsync('system.config');
+        systemConfig = await adapter.getForeignObjectAsync('system.config');
         if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
             systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
             adapter.log.warn('Please specify longitude and latitude in system settings, else astro events will not work');

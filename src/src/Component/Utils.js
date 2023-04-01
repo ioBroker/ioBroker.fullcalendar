@@ -96,16 +96,16 @@ function array2oneCron(obj) {
 }
 
 function obj2cron(cron) {
-    const parts = ['*', '*', '*', '*', '*', '?'];
+    const parts = [/* '*', */'*', '*', '*', '*', '?'];
     if (cron.seconds) {
         parts[0] = array2oneCron(cron.seconds);
     }
-    parts[1] = array2oneCron(cron.minutes);
-    parts[2] = array2oneCron(cron.hours);
-    parts[3] = array2oneCron(cron.dates);
-    parts[4] = array2oneCron(cron.months);
-    parts[5] = array2oneCron(cron.dows);
-    if (parts[0] === '0') parts.shift();
+    parts[0] = array2oneCron(cron.minutes);
+    parts[1] = array2oneCron(cron.hours);
+    parts[2] = array2oneCron(cron.dates);
+    parts[3] = array2oneCron(cron.months);
+    parts[4] = array2oneCron(cron.dows);
+    // if (parts[0] === '0') parts.shift();
     return parts.join(' ');
 }
 

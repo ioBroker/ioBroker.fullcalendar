@@ -1,0 +1,103 @@
+import { Confirm, I18n } from '@iobroker/adapter-react-v5';
+import { Cancel, Delete, Save } from '@mui/icons-material';
+import {
+    Button,
+    Dialog, DialogActions, DialogContent, DialogTitle, TextField,
+} from '@mui/material';
+import { withStyles } from '@mui/styles';
+import { useEffect, useState } from 'react';
+
+const styles = {
+    field: {
+        display: 'flex',
+        alignItems: 'end',
+        gap: 20,
+    },
+};
+
+const CalendarDialog = props => {
+    const [calendar, setCalendar] = useState(null);
+    const [deleteDialog, setDeleteDialog] = useState(false);
+    useEffect(() => {
+        setCalendar(props.calendar);
+    }, [props.open]);
+    if (!calendar) return null;
+    return <Dialog open={props.open} onClose={props.onClose}>
+        <DialogTitle>{I18n.t('Edit calendar')}</DialogTitle>
+        <DialogContent>
+            <div className={props.classes.field}>
+                <TextField
+                    label={I18n.t('Name')}
+                    value={calendar.common.name || ''}
+                    onChange={e => {
+                        const _calendar = JSON.parse(JSON.stringify(calendar));
+                        _calendar.common.name = e.target.value;
+                        setCalendar(_calendar);
+                    }}
+                    variant="standard"
+                />
+            </div>
+        </DialogContent>
+        <DialogActions>
+            <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<Delete />}
+                onClick={() => setDeleteDialog(true)}
+            >
+                {I18n.t('Delete')}
+            </Button>
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
+            </Button>
+            <Button
+                onClick={async () => {
+                    await props.socket.setObject(calendar._id, calendar);
+                    await props.updateCalendars();
+                    props.onClose();
+                }}
+                variant="contained"
+                color="primary"
+                startIcon={<Save />}
+            >
+                {I18n.t('Save')}
+            </Button>
+        </DialogActions>
+        {deleteDialog && <Confirm
+            title={I18n.t('Delete calendar')}
+            text={I18n.t('Calendar will be deleted. Confirm?')}
+            suppressQuestionMinutes={5}
+            dialogName="deleteConfirmDialog"
+            onClose={async isYes => {
+                if (isYes) {
+                    try {
+                        const events = Object.keys(await props.socket.getObjectViewCustom(
+                            'schedule',
+                            'schedule',
+                            `${calendar._id}.`,
+                            `${calendar._id}.\u9999`,
+                        ));
+                        await props.socket.delObject(calendar._id);
+                        await Promise.all(events.map(event => props.socket.delObject(event)));
+                        if (props.calendarPrefix === calendar._id) {
+                            props.setCalendarPrefix(`fullcalendar.${props.instance}`);
+                        }
+                        await props.updateCalendars();
+                    } catch (e) {
+                        window.alert(`Cannot delete calendar: ${e}`);
+                    }
+
+                    props.onClose();
+                }
+                setDeleteDialog(false);
+            }}
+        />}
+    </Dialog>;
+};
+
+export default withStyles(styles)(CalendarDialog);

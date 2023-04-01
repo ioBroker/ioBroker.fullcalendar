@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import SunCalc from 'suncalc2';
 import { I18n } from '@iobroker/adapter-react-v5';
-import { Button, IconButton, MenuItem } from '@mui/material';
+import {
+    Button, IconButton, Tab, Tabs,
+} from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import {
-    Delete, Edit, FiberManualRecord, PlayCircle, Stop,
+    Edit, FiberManualRecord, PlayCircle, Stop,
 } from '@mui/icons-material';
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
@@ -20,7 +21,9 @@ const Simulations = props => {
     const [dialogSimulationRecord, setDialogSimulationRecord] = useState(null);
     const [dialogSimulationPlay, setDialogSimulationPlay] = useState(null);
     const updateState = async (id, state) => {
-        setSimulationStates(_simulationStates => ({ ..._simulationStates, ...{ [id]: state.val } }));
+        if (state) {
+            setSimulationStates(_simulationStates => ({ ..._simulationStates, ...{ [id]: state.val } }));
+        }
     };
     const refreshSimulations = async () => {
         const objects = await props.socket.getObjectViewCustom(
@@ -45,10 +48,11 @@ const Simulations = props => {
     useEffect(() => {
         refreshSimulations();
     }, []);
-    const recordSimulation = (id, states) => {
+    const recordSimulation = (id, states, enums) => {
         props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', {
             id,
             states,
+            enums,
         });
         props.socket.subscribeObject(id, refreshSimulations);
     };
@@ -57,13 +61,15 @@ const Simulations = props => {
             id,
             options,
         });
-    }
+    };
     return <div style={{ display: 'flex', width: '100%', flex: 1 }}>
         <div>
             <SimulationDialog
                 socket={props.socket}
                 instance={props.instance}
                 simulation={simulations.find(s => s._id === dialogSimulation)}
+                selectedSimulation={selectedSimulation}
+                setSelectedSimulation={setSelectedSimulation}
                 refreshSimulations={refreshSimulations}
                 open={!!dialogSimulation}
                 onClose={() => setDialogSimulation(null)}
@@ -84,63 +90,63 @@ const Simulations = props => {
                 open={!!dialogSimulationPlay}
                 onClose={() => setDialogSimulationPlay(null)}
             />
-            {simulations.map(simulation =>
-                <div
-                    style={{ display: 'flex' }}
+            <Tabs value={selectedSimulation} onChange={(e, value) => setSelectedSimulation(value)} orientation="vertical">
+                {simulations.map(simulation => <Tab
+                    value={simulation._id}
+                    label={
+                        <div style={{ width: '100%', textAlign: 'left' }}>
+                            {simulation.common.name}
+                            <IconButton
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    setDialogSimulation(simulation._id);
+                                }}
+                                size="small"
+                            >
+                                <Edit />
+                            </IconButton>
+                            {simulationStates[simulation._id] === 'stop' && <IconButton
+                                onClick={async e => {
+                                    e.stopPropagation();
+                                    setDialogSimulationRecord(simulation._id);
+                                }}
+                                size="small"
+                            >
+                                <FiberManualRecord />
+                            </IconButton>}
+                            {simulationStates[simulation._id] === 'stop' && <IconButton
+                                onClick={async e => {
+                                    e.stopPropagation();
+                                    setDialogSimulationPlay(simulation._id);
+                                }}
+                                size="small"
+                            >
+                                <PlayCircle />
+                            </IconButton>}
+                            {simulationStates[simulation._id] !== 'stop' && <IconButton
+                                onClick={async e => {
+                                    e.stopPropagation();
+                                    props.socket.sendTo(
+                                        `fullcalendar.${props.instance}`,
+                                        simulationStates[simulation._id] === 'record' ? 'stopRecordSimulation' : 'stopPlaySimulation',
+                                        {
+                                            id: simulation._id,
+                                        },
+                                    );
+                                    if (simulationStates[simulation._id] === 'record') {
+                                        props.socket.unsubscribeObject(simulation._id, refreshSimulations);
+                                    }
+                                    refreshSimulations();
+                                }}
+                                size="small"
+                            >
+                                <Stop />
+                            </IconButton>}
+                        </div>
+                    }
                     key={simulation._id}
-                >
-                    <MenuItem
-                        onClick={() => setSelectedSimulation(simulation._id)}
-                        selected={selectedSimulation === simulation._id}
-                    >
-                        {simulation.common.name}
-                    </MenuItem>
-                    <IconButton onClick={() => setDialogSimulation(simulation._id)}>
-                        <Edit />
-                    </IconButton>
-                    {simulationStates[simulation._id] === 'stop' && <IconButton onClick={async () => {
-                        setDialogSimulationRecord(simulation._id);
-                        // props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', {
-                        //     id: simulation._id,
-                        //     states: ['javascript.0.power'],
-                        // });
-                    }}
-                    >
-                        <FiberManualRecord />
-                    </IconButton>}
-                    {simulationStates[simulation._id] === 'stop' && <IconButton onClick={async () => {
-                        setDialogSimulationPlay(simulation._id);
-                        // props.socket.sendTo(`fullcalendar.${props.instance}`, 'playSimulation', {
-                        //     id: simulation._id,
-                        // });
-                    }}
-                    >
-                        <PlayCircle />
-                    </IconButton>}
-                    {simulationStates[simulation._id] !== 'stop' && <IconButton onClick={async () => {
-                        props.socket.sendTo(
-                            `fullcalendar.${props.instance}`,
-                            simulationStates[simulation._id] === 'record' ? 'stopRecordSimulation' : 'stopPlaySimulation',
-                            {
-                                id: simulation._id,
-                            },
-                        );
-                        if (simulationStates[simulation._id] === 'record') {
-                            props.socket.unsubscribeObject(simulation._id, refreshSimulations);
-                        }
-                        refreshSimulations();
-                    }}
-                    >
-                        <Stop />
-                    </IconButton>}
-                    <IconButton onClick={async () => {
-                        await props.socket.delObject(simulation._id);
-                        refreshSimulations();
-                    }}
-                    >
-                        <Delete />
-                    </IconButton>
-                </div>)}
+                />)}
+            </Tabs>
             <Button
                 onClick={async () => {
                     const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
@@ -204,6 +210,7 @@ const Simulations = props => {
                 simulations={simulations}
                 t={I18n.t}
                 language={I18n.getLanguage()}
+                readOnly={simulationStates[selectedSimulation] === 'play'}
             />
         </div>}
     </div>;
