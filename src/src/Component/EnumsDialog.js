@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { Cancel, Check, ExpandMore } from '@mui/icons-material';
 import {
@@ -6,7 +7,25 @@ import {
     AccordionSummary,
     Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper,
 } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
+
+const style = {
+    accordion: {
+        paddingLeft: 20,
+    },
+    accordionSummary: {
+        padding: 0,
+        minHeight: 0,
+        margin: 'initial',
+    },
+    accordionDetails: {
+        padding: 0,
+    },
+    content: {
+        paddingRight: 20,
+    }
+}
 
 const EnumsDialog = props => {
     const [enumsTree, setEnumsTree] = useState({
@@ -63,13 +82,13 @@ const EnumsDialog = props => {
             </MenuItem>;
         }
         return <div>
-            <Accordion defaultExpanded style={{ paddingLeft: 20 }}>
-                <AccordionSummary expandIcon={<ExpandMore />} style={{ padding: 0, minHeight: 0, margin: 'initial' }}>
+            <Accordion defaultExpanded className={props.classes.accordion}>
+                <AccordionSummary expandIcon={<ExpandMore />} className={props.classes.accordionSummary}>
                     {typeof tree.object.common.name === 'string'
                         ? tree.object.common.name
                         : tree.object.common.name[I18n.getLanguage()]}
                 </AccordionSummary>
-                <AccordionDetails style={{ padding: 0 }}>
+                <AccordionDetails className={props.classes.accordionDetails}>
                     {Object.keys(tree.items).map(key => renderEnums(tree.items[key]))}
                 </AccordionDetails>
             </Accordion>
@@ -78,7 +97,7 @@ const EnumsDialog = props => {
     return <Dialog open={props.open} onClose={props.onClose} fullWidth>
         <DialogTitle>{I18n.t('Select enums')}</DialogTitle>
         <DialogContent>
-            <Paper style={{ paddingRight: 20 }}>
+            <Paper className={props.classes.content}>
                 {enumsTree.items?.enum && Object.keys(enumsTree.items.enum.items).map(id => renderEnums(enumsTree.items.enum.items[id], id))}
             </Paper>
         </DialogContent>
@@ -106,4 +125,13 @@ const EnumsDialog = props => {
     </Dialog>;
 };
 
-export default EnumsDialog;
+EnumsDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onSelect: PropTypes.func,
+    selectedEnums: PropTypes.array,
+    socket: PropTypes.object,
+    classes: PropTypes.object,
+};
+
+export default withStyles(style)(EnumsDialog);

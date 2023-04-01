@@ -1,16 +1,21 @@
 import { I18n, SelectID } from '@iobroker/adapter-react-v5';
 import {
     Button,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField,
+    Chip,
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
-import { Cancel, FiberManualRecord } from '@mui/icons-material';
+import { Add, Cancel, FiberManualRecord } from '@mui/icons-material';
 import EnumsDialog from './EnumsDialog';
 
 const styles = {
     field: {
-        display: 'flex',
+
+    },
+    chip: {
+        margin: 2,
     },
 };
 
@@ -34,36 +39,50 @@ const RecordSimulationDialog = props => {
     >
         <DialogTitle>{I18n.t('Record simulation')}</DialogTitle>
         <DialogContent>
-            <DialogContentText>
-                {I18n.t('Record simulation description')}
-            </DialogContentText>
-            <div className={props.classes.field}>
-                <TextField
-                    label={I18n.t('States')}
-                    fullWidth
-                    value={states.join(', ')}
-                    variant="standard"
-                />
-                <Button
+            <h4>
+                {I18n.t('States')}
+                <IconButton
                     onClick={() => setIdDialog(true)}
                     color="primary"
                 >
-                    ...
-                </Button>
-            </div>
+                    <Add />
+                </IconButton>
+            </h4>
             <div className={props.classes.field}>
-                <TextField
-                    label={I18n.t('Enums')}
-                    fullWidth
-                    value={enums.join(', ')}
-                    variant="standard"
-                />
-                <Button
+                <div className={props.classes.field}>
+                    {states.map(state => <Chip
+                        onDelete={() => {
+                            const _states = JSON.parse(JSON.stringify(states));
+                            _states.splice(_states.indexOf(state), 1);
+                            setStates(_states);
+                        }}
+                        label={state}
+                        key={state}
+                        className={props.classes.chip}
+                    />)}
+                </div>
+
+            </div>
+            <h4>
+                {I18n.t('Enums')}
+                <IconButton
                     onClick={() => setEnumsDialog(true)}
                     color="primary"
                 >
-                    ...
-                </Button>
+                    <Add />
+                </IconButton>
+            </h4>
+            <div className={props.classes.field}>
+                {enums.map(enumId => <Chip
+                    onDelete={() => {
+                        const _enums = JSON.parse(JSON.stringify(enums));
+                        _enums.splice(_enums.indexOf(enumId), 1);
+                        setEnums(_enums);
+                    }}
+                    label={enumId}
+                    key={enumId}
+                    className={props.classes.chip}
+                />)}
             </div>
         </DialogContent>
         <DialogActions>
@@ -106,6 +125,15 @@ const RecordSimulationDialog = props => {
             onClose={() => setEnumsDialog(false)}
         />
     </Dialog>;
+};
+
+RecordSimulationDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    recordSimulation: PropTypes.func,
+    simulation: PropTypes.object,
+    socket: PropTypes.object,
+    instance: PropTypes.any,
 };
 
 export default withStyles(styles)(RecordSimulationDialog);

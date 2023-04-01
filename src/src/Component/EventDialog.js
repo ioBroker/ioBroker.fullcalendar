@@ -602,6 +602,8 @@ EventDialog.propTypes = {
     t: PropTypes.func.isRequired,
     language: PropTypes.string.isRequired,
     widget: PropTypes.bool,
+    setEvent: PropTypes.func.isRequired,
+    deleteEvent: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(EventDialog);

@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { cron2obj, obj2cron } from './Utils';
 
 const styles = {
@@ -127,6 +128,16 @@ const SimulationDialog = props => {
             }}
         />}
     </Dialog>;
+};
+
+SimulationDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    simulation: PropTypes.object,
+    socket: PropTypes.object,
+    refreshSimulations: PropTypes.func,
+    selectedSimulation: PropTypes.string,
+    setSelectedSimulation: PropTypes.func,
 };
 
 export default withStyles(styles)(SimulationDialog);

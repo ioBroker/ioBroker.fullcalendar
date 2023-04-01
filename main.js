@@ -16,6 +16,7 @@ let adapter;
 let events;
 let nextTimer;
 let systemConfig;
+let adapterConfig;
 let timeZoneInterval;
 
 const configuredEvents  = [];
@@ -45,7 +46,6 @@ function startAdapter(options) {
                         dow = '0-6';
                     }
                     const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
-                    console.log(cron);
                     profile.native.events.push({
                         _id: `${simulation.id}.event-${uuidv4()}`,
                         common: {
@@ -361,11 +361,10 @@ function calculateNext() {
                     event.parsed = later.parse.cron(event.native.cron);
                 }
             }
-            console.log(JSON.stringify(event.parsed));
             let date = later.schedule(event.parsed).next();
 
             if (event.native.astro) {
-                date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig);
+                date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig, adapterConfig);
             }
 
             if (date.simulationStart && date.simulationStart.getTime() > date.getTime()) {
@@ -377,7 +376,6 @@ function calculateNext() {
             if (date.simulationDow && date.simulationDow.indexOf(date.getDay()) === -1) {
                 continue;
             }
-            console.log(event)
             console.log(date);
 
             if (event.native.timeRandomOffset) {
@@ -404,7 +402,7 @@ function calculateNext() {
             // expected 2017-09-12T12:12:00
             let time;
             if (event.native.astro) {
-                time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig);
+                time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig, adapterConfig);
             } else {
                 time = timeUtils.parseISOLocal(event.native.start);
             }
@@ -412,6 +410,8 @@ function calculateNext() {
             if (!time) {
                 continue;
             }
+
+            console.log(time);
 
             if (nowObj.getFullYear() === time.getFullYear() &&
                 nowObj.getMonth() === time.getMonth() &&
@@ -560,6 +560,7 @@ async function main() {
 
     try {
         systemConfig = await adapter.getForeignObjectAsync('system.config');
+        adapterConfig = await adapter.getForeignObjectAsync(`system.adapter.fullcalendar.${adapter.instance}`);
         if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
             systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
             adapter.log.warn('Please specify longitude and latitude in system settings, else astro events will not work');

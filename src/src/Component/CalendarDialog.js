@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Confirm, I18n } from '@iobroker/adapter-react-v5';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
@@ -98,6 +99,17 @@ const CalendarDialog = props => {
             }}
         />}
     </Dialog>;
+};
+
+CalendarDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    calendar: PropTypes.object,
+    socket: PropTypes.object,
+    instance: PropTypes.any,
+    calendarPrefix: PropTypes.string,
+    setCalendarPrefix: PropTypes.func,
+    updateCalendars: PropTypes.func,
 };
 
 export default withStyles(styles)(CalendarDialog);

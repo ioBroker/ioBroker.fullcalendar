@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { I18n } from '@iobroker/adapter-react-v5';
 import {
     Button, IconButton, Tab, Tabs,
@@ -7,16 +8,25 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     Edit, FiberManualRecord, PlayCircle, Stop,
 } from '@mui/icons-material';
+import { withStyles } from '@mui/styles';
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
 import RecordSimulationDialog from './RecordSimulationDialog';
 import PlaySimulationDialog from './PlaySimulationDialog';
 
+const style = {
+    container: {
+        display: 'flex', width: '100%', flex: 1,
+    },
+    tabs: {
+        paddingRight: 20,
+    },
+};
+
 const Simulations = props => {
     const [simulations, setSimulations] = useState([]);
     const [simulationStates, setSimulationStates] = useState({});
     const [selectedSimulation, setSelectedSimulation] = useState(null);
-    const [coords, setCoords] = useState({ lat: 0, lng: 0 });
     const [dialogSimulation, setDialogSimulation] = useState(null);
     const [dialogSimulationRecord, setDialogSimulationRecord] = useState(null);
     const [dialogSimulationPlay, setDialogSimulationPlay] = useState(null);
@@ -42,12 +52,15 @@ const Simulations = props => {
         }
         setSimulations(Object.values(objects));
         setSimulationStates(_simulationStates);
-        const config = await props.socket.getObject('system.config');
-        setCoords({ lat: config.common.latitude, lng: config.common.longitude });
     };
     useEffect(() => {
         refreshSimulations();
     }, []);
+    useEffect(() => {
+        if (!selectedSimulation) {
+            setSelectedSimulation(simulations[0]?._id);
+        }
+    }, [simulations]);
     const recordSimulation = (id, states, enums) => {
         props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', {
             id,
@@ -62,7 +75,7 @@ const Simulations = props => {
             options,
         });
     };
-    return <div style={{ display: 'flex', width: '100%', flex: 1 }}>
+    return <div className={props.classes.container}>
         <div>
             <SimulationDialog
                 socket={props.socket}
@@ -90,8 +103,9 @@ const Simulations = props => {
                 open={!!dialogSimulationPlay}
                 onClose={() => setDialogSimulationPlay(null)}
             />
-            <Tabs value={selectedSimulation} onChange={(e, value) => setSelectedSimulation(value)} orientation="vertical">
+            <Tabs value={selectedSimulation} onChange={(e, value) => setSelectedSimulation(value)} orientation="vertical" className={props.classes.tabs}>
                 {simulations.map(simulation => <Tab
+                    component="div"
                     value={simulation._id}
                     label={
                         <div style={{ width: '100%', textAlign: 'left' }}>
@@ -159,12 +173,14 @@ const Simulations = props => {
                         native: {
                             events: [
                             ],
+                            interval: 'week',
                         },
                         type: 'state',
                     });
                     await props.socket.setState(id, 'stop');
                     // props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', id);
-                    refreshSimulations();
+                    await refreshSimulations();
+                    setSelectedSimulation(id);
                 }}
                 variant="contained"
             >
@@ -217,4 +233,11 @@ const Simulations = props => {
     </div>;
 };
 
-export default Simulations;
+Simulations.propTypes = {
+    socket: PropTypes.object.isRequired,
+    instance: PropTypes.any.isRequired,
+    systemConfig: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(style)(Simulations);

@@ -180,7 +180,11 @@ function Calendar(props) {
                     calendarInterval.end || new Date(),
                 ).forEach(rruleTime => {
                     const time = event.native.astro ?
-                        SunCalc.getTimes(rruleTime, props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
+                        SunCalc.getTimes(
+                            rruleTime,
+                            props.adapterConfig.latitude || props.systemConfig.latitude,
+                            props.adapterConfig.longitude || props.systemConfig.longitude,
+                        )[event.native.astro] :
                         rruleTime;
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
@@ -538,6 +542,11 @@ Calendar.propTypes = {
     widget: PropTypes.bool,
     language: PropTypes.string.isRequired,
     storageName: PropTypes.string,
+    calendarPrefix: PropTypes.string,
+    isSimulation: PropTypes.bool,
+    simulationId: PropTypes.string,
+    setEvent: PropTypes.func,
+    adapterConfig: PropTypes.object,
 };
 
 export default withTheme(withStyles(styles)(Calendar));

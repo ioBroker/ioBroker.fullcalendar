@@ -14,6 +14,7 @@ import {
     Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField,
 } from '@mui/material';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Cancel, Delete, PlayCircle } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 
@@ -130,6 +131,14 @@ const PlaySimulationDialog = props => {
             </Button>
         </DialogActions>
     </Dialog>;
+};
+
+PlaySimulationDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    playSimulation: PropTypes.func,
+    simulation: PropTypes.object,
+    readOnly: PropTypes.bool,
 };
 
 export default withStyles(styles)(PlaySimulationDialog);

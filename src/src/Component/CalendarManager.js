@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import {
@@ -5,9 +6,26 @@ import {
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { Add, Edit } from '@mui/icons-material';
+import { withStyles } from '@mui/styles';
 import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog from './CalendarDialog';
+
+const style = {
+    tabs: {
+        paddingBottom: 20,
+    },
+    column: {
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'start',
+        height: '100%',
+    },
+    calendars: {
+        display: 'flex',
+    },
+};
 
 const CalendarManager = props => {
     const [calendarPrefix, setCalendarPrefix] = useState(`fullcalendar.${props.instance}`);
@@ -29,15 +47,8 @@ const CalendarManager = props => {
         updateCalendars();
     }, []);
 
-    return <div style={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'start',
-        height: '100%',
-    }}
-    >
-        <Tabs value={isSimulations ? 1 : 0} onChange={() => setIsSimulations(!isSimulations)}>
+    return <div className={props.classes.column}>
+        <Tabs value={isSimulations ? 1 : 0} onChange={() => setIsSimulations(!isSimulations)} className={props.classes.tabs}>
             <Tab label={I18n.t('Calendars')} />
             <Tab label={I18n.t('Simulations')} />
         </Tabs>
@@ -47,11 +58,12 @@ const CalendarManager = props => {
             instance={props.instance}
         /> :
             <>
-                <div style={{ display: 'flex' }}>
-                    <Tabs value={calendarPrefix} onChange={(e, value) => setCalendarPrefix(value)}>
+                <div className={props.classes.calendars}>
+                    <Tabs value={calendarPrefix} onChange={(e, value) => setCalendarPrefix(value)} className={props.classes.tabs}>
                         <Tab label={I18n.t('Default')} value={`fullcalendar.${props.instance}`} />
                         {calendars.map(calendar =>
                             <Tab
+                                component="div"
                                 key={calendar._id}
                                 label={<div>
                                     {calendar.common.name}
@@ -93,6 +105,7 @@ const CalendarManager = props => {
                     calendarPrefix={calendarPrefix}
                     t={I18n.t}
                     language={I18n.getLanguage()}
+                    adapterConfig={props.adapterConfig}
                 />
             </>}
         <CalendarDialog
@@ -108,4 +121,12 @@ const CalendarManager = props => {
     </div>;
 };
 
-export default CalendarManager;
+CalendarManager.propTypes = {
+    socket: PropTypes.object.isRequired,
+    instance: PropTypes.any.isRequired,
+    systemConfig: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
+    adapterConfig: PropTypes.object.isRequired,
+};
+
+export default withStyles(style)(CalendarManager);

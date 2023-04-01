@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import PropTypes from 'prop-types';
+
 import { I18n } from '@iobroker/adapter-react-v5';
 
 import Calendar from './Calendar';
@@ -116,11 +118,26 @@ const CalendarContainer = props => {
             simulation={props.simulation}
             simulations={props.simulations}
             readOnly={props.readOnly}
+            adapterConfig={props.adapterConfig}
         />
         {/* <pre>
             {JSON.stringify(this.state.events, null, 2)}
         </pre> */}
     </>;
+};
+
+CalendarContainer.propTypes = {
+    systemConfig: PropTypes.object,
+    socket: PropTypes.object,
+    instance: PropTypes.any,
+    calendarPrefix: PropTypes.string,
+    isSimulation: PropTypes.bool,
+    simulationId: PropTypes.string,
+    simulation: PropTypes.object,
+    simulations: PropTypes.array,
+    refreshSimulations: PropTypes.func,
+    readOnly: PropTypes.bool,
+    adapterConfig: PropTypes.object,
 };
 
 export default CalendarContainer;

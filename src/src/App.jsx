@@ -37,8 +37,17 @@ class App extends GenericApp {
         super(props, extendedProps);
     }
 
+    onConnectionReady() {
+        super.onConnectionReady();
+        (async () => {
+            const adapterConfig = await this.socket.getObject(`system.adapter.fullcalendar.${this.instance}`);
+            this.setState({ adapterConfig: adapterConfig.native });
+        }
+        )();
+    }
+
     render() {
-        if (!this.state.loaded) {
+        if (!this.state.loaded || !this.state.adapterConfig) {
             return <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
                     <Loader theme={this.state.themeType} />
@@ -53,6 +62,7 @@ class App extends GenericApp {
                         systemConfig={this._systemConfig}
                         socket={this.socket}
                         instance={this.instance}
+                        adapterConfig={this.state.adapterConfig}
                     />
                     {/* <pre>
                         {JSON.stringify(this.state.events, null, 2)}
