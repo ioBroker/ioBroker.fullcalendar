@@ -1,8 +1,34 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.0.5",
+    "version": "2.0.8",
     "news": {
+      "2.0.8": {
+        "en": "Corrected vis-2 widgets",
+        "de": "Korrigierte vis-2 Widgets",
+        "ru": "Исправленные виджеты vis-2",
+        "pt": "Vis-2 widgets corrigidos",
+        "nl": "Vertaling:",
+        "fr": "Widgets vis-2 corrigés",
+        "it": "Corretti widget vis-2",
+        "es": "Widgets corregidos vis-2",
+        "pl": "Poprawa wizy 2",
+        "uk": "Виправлено vis-2 віджети",
+        "zh-cn": "更正"
+      },
+      "2.0.6": {
+        "en": "Corrected vis-2 widgets",
+        "de": "Korrigierte vis-2 Widgets",
+        "ru": "Исправленные виджеты vis-2",
+        "pt": "Vis-2 widgets corrigidos",
+        "nl": "Vertaling:",
+        "fr": "Widgets vis-2 corrigés",
+        "it": "Corretti widget vis-2",
+        "es": "Widgets corregidos vis-2",
+        "pl": "Poprawa wizy 2",
+        "uk": "Виправлено vis-2 віджети",
+        "zh-cn": "更正"
+      },
       "2.0.5": {
         "en": "New material design\nLicense changed to MIT\nAllowed deletion of events",
         "de": "Neues Materialdesign\nLizenz geändert in MIT\nErlaubte Löschung von Ereignissen",
@@ -56,11 +82,6 @@
         "en": "Translations",
         "de": "Übersetzungen",
         "ru": "Поправлен перевод"
-      },
-      "0.2.3": {
-        "en": "Fix interval settings\nUpdate fullcalendar library",
-        "de": "Intervalleinstellungen korrigiert\nUpdate fullcalendar library",
-        "ru": "Исправлена ошибка с интервалом\nОбновлена библиотека fullcalendar"
       }
     },
     "title": "Calendar schedule",

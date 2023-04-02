@@ -3,7 +3,7 @@ import {
 } from '@mui/material';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
-    ColorPicker, SelectID, Confirm,
+    ColorPicker, SelectID, Confirm, I18n,
 } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -65,6 +65,23 @@ const styles = {
         display: 'inline-block',
     },
 };
+
+const astroTypes = [
+    'sunrise',
+    'sunriseEnd',
+    'goldenHourEnd',
+    'solarNoon',
+    'goldenHour',
+    'sunsetStart',
+    'sunset',
+    'dusk',
+    'nauticalDusk',
+    'night',
+    'nadir',
+    'nightEnd',
+    'nauticalDawn',
+    'dawn',
+];
 
 function getText(text, lang) {
     if (text && typeof text === 'object') {
@@ -238,6 +255,90 @@ const EventDialog = props => {
                     variant="standard"
                     className={props.classes.narrowText2}
                 >
+                    <InputLabel>{props.t('Time')}</InputLabel>
+                    <Select
+                        value={event.native.astro ? 'astro' : 'time'}
+                        disabled={props.readOnly}
+                        onChange={e =>
+                            changeEvent(newEvent => {
+                                if (e.target.value === 'astro') {
+                                    newEvent.native.astro = 'sunrise';
+                                } else {
+                                    delete newEvent.native.astro;
+                                }
+                            })}
+                        renderValue={value => props.t(value)}
+                    >
+                        {['time', 'astro'].map(type =>
+                            <MenuItem key={type} value={type}>
+                                <div>
+                                    {props.t(type)}
+                                </div>
+                            </MenuItem>)}
+                    </Select>
+                </FormControl>
+                {event.native.astro ?
+                    <FormControl
+                        className={props.classes.narrowText}
+                        variant="standard"
+                    >
+                        <InputLabel>{I18n.t('Astronomic event')}</InputLabel>
+                        <Select
+                            value={event.native.astro || ''}
+                            onChange={e => changeEvent(newEvent => newEvent.native.astro = e.target.value)}
+                        >
+                            {astroTypes
+                                .map(astroType => <MenuItem key={astroType} value={astroType}>{I18n.t(astroType)}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+
+                    : <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <TimePicker
+                            label={props.t('Time')}
+                            value={date || null}
+                            disabled={props.readOnly}
+                            onChange={_date => {
+                                if (!_date) {
+                                    return;
+                                }
+                                try {
+                                    changeEvent(newEvent => {
+                                        if (period === 'once') {
+                                            newEvent.native.start = clientDateToServer(_date.toDate(), 'date', props.serverTimeZone);
+                                        } else if (period === 'monthly' || period === 'daily') {
+                                            const newCron = cron2obj(newEvent.native.cron);
+                                            const timeZoneCron = clientDateToServer(_date.toDate(), 'cron', props.serverTimeZone);
+                                            newCron.hours = timeZoneCron.hours;
+                                            newCron.minutes = timeZoneCron.minutes;
+                                            newEvent.native.cron = obj2cron(newCron);
+                                        }
+                                    });
+                                } catch {
+                                //
+                                }
+                            }}
+                            renderInput={params => <TextField {...params} variant="standard" className={props.classes.narrowText} />}
+                            ampm={false}
+                        />
+                    </LocalizationProvider>}
+            </div>
+            {props.isSimulation && <div className={props.classes.field}>
+                <TextField
+                    label={props.t('Time random offset')}
+                    value={event.native.timeRandomOffset || 0}
+                    disabled={props.readOnly}
+                    onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
+                    variant="standard"
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                    }}
+                />
+            </div>}
+            <div className={props.classes.field}>
+                {!props.isSimulation && <FormControl
+                    variant="standard"
+                    className={props.classes.narrowText2}
+                >
                     <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
                         value={event.native.type || ''}
@@ -254,36 +355,7 @@ const EventDialog = props => {
                                 </div>
                             </MenuItem>)}
                     </Select>
-                </FormControl>
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                    <TimePicker
-                        label={props.t('Time')}
-                        value={date || null}
-                        disabled={props.readOnly}
-                        onChange={_date => {
-                            if (!_date) {
-                                return;
-                            }
-                            try {
-                                changeEvent(newEvent => {
-                                    if (period === 'once') {
-                                        newEvent.native.start = clientDateToServer(_date.toDate(), 'date', props.serverTimeZone);
-                                    } else if (period === 'monthly' || period === 'daily') {
-                                        const newCron = cron2obj(newEvent.native.cron);
-                                        const timeZoneCron = clientDateToServer(_date.toDate(), 'cron', props.serverTimeZone);
-                                        newCron.hours = timeZoneCron.hours;
-                                        newCron.minutes = timeZoneCron.minutes;
-                                        newEvent.native.cron = obj2cron(newCron);
-                                    }
-                                });
-                            } catch {
-                                //
-                            }
-                        }}
-                        renderInput={params => <TextField {...params} variant="standard" className={props.classes.narrowText} />}
-                        ampm={false}
-                    />
-                </LocalizationProvider>
+                </FormControl>}
                 {event.native.type !== 'single' && <TextField
                     label={props.t('Duration')}
                     value={duration}
@@ -315,7 +387,7 @@ const EventDialog = props => {
                 {event.native.type === 'double' && endValueField()}
             </div>
             <div className={props.classes.field}>
-                <FormControl
+                {!props.isSimulation && <FormControl
                     variant="standard"
                 >
                     <InputLabel>{props.t('Period')}</InputLabel>
@@ -350,8 +422,13 @@ const EventDialog = props => {
                     >
                         {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{props.t(type)}</MenuItem>)}
                     </Select>
-                </FormControl>
-                {period === 'daily' && <table className={props.classes.dayTable}>
+                </FormControl>}
+                {period === 'daily' && <table
+                    className={props.classes.dayTable}
+                    style={
+                        props.isSimulation ? { marginLeft: 0 } : undefined
+                    }
+                >
                     <thead>
                         <tr>
                             {daysOfWeek.map(value => <td
@@ -442,6 +519,7 @@ const EventDialog = props => {
                     name={props.t('Color')}
                 />
             </div>
+            <pre>{JSON.stringify(event, null, 2)}</pre>
         </DialogContent>
         <DialogActions>
             {!props.readOnly ? <Button
@@ -474,7 +552,7 @@ const EventDialog = props => {
                         event.native.intervals[0].timeOffset = (parseFloat(duration) || 1) * 60000;
                     }
 
-                    await props.socket.setObject(event._id, event);
+                    await props.setEvent(event._id, event);
                     props.updateEvents();
                     props.onClose();
                 }}
@@ -498,7 +576,7 @@ const EventDialog = props => {
             onClose={async isYes => {
                 if (isYes) {
                     try {
-                        await props.socket.delObject(event._id);
+                        await props.deleteEvent(event._id);
                         props.updateEvents();
                     } catch (e) {
                         window.alert(`Cannot delete event: ${e}`);
@@ -524,6 +602,8 @@ EventDialog.propTypes = {
     t: PropTypes.func.isRequired,
     language: PropTypes.string.isRequired,
     widget: PropTypes.bool,
+    setEvent: PropTypes.func.isRequired,
+    deleteEvent: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(EventDialog);

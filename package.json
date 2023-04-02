@@ -1,7 +1,7 @@
 {
   "name": "iobroker.fullcalendar",
   "description": "This adapter allows planing with calendar.",
-  "version": "2.0.5",
+  "version": "2.0.8",
   "author": {
     "name": "bluefox",
     "email": "dogafox@gmail.com"
@@ -24,8 +24,8 @@
     "schedule"
   ],
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.7",
     "later": "^1.2.0",
+    "@iobroker/adapter-core": "^2.6.8",
     "suncalc2": "^1.8.1"
   },
   "devDependencies": {
@@ -33,6 +33,7 @@
     "@alcalzone/release-script": "^3.5.9",
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
     "@alcalzone/release-script-plugin-license": "^3.5.9",
+    "@iobroker/vis-2-widgets-react-dev": "^0.3.19",
     "gulp": "^4.0.2",
     "mocha": "^10.2.0"
   },
@@ -45,6 +46,7 @@
     "img/",
     "io-package.json",
     "LICENSE",
+    "widgets/",
     "lib/",
     "main.js"
   ],
@@ -55,7 +57,8 @@
     "release": "release-script",
     "release-patch": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
-    "release-major": "release-script major --yes"
+    "release-major": "release-script major --yes",
+    "update-packages": "ncu --upgrade && cd src-widgets && ncu --upgrade && cd ../src && ncu --upgrade && cd .."
   },
   "license": "CC-BY-NC-4.0"
 }
