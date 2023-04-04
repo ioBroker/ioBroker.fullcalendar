@@ -519,7 +519,7 @@ const EventDialog = props => {
                     name={props.t('Color')}
                 />
             </div>
-            <pre>{JSON.stringify(event, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(event, null, 2)}</pre> */}
         </DialogContent>
         <DialogActions>
             {!props.readOnly ? <Button

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import {
-    IconButton, Tab, Tabs, Paper,
+    IconButton, Tab, Tabs, Paper, AppBar, Toolbar,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { Add, Edit } from '@mui/icons-material';
@@ -62,8 +62,34 @@ const CalendarManager = props => {
             setCalendarPrefix={setCalendarPrefix}
         /> :
             <div className={props.classes.container}>
-                <Paper>
-                    <div className={props.classes.calendars}>
+                <div className={props.classes.calendars}>
+                    <Paper>
+                        <AppBar
+                            position="relative"
+                            sx={{
+                                backgroundColor: theme => theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+                            }}
+                        >
+                            <Toolbar>
+                                <IconButton
+                                    onClick={async () => {
+                                        const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
+                                        await props.socket.setObject(id, {
+                                            type: 'folder',
+                                            common: {
+                                                name: 'NewCalendar',
+                                            },
+                                            native: {},
+                                        });
+                                        await updateCalendars();
+                                        setCalendarPrefix(id);
+                                    }}
+                                    variant="contained"
+                                >
+                                    <Add />
+                                </IconButton>
+                            </Toolbar>
+                        </AppBar>
                         <Tabs
                             value={calendarPrefix}
                             onChange={(e, value) => setCalendarPrefix(value)}
@@ -90,25 +116,8 @@ const CalendarManager = props => {
                                     value={calendar._id}
                                 />)}
                         </Tabs>
-                        <IconButton
-                            onClick={async () => {
-                                const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
-                                await props.socket.setObject(id, {
-                                    type: 'folder',
-                                    common: {
-                                        name: 'NewCalendar',
-                                    },
-                                    native: {},
-                                });
-                                await updateCalendars();
-                                setCalendarPrefix(id);
-                            }}
-                            variant="contained"
-                        >
-                            <Add />
-                        </IconButton>
-                    </div>
-                </Paper>
+                    </Paper>
+                </div>
                 <CalendarContainer
                     systemConfig={props.systemConfig}
                     socket={props.socket}

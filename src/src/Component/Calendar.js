@@ -348,6 +348,7 @@ function Calendar(props) {
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use ALT by dragging it to copy the events.')}</div>}
                     </div>
                 </Paper>
+                {props.button}
             </div>}
             <div className={props.classes.calendarBlock}>
                 <div className={props.classes.calendar}>
@@ -565,6 +566,7 @@ Calendar.propTypes = {
     simulationId: PropTypes.string,
     setEvent: PropTypes.func,
     adapterConfig: PropTypes.object,
+    button: PropTypes.any,
 };
 
 export default withTheme(withStyles(styles)(Calendar));

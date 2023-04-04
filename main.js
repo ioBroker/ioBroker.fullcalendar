@@ -132,6 +132,9 @@ function startAdapter(options) {
                     break;
                 case 'recordSimulation': {
                         const profile = await adapter.getForeignObjectAsync(obj.message.id);
+                        profile.native.record.start = new Date();
+                        profile.native.record.end = profile.native.interval === 'day' ? new Date(profile.native.record.start.getTime() + 24 * 60 * 60 * 1000) : new Date(profile.native.record.start.getTime() + 7 * 24 * 60 * 60 * 1000);
+                        obj.message = {...obj.message, ...profile.native.record};
                         adapter.setForeignState(obj.message.id, 'record');
                         if (obj.message.enums) {
                             for (const k in obj.message.enums) {
@@ -149,8 +152,7 @@ function startAdapter(options) {
                         }
                         console.log(obj.message.states);
                         adapter.subscribeForeignStates(obj.message.states)
-                        obj.message.start = new Date();
-                        obj.message.end = profile.native.interval === 'day' ? new Date(obj.message.start.getTime() + 24 * 60 * 60 * 1000) : new Date(obj.message.start.getTime() + 7 * 24 * 60 * 60 * 1000);
+                        await adapter.setForeignObjectAsync(obj.message.id, profile);
                         simulations.push(obj.message);
                     }
                     break;

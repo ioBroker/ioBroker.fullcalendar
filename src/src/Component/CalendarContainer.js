@@ -100,7 +100,6 @@ const CalendarContainer = props => {
     }, [props.calendarPrefix, props.isSimulation, props.simulationId, props.simulations]);
 
     return <>
-        {props.button}
         <Calendar
             systemConfig={props.systemConfig}
             events={events || []}
@@ -120,6 +119,7 @@ const CalendarContainer = props => {
             simulations={props.simulations}
             readOnly={props.readOnly}
             adapterConfig={props.adapterConfig}
+            button={props.button}
         />
         {/* <pre>
             {JSON.stringify(this.state.events, null, 2)}

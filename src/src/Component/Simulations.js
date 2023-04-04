@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n, Confirm } from '@iobroker/adapter-react-v5';
 import {
-    Button, IconButton, Tab, Tabs, Paper, AppBar, Toolbar,
+    Button, IconButton, Tab, Tabs, Paper, AppBar, Toolbar, Tooltip,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import {
     Edit, FiberManualRecord, PlayCircle, Pause, Add,
 } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
+import moment from 'moment';
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
-import RecordSimulationDialog from './RecordSimulationDialog';
 import PlaySimulationDialog from './PlaySimulationDialog';
 
 const style = {
@@ -29,8 +29,8 @@ const Simulations = props => {
     const [simulations, setSimulations] = useState([]);
     const [simulationStates, setSimulationStates] = useState({});
     const [selectedSimulation, setSelectedSimulation] = useState(null);
+    const [recordDialog, setRecordDialog] = useState(false);
     const [dialogSimulation, setDialogSimulation] = useState(null);
-    const [dialogSimulationRecord, setDialogSimulationRecord] = useState(null);
     const [dialogSimulationPlay, setDialogSimulationPlay] = useState(null);
     const updateState = async (id, state) => {
         if (state) {
@@ -63,11 +63,9 @@ const Simulations = props => {
             setSelectedSimulation(simulations[0]?._id);
         }
     }, [simulations]);
-    const recordSimulation = (id, states, enums) => {
+    const recordSimulation = id => {
         props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', {
             id,
-            states,
-            enums,
         });
         props.socket.subscribeObject(id, refreshSimulations);
     };
@@ -117,14 +115,6 @@ const Simulations = props => {
                 open={!!dialogSimulation}
                 onClose={() => setDialogSimulation(null)}
             />
-            <RecordSimulationDialog
-                socket={props.socket}
-                instance={props.instance}
-                recordSimulation={recordSimulation}
-                simulation={simulations.find(s => s._id === dialogSimulationRecord)}
-                open={!!dialogSimulationRecord}
-                onClose={() => setDialogSimulationRecord(null)}
-            />
             <PlaySimulationDialog
                 socket={props.socket}
                 instance={props.instance}
@@ -133,6 +123,25 @@ const Simulations = props => {
                 open={!!dialogSimulationPlay}
                 onClose={() => setDialogSimulationPlay(null)}
             />
+            {recordDialog && <Confirm
+                title={I18n.t('Delete record')}
+                text={I18n.t('Do you want to delete previously recorded events?')}
+                suppressQuestionMinutes={5}
+                dialogName="deleteRecordConfirmDialog"
+                onClose={async isYes => {
+                    if (isYes) {
+                        try {
+                            const _simulation = simulations.find(s => s._id === recordDialog);
+                            _simulation.native.events = [];
+                            await props.socket.setObject(_simulation._id, _simulation);
+                        } catch (e) {
+                            window.alert(`Cannot delete events: ${e}`);
+                        }
+                    }
+                    recordSimulation(recordDialog);
+                    setRecordDialog(false);
+                }}
+            />}
             <Paper>
                 <AppBar
                     position="relative"
@@ -155,6 +164,12 @@ const Simulations = props => {
                                         ],
                                         interval: 'day',
                                         defaultColor: '#3A87AD',
+                                        record: {
+                                            states: [],
+                                            enums: [],
+                                            start: null,
+                                            end: null,
+                                        },
                                     },
                                     type: 'state',
                                 });
@@ -185,30 +200,38 @@ const Simulations = props => {
                                 >
                                     <Edit />
                                 </IconButton>
-                                {['record', 'stop'].includes(simulationStates[simulation._id]) && <IconButton
-                                    onClick={async e => {
-                                        e.stopPropagation();
-                                        if (simulationStates[simulation._id] === 'record') {
-                                            props.socket.sendTo(
-                                                `fullcalendar.${props.instance}`,
-                                                'stopRecordSimulation',
-                                                {
-                                                    id: simulation._id,
-                                                },
-                                            );
-                                            props.socket.unsubscribeObject(simulation._id, refreshSimulations);
-                                            refreshSimulations();
-                                        } else {
-                                            setDialogSimulationRecord(simulation._id);
-                                        }
-                                    }}
-                                    size="small"
+                                {['record', 'stop'].includes(simulationStates[simulation._id]) &&
+                                <Tooltip title={simulationStates[simulation._id] === 'stop' ?
+                                    false :
+                                    `${I18n.t('Till')} ${moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss')}`}
                                 >
-                                    <FiberManualRecord style={{
-                                        color: simulationStates[simulation._id] === 'record' ? 'red' : undefined,
-                                    }}
-                                    />
-                                </IconButton>}
+                                    <IconButton
+                                        onClick={async e => {
+                                            e.stopPropagation();
+                                            if (simulationStates[simulation._id] === 'record') {
+                                                props.socket.sendTo(
+                                                    `fullcalendar.${props.instance}`,
+                                                    'stopRecordSimulation',
+                                                    {
+                                                        id: simulation._id,
+                                                    },
+                                                );
+                                                props.socket.unsubscribeObject(simulation._id, refreshSimulations);
+                                                refreshSimulations();
+                                            } else if (simulation.native.events.length) {
+                                                setRecordDialog(simulation._id);
+                                            } else {
+                                                recordSimulation(simulation._id);
+                                            }
+                                        }}
+                                        size="small"
+                                    >
+                                        <FiberManualRecord style={{
+                                            color: simulationStates[simulation._id] === 'record' ? 'red' : undefined,
+                                        }}
+                                        />
+                                    </IconButton>
+                                </Tooltip>}
                                 {['record', 'pause'].includes(simulationStates[simulation._id]) &&
                             <IconButton
                                 onClick={async e => {
