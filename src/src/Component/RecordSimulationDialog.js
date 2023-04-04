@@ -2,7 +2,7 @@ import { I18n, SelectID } from '@iobroker/adapter-react-v5';
 import {
     Button,
     Chip,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField,
+    Dialog, DialogActions, DialogContent, DialogTitle, IconButton,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -22,11 +22,33 @@ const styles = {
 const RecordSimulationDialog = props => {
     const [states, setStates] = useState([]);
     const [enums, setEnums] = useState([]);
+    const [enumStates, setEnumStates] = useState([]);
     const [idDialog, setIdDialog] = useState(false);
     const [enumsDialog, setEnumsDialog] = useState(false);
     useEffect(() => {
         setStates([]);
+        setEnums([]);
     }, [props.open]);
+    useEffect(() => {
+        (async () => {
+            const _states = [];
+            console.log(enums);
+            for (const k in enums) {
+                const _enumStates = (await Promise.all(enums[k].map(id => props.socket.getObject(id)))).map(e => e.common.members);
+                let intersection = [];
+                _enumStates.forEach((s, i) => {
+                    if (intersection.length || i) {
+                        intersection = intersection.filter(i => s.includes(i));
+                    } else {
+                        intersection = s;
+                    }
+                    console.log(intersection);
+                });
+                _states.push(...intersection);
+            }
+            setEnumStates(_states.filter((v, i, a) => a.indexOf(v) === i));
+        })();
+    }, [enums]);
 
     const handleRecord = () => {
         props.recordSimulation(props.simulation._id, states, enums);
@@ -73,27 +95,27 @@ const RecordSimulationDialog = props => {
                 </IconButton>
             </h4>
             <div className={props.classes.field}>
-                {enums.map(enumId => <Chip
+                {enums.map(enumIds => <Chip
                     onDelete={() => {
                         const _enums = JSON.parse(JSON.stringify(enums));
-                        _enums.splice(_enums.indexOf(enumId), 1);
+                        _enums.splice(_enums.indexOf(enumIds), 1);
                         setEnums(_enums);
                     }}
-                    label={enumId}
-                    key={enumId}
+                    label={enumIds.join(' + ')}
+                    key={enumIds}
+                    className={props.classes.chip}
+                />)}
+            </div>
+            <h4>{I18n.t('States from enums')}</h4>
+            <div className={props.classes.field}>
+                {enumStates.map(state => <Chip
+                    label={state}
+                    key={state}
                     className={props.classes.chip}
                 />)}
             </div>
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={props.onClose}
-                variant="contained"
-                color="grey"
-                startIcon={<Cancel />}
-            >
-                {I18n.t('Cancel')}
-            </Button>
             <Button
                 onClick={handleRecord}
                 variant="contained"
@@ -101,6 +123,14 @@ const RecordSimulationDialog = props => {
                 startIcon={<FiberManualRecord />}
             >
                 {I18n.t('Record')}
+            </Button>
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
             </Button>
         </DialogActions>
         {idDialog && <SelectID
@@ -118,9 +148,9 @@ const RecordSimulationDialog = props => {
             socket={props.socket}
             instance={props.instance}
             open={enumsDialog}
-            selectedEnums={enums}
+            selectedEnums={[]}
             onSelect={ids => {
-                setEnums(ids);
+                setEnums(_enums => [..._enums, ids]);
             }}
             onClose={() => setEnumsDialog(false)}
         />

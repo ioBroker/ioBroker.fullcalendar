@@ -423,7 +423,7 @@ const EventDialog = props => {
                         {['once', 'daily', 'monthly'].map(type => <MenuItem key={type} value={type}>{props.t(type)}</MenuItem>)}
                     </Select>
                 </FormControl>}
-                {period === 'daily' && <table
+                {period === 'daily' && (!props.isSimulation || props.simulation.native.interval === 'week') && <table
                     className={props.classes.dayTable}
                     style={
                         props.isSimulation ? { marginLeft: 0 } : undefined

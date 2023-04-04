@@ -1,4 +1,4 @@
-import { Confirm, I18n } from '@iobroker/adapter-react-v5';
+import { Confirm, I18n, ColorPicker } from '@iobroker/adapter-react-v5';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import {
     Button,
@@ -60,6 +60,17 @@ const SimulationDialog = props => {
                     </Select>
                 </FormControl>
             </div>
+            <div>
+                <ColorPicker
+                    label={I18n.t('Default color')}
+                    value={simulation.native.defaultColor}
+                    onChange={color => {
+                        const _simulation = JSON.parse(JSON.stringify(simulation));
+                        _simulation.native.defaultColor = color;
+                        setSimulation(_simulation);
+                    }}
+                />
+            </div>
         </DialogContent>
         <DialogActions>
             <Button
@@ -71,19 +82,11 @@ const SimulationDialog = props => {
                 {I18n.t('Delete')}
             </Button>
             <Button
-                onClick={props.onClose}
-                variant="contained"
-                color="grey"
-                startIcon={<Cancel />}
-            >
-                {I18n.t('Cancel')}
-            </Button>
-            <Button
                 onClick={async () => {
                     const _simulation = JSON.parse(JSON.stringify(simulation));
                     if (_simulation.native.interval !== props.simulation.native.interval) {
                         if (_simulation.native.interval === 'day') {
-                            console.log( _simulation);
+                            console.log(_simulation);
                             _simulation.native.events.forEach(event => {
                                 console.log(event.native.cron);
                                 const cron = cron2obj(event.native.cron);
@@ -103,6 +106,14 @@ const SimulationDialog = props => {
                 startIcon={<Save />}
             >
                 {I18n.t('Save')}
+            </Button>
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm

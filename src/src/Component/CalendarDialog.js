@@ -49,14 +49,6 @@ const CalendarDialog = props => {
                 {I18n.t('Delete')}
             </Button>
             <Button
-                onClick={props.onClose}
-                variant="contained"
-                color="grey"
-                startIcon={<Cancel />}
-            >
-                {I18n.t('Cancel')}
-            </Button>
-            <Button
                 onClick={async () => {
                     await props.socket.setObject(calendar._id, calendar);
                     await props.updateCalendars();
@@ -67,6 +59,14 @@ const CalendarDialog = props => {
                 startIcon={<Save />}
             >
                 {I18n.t('Save')}
+            </Button>
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm

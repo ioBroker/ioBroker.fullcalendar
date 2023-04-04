@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import {
-    IconButton, Tab, Tabs,
+    IconButton, Tab, Tabs, Paper,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { Add, Edit } from '@mui/icons-material';
@@ -13,7 +13,6 @@ import CalendarDialog from './CalendarDialog';
 
 const style = {
     tabs: {
-        paddingBottom: 20,
     },
     column: {
         width: '100%',
@@ -23,7 +22,9 @@ const style = {
         height: '100%',
     },
     calendars: {
-        display: 'flex',
+    },
+    container: {
+        display: 'flex', width: '100%', flex: 1,
     },
 };
 
@@ -56,48 +57,58 @@ const CalendarManager = props => {
             systemConfig={props.systemConfig}
             socket={props.socket}
             instance={props.instance}
+            updateCalendars={updateCalendars}
+            setIsSimulations={setIsSimulations}
+            setCalendarPrefix={setCalendarPrefix}
         /> :
-            <>
-                <div className={props.classes.calendars}>
-                    <Tabs value={calendarPrefix} onChange={(e, value) => setCalendarPrefix(value)} className={props.classes.tabs}>
-                        <Tab label={I18n.t('Default')} value={`fullcalendar.${props.instance}`} />
-                        {calendars.map(calendar =>
-                            <Tab
-                                component="div"
-                                key={calendar._id}
-                                label={<div>
-                                    {calendar.common.name}
-                                    <IconButton
-                                        size="small"
-                                        onClick={async e => {
-                                            setCalendarDialog(calendar._id);
-                                            e.stopPropagation();
-                                        }}
-                                    >
-                                        <Edit />
-                                    </IconButton>
-                                </div>}
-                                value={calendar._id}
-                            />)}
-                    </Tabs>
-                    <IconButton
-                        onClick={async () => {
-                            const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
-                            await props.socket.setObject(id, {
-                                type: 'folder',
-                                common: {
-                                    name: 'NewCalendar',
-                                },
-                                native: {},
-                            });
-                            await updateCalendars();
-                            setCalendarPrefix(id);
-                        }}
-                        variant="contained"
-                    >
-                        <Add />
-                    </IconButton>
-                </div>
+            <div className={props.classes.container}>
+                <Paper>
+                    <div className={props.classes.calendars}>
+                        <Tabs
+                            value={calendarPrefix}
+                            onChange={(e, value) => setCalendarPrefix(value)}
+                            className={props.classes.tabs}
+                            orientation="vertical"
+                        >
+                            <Tab label={I18n.t('Default')} value={`fullcalendar.${props.instance}`} />
+                            {calendars.map(calendar =>
+                                <Tab
+                                    component="div"
+                                    key={calendar._id}
+                                    label={<div>
+                                        {calendar.common.name}
+                                        <IconButton
+                                            size="small"
+                                            onClick={async e => {
+                                                setCalendarDialog(calendar._id);
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <Edit />
+                                        </IconButton>
+                                    </div>}
+                                    value={calendar._id}
+                                />)}
+                        </Tabs>
+                        <IconButton
+                            onClick={async () => {
+                                const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
+                                await props.socket.setObject(id, {
+                                    type: 'folder',
+                                    common: {
+                                        name: 'NewCalendar',
+                                    },
+                                    native: {},
+                                });
+                                await updateCalendars();
+                                setCalendarPrefix(id);
+                            }}
+                            variant="contained"
+                        >
+                            <Add />
+                        </IconButton>
+                    </div>
+                </Paper>
                 <CalendarContainer
                     systemConfig={props.systemConfig}
                     socket={props.socket}
@@ -107,7 +118,7 @@ const CalendarManager = props => {
                     language={I18n.getLanguage()}
                     adapterConfig={props.adapterConfig}
                 />
-            </>}
+            </div>}
         <CalendarDialog
             open={!!calendarDialog}
             onClose={() => setCalendarDialog(null)}

@@ -27,6 +27,20 @@ let rooms               = {};
 let funcs               = {};
 const simulations = [];
 
+const stopRecordSimulation = async id => {
+    const simulation = simulations.find(sim => sim.id === id);
+    if (simulation) {
+        simulations.splice(simulations.findIndex(sim => sim.id === id), 1);
+        simulation.states.forEach(state => {
+            if (simulations.find(sim => sim.states.includes(state))) {
+                return;
+            }
+            adapter.unsubscribeForeignStates(state);
+        });
+    }
+    adapter.setForeignState(id, 'stop');
+}
+
 function startAdapter(options) {
     options = options || {};
     options = Object.assign({}, options, {name: adapterName});
@@ -39,6 +53,10 @@ function startAdapter(options) {
             }
             simulations.forEach(async simulation => {
                 const profile = await adapter.getForeignObjectAsync(simulation.id);
+                const profileState = await adapter.getForeignStateAsync(simulation.id);
+                if (profileState.val === 'pause') {
+                    return;
+                }
                 if (simulation.states.includes(stateId)) {
                     const date = new Date();
                     let dow = date.getDay() === 0 ? 7 : date.getDay();
@@ -112,36 +130,38 @@ function startAdapter(options) {
                 case 'getConfigured':
                     adapter.sendTo(obj.from, obj.command, configuredEvents, obj.callback);
                     break;
-                case 'recordSimulation':
-                    adapter.setForeignState(obj.message.id, 'record');
-                    if (obj.message.enums) {
-                        for (let k in obj.message.enums) {
-                            const enumId = obj.message.enums[k];
-                            const enumObj = await adapter.getForeignObjectAsync(enumId);
-                            if (enumObj && enumObj.common && enumObj.common.members) {
-                                enumObj.common.members.forEach(state => {
-                                    if (!obj.message.states.includes(state)) {
-                                        obj.message.states.push(state);
+                case 'recordSimulation': {
+                        const profile = await adapter.getForeignObjectAsync(obj.message.id);
+                        adapter.setForeignState(obj.message.id, 'record');
+                        if (obj.message.enums) {
+                            for (const k in obj.message.enums) {
+                                const _enumStates = (await Promise.all(obj.message.enums[k].map(id => adapter.getForeignObjectAsync(id)))).map(e => e.common.members);
+                                let intersection = [];
+                                _enumStates.forEach((s, i) => {
+                                    if (intersection.length || i) {
+                                        intersection = intersection.filter(i => s.includes(i));
+                                    } else {
+                                        intersection = s;
                                     }
                                 });
+                                obj.message.states.push(...intersection);
                             }
                         }
+                        console.log(obj.message.states);
+                        adapter.subscribeForeignStates(obj.message.states)
+                        obj.message.start = new Date();
+                        obj.message.end = profile.native.interval === 'day' ? new Date(obj.message.start.getTime() + 24 * 60 * 60 * 1000) : new Date(obj.message.start.getTime() + 7 * 24 * 60 * 60 * 1000);
+                        simulations.push(obj.message);
                     }
-                    adapter.subscribeForeignStates(obj.message.states)
-                    simulations.push(obj.message);
                     break;
                 case 'stopRecordSimulation':
-                    const simulation = simulations.find(sim => sim.id === obj.message.id);
-                    if (simulation) {
-                        simulations.splice(simulations.findIndex(sim => sim.id === obj.message.id), 1);
-                        simulation.states.forEach(state => {
-                            if (simulations.find(sim => sim.states.includes(state))) {
-                                return;
-                            }
-                            adapter.unsubscribeForeignStates(state);
-                        });
-                    }
-                    adapter.setForeignState(obj.message.id, 'stop');
+                    stopRecordSimulation(obj.message.id);
+                    break;
+                case 'pauseRecordSimulation':
+                    adapter.setForeignState(obj.message.id, 'pause');
+                    break;
+                case 'resumeRecordSimulation':
+                    adapter.setForeignState(obj.message.id, 'record');
                     break;
                 case 'playSimulation': {
                         adapter.setForeignState(obj.message.id, 'play');
@@ -584,6 +604,14 @@ async function main() {
             adapter.log.error(`Cannot read custom config: ${e}`);
         }
     }
+
+    setInterval(() => {
+        simulations.forEach(simulation => {
+            if (simulation.end < Date.now()) {
+                stopRecordSimulation(simulation.id);
+            }
+        });
+    }, 60 * 1000);
 
     await afterMain();
 }

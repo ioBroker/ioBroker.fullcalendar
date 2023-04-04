@@ -111,14 +111,6 @@ const PlaySimulationDialog = props => {
         </DialogContent>
         <DialogActions>
             <Button
-                onClick={props.onClose}
-                variant="contained"
-                color="grey"
-                startIcon={<Cancel />}
-            >
-                {I18n.t('Cancel')}
-            </Button>
-            <Button
                 onClick={() => {
                     props.playSimulation(props.simulation._id, playSimulation);
                     props.onClose();
@@ -128,6 +120,14 @@ const PlaySimulationDialog = props => {
                 startIcon={<PlayCircle />}
             >
                 {I18n.t('Play')}
+            </Button>
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
             </Button>
         </DialogActions>
     </Dialog>;

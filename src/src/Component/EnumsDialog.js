@@ -6,6 +6,7 @@ import {
     AccordionDetails,
     AccordionSummary,
     Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper,
+    Chip,
 } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
@@ -24,14 +25,15 @@ const style = {
     },
     content: {
         paddingRight: 20,
-    }
-}
+    },
+};
 
 const EnumsDialog = props => {
     const [enumsTree, setEnumsTree] = useState({
         items: {},
     });
     const [selectedEnums, setSelectedEnums] = useState([]);
+    const [selectedStates, setSelectedStates] = useState([]);
     useEffect(() => {
         (async () => {
             const objects = await props.socket.getObjectViewCustom(
@@ -60,6 +62,21 @@ const EnumsDialog = props => {
             setSelectedEnums(props.selectedEnums || []);
         })();
     }, [props.open]);
+    useEffect(() => {
+        (async () => {
+            const states = (await Promise.all(selectedEnums.map(id => props.socket.getObject(id)))).map(e => e.common.members);
+            let intersection = [];
+            states.forEach((s, i) => {
+                if (intersection.length || i) {
+                    intersection = intersection.filter(i => s.includes(i));
+                } else {
+                    intersection = s;
+                }
+                console.log(intersection);
+            });
+            setSelectedStates(intersection.filter((v, i, a) => a.indexOf(v) === i));
+        })();
+    }, [selectedEnums]);
     const renderEnums = tree => {
         if (tree.object && !Object.values(tree.items).length) {
             return <MenuItem
@@ -100,16 +117,9 @@ const EnumsDialog = props => {
             <Paper className={props.classes.content}>
                 {enumsTree.items?.enum && Object.keys(enumsTree.items.enum.items).map(id => renderEnums(enumsTree.items.enum.items[id], id))}
             </Paper>
+            {selectedStates.map(id => <Chip key={id} label={id} />)}
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={props.onClose}
-                variant="contained"
-                color="grey"
-                startIcon={<Cancel />}
-            >
-                {I18n.t('Cancel')}
-            </Button>
             <Button
                 onClick={() => {
                     props.onSelect(selectedEnums);
@@ -120,6 +130,14 @@ const EnumsDialog = props => {
                 startIcon={<Check />}
             >
                 {I18n.t('Ok')}
+            </Button>
+            <Button
+                onClick={props.onClose}
+                variant="contained"
+                color="grey"
+                startIcon={<Cancel />}
+            >
+                {I18n.t('Cancel')}
             </Button>
         </DialogActions>
     </Dialog>;

@@ -100,6 +100,7 @@ const CalendarContainer = props => {
     }, [props.calendarPrefix, props.isSimulation, props.simulationId, props.simulations]);
 
     return <>
+        {props.button}
         <Calendar
             systemConfig={props.systemConfig}
             events={events || []}
@@ -138,6 +139,7 @@ CalendarContainer.propTypes = {
     refreshSimulations: PropTypes.func,
     readOnly: PropTypes.bool,
     adapterConfig: PropTypes.object,
+    button: PropTypes.any,
 };
 
 export default CalendarContainer;

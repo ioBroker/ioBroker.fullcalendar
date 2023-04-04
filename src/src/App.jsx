@@ -2,10 +2,8 @@ import React from 'react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
 import GenericApp from '@iobroker/adapter-react-v5/GenericApp';
-import { I18n, Loader } from '@iobroker/adapter-react-v5';
+import { Loader } from '@iobroker/adapter-react-v5';
 
-import Calendar from './Component/Calendar';
-import CalendarContainer from './Component/CalendarContainer';
 import CalendarManager from './Component/CalendarManager';
 
 class App extends GenericApp {
