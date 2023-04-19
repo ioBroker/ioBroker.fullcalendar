@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { I18n } from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import {
-    IconButton, Tab, Tabs, Paper, AppBar, Toolbar,
+    IconButton, Tab, Tabs, Paper, AppBar, Toolbar, Fab,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { Add, Edit } from '@mui/icons-material';
@@ -11,7 +11,7 @@ import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog from './CalendarDialog';
 
-const style = {
+const style = theme => ({
     tabs: {
     },
     column: {
@@ -26,7 +26,10 @@ const style = {
     container: {
         display: 'flex', width: '100%', flex: 1,
     },
-};
+    simulations: {
+        backgroundColor: theme.palette.mode === 'dark' ? '#131b2680': '#b6d3ff80',
+    },
+});
 
 const CalendarManager = props => {
     const [calendarPrefix, setCalendarPrefix] = useState(`fullcalendar.${props.instance}`);
@@ -51,7 +54,7 @@ const CalendarManager = props => {
     return <div className={props.classes.column}>
         <Tabs value={isSimulations ? 1 : 0} onChange={() => setIsSimulations(!isSimulations)} className={props.classes.tabs}>
             <Tab label={I18n.t('Calendars')} />
-            <Tab label={I18n.t('Simulations')} />
+            <Tab label={I18n.t('Simulations')} className={props.classes.simulations} />
         </Tabs>
         {isSimulations ? <Simulations
             systemConfig={props.systemConfig}
@@ -70,8 +73,11 @@ const CalendarManager = props => {
                                 backgroundColor: theme => theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
                             }}
                         >
-                            <Toolbar>
-                                <IconButton
+                            <Toolbar variant="dense">
+                                <Fab
+                                    size="small"
+                                    title={I18n.t('Add new calendar')}
+                                    color="primary"
                                     onClick={async () => {
                                         const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
                                         await props.socket.setObject(id, {
@@ -87,7 +93,7 @@ const CalendarManager = props => {
                                     variant="contained"
                                 >
                                     <Add />
-                                </IconButton>
+                                </Fab>
                             </Toolbar>
                         </AppBar>
                         <Tabs

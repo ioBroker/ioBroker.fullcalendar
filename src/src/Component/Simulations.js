@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { I18n, Confirm } from '@iobroker/adapter-react-v5';
+import { I18n, Confirm, Utils } from '@iobroker/adapter-react-v5';
 import {
-    Button, IconButton, Tab, Tabs, Paper, AppBar, Toolbar, Tooltip,
+    Button, IconButton, Tab, Tabs, Paper, AppBar, Toolbar, Tooltip, Fab,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -10,20 +10,26 @@ import {
 } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 import moment from 'moment';
+
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
 import PlaySimulationDialog from './PlaySimulationDialog';
 
-const style = {
+const style = theme => ({
     container: {
-        display: 'flex', width: '100%', flex: 1,
+        display: 'flex',
+        width: '100%',
+        flex: 1,
     },
     tabs: {
     },
     toCalendar: {
         paddingLeft: 20,
     },
-};
+    simulations: {
+        backgroundColor: theme.palette.mode === 'dark' ? '#131b2680': '#b6d3ff80',
+    },
+});
 
 const Simulations = props => {
     const [simulations, setSimulations] = useState([]);
@@ -103,7 +109,7 @@ const Simulations = props => {
         </Button>
     </div>;
 
-    return <div className={props.classes.container}>
+    return <div className={Utils.clsx(props.classes.container, props.classes.simulations)}>
         <div>
             <SimulationDialog
                 socket={props.socket}
@@ -149,8 +155,11 @@ const Simulations = props => {
                         backgroundColor: theme => theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
                     }}
                 >
-                    <Toolbar>
-                        <IconButton
+                    <Toolbar variant="dense">
+                        <Fab
+                            color="primary"
+                            size="small"
+                            title={I18n.t('Create new simulation')}
                             onClick={async () => {
                                 const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
                                 await props.socket.setObject(id, {
@@ -181,7 +190,7 @@ const Simulations = props => {
                             variant="contained"
                         >
                             <Add />
-                        </IconButton>
+                        </Fab>
                     </Toolbar>
                 </AppBar>
                 <Tabs value={selectedSimulation} onChange={(e, value) => setSelectedSimulation(value)} orientation="vertical" className={props.classes.tabs}>

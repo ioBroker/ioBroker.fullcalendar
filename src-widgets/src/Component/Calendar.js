@@ -22,7 +22,7 @@ import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { Paper } from '@mui/material';
 
-import { Utils } from '@iobroker/adapter-react-v5';
+import { Utils, I18n } from '@iobroker/adapter-react-v5';
 
 import { RRule } from 'rrule';
 import SunCalc from 'suncalc2';
@@ -164,6 +164,17 @@ function Calendar(props) {
             textColor = dimColor(textColor);
         }
 
+        let name = event.common.name;
+        if (event.native.oid) {
+            name = `${event.common.name} → ${event.native.startValue}`;
+            if (event.native.type === 'double') {
+                name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${event.native.intervals?.[0]?.value}`;
+            }
+            if (event.native.type === 'toggle') {
+                name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
+            }
+        }
+
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
             const cronObject = cron2obj(event.native.cron);
@@ -189,7 +200,7 @@ function Calendar(props) {
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
                         extendedProps: { eventId: event._id },
-                        title: event.common.name,
+                        title: name,
                         backgroundColor,
                         textColor,
                         start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
@@ -217,7 +228,7 @@ function Calendar(props) {
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
                         extendedProps: { eventId: event._id },
-                        title: event.common.name,
+                        title: name,
                         backgroundColor,
                         textColor,
                         start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
@@ -231,7 +242,7 @@ function Calendar(props) {
             events.push({
                 // id: event._id,
                 extendedProps: { eventId: event._id },
-                title: event.common.name,
+                title: name,
                 duration: initialDuration,
                 backgroundColor,
                 textColor,
@@ -242,7 +253,7 @@ function Calendar(props) {
         events.push({
             // id: event._id,
             extendedProps: { eventId: event._id },
-            title: event.common.name,
+            title: name,
             display: 'block',
             backgroundColor,
             textColor,
@@ -337,6 +348,7 @@ function Calendar(props) {
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use ALT by dragging it to copy the events.')}</div>}
                     </div>
                 </Paper>
+                {props.button}
             </div>}
             <div className={props.classes.calendarBlock}>
                 <div className={props.classes.calendar}>
@@ -474,11 +486,18 @@ function Calendar(props) {
                             if (props.isSimulation) {
                                 delete newEvent.native.start;
                                 const cron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
-                                cron.dows = [event.event.start.getDay()];
+                                cron.dows = props.simulation.native.interval === 'day' ? [0, 1, 2, 3, 4, 5, 6] : [event.event.start.getDay()];
                                 cron.dates = ['?'];
                                 cron.months = ['*'];
                                 newEvent.native.cron = obj2cron(cron);
                                 newEvent._id = `${props.simulationId}.event-${uuidv4()}`;
+                                newEvent.native.color = props.simulation.native.defaultColor;
+                                newEvent.native.record = {
+                                    states: [],
+                                    enums: [],
+                                    start: null,
+                                    end: null,
+                                };
                             }
                             await props.setEvent(newEvent._id, newEvent);
                             props.updateEvents();
@@ -547,6 +566,7 @@ Calendar.propTypes = {
     simulationId: PropTypes.string,
     setEvent: PropTypes.func,
     adapterConfig: PropTypes.object,
+    button: PropTypes.any,
 };
 
 export default withTheme(withStyles(styles)(Calendar));
