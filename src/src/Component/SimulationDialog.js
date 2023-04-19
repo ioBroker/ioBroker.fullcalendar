@@ -37,6 +37,7 @@ const styles = {
     },
     chipLabel: {
         display: 'flex',
+        alignItems: 'center',
     },
     headers: {
         marginBottom: -5,
@@ -226,7 +227,7 @@ const SimulationDialog = props => {
                     const label = ids.reduce((prev, curr) => [prev, <span key={j++}>+</span>, curr]);
 
                     return <Chip
-                        onClick={() => setEnumsDialog(enumIds)}
+                        onClick={() => setEnumsDialog(i)}
                         onDelete={() => {
                             const _simulation = JSON.parse(JSON.stringify(simulation));
                             _simulation.native.record.enums.splice(i, 1);
@@ -299,8 +300,7 @@ const SimulationDialog = props => {
             fullWidth={false}
             title={I18n.t('Delete simulation')}
             text={I18n.t('Simulation will be deleted. Confirm?')}
- //           suppressQuestionMinutes={5}
-            dialogName="deleteConfirmDialog"
+            ok={I18n.t('Delete')}
             onClose={async isYes => {
                 if (isYes) {
                     try {
@@ -337,13 +337,17 @@ const SimulationDialog = props => {
             socket={props.socket}
             enumsObjects={enumsObjects}
             instance={props.instance}
-            open={!!enumsDialog}
-            selectedEnums={typeof enumsDialog === 'object' ? enumsDialog : []}
+            open={enumsDialog !== false}
+            selectedEnums={typeof enumsDialog === 'number' ? simulation.native.record.enums[enumsDialog] : []}
             onSelect={ids => {
                 const _simulation = JSON.parse(JSON.stringify(simulation));
                 _simulation.native.record = _simulation.native.record || { enums: [], states: [] };
                 _simulation.native.record.enums = _simulation.native.record.enums || [];
-                _simulation.native.record.enums.push(ids);
+                if (typeof enumsDialog === 'number') {
+                    _simulation.native.record.enums[enumsDialog] = ids;
+                } else {
+                    _simulation.native.record.enums.push(ids);
+                }
                 setSimulation(_simulation);
                 setEnumsDialog(false);
             }}

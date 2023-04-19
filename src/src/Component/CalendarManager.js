@@ -57,10 +57,11 @@ const style = theme => ({
 });
 
 const CalendarManager = props => {
-    const [calendarPrefix, setCalendarPrefix] = useState(`fullcalendar.${props.instance}`);
+    const [calendarPrefix, setCalendarPrefix] = useState(window.localStorage.getItem('fullcalendar.calendar') || `fullcalendar.${props.instance}`);
     const [calendarDialog, setCalendarDialog] = useState(null);
     const [calendars, setCalendars] = useState([]);
-    const [isSimulations, setIsSimulations] = useState(false);
+    const [isSimulations, setIsSimulations] = useState(window.localStorage.getItem('fullcalendar.tab') === '1' ? 1 : 0);
+    const [alive, setAlive] = useState(false);
 
     const updateCalendars = async () => {
         const objects = await props.socket.getObjectViewSystem(
@@ -71,12 +72,34 @@ const CalendarManager = props => {
         setCalendars(Object.values(objects));
     };
 
+    const onAliveChanged = (id, state) => {
+        const val = (state && state.val) || false;
+        if (id === `system.adapter.fullcalendar.${props.instance}.alive` && alive !== val) {
+            setAlive(val);
+        }
+    };
+
     useEffect(() => {
-        updateCalendars();
+        updateCalendars()
+            .catch(e => console.error(e));
+
+        props.socket.getState(`system.adapter.fullcalendar.${props.instance}.alive`)
+            .then(state => setAlive((state && state.val) || false));
+
+        props.socket.subscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged);
+
+        return () => props.socket.unsubscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged);
     }, []);
 
     return <div className={props.classes.column}>
-        <Tabs value={isSimulations ? 1 : 0} onChange={() => setIsSimulations(!isSimulations)} className={props.classes.tabs}>
+        <Tabs
+            value={isSimulations ? 1 : 0}
+            onChange={() => {
+                window.localStorage.setItem('fullcalendar.tab', isSimulations ? '0' : '1');
+                setIsSimulations(!isSimulations);
+            }}
+            className={props.classes.tabs}
+        >
             <Tab label={I18n.t('Calendars')} />
             <Tab label={I18n.t('Simulations')} className={props.classes.simulations} />
         </Tabs>
@@ -87,6 +110,7 @@ const CalendarManager = props => {
             updateCalendars={updateCalendars}
             setIsSimulations={setIsSimulations}
             setCalendarPrefix={setCalendarPrefix}
+            alive={alive}
         /> :
             <div className={props.classes.container}>
                 <div className={props.classes.calendars}>
@@ -107,6 +131,8 @@ const CalendarManager = props => {
                                     });
                                     await updateCalendars();
                                     setCalendarPrefix(id);
+                                    window.localStorage.setItem('fullcalendar.calendar', id);
+                                    setTimeout(() => setCalendarDialog(id), 300);
                                 }}
                                 variant="contained"
                             >
@@ -115,7 +141,10 @@ const CalendarManager = props => {
                         </Toolbar>
                         <Tabs
                             value={calendarPrefix}
-                            onChange={(e, value) => setCalendarPrefix(value)}
+                            onChange={(e, value) => {
+                                window.localStorage.setItem('fullcalendar.calendar', value);
+                                setCalendarPrefix(value);
+                            }}
                             className={props.classes.tabs}
                             orientation="vertical"
                         >

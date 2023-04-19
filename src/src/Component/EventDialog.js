@@ -582,6 +582,7 @@ const EventDialog = props => {
             text={props.t('Event will be deleted. Confirm?')}
             suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
+            ok={I18n.t('Delete')}
             onClose={async isYes => {
                 if (isYes) {
                     try {

@@ -40,8 +40,7 @@ class App extends GenericApp {
         (async () => {
             const adapterConfig = await this.socket.getObject(`system.adapter.fullcalendar.${this.instance}`);
             this.setState({ adapterConfig: adapterConfig.native });
-        }
-        )();
+        })();
     }
 
     render() {
@@ -61,10 +60,8 @@ class App extends GenericApp {
                         socket={this.socket}
                         instance={this.instance}
                         adapterConfig={this.state.adapterConfig}
+                        alive={this.state.alive}
                     />
-                    {/* <pre>
-                        {JSON.stringify(this.state.events, null, 2)}
-                    </pre> */}
                 </div>
             </ThemeProvider>
         </StyledEngineProvider>;

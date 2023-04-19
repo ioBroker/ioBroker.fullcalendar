@@ -76,8 +76,7 @@ const CalendarDialog = props => {
             fullWidth={false}
             title={I18n.t('Delete calendar')}
             text={I18n.t('Calendar will be deleted. Confirm?')}
-            // suppressQuestionMinutes={5}
-            dialogName="deleteConfirmDialog"
+            ok={I18n.t('Delete')}
             onClose={async isYes => {
                 if (isYes) {
                     try {
