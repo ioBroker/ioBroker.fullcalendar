@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { I18n, Confirm, Utils } from '@iobroker/adapter-react-v5';
 import {
-    Button, IconButton, Tab, Tabs, Paper, AppBar, Toolbar, Tooltip, Fab,
+    Button, IconButton, Tab, Tabs, Paper, Toolbar, Tooltip, Fab,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -21,20 +21,44 @@ const style = theme => ({
         width: '100%',
         flex: 1,
     },
-    tabs: {
-    },
+    tabs: {},
     toCalendar: {
         paddingLeft: 20,
     },
+    calendarsPaper: {
+        minHeight: '100%',
+    },
+    label: {
+        width: '100%',
+        textAlign: 'left',
+        display: 'flex',
+        alignItems: 'center',
+        '& .edit': {
+            opacity: 0,
+        },
+        '&:hover .edit': {
+            opacity: 1,
+        },
+    },
+    divider: {
+        flexGrow: 1,
+    },
+    toolbar: {
+        backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+        padding: '2px 5px',
+    },
     simulations: {
-        backgroundColor: theme.palette.mode === 'dark' ? '#131b2680': '#b6d3ff80',
+        backgroundColor: theme.palette.mode === 'dark' ? '#131b2680' : '#b6d3ff80',
+    },
+    tabRoot: {
+        padding: '0 6px',
     },
 });
 
 const Simulations = props => {
     const [simulations, setSimulations] = useState([]);
     const [simulationStates, setSimulationStates] = useState({});
-    const [selectedSimulation, setSelectedSimulation] = useState(null);
+    const [selectedSimulation, setSelectedSimulation] = useState(window.localStorage.getItem('fullcalendar.selectedSimulation') || null);
     const [recordDialog, setRecordDialog] = useState(false);
     const [dialogSimulation, setDialogSimulation] = useState(null);
     const [dialogSimulationPlay, setDialogSimulationPlay] = useState(null);
@@ -44,8 +68,7 @@ const Simulations = props => {
         }
     };
     const refreshSimulations = async () => {
-        const objects = await props.socket.getObjectViewCustom(
-            'system',
+        const objects = await props.socket.getObjectViewSystem(
             'state',
             `fullcalendar.${props.instance}.Simulations.`,
             `fullcalendar.${props.instance}.Simulations.\u9999`,
@@ -62,7 +85,8 @@ const Simulations = props => {
         setSimulationStates(_simulationStates);
     };
     useEffect(() => {
-        refreshSimulations();
+        refreshSimulations()
+            .catch(() => {}); // ignore errors
     }, []);
     useEffect(() => {
         if (!selectedSimulation) {
@@ -130,9 +154,10 @@ const Simulations = props => {
                 onClose={() => setDialogSimulationPlay(null)}
             />
             {recordDialog && <Confirm
+                fullWidth={false}
                 title={I18n.t('Delete record')}
                 text={I18n.t('Do you want to delete previously recorded events?')}
-                suppressQuestionMinutes={5}
+                // suppressQuestionMinutes={5}
                 dialogName="deleteRecordConfirmDialog"
                 onClose={async isYes => {
                     if (isYes) {
@@ -148,143 +173,158 @@ const Simulations = props => {
                     setRecordDialog(false);
                 }}
             />}
-            <Paper>
-                <AppBar
-                    position="relative"
-                    sx={{
-                        backgroundColor: theme => theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+            <Paper className={props.classes.calendarsPaper}>
+                <Toolbar variant="dense" className={props.classes.toolbar}>
+                    <Fab
+                        color="primary"
+                        size="small"
+                        title={I18n.t('Create new simulation')}
+                        onClick={async () => {
+                            const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
+                            await props.socket.setObject(id, {
+                                common: {
+                                    name: 'New simulation',
+                                    role: 'state',
+                                    type: 'string',
+                                },
+                                native: {
+                                    events: [],
+                                    interval: 'day',
+                                    defaultColor: '#3A87AD',
+                                    record: {
+                                        states: [],
+                                        enums: [],
+                                        start: null,
+                                        end: null,
+                                    },
+                                },
+                                type: 'state',
+                            });
+                            await props.socket.setState(id, 'stop');
+                            // props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', id);
+                            await refreshSimulations();
+                            setSelectedSimulation(id);
+                        }}
+                        variant="contained"
+                    >
+                        <Add />
+                    </Fab>
+                </Toolbar>
+                <Tabs
+                    value={selectedSimulation || simulations[0]?._id}
+                    onChange={(e, value) => {
+                        window.localStorage.setItem('fullcalendar.selectedSimulation', value);
+                        setSelectedSimulation(value);
                     }}
+                    orientation="vertical"
+                    className={props.classes.tabs}
                 >
-                    <Toolbar variant="dense">
-                        <Fab
-                            color="primary"
-                            size="small"
-                            title={I18n.t('Create new simulation')}
-                            onClick={async () => {
-                                const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
-                                await props.socket.setObject(id, {
-                                    common: {
-                                        name: 'New simulation',
-                                        role: 'state',
-                                        type: 'string',
-                                    },
-                                    native: {
-                                        events: [
-                                        ],
-                                        interval: 'day',
-                                        defaultColor: '#3A87AD',
-                                        record: {
-                                            states: [],
-                                            enums: [],
-                                            start: null,
-                                            end: null,
-                                        },
-                                    },
-                                    type: 'state',
-                                });
-                                await props.socket.setState(id, 'stop');
-                                // props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', id);
-                                await refreshSimulations();
-                                setSelectedSimulation(id);
-                            }}
-                            variant="contained"
-                        >
-                            <Add />
-                        </Fab>
-                    </Toolbar>
-                </AppBar>
-                <Tabs value={selectedSimulation} onChange={(e, value) => setSelectedSimulation(value)} orientation="vertical" className={props.classes.tabs}>
                     {simulations.map(simulation => <Tab
+                        classes={{ root: props.classes.tabRoot }}
                         component="div"
                         value={simulation._id}
                         label={
-                            <div style={{ width: '100%', textAlign: 'left' }}>
+                            <div className={props.classes.label}>
                                 {simulation.common.name}
-                                <IconButton
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        setDialogSimulation(simulation._id);
-                                    }}
-                                    size="small"
-                                >
-                                    <Edit />
-                                </IconButton>
-                                {['record', 'stop'].includes(simulationStates[simulation._id]) &&
-                                <Tooltip title={simulationStates[simulation._id] === 'stop' ?
-                                    false :
-                                    `${I18n.t('Till')} ${moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss')}`}
-                                >
+                                <div className={props.classes.divider} />
+                                <Tooltip title={I18n.t('Edit name and settings')}>
                                     <IconButton
-                                        onClick={async e => {
+                                        className="edit"
+                                        onClick={e => {
                                             e.stopPropagation();
-                                            if (simulationStates[simulation._id] === 'record') {
+                                            setDialogSimulation(simulation._id);
+                                        }}
+                                        size="small"
+                                    >
+                                        <Edit />
+                                    </IconButton>
+                                </Tooltip>
+                                {['stop', 'play'].includes(simulationStates[simulation._id]) &&
+                                    simulation.native.events.length > 0 &&
+                                    <Tooltip title={simulationStates[simulation._id] === 'play' ? I18n.t('Stop recording') : I18n.t('Play recording')}>
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                if (simulationStates[simulation._id] === 'play') {
+                                                    props.socket.sendTo(
+                                                        `fullcalendar.${props.instance}`,
+                                                        'stopPlaySimulation',
+                                                        {
+                                                            id: simulation._id,
+                                                        },
+                                                    );
+                                                    await refreshSimulations();
+                                                } else {
+                                                    setDialogSimulationPlay(simulation._id);
+                                                }
+                                            }}
+                                            size="small"
+                                        >
+                                            <PlayCircle
+                                                style={{
+                                                    color: simulationStates[simulation._id] === 'play' ? 'green' : undefined,
+                                                }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>}
+                                {['record', 'stop'].includes(simulationStates[simulation._id]) &&
+                                    <Tooltip title={simulationStates[simulation._id] === 'stop' ?
+                                        I18n.t('Start recording') :
+                                        I18n.t('Till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}
+                                    >
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                if (simulationStates[simulation._id] === 'record') {
+                                                    props.socket.sendTo(
+                                                        `fullcalendar.${props.instance}`,
+                                                        'stopRecordSimulation',
+                                                        {
+                                                            id: simulation._id,
+                                                        },
+                                                    );
+                                                    props.socket.unsubscribeObject(simulation._id, refreshSimulations);
+                                                    await refreshSimulations();
+                                                } else if (simulation.native.events.length) {
+                                                    setRecordDialog(simulation._id);
+                                                } else {
+                                                    recordSimulation(simulation._id);
+                                                }
+                                            }}
+                                            size="small"
+                                        >
+                                            <FiberManualRecord
+                                                style={{
+                                                    color: simulationStates[simulation._id] === 'record' ? 'red' : undefined,
+                                                }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>}
+                                {['record', 'pause'].includes(simulationStates[simulation._id]) &&
+                                    <Tooltip title={simulationStates[simulation._id] === 'record' ?
+                                        I18n.t('Pause recording') :
+                                        I18n.t('Resume recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}
+                                    >
+                                        <IconButton
+                                            onClick={e => {
+                                                e.stopPropagation();
                                                 props.socket.sendTo(
                                                     `fullcalendar.${props.instance}`,
-                                                    'stopRecordSimulation',
+                                                    simulationStates[simulation._id] === 'record' ? 'pauseRecordSimulation' : 'resumeRecordSimulation',
                                                     {
                                                         id: simulation._id,
                                                     },
                                                 );
-                                                props.socket.unsubscribeObject(simulation._id, refreshSimulations);
-                                                refreshSimulations();
-                                            } else if (simulation.native.events.length) {
-                                                setRecordDialog(simulation._id);
-                                            } else {
-                                                recordSimulation(simulation._id);
-                                            }
-                                        }}
-                                        size="small"
-                                    >
-                                        <FiberManualRecord style={{
-                                            color: simulationStates[simulation._id] === 'record' ? 'red' : undefined,
-                                        }}
-                                        />
-                                    </IconButton>
-                                </Tooltip>}
-                                {['record', 'pause'].includes(simulationStates[simulation._id]) &&
-                            <IconButton
-                                onClick={async e => {
-                                    e.stopPropagation();
-                                    props.socket.sendTo(
-                                        `fullcalendar.${props.instance}`,
-                                        simulationStates[simulation._id] === 'record' ? 'pauseRecordSimulation' : 'resumeRecordSimulation',
-                                        {
-                                            id: simulation._id,
-                                        },
-                                    );
-                                }}
-                                size="small"
-                            >
-                                <Pause style={{
-                                    color: simulationStates[simulation._id] === 'pause' ? 'yellow' : undefined,
-                                }}
-                                />
-                            </IconButton>}
-                                {['stop', 'play'].includes(simulationStates[simulation._id]) &&
-                            simulation.native.events.length > 0 &&
-                            <IconButton
-                                onClick={async e => {
-                                    e.stopPropagation();
-                                    if (simulationStates[simulation._id] === 'play') {
-                                        props.socket.sendTo(
-                                            `fullcalendar.${props.instance}`,
-                                            'stopPlaySimulation',
-                                            {
-                                                id: simulation._id,
-                                            },
-                                        );
-                                        refreshSimulations();
-                                    } else {
-                                        setDialogSimulationPlay(simulation._id);
-                                    }
-                                }}
-                                size="small"
-                            >
-                                <PlayCircle style={{
-                                    color: simulationStates[simulation._id] === 'play' ? 'green' : undefined,
-                                }}
-                                />
-                            </IconButton>}
+                                            }}
+                                            size="small"
+                                        >
+                                            <Pause
+                                                style={{
+                                                    color: simulationStates[simulation._id] === 'pause' ? 'yellow' : undefined,
+                                                }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>}
                             </div>
                         }
                         key={simulation._id}
@@ -299,7 +339,6 @@ const Simulations = props => {
                 flex: 1,
             }}
         >
-
             <CalendarContainer
                 systemConfig={props.systemConfig}
                 socket={props.socket}

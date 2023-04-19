@@ -137,10 +137,12 @@ function Calendar(props) {
     let initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) && false ?
         new Date(parseInt(window.localStorage.getItem(`${storageName}Start`), 10)) :
         new Date();
+
     let initialView = props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth';
+
     if (props.isSimulation) {
         initialDate = new Date();
-        initialView = props.simulation.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek';
+        initialView = props.simulation?.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek';
     }
 
     let _eventTypes = eventTypes;

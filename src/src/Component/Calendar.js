@@ -140,7 +140,7 @@ function Calendar(props) {
     let initialView = props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth';
     if (props.isSimulation) {
         initialDate = new Date();
-        initialView = props.simulation.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek';
+        initialView = props.simulation?.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek';
     }
 
     let _eventTypes = eventTypes;
@@ -166,9 +166,18 @@ function Calendar(props) {
 
         let name = event.common.name;
         if (event.native.oid) {
-            name = `${event.common.name} → ${event.native.startValue}`;
+            let startValue = event.native.startValue;
+            if (typeof startValue === 'boolean') {
+                startValue = startValue ? I18n.t('ON') : I18n.t('OFF');
+            }
+            let endValue = event.native.intervals?.[0]?.value;
+            if (typeof endValue === 'boolean') {
+                endValue = endValue ? I18n.t('ON') : I18n.t('OFF');
+            }
+
+            name = `${event.common.name} → ${startValue}`;
             if (event.native.type === 'double') {
-                name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${event.native.intervals?.[0]?.value}`;
+                name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${endValue}`;
             }
             if (event.native.type === 'toggle') {
                 name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
@@ -293,9 +302,13 @@ function Calendar(props) {
     useEffect(() => {
         if (props.isSimulation) {
             const calendar = ref.current?.getApi();
-            calendar.changeView(props.simulation.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek', new Date());
+            calendar?.changeView(props.simulation?.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek', new Date());
         }
     }, [props.simulations, props.simulationId]);
+
+    if (props.isSimulation && !props.simulation) {
+        return null;
+    }
 
     return <>
         <style>
@@ -556,7 +569,7 @@ Calendar.propTypes = {
     hideWeekends: PropTypes.bool,
     viewMode: PropTypes.bool,
     updateEvents: PropTypes.func,
-    instance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    // instance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     t: PropTypes.func.isRequired,
     widget: PropTypes.bool,
     language: PropTypes.string.isRequired,

@@ -19,12 +19,14 @@ const styles = {
 const CalendarDialog = props => {
     const [calendar, setCalendar] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState(false);
+
     useEffect(() => {
         setCalendar(props.calendar);
     }, [props.open]);
+
     if (!calendar) return null;
     return <Dialog open={props.open} onClose={props.onClose}>
-        <DialogTitle>{I18n.t('Edit calendar')}</DialogTitle>
+        <DialogTitle>{I18n.t('Edit calendar name')}</DialogTitle>
         <DialogContent>
             <div className={props.classes.field}>
                 <TextField
@@ -49,6 +51,7 @@ const CalendarDialog = props => {
                 {I18n.t('Delete')}
             </Button>
             <Button
+                disabled={!calendar || !props.calendar || !calendar.common.name || calendar.common.name === props.calendar.common.name}
                 onClick={async () => {
                     await props.socket.setObject(calendar._id, calendar);
                     await props.updateCalendars();
@@ -70,9 +73,10 @@ const CalendarDialog = props => {
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm
+            fullWidth={false}
             title={I18n.t('Delete calendar')}
             text={I18n.t('Calendar will be deleted. Confirm?')}
-            suppressQuestionMinutes={5}
+            // suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
             onClose={async isYes => {
                 if (isYes) {

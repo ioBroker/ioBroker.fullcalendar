@@ -148,6 +148,10 @@ const EventDialog = props => {
             return null;
         }
         if (object.common.type === 'boolean') {
+            if (field === 'startValue' && typeof event.native[field] !== 'boolean') {
+                setTimeout(() => changeEvent(newEvent => newEvent.native[field] = !!newEvent.native[field]), 100);
+            }
+
             return <FormControlLabel
                 className={props.classes.narrowText2}
                 control={<Checkbox
@@ -188,6 +192,10 @@ const EventDialog = props => {
             return null;
         }
         if (object.common.type === 'boolean') {
+            if (typeof endValue !== 'boolean') {
+                setTimeout(() => setEndValue(!!endValue), 100);
+            }
+
             return <FormControlLabel
                 className={props.classes.narrowText2}
                 control={<Checkbox
@@ -569,6 +577,7 @@ const EventDialog = props => {
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm
+            fullWidth={false}
             title={props.t('Delete event')}
             text={props.t('Event will be deleted. Confirm?')}
             suppressQuestionMinutes={5}

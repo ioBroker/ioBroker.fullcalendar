@@ -1,17 +1,21 @@
-import {
-    Confirm, I18n, ColorPicker, SelectID,
-} from '@iobroker/adapter-react-v5';
-import {
-    Cancel, Delete, Save, Add,
-} from '@mui/icons-material';
+import { withStyles } from '@mui/styles';
+import { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
+
 import {
     Button,
     Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField,
     IconButton, Chip,
 } from '@mui/material';
-import { withStyles } from '@mui/styles';
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+
+import {
+    Cancel, Delete, Save, Add,
+} from '@mui/icons-material';
+
+import {
+    Confirm, I18n, ColorPicker, SelectID, TextWithIcon,
+} from '@iobroker/adapter-react-v5';
+
 import { cron2obj, obj2cron } from './Utils';
 import EnumsDialog from './EnumsDialog';
 
@@ -24,6 +28,19 @@ const styles = {
     chip: {
         margin: 2,
     },
+    chipSubText: {
+        fontSize: 10,
+        opacity: 0.5,
+        fontStyle: 'italic',
+        marginTop: -4,
+        paddingLeft: 4,
+    },
+    chipLabel: {
+        display: 'flex',
+    },
+    headers: {
+        marginBottom: -5,
+    },
 };
 
 const SimulationDialog = props => {
@@ -32,32 +49,102 @@ const SimulationDialog = props => {
     const [idDialog, setIdDialog] = useState(false);
     const [enumsDialog, setEnumsDialog] = useState(false);
     const [enumStates, setEnumStates] = useState([]);
+    const [enumsObjects, setEnumsObjects] = useState({});
+    const [statesObjects, setStatesObjects] = useState({});
+    const timer = useRef(null);
+
     useEffect(() => {
-        setSimulation(props.simulation);
-        setEnumStates([]);
+        if (props.open) {
+            setSimulation(props.simulation);
+            setEnumStates([]);
+            if (!Object.keys(enumsObjects).length) {
+                // request enums
+                props.socket.getEnums()
+                    .then(_enums => setEnumsObjects(_enums));
+            }
+        } else {
+            setSimulation(null);
+            timer.current && clearTimeout(timer.current);
+            timer.current = null;
+        }
     }, [props.open]);
+
     useEffect(() => {
-        if (!simulation) return;
+        if (!simulation) {
+            return;
+        }
+
         (async () => {
             const _states = [];
+
             console.log(simulation.native.record.enums);
-            for (const k in simulation.native.record.enums) {
-                const _enumStates = (await Promise.all(simulation.native.record.enums[k].map(id => props.socket.getObject(id)))).map(e => e.common.members);
+            const _enums = simulation.native.record.enums || [];
+
+            let objEnums = enumsObjects;
+            if (!Object.keys(objEnums).length) {
+                // request enums
+                objEnums = await props.socket.getEnums();
+                setEnumsObjects(objEnums);
+            }
+
+            for (const k in _enums) {
+                const _enumStates = _enums[k].map(id => objEnums[id]?.common?.members).filter(v => v);
                 let intersection = [];
                 _enumStates.forEach((s, i) => {
                     if (intersection.length || i) {
-                        intersection = intersection.filter(i => s.includes(i));
+                        intersection = intersection.filter(j => s.includes(j));
                     } else {
                         intersection = s;
                     }
-                    console.log(intersection);
                 });
                 _states.push(...intersection);
             }
-            setEnumStates(_states.filter((v, i, a) => a.indexOf(v) === i));
+
+            const _enumStates = _states.filter((v, i, a) => a.indexOf(v) === i);
+            simulation?.native.record?.states.forEach(id => !_enumStates.includes(id) && _enumStates.push(id));
+
+            setEnumStates(_enumStates);
         })();
-    }, [simulation?.native.record.enums]);
-    if (!simulation) return null;
+    }, [simulation?.native.record?.enums, simulation?.native.record?.states]);
+
+    const requestStates = () => {
+        timer.current && clearTimeout(timer.current);
+        timer.current = setTimeout(async () => {
+            timer.current = null;
+            const _statesObjects = JSON.parse(JSON.stringify(statesObjects));
+            for (let i = 0; i < enumStates.length; i++) {
+                if (!_statesObjects[enumStates[i]]) {
+                    try {
+                        _statesObjects[enumStates[i]] = await props.socket.getObject(enumStates[i]);
+                    } catch (e) {
+                        console.error(`Cannot get object for ${enumStates[i]}: ${e}`);
+                    }
+                    _statesObjects[enumStates[i]] = _statesObjects[enumStates[i]] || null;
+                }
+            }
+
+            setStatesObjects(_statesObjects);
+        }, 300);
+    };
+
+    const getStateChip = (id, onDelete) => {
+        const label = <div>
+            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} />
+            <div className={props.classes.chipSubText}>{id}</div>
+        </div>;
+
+        return <Chip
+            onDelete={onDelete}
+            label={label}
+            key={id}
+            className={props.classes.chip}
+        />;
+    };
+
+    if (!simulation) {
+        return null;
+    }
+
     return <Dialog open={props.open} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Edit simulation')}</DialogTitle>
         <DialogContent>
@@ -105,9 +192,10 @@ const SimulationDialog = props => {
                     }}
                 />
             </div>
-            <h4>
+            <h4 className={props.classes.headers}>
                 {I18n.t('States')}
                 <IconButton
+                    size="small"
                     onClick={() => setIdDialog(true)}
                     color="primary"
                 >
@@ -115,20 +203,16 @@ const SimulationDialog = props => {
                 </IconButton>
             </h4>
             <div>
-                {simulation.native.record.states.map((state, i) => <Chip
-                    onDelete={() => {
-                        const _simulation = JSON.parse(JSON.stringify(simulation));
-                        _simulation.native.record.states.splice(i, 1);
-                        setSimulation(_simulation);
-                    }}
-                    label={state}
-                    key={i}
-                    className={props.classes.chip}
-                />)}
+                {simulation.native.record?.states.map((state, i) => getStateChip(state, () => {
+                    const _simulation = JSON.parse(JSON.stringify(simulation));
+                    _simulation.native.record.states.splice(i, 1);
+                    setSimulation(_simulation);
+                }))}
             </div>
-            <h4>
+            <h4 className={props.classes.headers}>
                 {I18n.t('Enums')}
                 <IconButton
+                    size="small"
                     onClick={() => setEnumsDialog(true)}
                     color="primary"
                 >
@@ -136,26 +220,35 @@ const SimulationDialog = props => {
                 </IconButton>
             </h4>
             <div>
-                {simulation.native.record.enums.map((enumIds, i) => <Chip
-                    onDelete={() => {
-                        const _simulation = JSON.parse(JSON.stringify(simulation));
-                        _simulation.native.record.enums.splice(i, 1);
-                        setSimulation(_simulation);
-                    }}
-                    label={enumIds.join(' + ')}
-                    key={i}
-                    className={props.classes.chip}
-                />)}
+                {simulation.native.record?.enums.map((enumIds, i) => {
+                    const ids = enumIds.map(id => <TextWithIcon key={id} value={enumsObjects[id] || id} lang={I18n.getLanguage()} />);
+                    let j = 1;
+                    const label = ids.reduce((prev, curr) => [prev, <span key={j++}>+</span>, curr]);
+
+                    return <Chip
+                        onClick={() => setEnumsDialog(enumIds)}
+                        onDelete={() => {
+                            const _simulation = JSON.parse(JSON.stringify(simulation));
+                            _simulation.native.record.enums.splice(i, 1);
+                            setSimulation(_simulation);
+                        }}
+                        label={label}
+                        key={i}
+                        classes={{ label: props.classes.chipLabel }}
+                        className={props.classes.chip}
+                    />;
+                })}
             </div>
-            <h4>{I18n.t('States from enums')}</h4>
+            <h4 style={{ marginBottom: -0 }}>{I18n.t('Recorded states')}</h4>
             <div>
-                {enumStates.map((state, i) => <Chip
-                    label={state}
-                    key={i}
-                    className={props.classes.chip}
-                />)}
+                {enumStates.map(state => {
+                    if (statesObjects[state] === undefined && !timer.current) {
+                        requestStates();
+                    }
+
+                    return getStateChip(state);
+                })}
             </div>
-            {/* <pre>{JSON.stringify(simulation, null, 2)}</pre> */}
         </DialogContent>
         <DialogActions>
             <Button
@@ -167,6 +260,7 @@ const SimulationDialog = props => {
                 {I18n.t('Delete')}
             </Button>
             <Button
+                disabled={!props.simulation || !simulation || JSON.stringify(simulation.native) === JSON.stringify(props.simulation.native)}
                 onClick={async () => {
                     const _simulation = JSON.parse(JSON.stringify(simulation));
                     if (_simulation.native.interval !== props.simulation.native.interval) {
@@ -202,9 +296,10 @@ const SimulationDialog = props => {
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm
+            fullWidth={false}
             title={I18n.t('Delete simulation')}
             text={I18n.t('Simulation will be deleted. Confirm?')}
-            suppressQuestionMinutes={5}
+ //           suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
             onClose={async isYes => {
                 if (isYes) {
@@ -229,6 +324,8 @@ const SimulationDialog = props => {
             selected={simulation.native.record.states}
             onOk={ids => {
                 const _simulation = JSON.parse(JSON.stringify(simulation));
+                _simulation.native.record = _simulation.native.record || { enums: [], states: [] };
+                _simulation.native.record.states = _simulation.native.record.states || [];
                 _simulation.native.record.states = ids;
                 setSimulation(_simulation);
                 setIdDialog(false);
@@ -238,11 +335,14 @@ const SimulationDialog = props => {
         />}
         <EnumsDialog
             socket={props.socket}
+            enumsObjects={enumsObjects}
             instance={props.instance}
-            open={enumsDialog}
-            selectedEnums={[]}
+            open={!!enumsDialog}
+            selectedEnums={typeof enumsDialog === 'object' ? enumsDialog : []}
             onSelect={ids => {
                 const _simulation = JSON.parse(JSON.stringify(simulation));
+                _simulation.native.record = _simulation.native.record || { enums: [], states: [] };
+                _simulation.native.record.enums = _simulation.native.record.enums || [];
                 _simulation.native.record.enums.push(ids);
                 setSimulation(_simulation);
                 setEnumsDialog(false);
