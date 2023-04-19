@@ -2,11 +2,22 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { I18n, Confirm, Utils } from '@iobroker/adapter-react-v5';
 import {
-    Button, IconButton, Tab, Tabs, Paper, Toolbar, Tooltip, Fab,
+    Button,
+    IconButton,
+    Tab,
+    Tabs,
+    Paper,
+    Toolbar,
+    Tooltip,
+    Fab,
+    DialogActions,
+    DialogContentText,
+    DialogContent,
+    Dialog, DialogTitle,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import {
-    Edit, FiberManualRecord, PlayCircle, Pause, Add,
+    Edit, FiberManualRecord, Pause, Add, PlayArrow, Delete, Check,
 } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 import moment from 'moment';
@@ -63,48 +74,96 @@ const Simulations = props => {
     const [stopRecordDialog, setStopRecordDialog] = useState(false);
     const [dialogSimulation, setDialogSimulation] = useState(null);
     const [dialogSimulationPlay, setDialogSimulationPlay] = useState(null);
+
     const updateState = async (id, state) => {
         if (state) {
             setSimulationStates(_simulationStates => ({ ..._simulationStates, ...{ [id]: state.val } }));
         }
     };
-    const refreshSimulations = async () => {
+
+    const updateObject = async (/* id, obj */) => {
+        /*
+        const _simulations = JSON.parse(JSON.stringify(simulations));
+        const pos = _simulations.findIndex(s => s._id === id);
+
+        if (pos === -1) {
+            if (!obj) {
+                return;
+            }
+            _simulations.push(obj);
+        } else if (!obj) {
+            _simulations.splice(pos, 1);
+        } else {
+            _simulations[pos] = obj;
+        }
+
+        setSimulations(_simulations);
+        */
         const objects = await props.socket.getObjectViewSystem(
             'state',
             `fullcalendar.${props.instance}.Simulations.`,
             `fullcalendar.${props.instance}.Simulations.\u9999`,
         );
-        for (const k in simulations) {
-            props.socket.unsubscribeState(simulations[k]._id, updateState);
-        }
+
+        const _simulations = Object.values(objects);
+        _simulations.sort((a, b) => a.common.name.localeCompare(b.common.name));
+
+        setSimulations(_simulations);
+    };
+
+    const loadSimulations = async () => {
+        const objects = await props.socket.getObjectViewSystem(
+            'state',
+            `fullcalendar.${props.instance}.Simulations.`,
+            `fullcalendar.${props.instance}.Simulations.\u9999`,
+        );
+
         const _simulationStates = {};
         for (const id in objects) {
             _simulationStates[id] = (await props.socket.getState(id)).val;
-            props.socket.subscribeState(id, updateState);
         }
-        setSimulations(Object.values(objects));
+
+        const _simulations = Object.values(objects);
+        _simulations.sort((a, b) => a.common.name.localeCompare(b.common.name));
+        setSimulations(_simulations);
+
         setSimulationStates(_simulationStates);
+
+        props.socket.subscribeObject(`fullcalendar.${props.instance}.Simulations.*`, updateObject);
+        props.socket.subscribeState(`fullcalendar.${props.instance}.Simulations.*`, updateState);
     };
+
     useEffect(() => {
-        refreshSimulations()
+        loadSimulations()
             .catch(() => {}); // ignore errors
+
+        return async () => {
+            await props.socket.unsubscribeObject(`fullcalendar.${props.instance}.Simulations.*`, updateObject);
+            await props.socket.unsubscribeState(`fullcalendar.${props.instance}.Simulations.*`, updateState);
+        };
     }, []);
+
     useEffect(() => {
-        if (!selectedSimulation) {
+        if (!selectedSimulation || !simulations.find(s => s._id === selectedSimulation)) {
             setSelectedSimulation(simulations[0]?._id);
         }
     }, [simulations]);
-    const recordSimulation = id => {
-        props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', {
-            id,
-        });
-        props.socket.subscribeObject(id, refreshSimulations);
+
+    const recordSimulation = async (id, obj) => {
+        obj = obj || (await props.socket.getObject(id));
+        obj.native.record = obj.native.record || {};
+        obj.native.record.start = Date.now();
+        obj.native.record.end = obj.native.interval === 'day' ? new Date(Date.now() + 24 * 60 * 60 * 1000) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        props.socket.setObject(id, obj);
+        props.socket.setState(id, 'record');
     };
-    const playSimulation = (id, options) => {
-        props.socket.sendTo(`fullcalendar.${props.instance}`, 'playSimulation', {
-            id,
-            options,
-        });
+
+    const playSimulation = async (id, options) => {
+        const obj = await props.socket.getObject(id);
+        obj.native.play = options;
+        await props.socket.setObject(id, obj);
+        props.socket.setState(id, 'play');
     };
 
     const toCalendar = <div className={props.classes.toCalendar}>
@@ -119,12 +178,14 @@ const Simulations = props => {
                     },
                     native: {},
                 });
+
                 const events = simulations.find(s => s._id === selectedSimulation).native.events;
                 for (const k in events) {
                     const _event = JSON.parse(JSON.stringify(events[k]));
                     _event.id = `${id}.event-${uuidv4()}`;
                     props.socket.setObject(_event.id, _event);
                 }
+
                 props.updateCalendars();
                 props.setIsSimulations(false);
                 props.setCalendarPrefix(id);
@@ -136,43 +197,64 @@ const Simulations = props => {
 
     return <div className={Utils.clsx(props.classes.container, props.classes.simulations)}>
         <div>
-            <SimulationDialog
+            {dialogSimulation && <SimulationDialog
                 socket={props.socket}
                 instance={props.instance}
                 simulation={simulations.find(s => s._id === dialogSimulation)}
                 selectedSimulation={selectedSimulation}
                 setSelectedSimulation={setSelectedSimulation}
-                refreshSimulations={refreshSimulations}
-                open={!!dialogSimulation}
                 onClose={() => setDialogSimulation(null)}
-            />
-            <PlaySimulationDialog
+            />}
+            {dialogSimulationPlay && <PlaySimulationDialog
                 socket={props.socket}
                 instance={props.instance}
                 playSimulation={playSimulation}
                 simulation={simulations.find(s => s._id === dialogSimulationPlay)}
-                open={!!dialogSimulationPlay}
                 onClose={() => setDialogSimulationPlay(null)}
-            />
-            {recordDialog && <Confirm
-                fullWidth={false}
-                title={I18n.t('Delete record')}
-                text={I18n.t('Do you want to delete previously recorded events?')}
-                ok={I18n.t('Delete')}
-                onClose={async isYes => {
-                    if (isYes) {
-                        try {
-                            const _simulation = simulations.find(s => s._id === recordDialog);
-                            _simulation.native.events = [];
-                            await props.socket.setObject(_simulation._id, _simulation);
-                        } catch (e) {
-                            window.alert(`Cannot delete events: ${e}`);
-                        }
-                    }
-                    recordSimulation(recordDialog);
-                    setRecordDialog(false);
-                }}
             />}
+            {recordDialog && <Dialog
+                open={!0}
+                maxWidth="md"
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        setRecordDialog(false);
+                    }
+                }}
+            >
+                <DialogTitle id="confirmation-dialog-title">{I18n.t('Start recording')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {I18n.t('Do you want to delete previously recorded events?')}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        variant="contained"
+                        onClick={async () => {
+                            const obj = await props.socket.getObject(recordDialog);
+                            obj.native.events = [];
+                            await recordSimulation(obj._id, obj);
+                            setRecordDialog(false);
+                        }}
+                        style={{ backgroundColor: 'red', color: 'white' }}
+                        autoFocus
+                        startIcon={<Delete />}
+                    >
+                        {I18n.t('Delete events')}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={async () => {
+                            await recordSimulation(recordDialog);
+                            setRecordDialog(false);
+                        }}
+                        color="grey"
+                        startIcon={<Check />}
+                    >
+                        {I18n.t('Keep events')}
+                    </Button>
+                </DialogActions>
+            </Dialog>}
             {stopRecordDialog !== false && <Confirm
                 fullWidth={false}
                 title={I18n.t('Stop recording')}
@@ -180,15 +262,7 @@ const Simulations = props => {
                 ok={I18n.t('Stop')}
                 onClose={async isYes => {
                     if (isYes) {
-                        props.socket.sendTo(
-                            `fullcalendar.${props.instance}`,
-                            'stopRecordSimulation',
-                            {
-                                id: stopRecordDialog,
-                            },
-                        );
-                        props.socket.unsubscribeObject(stopRecordDialog, refreshSimulations);
-                        await refreshSimulations();
+                        props.socket.setState(stopRecordDialog, 'stop');
                     }
                     setStopRecordDialog(false);
                 }}
@@ -203,14 +277,15 @@ const Simulations = props => {
                             const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
                             await props.socket.setObject(id, {
                                 common: {
-                                    name: 'New simulation',
+                                    name: I18n.t('Simulation %s', simulations.length + 1),
                                     role: 'state',
                                     type: 'string',
+                                    states: ['stop', 'record', 'play', 'pause'],
+                                    color: '#3A87AD',
                                 },
                                 native: {
                                     events: [],
                                     interval: 'day',
-                                    defaultColor: '#3A87AD',
                                     record: {
                                         states: [],
                                         enums: [],
@@ -221,11 +296,12 @@ const Simulations = props => {
                                 type: 'state',
                             });
                             await props.socket.setState(id, 'stop');
-                            // props.socket.sendTo(`fullcalendar.${props.instance}`, 'recordSimulation', id);
-                            await refreshSimulations();
-                            setSelectedSimulation(id);
+
                             window.localStorage.setItem('fullcalendar.selectedSimulation', id);
-                            setTimeout(() => setDialogSimulation(id), 300);
+                            setTimeout(() => {
+                                setSelectedSimulation(id);
+                                setDialogSimulation(id);
+                            }, 300);
                         }}
                         variant="contained"
                     >
@@ -261,90 +337,92 @@ const Simulations = props => {
                                         <Edit />
                                     </IconButton>
                                 </Tooltip>
-                                {['stop', 'play'].includes(simulationStates[simulation._id]) &&
-                                    simulation.native.events.length > 0 &&
-                                    <Tooltip title={simulationStates[simulation._id] === 'play' ? I18n.t('Stop recording') : I18n.t('Play recording')}>
+                                {simulationStates[simulation._id] === 'stop' &&
+                                    <Tooltip title={I18n.t('Start recording')}>
                                         <span>
                                             <IconButton
-                                                disabled={!props.alive}
                                                 onClick={async e => {
                                                     e.stopPropagation();
-                                                    if (simulationStates[simulation._id] === 'play') {
-                                                        props.socket.sendTo(
-                                                            `fullcalendar.${props.instance}`,
-                                                            'stopPlaySimulation',
-                                                            {
-                                                                id: simulation._id,
-                                                            },
-                                                        );
-                                                        await refreshSimulations();
-                                                    } else {
-                                                        setDialogSimulationPlay(simulation._id);
-                                                    }
-                                                }}
-                                                size="small"
-                                            >
-                                                <PlayCircle
-                                                    style={{
-                                                        color: simulationStates[simulation._id] === 'play' ? 'green' : undefined,
-                                                    }}
-                                                />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                {['record', 'stop'].includes(simulationStates[simulation._id]) &&
-                                    <Tooltip title={simulationStates[simulation._id] === 'stop' ?
-                                        I18n.t('Start recording') :
-                                        I18n.t('Till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}
-                                    >
-                                        <span>
-                                            <IconButton
-                                                disabled={!props.alive}
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    if (simulationStates[simulation._id] === 'record') {
-                                                        setStopRecordDialog(simulation._id);
-                                                    } else if (simulation.native.events.length) {
+                                                    if (simulation.native.events.length) {
                                                         setRecordDialog(simulation._id);
                                                     } else {
-                                                        recordSimulation(simulation._id);
+                                                        await recordSimulation(simulation._id);
                                                     }
                                                 }}
                                                 size="small"
                                             >
-                                                <FiberManualRecord
-                                                    style={{
-                                                        color: simulationStates[simulation._id] === 'record' ? 'red' : undefined,
-                                                    }}
-                                                />
+                                                <FiberManualRecord />
                                             </IconButton>
                                         </span>
                                     </Tooltip>}
-                                {['record', 'pause'].includes(simulationStates[simulation._id]) &&
-                                    <Tooltip title={simulationStates[simulation._id] === 'record' ?
-                                        I18n.t('Pause recording') :
-                                        I18n.t('Resume recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}
-                                    >
+                                {simulationStates[simulation._id] === 'stop' && simulation.native.events.length > 0 &&
+                                    <Tooltip title={I18n.t('Start playing')}>
                                         <span>
                                             <IconButton
-                                                disabled={!props.alive}
-                                                onClick={e => {
+                                                onClick={async e => {
                                                     e.stopPropagation();
-                                                    props.socket.sendTo(
-                                                        `fullcalendar.${props.instance}`,
-                                                        simulationStates[simulation._id] === 'record' ? 'pauseRecordSimulation' : 'resumeRecordSimulation',
-                                                        {
-                                                            id: simulation._id,
-                                                        },
-                                                    );
+                                                    setDialogSimulationPlay(simulation._id);
                                                 }}
                                                 size="small"
                                             >
-                                                <Pause
-                                                    style={{
-                                                        color: simulationStates[simulation._id] === 'pause' ? 'yellow' : undefined,
-                                                    }}
-                                                />
+                                                <PlayArrow />
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>}
+                                {(simulationStates[simulation._id] === 'record' || simulationStates[simulation._id] === 'pause') &&
+                                    <Tooltip title={I18n.t('Stop recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}>
+                                        <span style={{ opacity: simulationStates[simulation._id] === 'pause' ? 0.5 : 1 }}>
+                                            <IconButton
+                                                disabled={simulationStates[simulation._id] === 'pause'}
+                                                onClick={async e => {
+                                                    e.stopPropagation();
+                                                    setStopRecordDialog(simulation._id);
+                                                }}
+                                                size="small"
+                                            >
+                                                <FiberManualRecord style={{ color: 'red' }} />
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>}
+                                {simulationStates[simulation._id] === 'play' &&
+                                    <Tooltip title={I18n.t('Stop playing')}>
+                                        <span>
+                                            <IconButton
+                                                onClick={async e => {
+                                                    e.stopPropagation();
+                                                    props.socket.setState(simulation._id, 'stop');
+                                                }}
+                                                size="small"
+                                            >
+                                                <PlayArrow style={{ color: 'green' }} />
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>}
+                                {simulationStates[simulation._id] === 'record' &&
+                                    <Tooltip title={I18n.t('Pause recording')}>
+                                        <span>
+                                            <IconButton
+                                                onClick={async e => {
+                                                    e.stopPropagation();
+                                                    props.socket.setState(simulation._id, 'pause');
+                                                }}
+                                                size="small"
+                                            >
+                                                <Pause />
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>}
+                                {simulationStates[simulation._id] === 'pause' &&
+                                    <Tooltip title={I18n.t('Resume recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}>
+                                        <span>
+                                            <IconButton
+                                                onClick={async e => {
+                                                    e.stopPropagation();
+                                                    props.socket.setState(simulation._id, 'record');
+                                                }}
+                                                size="small"
+                                            >
+                                                <Pause style={{ color: 'yellow' }} />
                                             </IconButton>
                                         </span>
                                     </Tooltip>}
@@ -373,7 +451,6 @@ const Simulations = props => {
                 t={I18n.t}
                 language={I18n.getLanguage()}
                 readOnly={simulationStates[selectedSimulation] === 'play'}
-                refreshSimulations={refreshSimulations}
                 button={toCalendar}
             />
         </div>}
@@ -388,7 +465,6 @@ Simulations.propTypes = {
     updateCalendars: PropTypes.func.isRequired,
     setIsSimulations: PropTypes.func.isRequired,
     setCalendarPrefix: PropTypes.func.isRequired,
-    alive: PropTypes.bool.isRequired,
 };
 
 export default withStyles(style)(Simulations);

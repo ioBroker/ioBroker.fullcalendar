@@ -32,7 +32,7 @@ const CalendarContainer = props => {
         if (props.isSimulation) {
             const _simulationObject = await props.socket.getObject(props.simulationId);
             setSimulationObject(_simulationObject);
-            objects = Object.values(_simulationObject.native.events);
+            objects = Object.values(_simulationObject?.native?.events || []);
         } else {
             objects = Object.values(await props.socket.getObjectViewCustom(
                 'schedule',
@@ -69,7 +69,6 @@ const CalendarContainer = props => {
                 _simulationObject.native.events.push(event);
             }
             await props.socket.setObject(props.simulationId, _simulationObject);
-            props.refreshSimulations();
         }
         return props.socket.setObject(id, event);
     };
@@ -81,7 +80,6 @@ const CalendarContainer = props => {
                 _simulationObject.native.events.splice(eventPos, 1);
             }
             await props.socket.setObject(props.simulationId, _simulationObject);
-            props.refreshSimulations();
         }
         return props.socket.delObject(id);
     };
@@ -136,7 +134,6 @@ CalendarContainer.propTypes = {
     simulationId: PropTypes.string,
     simulation: PropTypes.object,
     simulations: PropTypes.array,
-    refreshSimulations: PropTypes.func,
     readOnly: PropTypes.bool,
     adapterConfig: PropTypes.object,
     button: PropTypes.any,

@@ -165,17 +165,6 @@
     ]
   },
   "native": {
-    "debounce": 1000,
-    "changesRelogInterval": 0,
-    "ackType": "any",
-    "changesMinDelta": 0,
-    "allEventsEnabled": false,
-    "allEventsMax": 1000,
-    "allEventsSaveOnDisk": false,
-    "eventsPath": "calendar/",
-    "cfgEventsEnabled": true,
-    "cfgEventsMax": 1000,
-    "cfgEventsSaveOnDisk": false
   },
   "instanceObjects": [
     {
@@ -183,30 +172,6 @@
       "type": "channel",
       "common": {
         "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.lastConfiguredEvent",
-      "type": "state",
-      "common": {
-        "role": "state",
-        "name": "Last configured event",
-        "type": "json",
-        "read": true,
-        "write": false
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.lastEvent",
-      "type": "state",
-      "common": {
-        "role": "state",
-        "name": "Any last event",
-        "type": "json",
-        "read": true,
-        "write": false
       },
       "native": {}
     },

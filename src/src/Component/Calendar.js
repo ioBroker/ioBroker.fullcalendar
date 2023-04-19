@@ -504,7 +504,7 @@ function Calendar(props) {
                                 cron.months = ['*'];
                                 newEvent.native.cron = obj2cron(cron);
                                 newEvent._id = `${props.simulationId}.event-${uuidv4()}`;
-                                newEvent.native.color = props.simulation.native.defaultColor;
+                                newEvent.native.color = props.simulation.common.color;
                                 newEvent.native.record = {
                                     states: [],
                                     enums: [],

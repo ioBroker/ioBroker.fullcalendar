@@ -55,20 +55,18 @@ const SimulationDialog = props => {
     const timer = useRef(null);
 
     useEffect(() => {
-        if (props.open) {
-            setSimulation(props.simulation);
-            setEnumStates([]);
-            if (!Object.keys(enumsObjects).length) {
-                // request enums
-                props.socket.getEnums()
-                    .then(_enums => setEnumsObjects(_enums));
-            }
-        } else {
-            setSimulation(null);
+        setSimulation(props.simulation);
+        setEnumStates([]);
+        if (!Object.keys(enumsObjects).length) {
+            // request enums
+            props.socket.getEnums()
+                .then(_enums => setEnumsObjects(_enums));
+        }
+        return () => {
             timer.current && clearTimeout(timer.current);
             timer.current = null;
-        }
-    }, [props.open]);
+        };
+    }, []);
 
     useEffect(() => {
         if (!simulation) {
@@ -146,7 +144,7 @@ const SimulationDialog = props => {
         return null;
     }
 
-    return <Dialog open={props.open} onClose={props.onClose}>
+    return <Dialog open={!0} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Edit simulation')}</DialogTitle>
         <DialogContent>
             <div className={props.classes.field}>
@@ -185,10 +183,10 @@ const SimulationDialog = props => {
             <div className={props.classes.field}>
                 <ColorPicker
                     label={I18n.t('Default color')}
-                    value={simulation.native.defaultColor}
+                    value={simulation.common.color}
                     onChange={color => {
                         const _simulation = JSON.parse(JSON.stringify(simulation));
-                        _simulation.native.defaultColor = color;
+                        _simulation.common.color = color;
                         setSimulation(_simulation);
                     }}
                 />
@@ -278,7 +276,6 @@ const SimulationDialog = props => {
                         }
                     }
                     await props.socket.setObject(simulation._id, _simulation);
-                    await props.refreshSimulations();
                     props.onClose();
                 }}
                 variant="contained"
@@ -308,7 +305,6 @@ const SimulationDialog = props => {
                         if (props.selectedSimulation === simulation._id) {
                             props.setSelectedSimulation(null);
                         }
-                        await props.refreshSimulations();
                     } catch (e) {
                         window.alert(`Cannot delete simulation: ${e}`);
                     }
@@ -357,11 +353,9 @@ const SimulationDialog = props => {
 };
 
 SimulationDialog.propTypes = {
-    open: PropTypes.bool,
     onClose: PropTypes.func,
     simulation: PropTypes.object,
     socket: PropTypes.object,
-    refreshSimulations: PropTypes.func,
     selectedSimulation: PropTypes.string,
     setSelectedSimulation: PropTypes.func,
 };

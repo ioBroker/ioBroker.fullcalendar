@@ -1,8 +1,3 @@
-/* jshint -W097 */
-/* jshint strict: false */
-/* jslint node: true */
-'use strict';
-
 // you have to require the utils module and call adapter function
 const utils       = require('@iobroker/adapter-core'); // Get common adapter utils
 
@@ -18,6 +13,7 @@ let nextTimer;
 let systemConfig;
 let adapterConfig;
 let timeZoneInterval;
+let updateInterval;
 
 const configuredEvents  = [];
 const cfgEventsSettings = {};
@@ -25,20 +21,124 @@ const allEvents         = [];
 const names             = {};
 let rooms               = {};
 let funcs               = {};
-const simulations = [];
+const recordingSimulations = {};
+const enums = {};
+const subscribed = [];
+
+function subscribeUnsubscribe() {
+    const toSubscribe = [];
+    // collect all states
+    Object.keys(recordingSimulations).forEach(id => {
+        if (recordingSimulations[id].value === 'record') {
+            recordingSimulations[id].allStates.forEach(state => {
+                if (!toSubscribe.includes(state)) {
+                    toSubscribe.push(state);
+                }
+            });
+        }
+    });
+
+    // subscribe new
+    toSubscribe.forEach(state => {
+        if (!subscribed.includes(state)) {
+            subscribed.push(state);
+            adapter.subscribeForeignStates(state);
+        }
+    });
+
+    // unsubscribe old
+    subscribed.forEach(state => {
+        const pos = subscribed.indexOf(state);
+        if (pos === -1) {
+            subscribed.splice(pos, 1);
+            adapter.unsubscribeForeignStates(state);
+        }
+    });
+}
 
 const stopRecordSimulation = async id => {
-    const simulation = simulations.find(sim => sim.id === id);
-    if (simulation) {
-        simulations.splice(simulations.findIndex(sim => sim.id === id), 1);
-        simulation.states.forEach(state => {
-            if (simulations.find(sim => sim.states.includes(state))) {
-                return;
-            }
-            adapter.unsubscribeForeignStates(state);
-        });
+    recordingSimulations[id].value = 'stop';
+    subscribeUnsubscribe();
+}
+
+function collectAllStates(id) {
+    recordingSimulations[id].allStates = [...recordingSimulations[id].native.record.states];
+
+    const enumList = recordingSimulations[id].native.record.enums;
+    // combine all states
+    if (enumList) {
+        for (const k in enumList) {
+            const enumStates = enumList[k].map(id => (enums[id] && enums[id].common && enums[id].common.members) || []);
+            let intersection = [];
+            enumStates.forEach((s, i) => {
+                if (intersection.length || i) {
+                    intersection = intersection.filter(i => s.includes(i));
+                } else {
+                    intersection = s;
+                }
+            });
+            recordingSimulations[id].allStates.push(...intersection);
+        }
     }
-    adapter.setForeignState(id, 'stop');
+    recordingSimulations[id].allStates.sort();
+    // remove duplicates
+    recordingSimulations[id].allStates = recordingSimulations[id].allStates.filter((item, pos) => recordingSimulations[id].allStates.indexOf(item) === pos);
+}
+
+async function startRecordSimulation(id) {
+    if (!recordingSimulations[id]) {
+        recordingSimulations[id] = await adapter.getForeignObjectAsync(id);
+        recordingSimulations[id].value = await adapter.getForeignStateAsync(id);
+    }
+
+    collectAllStates(id);
+
+    if (recordingSimulations[id].native.record.start >= Date.now() || recordingSimulations[id].native.record.end < Date.now()) {
+        adapter.setForeignState(id, 'stop');
+        recordingSimulations[id].value = 'stop';
+        return;
+    }
+
+    const obj = JSON.parse(JSON.stringify(recordingSimulations[id]));
+    delete obj.value;
+    delete obj.allStates;
+
+    // save simulation
+    // await adapter.setForeignObjectAsync(id, obj);
+
+    subscribeUnsubscribe();
+}
+
+async function setSimulationStatus(id, value) {
+    const oldValue = recordingSimulations[id].value;
+    recordingSimulations[id].value = value;
+    if (value === 'record') {
+        await startRecordSimulation(id);
+    } else if (value === 'stop') {
+        if (oldValue === 'record') {
+            await stopRecordSimulation(id);
+        } else if (oldValue === 'play') {
+            // stop playing
+            recordingSimulations[id].native.events.forEach(event => {
+                if (events[event._id]) {
+                    stopEvent(events[event._id]);
+                    delete events[event._id];
+                }
+            });
+        }
+    } else if (value === 'pause') {
+        subscribeUnsubscribe();
+    } else if (value === 'play') {
+        recordingSimulations[id].native.events.forEach(event => {
+            event.simulationStart = recordingSimulations[id].native.play && new Date(recordingSimulations[id].native.play.start);
+            event.simulationEnd = recordingSimulations[id].native.play.end && new Date(recordingSimulations[id].native.play.end);
+            event.simulationDow = recordingSimulations[id].native.play.dow;
+            events[event._id] = event;
+            names[event._id] = event.common.name;
+        });
+
+        calculateNext();
+    }
 }
 
 function startAdapter(options) {
@@ -48,16 +148,25 @@ function startAdapter(options) {
     adapter = new utils.Adapter(options);
     adapter.on('stateChange', async (stateId, state) => {
         if (stateId && state) {
+            if (stateId.startsWith(`${adapter.namespace}.Simulations.`)) {
+                if (recordingSimulations[stateId] && recordingSimulations[stateId].value !== state.val) {
+                    await setSimulationStatus(stateId, state.val);
+                }
+
+                return;
+            }
+
             if (stateId.startsWith('system.')) {
                 return;
             }
-            simulations.forEach(async simulation => {
-                const profile = await adapter.getForeignObjectAsync(simulation.id);
-                const profileState = await adapter.getForeignStateAsync(simulation.id);
-                if (profileState.val === 'pause') {
-                    return;
-                }
+
+            for (let i = 0; i < recordingSimulations.length; i++) {
+                const simulation = recordingSimulations[i];
                 if (simulation.states.includes(stateId)) {
+                    // read current simulation
+                    const profile = await adapter.getForeignObjectAsync(simulation.id);
+
+                    // add new event
                     const date = new Date();
                     let dow = date.getDay() === 0 ? 7 : date.getDay();
                     if (profile.native.interval === 'day') {
@@ -79,122 +188,160 @@ function startAdapter(options) {
                             color: '#3A87AD',
                         },
                         type: 'schedule',
-                    })
-                }
-                await adapter.setForeignObjectAsync(simulation.id, profile);
-            });
-            if (adapter.config.allEventsEnabled || adapter.config.cfgEventsEnabled) {
-                const {name, id} = await getStateName(stateId, state);
-                if (adapter.config.allEventsEnabled) {
-                    if (adapter.config.ackType === 'true' && !state.ack) {
-                        return;
-                    }
-                    if (adapter.config.ackType === 'false' && state.ack) {
-                        return;
-                    }
-                    const cfgA = {id, val: state.val, ack: state.ack, ts: state.ts, name};
-                    allEvents.push(cfgA);
-                    if (allEvents.length > adapter.config.allEventsMax) {
-                        allEvents.slice(allEvents.length - adapter.config.allEventsMax);
-                    }
-                    await adapter.setStateAsync('info.lastEvent', JSON.stringify(cfgA), true);
-                }
+                    });
 
-                if (adapter.config.cfgEventsEnabled && cfgEventsSettings[id]) {
-                    if (cfgEventsSettings[id].ackType === 'true' && !state.ack) {
-                        return;
-                    }
-                    if (cfgEventsSettings[id].ackType === 'false' && state.ack) {
-                        return;
-                    }
-                    const cfgE = {id, val: state.val, ack: state.ack, ts: state.ts, name};
-                    configuredEvents.push(cfgE);
-                    if (configuredEvents.length > adapter.config.cfgEventsMax) {
-                        configuredEvents.slice(configuredEvents.length - adapter.config.cfgEventsMax);
-                    }
-                    await adapter.setStateAsync('info.lastConfiguredEvent', JSON.stringify(cfgE), true);
+                    // save simulation
+                    await adapter.setForeignObjectAsync(simulation.id, profile);
                 }
             }
+
+            // if (adapter.config.allEventsEnabled || adapter.config.cfgEventsEnabled) {
+            //     const {name, id} = await getStateName(stateId, state);
+            //     if (adapter.config.allEventsEnabled) {
+            //         if (adapter.config.ackType === 'true' && !state.ack) {
+            //             return;
+            //         }
+            //         if (adapter.config.ackType === 'false' && state.ack) {
+            //             return;
+            //         }
+            //         const cfgA = {id, val: state.val, ack: state.ack, ts: state.ts, name};
+            //         allEvents.push(cfgA);
+            //         if (allEvents.length > adapter.config.allEventsMax) {
+            //             allEvents.slice(allEvents.length - adapter.config.allEventsMax);
+            //         }
+            //         await adapter.setStateAsync('info.lastEvent', JSON.stringify(cfgA), true);
+            //     }
+            //
+            //     if (adapter.config.cfgEventsEnabled && cfgEventsSettings[id]) {
+            //         if (cfgEventsSettings[id].ackType === 'true' && !state.ack) {
+            //             return;
+            //         }
+            //         if (cfgEventsSettings[id].ackType === 'false' && state.ack) {
+            //             return;
+            //         }
+            //         const cfgE = {id, val: state.val, ack: state.ack, ts: state.ts, name};
+            //         configuredEvents.push(cfgE);
+            //         if (configuredEvents.length > adapter.config.cfgEventsMax) {
+            //             configuredEvents.slice(configuredEvents.length - adapter.config.cfgEventsMax);
+            //         }
+            //         await adapter.setStateAsync('info.lastConfiguredEvent', JSON.stringify(cfgE), true);
+            //     }
+            // }
         }
     });
 
     adapter.on('ready', () => main(adapter));
 
-    adapter.on('message', async obj => {
-        if (obj && obj.callback) {
-            switch (obj.command) {
-                case 'getAll':
-                    adapter.sendTo(obj.from, obj.command, allEvents, obj.callback);
-                    break;
+    // adapter.on('message', async obj => {
+    //     if (obj && obj.callback) {
+    //         switch (obj.command) {
+    //             case 'getAll':
+    //                 adapter.sendTo(obj.from, obj.command, allEvents, obj.callback);
+    //                 break;
+    //
+    //             case 'getConfigured':
+    //                 adapter.sendTo(obj.from, obj.command, configuredEvents, obj.callback);
+    //                 break;
+    //
+    //             case 'recordSimulation':
+    //                 startRecordSimulation(obj.message);
+    //                 break;
+    //
+    //             case 'stopRecordSimulation':
+    //                 stopRecordSimulation(obj.message.id);
+    //                 break;
+    //
+    //             case 'pauseRecordSimulation':
+    //                 adapter.setForeignState(obj.message.id, 'pause');
+    //                 break;
+    //
+    //             case 'resumeRecordSimulation':
+    //                 adapter.setForeignState(obj.message.id, 'record');
+    //                 break;
+    //
+    //             case 'playSimulation': {
+    //                     adapter.setForeignState(obj.message.id, 'play');
+    //                     const profile = await adapter.getForeignObjectAsync(obj.message.id);
+    //                     profile.native.events.forEach(event => {
+    //                         event.simulationStart = obj.message.options.start && new Date(obj.message.options.start);
+    //                         event.simulationEnd = obj.message.options.end && new Date(obj.message.options.end);
+    //                         event.simulationDow = obj.message.options.dow;
+    //                         events[event._id] = event;
+    //                         names[event._id] = event.common.name;
+    //                     });
+    //                     calculateNext();
+    //                 }
+    //                 break;
+    //
+    //             case 'stopPlaySimulation': {
+    //                     const profile = await adapter.getForeignObjectAsync(obj.message.id);
+    //                     profile.native.events.forEach(event => {
+    //                         if (events[event._id]) {
+    //                             stopEvent(events[event._id]);
+    //                             delete events[event._id];
+    //                         }
+    //                     });
+    //                     adapter.setForeignState(obj.message.id, 'stop');
+    //                 }
+    //                 break;
+    //         }
+    //     }
+    // });
 
-                case 'getConfigured':
-                    adapter.sendTo(obj.from, obj.command, configuredEvents, obj.callback);
-                    break;
-                case 'recordSimulation': {
-                        const profile = await adapter.getForeignObjectAsync(obj.message.id);
-                        profile.native.record.start = new Date();
-                        profile.native.record.end = profile.native.interval === 'day' ? new Date(profile.native.record.start.getTime() + 24 * 60 * 60 * 1000) : new Date(profile.native.record.start.getTime() + 7 * 24 * 60 * 60 * 1000);
-                        obj.message = {...obj.message, ...profile.native.record};
-                        adapter.setForeignState(obj.message.id, 'record');
-                        if (obj.message.enums) {
-                            for (const k in obj.message.enums) {
-                                const _enumStates = (await Promise.all(obj.message.enums[k].map(id => adapter.getForeignObjectAsync(id)))).map(e => e.common.members);
-                                let intersection = [];
-                                _enumStates.forEach((s, i) => {
-                                    if (intersection.length || i) {
-                                        intersection = intersection.filter(i => s.includes(i));
-                                    } else {
-                                        intersection = s;
-                                    }
-                                });
-                                obj.message.states.push(...intersection);
-                            }
-                        }
-                        console.log(obj.message.states);
-                        adapter.subscribeForeignStates(obj.message.states)
-                        await adapter.setForeignObjectAsync(obj.message.id, profile);
-                        simulations.push(obj.message);
-                    }
-                    break;
-                case 'stopRecordSimulation':
-                    stopRecordSimulation(obj.message.id);
-                    break;
-                case 'pauseRecordSimulation':
-                    adapter.setForeignState(obj.message.id, 'pause');
-                    break;
-                case 'resumeRecordSimulation':
-                    adapter.setForeignState(obj.message.id, 'record');
-                    break;
-                case 'playSimulation': {
-                        adapter.setForeignState(obj.message.id, 'play');
-                        const profile = await adapter.getForeignObjectAsync(obj.message.id);
-                        profile.native.events.forEach(event => {
-                            event.simulationStart = obj.message.options.start && new Date(obj.message.options.start);
-                            event.simulationEnd = obj.message.options.end && new Date(obj.message.options.end);
-                            event.simulationDow = obj.message.options.dow;
-                            events[event._id] = event;
-                            names[event._id] = event.common.name;
-                        });
-                        calculateNext();
-                    }
-                    break;
-                case 'stopPlaySimulation': {
-                        const profile = await adapter.getForeignObjectAsync(obj.message.id);
-                        profile.native.events.forEach(event => {
-                            if (events[event._id]) {
-                                stopEvent(events[event._id]);
-                                delete events[event._id];
-                            }
-                        });
-                        adapter.setForeignState(obj.message.id, 'stop');
-                    }
-                    break;
-            }
-        }
+    adapter.on('unload', callback => {
+        updateInterval && clearTimeout(updateInterval);
+        updateInterval= null;
+        callback();
     });
 
     adapter.on('objectChange', async (id, obj) => {
         if (!id) {
+            return;
+        }
+
+        if (id.startsWith('enum.')) {
+            if (obj) {
+                enums[id] = obj;
+                if (id.startsWith('enum.functions.')) {
+                    funcs[id] = obj;
+                } else if (id.startsWith('enum.rooms.')) {
+                    rooms[id] = obj;
+                }
+            } else {
+                if (funcs[id]) {
+                    delete funcs[id];
+                }
+                if (rooms[id]) {
+                    delete rooms[id];
+                }
+                delete enums[id];
+            }
+
+            return;
+        }
+
+        if (id.startsWith(`${adapter.namespace}.info.`)) {
+            return;
+        }
+
+        if (id.startsWith(`${adapter.namespace}.Simulations.`)) {
+            if (obj) {
+                recordingSimulations[id] = obj;
+                collectAllStates(id);
+                const _state = await adapter.getForeignStateAsync(id);
+                if (_state && _state.val) {
+                    recordingSimulations[id].value = _state.val;
+                } else {
+                    recordingSimulations[id].value = 'stop';
+                }
+
+                if (recordingSimulations[id].value === 'record') {
+                    await startRecordSimulation(id);
+                }
+            } else if (recordingSimulations[id]) {
+                 await stopRecordSimulation(id);
+                 delete recordingSimulations[id];
+            }
             return;
         }
 
@@ -211,7 +358,6 @@ function startAdapter(options) {
             calculateNext();
             return;
         }
-
 
         if (!id.startsWith(`${adapter.namespace}.`)) {
             return;
@@ -351,6 +497,7 @@ async function executeEvent(event, now) {
             event.native.startValue = event.native.startValue.toString();
         }
     }
+
     await adapter.setForeignStateAsync(obj._id, event.native.startValue);
 }
 
@@ -489,8 +636,8 @@ function getRoomFunc(id) {
     }
     let func = '';
     for (const f in funcs) {
-        if (funcs[r].common.members.includes(id)) {
-            func = funcs[r].common.name || r.substring('enum.functions.'.length);
+        if (funcs[f].common.members.includes(id)) {
+            func = funcs[f].common.name || f.substring('enum.functions.'.length);
             break;
         }
     }
@@ -498,29 +645,11 @@ function getRoomFunc(id) {
 }
 
 async function readEnums() {
-    const roomsObjs = await adapter.getObjectViewAsync('system', 'enum', {
-        startkey: 'enum.rooms.',
-        endkey: 'enum.rooms.\u9999'
-    });
     rooms = {};
-    for (let r = 0; r < roomsObjs.rows.length; r++) {
-        const obj = roomsObjs.rows[r].value;
-        if (obj && obj.common && obj.members) {
-            rooms[obj._id] = obj;
-        }
-    }
+    Object.keys(enums).filter(id => id.startsWith('enum.rooms.')).forEach(id => rooms[id] = enums[id]);
 
-    const funcsObjs = await adapter.getObjectViewAsync('system', 'enum', {
-        startkey: 'enum.functions.',
-        endkey: 'enum.functions.\u9999'
-    });
     funcs = {};
-    for (let r = 0; r < funcsObjs.rows.length; r++) {
-        const obj = funcsObjs.rows[r].value;
-        if (obj && obj.common && obj.members) {
-            funcs[obj._id] = obj;
-        }
-    }
+    Object.keys(enums).filter(id => id.startsWith('enum.functions.')).forEach(id => funcs[id] = enums[id]);
 }
 
 async function afterMain() {
@@ -545,6 +674,16 @@ async function main() {
 
     setTimeZone();
 
+    const result = await adapter.getObjectViewAsync('system', 'enum', {startkey: 'enum.', endkey: 'enum.\u9999'});
+    if (result) {
+        for (let i = 0; i < result.rows.length; i++) {
+            if (result.rows[i].value && result.rows[i].value.common && result.rows[i].value.common.members) {
+                enums[result.rows[i].id] = result.rows[i].value;
+            }
+        }
+    }
+    await adapter.subscribeForeignObjectsAsync('enum.*');
+
     // fix old design
     const design = await adapter.getForeignObjectAsync('_design/schedule');
     if (!design || !design.views || !design.views.schedule || design.views.schedule.map !== 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }') {
@@ -552,10 +691,11 @@ async function main() {
             language: 'javascript',
             views: {
                 schedule: {
-                    map: 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }'
-                }
-            }
+                    map: 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }',
+                },
+            },
         });
+
         // restart instance
         const aObj = await adapter.getForeignObjectAsync(`system.adapter.${adapter.namespace}`);
         await adapter.setForeignObjectAsync(aObj._id, aObj);
@@ -567,7 +707,7 @@ async function main() {
     try {
         const res = await adapter.getObjectViewAsync('schedule', 'schedule', {
             startkey: `${adapter.namespace}.`,
-            endkey: `${adapter.namespace}.\u9999`
+            endkey: `${adapter.namespace}.\u9999`,
         });
 
         if (res) {
@@ -591,26 +731,44 @@ async function main() {
         adapter.log.error(`Cannot read system.config: ${e}`);
     }
 
-    if (adapter.config.cfgEventsEnabled) {
-        try {
-            const result = await adapter.getObjectViewAsync('system', 'custom', {startkey: '', endkey: '\u9999'});
-            if (result) {
-                for (let i = 0; i < result.rows.length; i++) {
-                    const customObj = result.rows[i].value;
-                    if (customObj[adapter.namespace] && customObj[adapter.namespace].enabled) {
-                        cfgEventsSettings[result.rows[i].id] = customObj[adapter.namespace];
-                    }
-                }
-            }
-        } catch (e) {
-            adapter.log.error(`Cannot read custom config: ${e}`);
+    // if (adapter.config.cfgEventsEnabled) {
+    //     try {
+    //         const result = await adapter.getObjectViewAsync('system', 'custom', {startkey: '', endkey: '\u9999'});
+    //         if (result) {
+    //             for (let i = 0; i < result.rows.length; i++) {
+    //                 const customObj = result.rows[i].value;
+    //                 if (customObj[adapter.namespace] && customObj[adapter.namespace].enabled) {
+    //                     cfgEventsSettings[result.rows[i].id] = customObj[adapter.namespace];
+    //                 }
+    //             }
+    //         }
+    //     } catch (e) {
+    //         adapter.log.error(`Cannot read custom config: ${e}`);
+    //     }
+    // }
+
+    // read possible simulations
+    const res = await adapter.getObjectViewAsync('system', 'state', {
+        startkey: `${adapter.namespace}.Simulations.`,
+        endkey: `${adapter.namespace}.Simulations.\u9999`,
+    });
+
+    for (let i = 0; i < res.rows.length; i++) {
+        const id = res.rows[i].id;
+        recordingSimulations[id] = res.rows[i].value;
+        collectAllStates(id);
+        const value = await adapter.getForeignStateAsync(id);
+        if (value && value.val) {
+            await setSimulationStatus(id, value.val);
         }
     }
 
-    setInterval(() => {
-        simulations.forEach(simulation => {
-            if (simulation.end < Date.now()) {
-                stopRecordSimulation(simulation.id);
+    updateInterval = setInterval(() => {
+        Object.keys(recordingSimulations).forEach(id => {
+            if ((recordingSimulations[id].value === 'record' || recordingSimulations[id].value === 'pause') &&
+                recordingSimulations[id].native.record.end < Date.now()
+            ) {
+                stopRecordSimulation(id);
             }
         });
     }, 60 * 1000);

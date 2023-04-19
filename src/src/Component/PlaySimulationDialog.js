@@ -39,7 +39,7 @@ const PlaySimulationDialog = props => {
 
     moment.locale(I18n.getLanguage());
 
-    return <Dialog open={props.open} onClose={props.onClose}>
+    return <Dialog open={!0} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Play simulation')}</DialogTitle>
         <DialogContent>
             <div className={props.classes.field}>
@@ -134,7 +134,6 @@ const PlaySimulationDialog = props => {
 };
 
 PlaySimulationDialog.propTypes = {
-    open: PropTypes.bool,
     onClose: PropTypes.func,
     playSimulation: PropTypes.func,
     simulation: PropTypes.object,
