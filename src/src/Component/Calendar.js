@@ -198,7 +198,7 @@ function Calendar(props) {
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     bymonth: cronObject.months,
-                    //tzid: TIME_ZONE,
+                    // tzid: TIME_ZONE,
                 });
 
                 rule.between(
@@ -234,7 +234,7 @@ function Calendar(props) {
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
-                    //tzid: TIME_ZONE,
+                    // tzid: TIME_ZONE,
                 });
 
                 rule.between(

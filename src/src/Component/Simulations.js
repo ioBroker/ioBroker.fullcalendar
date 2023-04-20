@@ -23,10 +23,12 @@ import {
     Edit, FiberManualRecord, Pause,
     Add, PlayArrow, Delete, Check,
     ReportProblem as Alert,
-    Stop
+    Stop,
 } from '@mui/icons-material';
 
-import {I18n, Utils, Confirm, TextWithIcon} from '@iobroker/adapter-react-v5';
+import {
+    I18n, Utils, Confirm, TextWithIcon,
+} from '@iobroker/adapter-react-v5';
 
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
@@ -102,7 +104,7 @@ const Simulations = props => {
         }
     };
 
-    const updateObject = async ( id, obj) => {
+    const updateObject = async (id, obj) => {
         setSimulations(oldSimulations => {
             const _simulations = JSON.parse(JSON.stringify(oldSimulations));
 

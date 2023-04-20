@@ -332,17 +332,17 @@ const EventDialog = props => {
                             ampm={false}
                         />
                     </LocalizationProvider>}
-                    {props.isSimulation && <TextField
-                        className={props.classes.randomTime}
-                        label={props.t('Time random offset')}
-                        value={event.native.timeRandomOffset || 0}
-                        disabled={props.readOnly}
-                        onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
-                        variant="standard"
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
-                        }}
-                    />}
+                {props.isSimulation && <TextField
+                    className={props.classes.randomTime}
+                    label={props.t('Time random offset')}
+                    value={event.native.timeRandomOffset || 0}
+                    disabled={props.readOnly}
+                    onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
+                    variant="standard"
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                    }}
+                />}
             </div>
             <div className={props.classes.field}>
                 {!props.isSimulation && <FormControl

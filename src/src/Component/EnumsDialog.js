@@ -215,7 +215,7 @@ const EnumsDialog = props => {
                     flexDirection: 'row',
                 }}
             >
-                <Paper className={props.classes.content} >
+                <Paper className={props.classes.content}>
                     {enumsTree.items?.enum && Object.keys(enumsTree.items.enum.items).map(id => renderEnums(enumsTree.items.enum.items[id], id))}
                 </Paper>
                 <div style={{ marginLeft: 8, overflow: 'auto' }}>

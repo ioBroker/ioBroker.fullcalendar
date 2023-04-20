@@ -64,6 +64,9 @@ const styles = {
         marginLeft: 20,
         display: 'inline-block',
     },
+    randomTime: {
+        marginLeft: 16,
+    },
 };
 
 const astroTypes = [
@@ -148,6 +151,10 @@ const EventDialog = props => {
             return null;
         }
         if (object.common.type === 'boolean') {
+            if (field === 'startValue' && typeof event.native[field] !== 'boolean') {
+                setTimeout(() => changeEvent(newEvent => newEvent.native[field] = !!newEvent.native[field]), 100);
+            }
+
             return <FormControlLabel
                 className={props.classes.narrowText2}
                 control={<Checkbox
@@ -188,6 +195,10 @@ const EventDialog = props => {
             return null;
         }
         if (object.common.type === 'boolean') {
+            if (typeof endValue !== 'boolean') {
+                setTimeout(() => setEndValue(!!endValue), 100);
+            }
+
             return <FormControlLabel
                 className={props.classes.narrowText2}
                 control={<Checkbox
@@ -321,9 +332,8 @@ const EventDialog = props => {
                             ampm={false}
                         />
                     </LocalizationProvider>}
-            </div>
-            {props.isSimulation && <div className={props.classes.field}>
-                <TextField
+                {props.isSimulation && <TextField
+                    className={props.classes.randomTime}
                     label={props.t('Time random offset')}
                     value={event.native.timeRandomOffset || 0}
                     disabled={props.readOnly}
@@ -332,8 +342,8 @@ const EventDialog = props => {
                     InputProps={{
                         endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
                     }}
-                />
-            </div>}
+                />}
+            </div>
             <div className={props.classes.field}>
                 {!props.isSimulation && <FormControl
                     variant="standard"
@@ -512,14 +522,13 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.narrowColor}>
                 <ColorPicker
-                    value={event.native.color || ''}
+                    value={event.common.color || event.native.color || ''}
                     disabled={props.readOnly}
                     onChange={color =>
-                        changeEvent(newEvent => newEvent.native.color = color)}
+                        changeEvent(newEvent => newEvent.common.color = color)}
                     name={props.t('Color')}
                 />
             </div>
-            {/* <pre>{JSON.stringify(event, null, 2)}</pre> */}
         </DialogContent>
         <DialogActions>
             {!props.readOnly ? <Button
@@ -565,14 +574,16 @@ const EventDialog = props => {
                 startIcon={<Cancel />}
                 onClick={props.onClose}
             >
-                {props.readOnly ? props.t('Close') : props.t('Cancel')}
+                {props.readOnly || !changed ? props.t('ra_Close') : props.t('ra_Cancel')}
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm
+            fullWidth={false}
             title={props.t('Delete event')}
             text={props.t('Event will be deleted. Confirm?')}
             suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
+            ok={I18n.t('Delete')}
             onClose={async isYes => {
                 if (isYes) {
                     try {
