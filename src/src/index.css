@@ -33,6 +33,10 @@ body {
   background-color: #575757;
 }
 
+.fc-event {
+  min-height: 21px;
+}
+
 
 #root {
   height: 100%;

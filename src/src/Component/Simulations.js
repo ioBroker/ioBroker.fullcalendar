@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { I18n, Confirm, Utils } from '@iobroker/adapter-react-v5';
+import { withStyles } from '@mui/styles';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
+
 import {
     Button,
     IconButton,
@@ -15,12 +18,15 @@ import {
     DialogContent,
     Dialog, DialogTitle,
 } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
+
 import {
-    Edit, FiberManualRecord, Pause, Add, PlayArrow, Delete, Check,
+    Edit, FiberManualRecord, Pause,
+    Add, PlayArrow, Delete, Check,
+    ReportProblem as Alert,
+    Stop
 } from '@mui/icons-material';
-import { withStyles } from '@mui/styles';
-import moment from 'moment';
+
+import {I18n, Utils, Confirm, TextWithIcon} from '@iobroker/adapter-react-v5';
 
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
@@ -64,6 +70,21 @@ const style = theme => ({
     tabRoot: {
         padding: '0 6px',
     },
+    alert: {
+        color: theme.palette.error.main,
+    },
+    selected: {
+        backgroundColor: theme.palette.primary.main,
+        color: 'white !important',
+    },
+    eventsCount: {
+        position: 'absolute',
+        right: 5,
+        top: 2,
+        fontSize: 10,
+        opacity: 0.7,
+        fontStyle: 'italic',
+    },
 });
 
 const Simulations = props => {
@@ -81,34 +102,27 @@ const Simulations = props => {
         }
     };
 
-    const updateObject = async (/* id, obj */) => {
-        /*
-        const _simulations = JSON.parse(JSON.stringify(simulations));
-        const pos = _simulations.findIndex(s => s._id === id);
+    const updateObject = async ( id, obj) => {
+        setSimulations(oldSimulations => {
+            const _simulations = JSON.parse(JSON.stringify(oldSimulations));
 
-        if (pos === -1) {
-            if (!obj) {
-                return;
+            const pos = _simulations.findIndex(s => s._id === id);
+
+            if (pos === -1) {
+                if (!obj) {
+                    return oldSimulations;
+                }
+                _simulations.push(obj);
+            } else if (!obj) {
+                _simulations.splice(pos, 1);
+            } else {
+                _simulations[pos] = obj;
             }
-            _simulations.push(obj);
-        } else if (!obj) {
-            _simulations.splice(pos, 1);
-        } else {
-            _simulations[pos] = obj;
-        }
 
-        setSimulations(_simulations);
-        */
-        const objects = await props.socket.getObjectViewSystem(
-            'state',
-            `fullcalendar.${props.instance}.Simulations.`,
-            `fullcalendar.${props.instance}.Simulations.\u9999`,
-        );
+            console.log(_simulations);
 
-        const _simulations = Object.values(objects);
-        _simulations.sort((a, b) => a.common.name.localeCompare(b.common.name));
-
-        setSimulations(_simulations);
+            return _simulations;
+        });
     };
 
     const loadSimulations = async () => {
@@ -127,6 +141,10 @@ const Simulations = props => {
         _simulations.sort((a, b) => a.common.name.localeCompare(b.common.name));
         setSimulations(_simulations);
 
+        if (!selectedSimulation || (simulations.length && !simulations.find(s => s._id === selectedSimulation))) {
+            setSelectedSimulation(simulations[0]?._id);
+        }
+
         setSimulationStates(_simulationStates);
 
         props.socket.subscribeObject(`fullcalendar.${props.instance}.Simulations.*`, updateObject);
@@ -144,7 +162,7 @@ const Simulations = props => {
     }, []);
 
     useEffect(() => {
-        if (!selectedSimulation || !simulations.find(s => s._id === selectedSimulation)) {
+        if (!selectedSimulation || (simulations.length && !simulations.find(s => s._id === selectedSimulation))) {
             setSelectedSimulation(simulations[0]?._id);
         }
     }, [simulations]);
@@ -204,6 +222,18 @@ const Simulations = props => {
                 selectedSimulation={selectedSimulation}
                 setSelectedSimulation={setSelectedSimulation}
                 onClose={() => setDialogSimulation(null)}
+                onDelete={async id => {
+                    try {
+                        if (selectedSimulation === id) {
+                            const firstSimulation = simulations.find(s => s._id !== id);
+
+                            setSelectedSimulation(firstSimulation?._id || null);
+                        }
+                        await props.socket.delObject(id);
+                    } catch (e) {
+                        window.alert(`Cannot delete simulation: ${e}`);
+                    }
+                }}
             />}
             {dialogSimulationPlay && <PlaySimulationDialog
                 socket={props.socket}
@@ -307,6 +337,8 @@ const Simulations = props => {
                     >
                         <Add />
                     </Fab>
+                    <div className={props.classes.divider} />
+                    {!props.alive && <Tooltip title={I18n.t('Instance inactive')}><Alert className={props.classes.alert} /></Tooltip>}
                 </Toolbar>
                 <Tabs
                     value={selectedSimulation || simulations[0]?._id}
@@ -318,12 +350,12 @@ const Simulations = props => {
                     className={props.classes.tabs}
                 >
                     {simulations.map(simulation => <Tab
-                        classes={{ root: props.classes.tabRoot }}
+                        classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
                         component="div"
                         value={simulation._id}
                         label={
                             <div className={props.classes.label}>
-                                {simulation.common.name}
+                                <TextWithIcon value={simulation} lang={I18n.getLanguage()} />
                                 <div className={props.classes.divider} />
                                 <Tooltip title={I18n.t('Edit name and settings')}>
                                     <IconButton
@@ -394,7 +426,7 @@ const Simulations = props => {
                                                 }}
                                                 size="small"
                                             >
-                                                <PlayArrow style={{ color: 'green' }} />
+                                                <Stop style={{ color: 'green' }} />
                                             </IconButton>
                                         </span>
                                     </Tooltip>}
@@ -426,6 +458,7 @@ const Simulations = props => {
                                             </IconButton>
                                         </span>
                                     </Tooltip>}
+                                <div className={props.classes.eventsCount}>{simulation.native.events?.length}</div>
                             </div>
                         }
                         key={simulation._id}

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {
     Button,
     Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField,
-    IconButton, Chip,
+    IconButton, Chip, Tooltip,
 } from '@mui/material';
 
 import {
@@ -41,6 +41,16 @@ const styles = {
     },
     headers: {
         marginBottom: -5,
+    },
+    '@keyframes blinker': {
+        from: { opacity: 'red' },
+        to: { color: 'inherit' },
+    },
+    blink: {
+        animationName: '$blinker',
+        animationDuration: '1s',
+        animationTimingFunction: 'linear',
+        animationIterationCount: 'infinite',
     },
 };
 
@@ -144,6 +154,11 @@ const SimulationDialog = props => {
         return null;
     }
 
+    const disabled = !props.simulation || !simulation || (
+        JSON.stringify(simulation.native) === JSON.stringify(props.simulation.native) &&
+        JSON.stringify(simulation.common) === JSON.stringify(props.simulation.common)
+    );
+
     return <Dialog open={!0} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Edit simulation')}</DialogTitle>
         <DialogContent>
@@ -193,13 +208,16 @@ const SimulationDialog = props => {
             </div>
             <h4 className={props.classes.headers}>
                 {I18n.t('States')}
-                <IconButton
-                    size="small"
-                    onClick={() => setIdDialog(true)}
-                    color="primary"
-                >
-                    <Add />
-                </IconButton>
+                <Tooltip title={I18n.t('Add states for recording')}>
+                    <IconButton
+                        className={!enumStates.length && simulation?.native?.record?.states?.length ? props.classes.blink : ''}
+                        size="small"
+                        onClick={() => setIdDialog(true)}
+                        color="primary"
+                    >
+                        <Add />
+                    </IconButton>
+                </Tooltip>
             </h4>
             <div>
                 {simulation.native.record?.states.map((state, i) => getStateChip(state, () => {
@@ -209,14 +227,17 @@ const SimulationDialog = props => {
                 }))}
             </div>
             <h4 className={props.classes.headers}>
-                {I18n.t('Enums')}
-                <IconButton
-                    size="small"
-                    onClick={() => setEnumsDialog(true)}
-                    color="primary"
-                >
-                    <Add />
-                </IconButton>
+                {I18n.t('Categories')}
+                <Tooltip title={I18n.t('Add overlap of categories for recording')}>
+                    <IconButton
+                        className={!enumStates.length && simulation?.native?.record?.states?.length ? props.classes.blink : ''}
+                        size="small"
+                        onClick={() => setEnumsDialog(true)}
+                        color="primary"
+                    >
+                        <Add />
+                    </IconButton>
+                </Tooltip>
             </h4>
             <div>
                 {simulation.native.record?.enums.map((enumIds, i) => {
@@ -259,7 +280,7 @@ const SimulationDialog = props => {
                 {I18n.t('Delete')}
             </Button>
             <Button
-                disabled={!props.simulation || !simulation || JSON.stringify(simulation.native) === JSON.stringify(props.simulation.native)}
+                disabled={disabled}
                 onClick={async () => {
                     const _simulation = JSON.parse(JSON.stringify(simulation));
                     if (_simulation.native.interval !== props.simulation.native.interval) {
@@ -290,25 +311,17 @@ const SimulationDialog = props => {
                 color="grey"
                 startIcon={<Cancel />}
             >
-                {I18n.t('Cancel')}
+                {disabled ? I18n.t('ra_Close') : I18n.t('ra_Cancel')}
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm
             fullWidth={false}
             title={I18n.t('Delete simulation')}
             text={I18n.t('Simulation will be deleted. Confirm?')}
-            ok={I18n.t('Delete')}
+            ok={I18n.t('ra_Delete')}
             onClose={async isYes => {
                 if (isYes) {
-                    try {
-                        await props.socket.delObject(simulation._id);
-                        if (props.selectedSimulation === simulation._id) {
-                            props.setSelectedSimulation(null);
-                        }
-                    } catch (e) {
-                        window.alert(`Cannot delete simulation: ${e}`);
-                    }
-
+                    await props.onDelete(simulation._id);
                     props.onClose();
                 }
                 setDeleteDialog(false);
@@ -354,10 +367,9 @@ const SimulationDialog = props => {
 
 SimulationDialog.propTypes = {
     onClose: PropTypes.func,
+    onDelete: PropTypes.func,
     simulation: PropTypes.object,
     socket: PropTypes.object,
-    selectedSimulation: PropTypes.string,
-    setSelectedSimulation: PropTypes.func,
 };
 
 export default withStyles(styles)(SimulationDialog);

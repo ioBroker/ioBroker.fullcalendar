@@ -64,6 +64,9 @@ const styles = {
         marginLeft: 20,
         display: 'inline-block',
     },
+    randomTime: {
+        marginLeft: 16,
+    },
 };
 
 const astroTypes = [
@@ -329,19 +332,18 @@ const EventDialog = props => {
                             ampm={false}
                         />
                     </LocalizationProvider>}
+                    {props.isSimulation && <TextField
+                        className={props.classes.randomTime}
+                        label={props.t('Time random offset')}
+                        value={event.native.timeRandomOffset || 0}
+                        disabled={props.readOnly}
+                        onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
+                        variant="standard"
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                        }}
+                    />}
             </div>
-            {props.isSimulation && <div className={props.classes.field}>
-                <TextField
-                    label={props.t('Time random offset')}
-                    value={event.native.timeRandomOffset || 0}
-                    disabled={props.readOnly}
-                    onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
-                    variant="standard"
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
-                    }}
-                />
-            </div>}
             <div className={props.classes.field}>
                 {!props.isSimulation && <FormControl
                     variant="standard"
@@ -520,14 +522,13 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.narrowColor}>
                 <ColorPicker
-                    value={event.native.color || ''}
+                    value={event.common.color || event.native.color || ''}
                     disabled={props.readOnly}
                     onChange={color =>
-                        changeEvent(newEvent => newEvent.native.color = color)}
+                        changeEvent(newEvent => newEvent.common.color = color)}
                     name={props.t('Color')}
                 />
             </div>
-            {/* <pre>{JSON.stringify(event, null, 2)}</pre> */}
         </DialogContent>
         <DialogActions>
             {!props.readOnly ? <Button
@@ -573,7 +574,7 @@ const EventDialog = props => {
                 startIcon={<Cancel />}
                 onClick={props.onClose}
             >
-                {props.readOnly ? props.t('Close') : props.t('Cancel')}
+                {props.readOnly || !changed ? props.t('Close') : props.t('Cancel')}
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm

@@ -37,7 +37,7 @@ const eventTypes = [
     { type: 'toggle', name: 'Toggle event' },
 ];
 
-const DraggableButton = ({ type, t }) => {
+const DraggableButton = ({ type, t, color }) => {
     const ref = useRef(null);
 
     useEffect(() => {
@@ -59,7 +59,7 @@ const DraggableButton = ({ type, t }) => {
 
     return <div
         style={{
-            backgroundColor: 'rgb(58, 135, 178)',
+            backgroundColor: color || 'rgb(58, 135, 178)',
             color: 'white',
             cursor: 'pointer',
             fontSize: '14px',
@@ -156,10 +156,12 @@ function Calendar(props) {
         }
         // duration in ms
         const initialDuration = event.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ?
-            event.native.intervals[0].timeOffset : 20;
+            event.native.intervals[0].timeOffset : 30;
 
-        const backgroundColor = event.common.enabled ? event.native.color : dimColor(event.native.color);
-        let textColor = Utils.invertColor(event.native.color, true);
+        event.common.color = event.common.color || '#3a87b2';
+
+        const backgroundColor = event.common.enabled ? event.common.color : dimColor(event.common.color);
+        let textColor = Utils.invertColor(event.common.color, true);
         if (!event.common.enabled) {
             textColor = dimColor(textColor);
         }
@@ -187,14 +189,17 @@ function Calendar(props) {
         if (event.native.cron) {
             const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
             const cronObject = cron2obj(event.native.cron);
-            start.setFullYear(1970);
+            start.setFullYear(new Date().getFullYear() - 1);
+
             if (Array.isArray(cronObject.months)) {
                 const rule = new RRule({
                     dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     bymonth: cronObject.months,
+                    //tzid: TIME_ZONE,
                 });
+
                 rule.between(
                     calendarInterval.start || new Date(),
                     calendarInterval.end || new Date(),
@@ -206,6 +211,7 @@ function Calendar(props) {
                             props.adapterConfig.longitude || props.systemConfig.longitude,
                         )[event.native.astro] :
                         rruleTime;
+
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
                         extendedProps: { eventId: event._id },
@@ -220,13 +226,16 @@ function Calendar(props) {
                 });
                 return;
             }
+
             if (Array.isArray(cronObject.dows)) {
                 const rule = new RRule({
                     dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                     until: calendarInterval.end || new Date(),
                     freq: RRule.WEEKLY,
                     byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
+                    //tzid: TIME_ZONE,
                 });
+
                 rule.between(
                     calendarInterval.start || new Date(),
                     calendarInterval.end || new Date(),
@@ -234,6 +243,7 @@ function Calendar(props) {
                     const time = event.native.astro ?
                         SunCalc.getTimes(rruleTime, props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
                         rruleTime;
+
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
                         extendedProps: { eventId: event._id },
@@ -248,6 +258,7 @@ function Calendar(props) {
                 });
                 return;
             }
+
             events.push({
                 // id: event._id,
                 extendedProps: { eventId: event._id },
@@ -355,6 +366,7 @@ function Calendar(props) {
                                 name={props.t(type.name)}
                                 key={type.type}
                                 index={index}
+                                color={props.isSimulation ? props.simulation?.common?.color : undefined}
                             />)}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Drag and drop the events above to create a new one.')}</div>}
                         {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
@@ -384,6 +396,8 @@ function Calendar(props) {
                         selectMirror
                         nowIndicator
                         dayMaxEvents
+                        eventResizableFromStart={!props.isSimulation}
+                        eventDurationEditable={!props.isSimulation}
                         events={events}
                         height="calc(100% - 20px)"
                         locales={[
@@ -480,6 +494,7 @@ function Calendar(props) {
                                 common: {
                                     name: event.event.title,
                                     enabled: true,
+                                    color: '#3A87AD',
                                 },
                                 native: {
                                     id: Date.now(),
@@ -487,7 +502,6 @@ function Calendar(props) {
                                     type: event.event.extendedProps.type,
                                     oid: '',
                                     startValue: '',
-                                    color: '#3A87AD',
                                 },
                                 type: 'schedule',
                             };
@@ -497,6 +511,8 @@ function Calendar(props) {
                                 }];
                             }
                             if (props.isSimulation) {
+                                newEvent.common.color = props.simulation.common.color || newEvent.common.color;
+
                                 delete newEvent.native.start;
                                 const cron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
                                 cron.dows = props.simulation.native.interval === 'day' ? [0, 1, 2, 3, 4, 5, 6] : [event.event.start.getDay()];
@@ -504,7 +520,6 @@ function Calendar(props) {
                                 cron.months = ['*'];
                                 newEvent.native.cron = obj2cron(cron);
                                 newEvent._id = `${props.simulationId}.event-${uuidv4()}`;
-                                newEvent.native.color = props.simulation.common.color;
                                 newEvent.native.record = {
                                     states: [],
                                     enums: [],
@@ -529,21 +544,25 @@ function Calendar(props) {
                                 common: {
                                     name: props.t('Single event'),
                                     enabled: true,
+                                    color: '#3A87AD',
                                 },
                                 native: {
                                     id: Date.now(),
                                     start: clientDateToServer(selectInfo.date || selectInfo.start, 'date', props.serverTimeZone),
-                                    intervals: selectInfo.end ? [{
+                                    intervals: selectInfo.end && !props.isSimulation ? [{
                                         value: '',
                                         timeOffset: (selectInfo.end.getTime() - selectInfo.start.getTime()),
                                     }] : undefined,
-                                    type: selectInfo.end ? 'double' : 'single',
+                                    type: selectInfo.end && !props.isSimulation ? 'double' : 'single',
                                     oid: '',
                                     startValue: '',
-                                    color: '#3A87AD',
                                 },
                                 type: 'schedule',
                             };
+                            if (props.isSimulation) {
+                                newEvent.common.color = props.simulation.common.color || newEvent.common.color;
+                            }
+
                             await props.setEvent(newEvent._id, newEvent);
                             await props.updateEvents();
                             setTimeout(() => setEventDialog(newEvent._id), 100);

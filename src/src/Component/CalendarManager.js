@@ -1,12 +1,16 @@
-import PropTypes from 'prop-types';
-import { I18n } from '@iobroker/adapter-react-v5';
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@mui/styles';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
     IconButton, Tab, Tabs, Paper, Tooltip, Toolbar, Fab,
 } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
-import { Add, Edit } from '@mui/icons-material';
-import { withStyles } from '@mui/styles';
+
+import { Add, Edit, ReportProblem as Alert } from '@mui/icons-material';
+
+import { I18n } from '@iobroker/adapter-react-v5';
+
 import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog from './CalendarDialog';
@@ -54,6 +58,13 @@ const style = theme => ({
     tabRoot: {
         padding: '0 6px',
     },
+    alert: {
+        color: theme.palette.error.main,
+    },
+    selected: {
+        backgroundColor: theme.palette.primary.main,
+        color: 'white !important',
+    },
 });
 
 const CalendarManager = props => {
@@ -61,6 +72,7 @@ const CalendarManager = props => {
     const [calendarDialog, setCalendarDialog] = useState(null);
     const [calendars, setCalendars] = useState([]);
     const [isSimulations, setIsSimulations] = useState(window.localStorage.getItem('fullcalendar.tab') === '1' ? 1 : 0);
+    const [alive, setAlive] = useState(false);
 
     const updateCalendars = async () => {
         const objects = await props.socket.getObjectViewSystem(
@@ -74,6 +86,20 @@ const CalendarManager = props => {
     useEffect(() => {
         updateCalendars()
             .catch(e => console.error(e));
+
+        const onAliveChanged = (id, state) => {
+            const val = (state && state.val) || false;
+            setAlive(val);
+        };
+
+        props.socket.subscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged);
+
+        props.socket.getState(`system.adapter.fullcalendar.${props.instance}.alive`)
+            .then(state => setAlive((state && state.val) || false));
+
+        return () => {
+            props.socket.unsubscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged);
+        };
     }, []);
 
     return <div className={props.classes.column}>
@@ -95,6 +121,7 @@ const CalendarManager = props => {
             updateCalendars={updateCalendars}
             setIsSimulations={setIsSimulations}
             setCalendarPrefix={setCalendarPrefix}
+            alive={alive}
         /> :
             <div className={props.classes.container}>
                 <div className={props.classes.calendars}>
@@ -122,6 +149,8 @@ const CalendarManager = props => {
                             >
                                 <Add />
                             </Fab>
+                            <div className={props.classes.divider} />
+                            {!alive && <Tooltip title={I18n.t('Instance inactive')}><Alert className={props.classes.alert} /></Tooltip>}
                         </Toolbar>
                         <Tabs
                             value={calendarPrefix}
@@ -133,7 +162,7 @@ const CalendarManager = props => {
                             orientation="vertical"
                         >
                             <Tab
-                                classes={{ root: props.classes.tabRoot }}
+                                classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
                                 label={<div className={props.classes.label}>
                                     {I18n.t('Default')}
                                 </div>}
@@ -143,7 +172,7 @@ const CalendarManager = props => {
                                 <Tab
                                     component="div"
                                     key={calendar._id}
-                                    classes={{ root: props.classes.tabRoot }}
+                                    classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
                                     label={<div className={props.classes.label}>
                                         {calendar.common.name}
                                         <div className={props.classes.divider} />

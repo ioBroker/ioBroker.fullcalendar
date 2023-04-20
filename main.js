@@ -43,6 +43,7 @@ function subscribeUnsubscribe() {
         if (!subscribed.includes(state)) {
             subscribed.push(state);
             adapter.subscribeForeignStates(state);
+            adapter.log.debug(`+ Subscribed to ${state}`);
         }
     });
 
@@ -52,6 +53,7 @@ function subscribeUnsubscribe() {
         if (pos === -1) {
             subscribed.splice(pos, 1);
             adapter.unsubscribeForeignStates(state);
+            adapter.log.debug(`- Unsubscribed to ${state}`);
         }
     });
 }
@@ -98,13 +100,6 @@ async function startRecordSimulation(id) {
         recordingSimulations[id].value = 'stop';
         return;
     }
-
-    const obj = JSON.parse(JSON.stringify(recordingSimulations[id]));
-    delete obj.value;
-    delete obj.allStates;
-
-    // save simulation
-    // await adapter.setForeignObjectAsync(id, obj);
 
     subscribeUnsubscribe();
 }
@@ -160,11 +155,12 @@ function startAdapter(options) {
                 return;
             }
 
-            for (let i = 0; i < recordingSimulations.length; i++) {
-                const simulation = recordingSimulations[i];
-                if (simulation.states.includes(stateId)) {
+            const ids = Object.keys(recordingSimulations);
+            for (let i = 0; i < ids.length; i++) {
+                const simulation = recordingSimulations[ids[i]];
+                if (simulation.allStates.includes(stateId) && simulation.value === 'record') {
                     // read current simulation
-                    const profile = await adapter.getForeignObjectAsync(simulation.id);
+                    const profile = await adapter.getForeignObjectAsync(simulation._id);
 
                     // add new event
                     const date = new Date();
@@ -174,7 +170,7 @@ function startAdapter(options) {
                     }
                     const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
                     profile.native.events.push({
-                        _id: `${simulation.id}.event-${uuidv4()}`,
+                        _id: `${simulation._id}.event-${uuidv4()}`,
                         common: {
                             name: stateId,
                             enabled: true,
@@ -190,8 +186,10 @@ function startAdapter(options) {
                         type: 'schedule',
                     });
 
+                    adapter.log.debug(`Add event to simulation "${simulation.common.name}": ${stateId} => ${state.val}`);
+
                     // save simulation
-                    await adapter.setForeignObjectAsync(simulation.id, profile);
+                    await adapter.setForeignObjectAsync(simulation._id, profile);
                 }
             }
 
@@ -299,6 +297,7 @@ function startAdapter(options) {
             return;
         }
 
+        // sync enums
         if (id.startsWith('enum.')) {
             if (obj) {
                 enums[id] = obj;
@@ -320,6 +319,7 @@ function startAdapter(options) {
             return;
         }
 
+        // ignore info states
         if (id.startsWith(`${adapter.namespace}.info.`)) {
             return;
         }
@@ -338,6 +338,7 @@ function startAdapter(options) {
                 if (recordingSimulations[id].value === 'record') {
                     await startRecordSimulation(id);
                 }
+                subscribeUnsubscribe();
             } else if (recordingSimulations[id]) {
                  await stopRecordSimulation(id);
                  delete recordingSimulations[id];
@@ -545,7 +546,7 @@ function calculateNext() {
             if (date.simulationDow && date.simulationDow.indexOf(date.getDay()) === -1) {
                 continue;
             }
-            console.log(date);
+            // console.log(date);
 
             if (event.native.timeRandomOffset) {
                 date = new Date(date.getTime() + Math.round(Math.random() * event.native.timeRandomOffset * (Math.random() > 0.5 ? 1 : -1)));
@@ -580,7 +581,7 @@ function calculateNext() {
                 continue;
             }
 
-            console.log(time);
+            // console.log(time);
 
             if (nowObj.getFullYear() === time.getFullYear() &&
                 nowObj.getMonth() === time.getMonth() &&
@@ -654,7 +655,7 @@ async function readEnums() {
 
 async function afterMain() {
     await readEnums();
-    await adapter.subscribeObjectsAsync('*');
+    await adapter.subscribeObjectsAsync('*'); // subscribe on own events and simulations
     calculateNext();
 
     const ids = Object.keys(cfgEventsSettings);
@@ -762,6 +763,7 @@ async function main() {
             await setSimulationStatus(id, value.val);
         }
     }
+    await adapter.subscribeForeignStatesAsync(`${adapter.namespace}.Simulations.*`); // subscribe on own events and simulations
 
     updateInterval = setInterval(() => {
         Object.keys(recordingSimulations).forEach(id => {
@@ -771,7 +773,7 @@ async function main() {
                 stopRecordSimulation(id);
             }
         });
-    }, 60 * 1000);
+    }, 60 * 1000); // every minute
 
     await afterMain();
 }

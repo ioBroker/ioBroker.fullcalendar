@@ -27,7 +27,8 @@ const style = {
         padding: 0,
     },
     content: {
-        // paddingRight: 20,
+        overflow: 'auto',
+        minWidth: 250,
     },
     chipSubText: {
         fontSize: 10,
@@ -204,7 +205,7 @@ const EnumsDialog = props => {
     };
 
     return <Dialog open={props.open} onClose={props.onClose} fullWidth>
-        <DialogTitle>{I18n.t('Select enums')}</DialogTitle>
+        <DialogTitle>{I18n.t('Select categories')}</DialogTitle>
         <DialogContent>
             <div
                 style={{
@@ -214,7 +215,7 @@ const EnumsDialog = props => {
                     flexDirection: 'row',
                 }}
             >
-                <Paper className={props.classes.content} style={{ overflow: 'auto' }}>
+                <Paper className={props.classes.content} >
                     {enumsTree.items?.enum && Object.keys(enumsTree.items.enum.items).map(id => renderEnums(enumsTree.items.enum.items[id], id))}
                 </Paper>
                 <div style={{ marginLeft: 8, overflow: 'auto' }}>
