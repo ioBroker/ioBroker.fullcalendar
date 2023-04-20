@@ -9,6 +9,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import rrulePlugin from '@fullcalendar/rrule';
 import listPlugin from '@fullcalendar/list';
+
 import deLocale from '@fullcalendar/core/locales/de';
 import ruLocale from '@fullcalendar/core/locales/ru';
 import ptLocale from '@fullcalendar/core/locales/pt';

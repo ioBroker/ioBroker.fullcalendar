@@ -119,8 +119,6 @@ const Simulations = props => {
                 _simulations[pos] = obj;
             }
 
-            console.log(_simulations);
-
             return _simulations;
         });
     };
@@ -185,32 +183,34 @@ const Simulations = props => {
     };
 
     const toCalendar = <div className={props.classes.toCalendar}>
-        <Button
-            variant="contained"
-            onClick={async () => {
-                const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
-                await props.socket.setObject(id, {
-                    type: 'folder',
-                    common: {
-                        name: 'NewCalendar',
-                    },
-                    native: {},
-                });
+        <Tooltip title={I18n.t('You can export events to static calender')}>
+            <Button
+                variant="contained"
+                onClick={async () => {
+                    const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
+                    await props.socket.setObject(id, {
+                        type: 'folder',
+                        common: {
+                            name: 'NewCalendar',
+                        },
+                        native: {},
+                    });
 
-                const events = simulations.find(s => s._id === selectedSimulation).native.events;
-                for (const k in events) {
-                    const _event = JSON.parse(JSON.stringify(events[k]));
-                    _event.id = `${id}.event-${uuidv4()}`;
-                    props.socket.setObject(_event.id, _event);
-                }
+                    const events = simulations.find(s => s._id === selectedSimulation).native.events;
+                    for (const k in events) {
+                        const _event = JSON.parse(JSON.stringify(events[k]));
+                        _event.id = `${id}.event-${uuidv4()}`;
+                        props.socket.setObject(_event.id, _event);
+                    }
 
-                props.updateCalendars();
-                props.setIsSimulations(false);
-                props.setCalendarPrefix(id);
-            }}
-        >
-            {I18n.t('To calendar')}
-        </Button>
+                    props.updateCalendars();
+                    props.setIsSimulations(false);
+                    props.setCalendarPrefix(id);
+                }}
+            >
+                {I18n.t('To calendar')}
+            </Button>
+        </Tooltip>
     </div>;
 
     return <div className={Utils.clsx(props.classes.container, props.classes.simulations)}>

@@ -574,7 +574,7 @@ const EventDialog = props => {
                 startIcon={<Cancel />}
                 onClick={props.onClose}
             >
-                {props.readOnly || !changed ? props.t('Close') : props.t('Cancel')}
+                {props.readOnly || !changed ? props.t('ra_Close') : props.t('ra_Cancel')}
             </Button>
         </DialogActions>
         {deleteDialog && <Confirm

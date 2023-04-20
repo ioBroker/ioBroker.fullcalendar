@@ -226,6 +226,7 @@ const EnumsDialog = props => {
         </DialogContent>
         <DialogActions>
             <Button
+                disabled={!selectedEnums.length}
                 onClick={() => {
                     props.onSelect(selectedEnums);
                     props.onClose();
@@ -242,7 +243,7 @@ const EnumsDialog = props => {
                 color="grey"
                 startIcon={<Cancel />}
             >
-                {I18n.t('Cancel')}
+                {selectedEnums.length ? I18n.t('ra_Cancel') : I18n.t('ra_Close')}
             </Button>
         </DialogActions>
     </Dialog>;
