@@ -44,6 +44,7 @@ const CalendarContainer = props => {
                 objects = objects.filter(o => !o._id.match(/^fullcalendar\.[0-9]\.Calendars/));
             }
         }
+
         let _serverTimeZone = 0;
         try {
             const state = await props.socket.getState('fullcalendar.0.info.timeZone');
@@ -69,8 +70,9 @@ const CalendarContainer = props => {
                 _simulationObject.native.events.push(event);
             }
             await props.socket.setObject(props.simulationId, _simulationObject);
+        } else {
+            return props.socket.setObject(id, event);
         }
-        return props.socket.setObject(id, event);
     };
     const deleteEvent = async id => {
         if (props.isSimulation) {
@@ -116,7 +118,6 @@ const CalendarContainer = props => {
             simulation={props.simulation}
             simulations={props.simulations}
             readOnly={props.readOnly}
-            adapterConfig={props.adapterConfig}
             button={props.button}
         />
         {/* <pre>
@@ -135,7 +136,6 @@ CalendarContainer.propTypes = {
     simulation: PropTypes.object,
     simulations: PropTypes.array,
     readOnly: PropTypes.bool,
-    adapterConfig: PropTypes.object,
     button: PropTypes.any,
 };
 

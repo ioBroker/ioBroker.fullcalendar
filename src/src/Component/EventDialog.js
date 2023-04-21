@@ -1,16 +1,6 @@
-import {
-    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, TextField,
-} from '@mui/material';
-import { Cancel, Delete, Save } from '@mui/icons-material';
-import {
-    ColorPicker, SelectID, Confirm, I18n,
-} from '@iobroker/adapter-react-v5';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { withStyles } from '@mui/styles';
 import moment from 'moment';
 import 'moment/locale/de';
 import 'moment/locale/ru';
@@ -22,8 +12,21 @@ import 'moment/locale/nl';
 import 'moment/locale/pl';
 import 'moment/locale/pt';
 import 'moment/locale/uk';
+import SunCalc from 'suncalc2';
 
-import { withStyles } from '@mui/styles';
+import {
+    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, TextField,
+} from '@mui/material';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+
+import { Cancel, Delete, Save } from '@mui/icons-material';
+
+import {
+    ColorPicker, SelectID, Confirm, Icon, Utils,
+} from '@iobroker/adapter-react-v5';
+
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';
@@ -48,10 +51,19 @@ const styles = {
     },
     selectId: {
         display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+    },
+    timeType: {
+        width: 120,
     },
     narrowText: {
         width: 140,
         marginLeft: 8,
+    },
+    width60: {
+        width: 80,
+        marginLeft: 16,
     },
     narrowText2: {
         minWidth: 150,
@@ -66,6 +78,7 @@ const styles = {
     },
     randomTime: {
         marginLeft: 16,
+        width: 133,
     },
 };
 
@@ -93,6 +106,39 @@ function getText(text, lang) {
     return text;
 }
 
+async function getImage(id, socket) {
+    let obj;
+    if (typeof id === 'string') {
+        obj = await socket.getObject(id);
+    } else {
+        obj = id;
+    }
+    let icon = null;
+
+    if (obj && obj.common && obj.common.icon) {
+        icon = Utils.getObjectIcon(obj);
+    } else if (obj.type === 'state') {
+        // get parent name
+        let parts = obj._id.split('.');
+        parts.pop();
+        let parentId = parts.join('.');
+        obj = await socket.getObject(parentId);
+        if (obj && obj.common && obj.common.icon) {
+            icon = Utils.getObjectIcon(obj);
+        } else if (!obj || (obj.type === 'channel' || obj.type === 'device')) {
+            parts = obj._id.split('.');
+            parts.pop();
+            parentId = parts.join('.');
+            obj = await socket.getObject(parentId);
+            if (obj && obj.common && obj.common.icon) {
+                icon = Utils.getObjectIcon(obj);
+            }
+        }
+    }
+
+    return icon;
+}
+
 const EventDialog = props => {
     const initialDuration = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].timeOffset ? props.event.native.intervals[0].timeOffset / 60000 : 0;
     const initialEndValue = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].value !== undefined ? props.event.native.intervals[0].value : '';
@@ -102,17 +148,42 @@ const EventDialog = props => {
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [duration, setDuration] = useState(initialDuration);
     const [endValue, setEndValue] = useState(initialEndValue);
+    const [astroEventTimes, setAstroEventTimes] = useState({});
 
     moment.locale(props.language);
 
     useEffect(() => {
+        const _astroEventTimes = SunCalc.getTimes(
+            Date.now(),
+            props.systemConfig.latitude,
+            props.systemConfig.longitude,
+        );
+
+        setAstroEventTimes(_astroEventTimes);
+
         if (event.native.oid) {
-            props.socket.getObject(event.native.oid)
-                .then(obj => setObject(obj))
-                .catch(e => {
+            if (!object || object._id !== event.native.oid) {
+                try {
+                    // read object
+                    props.socket.getObject(event.native.oid)
+                        .then(obj => {
+                            // update states if required
+                            if (JSON.stringify(event.native.states) !== JSON.stringify(obj.common.states)) {
+                                changeEvent(newEvent => newEvent.native.states = obj.common.states)
+                            }
+
+                            if (object || props.event.native.oid !== event.native.oid) {
+                                getImage(obj, props.socket)
+                                    .then(newImage => changeEvent(newEvent => newEvent.common.icon = newImage));
+                            }
+
+                            setObject(obj);
+                        });
+                } catch(e) {
                     console.error(`Cannot get object ${event.native.oid}: ${e}`);
                     setObject(null);
-                });
+                }
+            }
         } else {
             setObject(null);
         }
@@ -162,9 +233,11 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.checked)}
                 />}
-                label={props.t(name)}
+                label={<div><div>{props.t(name)}</div><div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div></div>}
             />;
-        } if (object.common.states) {
+        }
+
+        if (object.common.states) {
             return <FormControl
                 className={props.classes.narrowText2}
                 variant="standard"
@@ -180,6 +253,7 @@ const EventDialog = props => {
                 </Select>
             </FormControl>;
         }
+
         return <TextField
             className={props.classes.narrowText2}
             label={props.t(name)}
@@ -206,9 +280,11 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => setEndValue(e.target.checked)}
                 />}
-                label={props.t('End value')}
+                label={<div><div>{props.t('End value')}</div><div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div></div>}
             />;
-        } if (object.common.states) {
+        }
+
+        if (object.common.states) {
             return <FormControl
                 className={props.classes.narrowText2}
                 variant="standard"
@@ -224,6 +300,7 @@ const EventDialog = props => {
                 </Select>
             </FormControl>;
         }
+
         return <TextField
             label={props.t('End value')}
             value={endValue || ''}
@@ -235,6 +312,14 @@ const EventDialog = props => {
     };
 
     const daysOfWeek = props.systemConfig?.firstDayOfWeek === 'monday' ? [1, 2, 3, 4, 5, 6, 0] : [0, 1, 2, 3, 4, 5, 6];
+
+    const astroTime = event.native.astro && astroEventTimes ? astroEventTimes[event.native.astro] : '';
+    const astroText = astroTime ? astroTime.toLocaleTimeString().replace(/:\d\d$/, '') : '';
+    let astroTextOffset = '';
+    if (event.native.astro && event.native.offset && astroTime) {
+        const t = new Date(astroTime.getTime() + event.native.offset * 60000);
+        astroTextOffset = t.toLocaleTimeString().replace(/:\d\d$/, '');
+    }
 
     return <Dialog open={!0} onClose={props.onClose} fullWidth>
         <DialogTitle>{props.t('Configure event')}</DialogTitle>
@@ -264,9 +349,9 @@ const EventDialog = props => {
             <div className={props.classes.field}>
                 <FormControl
                     variant="standard"
-                    className={props.classes.narrowText2}
+                    className={props.classes.timeType}
                 >
-                    <InputLabel>{props.t('Time')}</InputLabel>
+                    <InputLabel>{props.t('Time type')}</InputLabel>
                     <Select
                         value={event.native.astro ? 'astro' : 'time'}
                         disabled={props.readOnly}
@@ -293,13 +378,14 @@ const EventDialog = props => {
                         className={props.classes.narrowText}
                         variant="standard"
                     >
-                        <InputLabel>{I18n.t('Astronomic event')}</InputLabel>
+                        <InputLabel>{props.t('Astronomic event')}</InputLabel>
                         <Select
                             value={event.native.astro || ''}
                             onChange={e => changeEvent(newEvent => newEvent.native.astro = e.target.value)}
+                            renderValue={value => props.t(value)}
                         >
                             {astroTypes
-                                .map(astroType => <MenuItem key={astroType} value={astroType}>{I18n.t(astroType)}</MenuItem>)}
+                                .map(astroType => <MenuItem key={astroType} value={astroType}>{props.t(astroType)} - [{astroText}]</MenuItem>)}
                         </Select>
                     </FormControl>
 
@@ -332,6 +418,51 @@ const EventDialog = props => {
                             ampm={false}
                         />
                     </LocalizationProvider>}
+                {event.native.astro ? <FormControl
+                        variant="standard"
+                        className={props.classes.width60}
+                    >
+                        <InputLabel>{props.t('Offset')}</InputLabel>
+                        <Select
+                            value={event.native.offset || 0}
+                            disabled={props.readOnly}
+                            onChange={e =>
+                                changeEvent(newEvent => newEvent.native.offset = e.target.value)}
+                        >
+                            {[
+                                { label: 'none', value: 0 },
+                                { label: '5 min', value: 5 },
+                                { label: '10 min', value: 10 },
+                                { label: '15 min', value: 15 },
+                                { label: '20 min', value: 20 },
+                                { label: '30 min', value: 30 },
+                                { label: '45 min', value: 45 },
+                                { label: '1 hour', value: 60 },
+                                { label: '1.5 hours', value: 90 },
+                                { label: '2 hours', value: 120 },
+                                { label: '2.5 hours', value: 150 },
+                                { label: '3 hours', value: 180 },
+                                { label: '4 hours', value: 240 },
+                                { label: '5 min', value: -5 },
+                                { label: '10 min', value: -10 },
+                                { label: '15 min', value: -15 },
+                                { label: '20 min', value: -20 },
+                                { label: '30 min', value: -30 },
+                                { label: '45 min', value: -45 },
+                                { label: '1 hour', value: -60 },
+                                { label: '1.5 hours', value: -90 },
+                                { label: '2 hours', value: -120 },
+                                { label: '2.5 hours', value: -150 },
+                                { label: '3 hours', value: -180 },
+                                { label: '4 hours', value: -240 },
+                            ]
+                                .map(time =>
+                                    <MenuItem key={time.value} value={time.value}>
+                                        {time.value < 0 ? `- ${props.t(time.label)}` : props.t(time.label)}
+                                    </MenuItem>)}
+                        </Select>
+                    </FormControl> : null}
+
                 {props.isSimulation && <TextField
                     className={props.classes.randomTime}
                     label={props.t('Time random offset')}
@@ -344,6 +475,10 @@ const EventDialog = props => {
                     }}
                 />}
             </div>
+            {event.native.astro ? <div className={props.classes.field}>
+                    {props.t('Today %s is at %s.', props.t(event.native.astro), astroText)}&nbsp;
+                    {event.native.offset ? props.t('With offset at %s.', astroTextOffset) : null}
+            </div> : null}
             <div className={props.classes.field}>
                 {!props.isSimulation && <FormControl
                     variant="standard"
@@ -380,6 +515,7 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.field}>
                 <div className={props.classes.selectId}>
+                    <Icon src={event.common.icon || ''} style={{ width: 32, height: 32 }} />
                     <TextField
                         label="Object ID"
                         value={event.native.oid || ''}
@@ -393,7 +529,7 @@ const EventDialog = props => {
                 </div>
             </div>
             <div className={props.classes.field}>
-                {valueField('startValue', event.native.type === 'toggle' ? 'First value' : 'Start value')}
+                {valueField('startValue', event.native.type === 'toggle' ? 'First value' : (event.native.type === 'single' ? 'Desired value' : 'Start value'))}
                 {event.native.type === 'double' && endValueField()}
             </div>
             <div className={props.classes.field}>
@@ -583,7 +719,7 @@ const EventDialog = props => {
             text={props.t('Event will be deleted. Confirm?')}
             suppressQuestionMinutes={5}
             dialogName="deleteConfirmDialog"
-            ok={I18n.t('Delete')}
+            ok={props.t('Delete')}
             onClose={async isYes => {
                 if (isYes) {
                     try {

@@ -7,7 +7,13 @@ import {
     IconButton, Tab, Tabs, Paper, Tooltip, Toolbar, Fab,
 } from '@mui/material';
 
-import { Add, Edit, ReportProblem as Alert } from '@mui/icons-material';
+import {
+    Add,
+    Edit,
+    ReportProblem as Alert,
+    PlaylistPlay as SimulationIcon,
+    CalendarMonth,
+} from '@mui/icons-material';
 
 import { I18n } from '@iobroker/adapter-react-v5';
 
@@ -83,6 +89,11 @@ const CalendarManager = props => {
         setCalendars(Object.values(objects));
     };
 
+    const changeCalendarType = () => setIsSimulations(_isSimulations => {
+        window.localStorage.setItem('fullcalendar.tab', _isSimulations ? '0' : '1');
+        return !_isSimulations;
+    });
+
     useEffect(() => {
         updateCalendars()
             .catch(e => console.error(e));
@@ -103,29 +114,26 @@ const CalendarManager = props => {
     }, []);
 
     return <div className={props.classes.column}>
-        <Tabs
-            value={isSimulations ? 1 : 0}
-            onChange={() => {
-                window.localStorage.setItem('fullcalendar.tab', isSimulations ? '0' : '1');
-                setIsSimulations(!isSimulations);
-            }}
-            className={props.classes.tabs}
-        >
-            <Tab label={I18n.t('Calendars')} />
-            <Tab label={I18n.t('Simulations')} className={props.classes.simulations} />
-        </Tabs>
         {isSimulations ? <Simulations
             systemConfig={props.systemConfig}
             socket={props.socket}
             instance={props.instance}
             updateCalendars={updateCalendars}
-            setIsSimulations={setIsSimulations}
+            changeCalendarType={changeCalendarType}
             setCalendarPrefix={setCalendarPrefix}
             alive={alive}
         /> :
             <div className={props.classes.container}>
                 <div className={props.classes.calendars}>
                     <Paper className={props.classes.calendarsPaper}>
+                        <Tabs
+                            value={0}
+                            onChange={changeCalendarType}
+                            className={props.classes.tabs}
+                        >
+                            <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
+                            <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} className={props.classes.simulations} />
+                        </Tabs>
                         <Toolbar variant="dense" className={props.classes.toolbar}>
                             <Fab
                                 size="small"
@@ -153,7 +161,7 @@ const CalendarManager = props => {
                             {!alive && <Tooltip title={I18n.t('Instance inactive')}><Alert className={props.classes.alert} /></Tooltip>}
                         </Toolbar>
                         <Tabs
-                            value={calendarPrefix}
+                            value={calendars.find(c => c._id === calendarPrefix) ? calendarPrefix : `fullcalendar.${props.instance}`}
                             onChange={(e, value) => {
                                 window.localStorage.setItem('fullcalendar.calendar', value);
                                 setCalendarPrefix(value);
@@ -201,7 +209,6 @@ const CalendarManager = props => {
                     calendarPrefix={calendarPrefix}
                     t={I18n.t}
                     language={I18n.getLanguage()}
-                    adapterConfig={props.adapterConfig}
                 />
             </div>}
         <CalendarDialog
@@ -222,7 +229,6 @@ CalendarManager.propTypes = {
     instance: PropTypes.any.isRequired,
     systemConfig: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
-    adapterConfig: PropTypes.object.isRequired,
 };
 
 export default withStyles(style)(CalendarManager);

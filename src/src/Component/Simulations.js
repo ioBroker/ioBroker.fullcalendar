@@ -23,7 +23,8 @@ import {
     Edit, FiberManualRecord, Pause,
     Add, PlayArrow, Delete, Check,
     ReportProblem as Alert,
-    Stop,
+    Stop, CalendarMonth,
+    PlaylistPlay as SimulationIcon,
 } from '@mui/icons-material';
 
 import {
@@ -40,7 +41,9 @@ const style = theme => ({
         width: '100%',
         flex: 1,
     },
-    tabs: {},
+    tabs: {
+
+    },
     toCalendar: {
         paddingLeft: 20,
     },
@@ -300,6 +303,14 @@ const Simulations = props => {
                 }}
             />}
             <Paper className={props.classes.calendarsPaper}>
+                <Tabs
+                    value={1}
+                    onChange={props.changeCalendarType}
+                    className={props.classes.tabs}
+                >
+                    <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
+                    <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} className={props.classes.simulations} />
+                </Tabs>
                 <Toolbar variant="dense" className={props.classes.toolbar}>
                     <Fab
                         color="primary"
@@ -498,7 +509,7 @@ Simulations.propTypes = {
     systemConfig: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
     updateCalendars: PropTypes.func.isRequired,
-    setIsSimulations: PropTypes.func.isRequired,
+    changeCalendarType: PropTypes.func.isRequired,
     setCalendarPrefix: PropTypes.func.isRequired,
 };
 

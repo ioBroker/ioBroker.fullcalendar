@@ -23,6 +23,8 @@ const recordingSimulations = {};
 const enums = {};
 const subscribed = [];
 
+const imageCache = {};
+
 
 function t(word) {
     if (language === 'de') {
@@ -88,10 +90,90 @@ const stopRecordSimulation = async id => {
     subscribeUnsubscribe();
 }
 
-function collectAllStates(id) {
-    recordingSimulations[id].allStates = [...recordingSimulations[id].native.record.states];
+function getObjectIcon(id, obj) {
+    // If id is Object
+    if (typeof id === 'object') {
+        obj = id;
+        id = obj._id;
+    }
 
-    const enumList = recordingSimulations[id].native.record.enums;
+    if (obj && obj.common && obj.common.icon) {
+        let icon = obj.common.icon;
+        // If UTF-8 icon
+        if (typeof icon === 'string' && icon.length <= 2) {
+            return icon;
+        } else
+        if (icon.startsWith('data:image')) {
+            return icon;
+        } else {
+            const parts = id.split('.');
+            if (parts[0] === 'system') {
+                icon = `adapter/${parts[2]}${icon.startsWith('/') ? '' : '/'}${icon}`;
+            } else {
+                icon = `adapter/${parts[0]}${icon.startsWith('/') ? '' : '/'}${icon}`;
+            }
+
+            if (window.location.pathname.match(/adapter\/[^/]+\/[^/]+\.html/)) {
+                icon = `../../${icon}`;
+            } else if (window.location.pathname.match(/material\/[.\d]+/)) {
+                icon = `../../${icon}`;
+            } else
+            if (window.location.pathname.match(/material\//)) {
+                icon = `../${icon}`;
+            }
+            return icon;
+        }
+    } else {
+        return null;
+    }
+}
+
+async function getImage(id) {
+    let obj;
+    if (typeof id === 'string') {
+        if (imageCache[id] !== undefined) {
+            return imageCache[id];
+        }
+        obj = await adapter.getForeignObjectAsync(id);
+    } else {
+        obj = id;
+    }
+    const stateId = obj._id;
+    if (imageCache[stateId] !== undefined) {
+        return imageCache[stateId];
+    }
+    if (obj && obj.common && obj.common.icon) {
+        imageCache[stateId] = getObjectIcon(obj);
+        return imageCache[stateId];
+    } else if (obj.type === 'state') {
+        // get parent name
+        let parts = obj._id.split('.');
+        parts.pop();
+        let parentId = parts.join('.');
+        obj = await adapter.getForeignObjectAsync(parentId);
+        if (obj && obj.common && obj.common.icon) {
+            imageCache[stateId] = getObjectIcon(obj);
+            return imageCache[stateId];
+        } else if (!obj || (obj.type === 'channel' || obj.type === 'device')) {
+            parts = obj._id.split('.');
+            parts.pop();
+            parentId = parts.join('.');
+            obj = await adapter.getForeignObjectAsync(parentId);
+            if (obj && obj.common && obj.common.icon) {
+                imageCache[stateId] = getObjectIcon(obj);
+                return imageCache[stateId];
+            }
+        }
+    }
+
+    imageCache[stateId] = null;
+    return null;
+}
+
+function collectAllStates(id) {
+    recordingSimulations[id].allStates = recordingSimulations[id].native.record ? [...recordingSimulations[id].native.record.states] : [];
+
+    const enumList = recordingSimulations[id].native.record?.enums || [];
     // combine all states
     if (enumList) {
         for (const k in enumList) {
@@ -209,12 +291,19 @@ function startAdapter(options) {
                     stateObj = stateObj || (await adapter.getForeignObjectAsync(stateId));
                     const name = getText(stateObj) || stateId;
 
+                    if (stateObj.common.write === false) {
+                        adapter.log.warn(`Cannot record state "${name}/${stateId}" because it is read-only`);
+                        return;
+                    }
+
                     const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
                     profile.native.events.push({
                         _id: `${simulation._id}.event-${uuidv4()}`,
                         common: {
                             name,
                             enabled: true,
+                            icon: (await getImage(stateObj)) || undefined,
+                            color: simulation.common.color || '#3A87AD',
                         },
                         native: {
                             id: Date.now(),
@@ -222,12 +311,12 @@ function startAdapter(options) {
                             type: 'single',
                             oid: stateId,
                             startValue: state.val,
-                            color: '#3A87AD',
+                            states: stateObj.common.states,
                         },
                         type: 'schedule',
                     });
 
-                    adapter.log.debug(`Add event to simulation "${simulation.common.name}": ${stateId} => ${state.val}`);
+                    adapter.log.debug(`Add event to simulation "${getText(simulation)}": ${stateId} => ${state.val}`);
 
                     // save simulation
                     await adapter.setForeignObjectAsync(simulation._id, profile);
@@ -287,7 +376,7 @@ function startAdapter(options) {
         }
 
         if (id.startsWith(`${adapter.namespace}.Simulations.`)) {
-            if (obj) {
+            if (obj && obj.type === 'state') {
                 recordingSimulations[id] = obj;
                 collectAllStates(id);
                 const _state = await adapter.getForeignStateAsync(id);
