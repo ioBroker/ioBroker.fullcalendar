@@ -152,6 +152,12 @@ const EventDialog = props => {
 
     moment.locale(props.language);
 
+    const changeEvent = modify => {
+        const newEvent = JSON.parse(JSON.stringify(event));
+        modify(newEvent);
+        setEvent(newEvent);
+    };
+
     useEffect(() => {
         const now = new Date();
         now.setHours(0);
@@ -175,7 +181,7 @@ const EventDialog = props => {
                         .then(obj => {
                             // update states if required
                             if (JSON.stringify(event.native.states) !== JSON.stringify(obj.common.states)) {
-                                changeEvent(newEvent => newEvent.native.states = obj.common.states)
+                                changeEvent(newEvent => newEvent.native.states = obj.common.states);
                             }
 
                             if (object || props.event.native.oid !== event.native.oid) {
@@ -185,7 +191,7 @@ const EventDialog = props => {
 
                             setObject(obj);
                         });
-                } catch(e) {
+                } catch (e) {
                     console.error(`Cannot get object ${event.native.oid}: ${e}`);
                     setObject(null);
                 }
@@ -217,12 +223,6 @@ const EventDialog = props => {
         duration !== initialDuration ||
         endValue !== initialEndValue;
 
-    const changeEvent = modify => {
-        const newEvent = JSON.parse(JSON.stringify(event));
-        modify(newEvent);
-        setEvent(newEvent);
-    };
-
     const valueField = (field, name) => {
         if (!object) {
             return null;
@@ -239,7 +239,12 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.checked)}
                 />}
-                label={<div><div>{props.t(name)}</div><div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div></div>}
+                label={
+                    <div>
+                        <div>{props.t(name)}</div>
+                        <div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div>
+                    </div>
+                }
             />;
         }
 
@@ -286,7 +291,12 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => setEndValue(e.target.checked)}
                 />}
-                label={<div><div>{props.t('End value')}</div><div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div></div>}
+                label={
+                    <div>
+                        <div>{props.t('End value')}</div>
+                        <div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div>
+                    </div>
+                }
             />;
         }
 
@@ -403,7 +413,12 @@ const EventDialog = props => {
                                     <div style={{ display: 'flex', width: '100%' }}>
                                         <span>{props.t(astroType)}</span>
                                         <span style={{ flexGrow: 1 }} />
-                                        <span> - [{astroEventTimes && astroEventTimes[astroType] ? astroEventTimes[astroType].toLocaleTimeString().replace(/:\d\d$/, '') : '??:??'}]</span>
+                                        <span>
+                                            {' '}
+- [
+                                            {astroEventTimes && astroEventTimes[astroType] ? astroEventTimes[astroType].toLocaleTimeString().replace(/:\d\d$/, '') : '??:??'}
+]
+                                        </span>
                                     </div>
                                 </MenuItem>)}
                         </Select>
@@ -439,49 +454,49 @@ const EventDialog = props => {
                         />
                     </LocalizationProvider>}
                 {event.native.astro ? <FormControl
-                        variant="standard"
-                        className={props.classes.width60}
+                    variant="standard"
+                    className={props.classes.width60}
+                >
+                    <InputLabel>{props.t('Offset')}</InputLabel>
+                    <Select
+                        value={event.native.offset || 0}
+                        disabled={props.readOnly}
+                        onChange={e =>
+                            changeEvent(newEvent => newEvent.native.offset = e.target.value)}
                     >
-                        <InputLabel>{props.t('Offset')}</InputLabel>
-                        <Select
-                            value={event.native.offset || 0}
-                            disabled={props.readOnly}
-                            onChange={e =>
-                                changeEvent(newEvent => newEvent.native.offset = e.target.value)}
-                        >
-                            {[
-                                { label: 'none', value: 0 },
-                                { label: '5 min', value: 5 },
-                                { label: '10 min', value: 10 },
-                                { label: '15 min', value: 15 },
-                                { label: '20 min', value: 20 },
-                                { label: '30 min', value: 30 },
-                                { label: '45 min', value: 45 },
-                                { label: '1 hour', value: 60 },
-                                { label: '1.5 hours', value: 90 },
-                                { label: '2 hours', value: 120 },
-                                { label: '2.5 hours', value: 150 },
-                                { label: '3 hours', value: 180 },
-                                { label: '4 hours', value: 240 },
-                                { label: '5 min', value: -5 },
-                                { label: '10 min', value: -10 },
-                                { label: '15 min', value: -15 },
-                                { label: '20 min', value: -20 },
-                                { label: '30 min', value: -30 },
-                                { label: '45 min', value: -45 },
-                                { label: '1 hour', value: -60 },
-                                { label: '1.5 hours', value: -90 },
-                                { label: '2 hours', value: -120 },
-                                { label: '2.5 hours', value: -150 },
-                                { label: '3 hours', value: -180 },
-                                { label: '4 hours', value: -240 },
-                            ]
-                                .map(time =>
-                                    <MenuItem key={time.value} value={time.value}>
-                                        {time.value < 0 ? `- ${props.t(time.label)}` : props.t(time.label)}
-                                    </MenuItem>)}
-                        </Select>
-                    </FormControl> : null}
+                        {[
+                            { label: 'none', value: 0 },
+                            { label: '5 min', value: 5 },
+                            { label: '10 min', value: 10 },
+                            { label: '15 min', value: 15 },
+                            { label: '20 min', value: 20 },
+                            { label: '30 min', value: 30 },
+                            { label: '45 min', value: 45 },
+                            { label: '1 hour', value: 60 },
+                            { label: '1.5 hours', value: 90 },
+                            { label: '2 hours', value: 120 },
+                            { label: '2.5 hours', value: 150 },
+                            { label: '3 hours', value: 180 },
+                            { label: '4 hours', value: 240 },
+                            { label: '5 min', value: -5 },
+                            { label: '10 min', value: -10 },
+                            { label: '15 min', value: -15 },
+                            { label: '20 min', value: -20 },
+                            { label: '30 min', value: -30 },
+                            { label: '45 min', value: -45 },
+                            { label: '1 hour', value: -60 },
+                            { label: '1.5 hours', value: -90 },
+                            { label: '2 hours', value: -120 },
+                            { label: '2.5 hours', value: -150 },
+                            { label: '3 hours', value: -180 },
+                            { label: '4 hours', value: -240 },
+                        ]
+                            .map(time =>
+                                <MenuItem key={time.value} value={time.value}>
+                                    {time.value < 0 ? `- ${props.t(time.label)}` : props.t(time.label)}
+                                </MenuItem>)}
+                    </Select>
+                </FormControl> : null}
 
                 {props.isSimulation && <TextField
                     className={props.classes.randomTime}
@@ -496,7 +511,8 @@ const EventDialog = props => {
                 />}
             </div>
             {event.native.astro ? <div className={props.classes.field}>
-                {props.t('Today %s is at %s.', props.t(event.native.astro), astroText)}&nbsp;
+                {props.t('Today %s is at %s.', props.t(event.native.astro), astroText)}
+                &nbsp;
                 {event.native.offset ? props.t('With offset at %s.', astroTextOffset) : null}
             </div> : null}
             <div className={props.classes.field}>

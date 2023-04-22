@@ -69,10 +69,9 @@ const CalendarContainer = props => {
             } else {
                 _simulationObject.native.events.push(event);
             }
-            await props.socket.setObject(props.simulationId, _simulationObject);
-        } else {
-            return props.socket.setObject(id, event);
+            return props.socket.setObject(props.simulationId, _simulationObject);
         }
+        return props.socket.setObject(id, event);
     };
     const deleteEvent = async id => {
         if (props.isSimulation) {
