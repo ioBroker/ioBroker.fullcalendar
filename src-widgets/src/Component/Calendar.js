@@ -225,7 +225,7 @@ function Calendar(props) {
 
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
-                        extendedProps: { eventId: event._id, icon: event.common.icon, },
+                        extendedProps: { eventId: event._id, icon: event.common.icon },
                         title: name,
                         backgroundColor,
                         textColor,
@@ -256,7 +256,7 @@ function Calendar(props) {
                     }
 
                     events.push({
-                        extendedProps: { eventId: event._id, icon: event.common.icon, },
+                        extendedProps: { eventId: event._id, icon: event.common.icon },
                         title: name,
                         backgroundColor,
                         textColor,
@@ -268,7 +268,7 @@ function Calendar(props) {
                 });
             } else {
                 events.push({
-                    extendedProps: { eventId: event._id, icon: event.common.icon, },
+                    extendedProps: { eventId: event._id, icon: event.common.icon },
                     title: name,
                     duration: initialDuration,
                     backgroundColor,
@@ -286,7 +286,7 @@ function Calendar(props) {
             }
 
             events.push({
-                extendedProps: { eventId: event._id, icon: event.common.icon, },
+                extendedProps: { eventId: event._id, icon: event.common.icon },
                 title: name,
                 display: 'block',
                 backgroundColor,
@@ -580,7 +580,7 @@ function Calendar(props) {
                             const diff = selectInfo.end.getTime() - selectInfo.start.getTime();
                             if ((!dblClick.current || Date.now() - dblClick.current > 500) && diff === 30 * 60 * 1000) {
                                 dblClick.current = Date.now();
-                                return
+                                return;
                             }
 
                             const newEvent = {
