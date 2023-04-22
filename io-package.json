@@ -3,19 +3,6 @@
     "name": "fullcalendar",
     "version": "2.1.0",
     "news": {
-      "2.1.0": {
-        "en": "Added simulation of events",
-        "de": "Simulation von Ereignissen hinzugefügt",
-        "ru": "Добавлена симуляция событий",
-        "pt": "Adicionado simulação de eventos",
-        "nl": "Toegevoegd simulatie van gebeurtenissen",
-        "fr": "Ajout de la simulation des événements",
-        "it": "Aggiunta simulazione di eventi",
-        "es": "Se agregó simulación de eventos",
-        "pl": "Symulacja zdarzeń na temat wydarzeń",
-        "uk": "Додано моделювання подій",
-        "zh-cn": "增加事件模拟"
-      },
       "2.0.8": {
         "en": "Corrected vis-2 widgets",
         "de": "Korrigierte vis-2 Widgets",
