@@ -76,6 +76,16 @@ const EnumsDialog = props => {
     const getStateChip = id => {
         if (statesObjects[id] === undefined && !timer.current) {
             requestStates();
+            return null;
+        }
+
+        if (statesObjects[id] === null) {
+            return null;
+        }
+
+        if (statesObjects[id] && statesObjects[id].common && statesObjects[id].common.write === false) {
+            // do not show read-only states
+            return null;
         }
 
         const label = <div>
