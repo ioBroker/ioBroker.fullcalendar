@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
-import { Card, CardContent } from '@mui/material';
+import { Card, CardContent, Select, MenuItem } from '@mui/material';
 
 import {
     I18n,
@@ -22,6 +22,52 @@ const styles = () => ({
 
 const Generic = window.visRxWidget || VisRxWidget;
 
+class CalendarsSelector extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            list: [{value: '', label: Generic.t('default')}],
+        };
+    }
+
+    static getText(text) {
+        if (typeof text === 'object') {
+            return text[I18n.getLanguage()] || text.en;
+        }
+        return text;
+    }
+
+    componentDidMount() {
+        if (this.props.instance) {
+            // read possible calenders
+            this.props.socket.getObjectViewSystem(
+                'folder',
+                `fullcalendar.${this.props.instance}.Calendars.`,
+                `fullcalendar.${this.props.instance}.Calendars.\u9999`,
+            )
+                .then(objects => {
+                    const list = Object.keys(objects).map(id => ({
+                        value: id,
+                        label: CalendarsSelector.getText(objects[id].common.name)
+                    }));
+                    list.unshift({ value: '', label: Generic.t('default') });
+                    this.setState({ list });
+                });
+        }
+    }
+
+    render() {
+        return <Select
+            variant="standard"
+            fullWidth
+            value={this.props.value || ''}
+            onChange={e => this.props.onChange(e.target.value)}
+        >
+            {this.state.list.map(item => <MenuItem key={item.value}>{item.label}</MenuItem>)}
+        </Select>;
+    }
+}
+
 class FullCalendar extends Generic {
     static getWidgetInfo() {
         return {
@@ -40,6 +86,20 @@ class FullCalendar extends Generic {
                         type: 'instance',
                         adapter: 'fullcalendar',
                         isShort: true,
+                    },
+                    {
+                        label: 'calendar',
+                        name: 'calendar',
+                        type: 'custom',
+                        component: (field, data, onDataChange, props) =>
+                            <CalendarsSelector
+                                key={data.instance}
+                                instance={data.instance}
+                                value={data.calendar}
+                                onChange={value => onDataChange({ calendar: value })}
+                                socket={props.socket}
+                            />,
+                        default: '',
                     },
                     {
                         label: 'read_only',
@@ -126,14 +186,23 @@ class FullCalendar extends Generic {
 
     componentDidMount() {
         super.componentDidMount();
-        this.props.socket.subscribeObject(`fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+        this.props.socket.subscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
 
         this.updateEvents();
     }
 
     onEventsChanged = (id, obj) => {
+        if (!this.state.rxData.calendar) {
+            // filter out all events of sub calendars
+            // fullcalendar.0.event-56c1746a-7f82-4ee1-8568-b81b323bac10
+            if (id.split('.').length > 3) {
+                return;
+            }
+        }
+
         const events = JSON.parse(JSON.stringify(this.state.events));
         const eventPos = events.findIndex(e => e._id === id);
+
         if (eventPos !== -1) {
             if (obj) {
                 events[eventPos] = obj;
@@ -143,11 +212,12 @@ class FullCalendar extends Generic {
         } else {
             events.push(obj);
         }
+
         this.setState({ events });
     };
 
     componentWillUnmount() {
-        this.props.socket.unsubscribeObject(`fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+        this.props.socket.unsubscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
         super.componentWillUnmount();
     }
 
@@ -159,17 +229,25 @@ class FullCalendar extends Generic {
         const objects = await this.props.socket.getObjectViewCustom(
             'schedule',
             'schedule',
-            `fullcalendar.${this.state.rxData.instance}.`,
-            `fullcalendar.${this.state.rxData.instance}.\u9999`,
+            this.state.rxData.calendar ? `${this.state.rxData.calendar}.` : `fullcalendar.${this.state.rxData.instance}.`,
+            this.state.rxData.calendar ? `${this.state.rxData.calendar}.\u9999` : `fullcalendar.${this.state.rxData.instance}.\u9999`,
         );
+
         let serverTimeZone = 0;
         try {
-            const state = await this.props.socket.getState('fullcalendar.0.info.timeZone');
+            const state = await this.props.socket.getState(`fullcalendar.${this.state.rxData.instance}.info.timeZone`);
             serverTimeZone = state?.val || 0;
         } catch (e) {
             // ignore
         }
-        this.setState({ events: Object.values(objects), serverTimeZone });
+        let list = Object.values(objects);
+        if (!this.state.rxData.calendar) {
+            // filter out all events of sub calendars
+            // fullcalendar.0.event-56c1746a-7f82-4ee1-8568-b81b323bac10
+            list = list.filter(obj => obj._id.split('.').length <= 3);
+        }
+
+        this.setState({ events: list, serverTimeZone });
     };
 
     changeEvents = events => {

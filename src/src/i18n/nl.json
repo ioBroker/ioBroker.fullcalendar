@@ -110,12 +110,12 @@
   "30 min": "30 min.",
   "45 min": "45 min.",
   "1 hour": "1 uur",
-  "1.5 hour": "1,5 uur",
-  "2 hour": "2 uur",
-  "2.5 hour": "2,5 uur",
-  "3 hour": "3 uur",
-  "4 hour": "4 uur",
   "Time type": "Type tijd",
   "Today %s is at %s.": "Vandaag staat \"%s\" op %s.",
-  "With offset at %s.": "Met offset op %s."
+  "With offset at %s.": "Met offset op %s.",
+  "1.5 hours": "1,5 uur",
+  "2 hours": "2 uur",
+  "2.5 hours": "2,5 uur",
+  "3 hours": "3 uur",
+  "4 hours": "4 uur"
 }

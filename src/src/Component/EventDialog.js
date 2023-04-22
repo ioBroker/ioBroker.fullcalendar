@@ -153,8 +153,14 @@ const EventDialog = props => {
     moment.locale(props.language);
 
     useEffect(() => {
+        const now = new Date();
+        now.setHours(0);
+        now.setMinutes(0);
+        now.setSeconds(0);
+        now.setMilliseconds(0);
+
         const _astroEventTimes = SunCalc.getTimes(
-            Date.now(),
+            now,
             props.systemConfig.latitude,
             props.systemConfig.longitude,
         );
@@ -321,6 +327,11 @@ const EventDialog = props => {
         astroTextOffset = t.toLocaleTimeString().replace(/:\d\d$/, '');
     }
 
+    let icon = event.common.icon;
+    if (icon && !icon.startsWith('data:image') && !icon.startsWith('http') && !icon.startsWith('/')) {
+        icon = `../../${icon}`;
+    }
+
     return <Dialog open={!0} onClose={props.onClose} fullWidth>
         <DialogTitle>{props.t('Configure event')}</DialogTitle>
         <DialogContent>
@@ -385,7 +396,16 @@ const EventDialog = props => {
                             renderValue={value => props.t(value)}
                         >
                             {astroTypes
-                                .map(astroType => <MenuItem key={astroType} value={astroType}>{props.t(astroType)} - [{astroText}]</MenuItem>)}
+                                .map(astroType => <MenuItem
+                                    key={astroType}
+                                    value={astroType}
+                                >
+                                    <div style={{ display: 'flex', width: '100%' }}>
+                                        <span>{props.t(astroType)}</span>
+                                        <span style={{ flexGrow: 1 }} />
+                                        <span> - [{astroEventTimes && astroEventTimes[astroType] ? astroEventTimes[astroType].toLocaleTimeString().replace(/:\d\d$/, '') : '??:??'}]</span>
+                                    </div>
+                                </MenuItem>)}
                         </Select>
                     </FormControl>
 
@@ -476,8 +496,8 @@ const EventDialog = props => {
                 />}
             </div>
             {event.native.astro ? <div className={props.classes.field}>
-                    {props.t('Today %s is at %s.', props.t(event.native.astro), astroText)}&nbsp;
-                    {event.native.offset ? props.t('With offset at %s.', astroTextOffset) : null}
+                {props.t('Today %s is at %s.', props.t(event.native.astro), astroText)}&nbsp;
+                {event.native.offset ? props.t('With offset at %s.', astroTextOffset) : null}
             </div> : null}
             <div className={props.classes.field}>
                 {!props.isSimulation && <FormControl
@@ -515,7 +535,7 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.field}>
                 <div className={props.classes.selectId}>
-                    <Icon src={event.common.icon || ''} style={{ width: 32, height: 32 }} />
+                    <Icon src={icon || ''} style={{ width: 32, height: 32 }} />
                     <TextField
                         label="Object ID"
                         value={event.native.oid || ''}

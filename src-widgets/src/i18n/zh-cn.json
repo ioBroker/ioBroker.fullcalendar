@@ -46,5 +46,6 @@
   "hide_left_block_hint": "在左侧块中隐藏提示",
   "hide_top_block_buttons": "隐藏顶部块中的按钮",
   "hide_weekends": "隐藏周末",
-  "Event will be deleted. Confirm?": "事件将被删除。确认？"
+  "Event will be deleted. Confirm?": "事件将被删除。确认？",
+  "calendar": "具体日历"
 }

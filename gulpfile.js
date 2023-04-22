@@ -81,18 +81,20 @@ gulp.task('widget-3-copy', () => Promise.all([
     gulp.src([`src-widgets/build/*.js`]).pipe(gulp.dest(`widgets/${adapterName}`)),
     gulp.src([`src-widgets/build/img/*`]).pipe(gulp.dest(`widgets/${adapterName}/img`)),
     gulp.src([`src-widgets/build/*.map`]).pipe(gulp.dest(`widgets/${adapterName}`)),
+
     gulp.src([
         `src-widgets/build/static/**/*`,
         ...gulpHelper.ignoreFiles(`${__dirname}/src-widgets/`),
     ]).pipe(gulp.dest(`widgets/${adapterName}/static`)),
 
     gulp.src([
-        'src-widgets/build/static/js/vendors-node_modules_mui_material_styles_styled_js-node_modules_mui_material_styles_useTheme*.*',
-        'src-widgets/build/static/js/vendors-node_modules_mui_material_Button_Button_js-node_modules_mui_material_DialogActions*.*',
-        'src-widgets/build/static/js/vendors-node_modules_mui_material_Button_Button_js-node_modules_mui_material_Chip_Chip_*.*',
-        'src-widgets/build/static/js/vendors-node_modules_mui_x-date-pickers_TimePicker_TimePicker*.*',
-        'src-widgets/build/static/js/vendors-node_modules_mui_x-date-pickers_AdapterMoment*.*',
-        'src-widgets/build/static/js/vendors-node_modules_react-transition-group_esm_CSSTransition*.*',
+        'src-widgets/build/static/js/*mui_material_styles_styled_js-node_modules_mui_material_styles_useTheme*.*',
+        'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_DialogActions*.*',
+        'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Chip_Chip_*.*',
+        'src-widgets/build/static/js/*mui_x-date-pickers_TimePicker_TimePicker*.*',
+        'src-widgets/build/static/js/*mui_x-date-pickers_AdapterMoment*.*',
+        'src-widgets/build/static/js/*react-transition-group_esm_CSSTransition*.*',
+        'src-widgets/build/static/js/*suncalc2_suncalc2*.*',
         ...gulpHelper.copyFiles(`${__dirname}/src-widgets/`),
     ]).pipe(gulp.dest(`widgets/${adapterName}/static/js`)),
 

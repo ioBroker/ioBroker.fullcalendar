@@ -46,5 +46,6 @@
   "hide_left_block_hint": "Ocultar dica no bloco esquerdo",
   "hide_top_block_buttons": "Ocultar botões no bloco superior",
   "hide_weekends": "Ocultar fins de semana",
-  "Event will be deleted. Confirm?": "O evento será excluído. Confirme?"
+  "Event will be deleted. Confirm?": "O evento será excluído. Confirme?",
+  "calendar": "calendário específico"
 }

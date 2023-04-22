@@ -549,9 +549,14 @@ function Calendar(props) {
                             setTimeout(() => setEventDialog(newEvent._id), 100);
                         }}
                         eventDidMount={info => {
-                            if (info.event.extendedProps.icon) {
+                            let icon = info.event.extendedProps.icon;
+                            if (icon) {
                                 const img = window.document.createElement('img');
-                                img.setAttribute('src', info.event.extendedProps.icon);
+                                if (!icon.startsWith('data:image') && !icon.startsWith('http') && !icon.startsWith('/')) {
+                                    icon = `../../${icon}`;
+                                }
+
+                                img.setAttribute('src', icon);
                                 img.className = 'icon';
                                 img.style.width = '20px';
                                 img.style.height = '20px';

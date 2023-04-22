@@ -110,12 +110,12 @@
   "30 min": "30 Min.",
   "45 min": "45 Min.",
   "1 hour": "1 Std",
-  "1.5 hour": "1,5 Std.",
-  "2 hour": "2 Std.",
-  "2.5 hour": "2,5 Std.",
-  "3 hour": "3 Std.",
-  "4 hour": "4 Std.",
   "Time type": "Zeittyp",
   "Today %s is at %s.": "Heute ist \"%s\" um %s.",
-  "With offset at %s.": "Mit Versatz um %s."
+  "With offset at %s.": "Mit Versatz um %s.",
+  "1.5 hours": "1,5 Std.",
+  "2 hours": "2 Std.",
+  "2.5 hours": "2,5 Std.",
+  "3 hours": "3 Std.",
+  "4 hours": "4 Std."
 }

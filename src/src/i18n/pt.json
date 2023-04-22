@@ -110,12 +110,12 @@
   "30 min": "30 min.",
   "45 min": "45 min.",
   "1 hour": "1 hora",
-  "1.5 hour": "1,5 hora",
-  "2 hour": "2 horas",
-  "2.5 hour": "2,5 horas",
-  "3 hour": "3 horas",
-  "4 hour": "4 horas",
   "Time type": "Tipo de hora",
   "Today %s is at %s.": "Hoje \"%s\" é em %s.",
-  "With offset at %s.": "Com deslocamento em %s."
+  "With offset at %s.": "Com deslocamento em %s.",
+  "1.5 hours": "1,5 hora",
+  "2 hours": "2 horas",
+  "2.5 hours": "2,5 horas",
+  "3 hours": "3 horas",
+  "4 hours": "4 horas"
 }

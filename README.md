@@ -8,15 +8,27 @@
 
 Schedules with [fullcalendar](https://fullcalendar.io).
 
+## Plan the events (control your devices)
 You must not use any external resources, the scheduling is processed only in ioBroker and will be not combined with any external services like "google calendar" or "iTunes".
 
 ![Example](img/example.png)
 
 You can control your events with calendar and can plan to control them periodically.
 
+## Events simulation
+You can record your behavior and can play back it later.
+For example, you can create two recordings for workday and for weekend and play them back on according days.
+
+Or you can record the whole week and can play it back on the next weeks during you are away.
+
+How to use:
+- Go to simulation tab
+- Create new simulation by clicking on the "+" button and select type of simulation: day or week
+- Click record button and wait 24 hours or 7 days till simulation stops to record events
+- Now you can replay the simulation by clicking on the play button. Additionally, you can define to time when the simulation should be started.
+
 ## Todo
 - Week and day must scroll to the current time
-- Astro events
 
 <!--
 	Placeholder for the next version (at the beginning of the line):

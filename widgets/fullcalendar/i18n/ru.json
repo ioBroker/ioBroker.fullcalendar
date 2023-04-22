@@ -46,5 +46,6 @@
   "hide_left_block_hint": "Скрыть подсказку в левом блоке",
   "hide_top_block_buttons": "Скрыть кнопки в верхнем блоке",
   "hide_weekends": "Скрыть выходные",
-  "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?"
+  "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?",
+  "calendar": "Конкретный календарь"
 }
