@@ -400,10 +400,10 @@ const EventDialog = props => {
                                     key={astroType}
                                     value={astroType}
                                 >
-                                    <div style={{ display: 'flex' }}>
+                                    <div style={{ display: 'flex', width: '100%' }}>
                                         <span>{props.t(astroType)}</span>
                                         <span style={{ flexGrow: 1 }} />
-                                        <span>- [{astroEventTimes && astroEventTimes[astroType] ? astroEventTimes[astroType].toLocaleTimeString().replace(/:\d\d$/, '') : '??:??'}]</span>
+                                        <span> - [{astroEventTimes && astroEventTimes[astroType] ? astroEventTimes[astroType].toLocaleTimeString().replace(/:\d\d$/, '') : '??:??'}]</span>
                                     </div>
                                 </MenuItem>)}
                         </Select>
