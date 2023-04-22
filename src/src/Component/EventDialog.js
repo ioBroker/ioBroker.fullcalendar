@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import moment from 'moment';
@@ -152,11 +152,11 @@ const EventDialog = props => {
 
     moment.locale(props.language);
 
-    const changeEvent = modify => {
+    const changeEvent = useCallback(modify => {
         const newEvent = JSON.parse(JSON.stringify(event));
         modify(newEvent);
         setEvent(newEvent);
-    };
+    }, [event]);
 
     useEffect(() => {
         const now = new Date();
@@ -199,7 +199,7 @@ const EventDialog = props => {
         } else {
             setObject(null);
         }
-    }, [event.native.oid, props.socket]);
+    }, [event.native.oid, props.socket, changeEvent, event.native.states, object, props.event.native.oid, props.systemConfig.latitude, props.systemConfig.longitude]);
 
     const cronObject = event.native.cron ? cron2obj(event.native.cron) : null;
     let period = 'once';

@@ -330,7 +330,7 @@ function Calendar(props) {
             const calendar = ref.current?.getApi();
             calendar?.changeView(props.simulation?.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek', new Date());
         }
-    }, [props.simulations, props.simulationId]);
+    }, [props.isSimulation, props.simulation?.native.interval]);
 
     if (props.isSimulation && !props.simulation) {
         return null;

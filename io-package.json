@@ -120,7 +120,7 @@
     "authors": [
       "bluefox <dogafox@gmail.com>"
     ],
-    "license": "CC-BY-NC-4.0",
+    "license": "MIT",
     "platform": "Javascript/Node.js",
     "icon": "fullcalendar.png",
     "mode": "daemon",

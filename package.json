@@ -60,5 +60,5 @@
     "release-major": "release-script major --yes",
     "update-packages": "ncu --upgrade && cd src-widgets && ncu --upgrade && cd ../src && ncu --upgrade && cd .."
   },
-  "license": "CC-BY-NC-4.0"
+  "license": "MIT"
 }
