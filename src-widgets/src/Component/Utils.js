@@ -3,7 +3,9 @@ function sortNumbers(a, b) {
 }
 
 function oneCron2Array(str) {
-    if (str === '*' || str === '?' || str === '') return str;
+    if (str === '*' || str === '?' || str === '') {
+        return str;
+    }
 
     const parts = str.split(',');
     const result = [];
@@ -55,11 +57,21 @@ function cron2obj(str, date) {
 }
 
 function array2oneCron(obj) {
-    if (obj === '*' || obj === '?') return obj;
-    if (typeof obj === 'string') obj = parseInt(obj, 10);
-    if (typeof obj !== 'object') obj = [obj];
-    obj.sort(sortNumbers);
-    if (obj.length < 3) return obj.join(',');
+    if (obj === '*' || obj === '?') {
+        return obj;
+    }
+    if (typeof obj === 'string') {
+        obj = parseInt(obj, 10);
+    }
+    if (typeof obj !== 'object') {
+        obj = [obj];
+    }
+
+    obj.sort((a, b) => a - b);
+
+    if (obj.length < 3) {
+        return obj.join(',');
+    }
 
     const newObj = [];
     let start = obj[0];
@@ -82,6 +94,7 @@ function array2oneCron(obj) {
             end = obj[i];
         }
     }
+
     if (start !== end) {
         if (start + 1 === end) {
             newObj.push(`${start},${end}`);
@@ -96,15 +109,15 @@ function array2oneCron(obj) {
 }
 
 function obj2cron(cron) {
-    const parts = [/* '*', */'*', '*', '*', '*', '?'];
+    const parts = [];
     if (cron.seconds) {
-        parts[0] = array2oneCron(cron.seconds);
+        parts.push(array2oneCron(cron.seconds));
     }
-    parts[0] = array2oneCron(cron.minutes);
-    parts[1] = array2oneCron(cron.hours);
-    parts[2] = array2oneCron(cron.dates);
-    parts[3] = array2oneCron(cron.months);
-    parts[4] = array2oneCron(cron.dows);
+    parts.push(array2oneCron(cron.minutes));
+    parts.push(array2oneCron(cron.hours));
+    parts.push(array2oneCron(cron.dates));
+    parts.push(array2oneCron(cron.months));
+    parts.push(array2oneCron(cron.dows));
     // if (parts[0] === '0') parts.shift();
     return parts.join(' ');
 }
@@ -120,6 +133,7 @@ function serverDateToClient(dateString, format /* , serverTimeZone */) {
         // date = new Date(date.getTime() - (date.getTimezoneOffset() - serverTimeZone) * 60000);
         return date;
     }
+
     if (format === 'date') {
         return new Date(dateString);
         // dateString += 'Z';

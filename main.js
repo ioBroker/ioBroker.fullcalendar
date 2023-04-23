@@ -317,6 +317,8 @@ async function getForeignObjectAsyncCached(id) {
     return stateObjs[id];
 }
 
+let lastEvent = {};
+
 function startAdapter(options) {
     options = options || {};
     options = Object.assign({}, options, {name: adapterName});
@@ -369,21 +371,7 @@ function startAdapter(options) {
                     if (profile.native.interval === 'day') {
                         dow = '0-6';
                     }
-                    const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
-
-                    // filter out same states
-                    if (profile.native.events.length) {
-                        const lastEvent = profile.native.events[profile.native.events.length - 1];
-                        if (lastEvent &&
-                            lastEvent.native &&
-                            lastEvent.native.oid === stateId &&
-                            lastEvent.native.startValue === state.val &&
-                            lastEvent.native.cron === cron
-                        ) {
-                            adapter.log.warn(`Ignore state "${stateId}" because it is the same as last one`);
-                            continue;
-                        }
-                    }
+                    const cron = `${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
 
                     // Get information about the object
                     stateObj = await getForeignObjectAsyncCached(stateId);
@@ -392,6 +380,15 @@ function startAdapter(options) {
 
                     if (stateObj.common.write === false) {
                         // adapter.log.warn(`Cannot record state "${name}/${stateId}" because it is read-only`);
+                        continue;
+                    }
+
+                    const prevEvent = lastEvent[ids[i]];
+                    lastEvent[ids[i]] = {id: stateId, value: state.val, ts: Date.now()};
+
+                    // filter out same states
+                    if (prevEvent && prevEvent.id === stateId && prevEvent.value === state.val && Date.now() - prevEvent.ts < 500) {
+                        adapter.log.warn(`Ignore state "${name} / ${stateId}" because it is the same as last one (${state.val}, ${cron})`);
                         continue;
                     }
 
