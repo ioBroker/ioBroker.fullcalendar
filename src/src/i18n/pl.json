@@ -117,5 +117,6 @@
   "2 hours": "2 godziny",
   "2.5 hours": "2,5 godziny",
   "3 hours": "3 godzina",
-  "4 hours": "4 godziny"
+  "4 hours": "4 godziny",
+  "Stop recording. Recording till %s": "Zatrzymaj nagrywanie. Nagrywanie do %s"
 }

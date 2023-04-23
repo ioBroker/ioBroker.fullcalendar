@@ -144,6 +144,97 @@ function clientDateToServer(date, format /* , serverTimeZone */) {
     return null;
 }
 
+const objCache = {};
+
+const IGNORE_STATES = [
+    'COMBINED_PARAMETER',
+    'ON_TIME',
+    'DURATION',
+    'DURATION_VALUE',
+    'RAMP_TIME_UNIT',
+    'PRESENCE_DETECTION_ACTIVE',
+    'PRESENCE_DETECTION',
+    'RESET_PRESENCE',
+    'RAMP_TIME_VALUE',
+    'DURATION_UNIT',
+    'MOTION_DETECTION_ACTIVE',
+    'RESET_MOTION',
+];
+
+function buildOverlap(enumIds, enumObjs, exceptions) {
+    // const states = selectedEnums.map(id => objects[id]?.common?.members);
+    const groups = {};
+    enumIds.forEach(enumId => {
+        const parts = enumId.split('.');
+        const categoryType = parts[1];
+        groups[categoryType] = groups[categoryType] || [];
+        if (enumObjs[enumId]) {
+            enumObjs[enumId].common?.members?.forEach(id => !exceptions.includes(id) && !groups[categoryType].includes(id) && groups[categoryType].push(id));
+        }
+    });
+
+    let intersection = [];
+    Object.keys(groups).forEach((groupId, i) => {
+        const group = groups[groupId];
+        if (i) {
+            intersection = intersection.filter(j => group.includes(j));
+        } else {
+            intersection = group;
+        }
+    });
+
+    // filter out duplicates
+    return intersection.filter((v, i) => intersection.indexOf(v) === i);
+}
+
+function getIcon(id) {
+    if (objCache[id]) {
+        if (objCache[id].common?.icon) {
+            return objCache[id].common?.icon;
+        }
+        if (objCache[id].type === 'state' || objCache[id].type === 'channel') {
+            // get parent
+            let parts = id.split('.');
+            parts.pop();
+            let parentId = parts.join('.');
+
+            if (objCache[parentId] && objCache[parentId].common?.icon) {
+                return objCache[parentId].common?.icon;
+            }
+            if (objCache[parentId] && objCache[parentId].type === 'channel') {
+                // get parent
+                parts = id.split('.');
+                parts.pop();
+                parentId = parts.join('.');
+                if (objCache[parentId] && objCache[parentId].common?.icon) {
+                    return objCache[parentId].common?.icon;
+                }
+            }
+        }
+    }
+
+    return undefined;
+}
+
+async function getCachedObject(id, socket) {
+    if (objCache[id] === undefined) {
+        try {
+            objCache[id] = await socket.getObject(id);
+        } catch (e) {
+            // ignore
+        }
+        objCache[id] = objCache[id] || null;
+    }
+    return objCache[id];
+}
+
 export {
-    cron2obj, obj2cron, serverDateToClient, clientDateToServer,
+    cron2obj,
+    obj2cron,
+    serverDateToClient,
+    clientDateToServer,
+    getIcon,
+    IGNORE_STATES,
+    buildOverlap,
+    getCachedObject,
 };

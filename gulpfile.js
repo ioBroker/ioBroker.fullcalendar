@@ -29,6 +29,7 @@ function buildWidgets() {
     sync2files(`${__dirname}/src-widgets/src/Component/Calendar.js`, `${__dirname}/src/src/Component/Calendar.js`);
     sync2files(`${__dirname}/src-widgets/src/Component/EventDialog.js`, `${__dirname}/src/src/Component/EventDialog.js`);
     sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src/src/Component/Utils.js`);
+    sync2files(`${__dirname}/src-widgets/src/Component/styles.css`, `${__dirname}/src/src/Component/styles.css`);
 
     return gulpHelper.buildWidgets(__dirname, `${__dirname}/src-widgets/`);
 }

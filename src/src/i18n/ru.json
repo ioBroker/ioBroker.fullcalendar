@@ -117,5 +117,6 @@
   "2 hours": "2 часа",
   "2.5 hours": "2,5 часа",
   "3 hours": "3 часа",
-  "4 hours": "4 часа"
+  "4 hours": "4 часа",
+  "Stop recording. Recording till %s": "Остановить запись. Запись до %s"
 }

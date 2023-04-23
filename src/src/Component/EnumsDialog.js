@@ -1,18 +1,31 @@
 import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
     Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper,
-    Chip,
+    Chip, LinearProgress,
 } from '@mui/material';
 
-import { Cancel, Check, ExpandMore } from '@mui/icons-material';
+import {
+    Cancel,
+    Check,
+    ExpandMore,
+    Add,
+    Remove,
+} from '@mui/icons-material';
 
-import { I18n, TextWithIcon } from '@iobroker/adapter-react-v5';
+import { I18n, TextWithIcon, Utils } from '@iobroker/adapter-react-v5';
+
+import {
+    IGNORE_STATES,
+    getIcon,
+    getCachedObject,
+    buildOverlap,
+} from './Utils';
 
 const style = {
     accordion: {
@@ -40,6 +53,9 @@ const style = {
     chip: {
         margin: 2,
     },
+    chipException: {
+        opacity: 0.3,
+    },
 };
 
 const EnumsDialog = props => {
@@ -51,61 +67,79 @@ const EnumsDialog = props => {
     const [enumsObjects, setEnumsObjects] = useState(null);
     const [expanded, setExpanded] = useState([]);
     const [statesObjects, setStatesObjects] = useState({});
-    const timer = useRef(null);
+    const [exceptions, setExceptions] = useState(props.exceptions || []);
+    const [working, setWorking] = useState(false);
 
-    const requestStates = () => {
-        timer.current && clearTimeout(timer.current);
-        timer.current = setTimeout(async () => {
-            timer.current = null;
-            const _statesObjects = JSON.parse(JSON.stringify(statesObjects));
-            for (let i = 0; i < selectedStates.length; i++) {
-                if (!_statesObjects[selectedStates[i]]) {
-                    try {
-                        _statesObjects[selectedStates[i]] = await props.socket.getObject(selectedStates[i]);
-                    } catch (e) {
-                        console.error(`Cannot get object ${selectedStates[i]}`);
+    const requestStates = async _selectedStates => {
+        _selectedStates = _selectedStates || selectedStates;
+        const _statesObjects = {};
+        for (let i = 0; i < _selectedStates.length; i++) {
+            const id = _selectedStates[i];
+            if (!_statesObjects[id] && !id.startsWith('alexa2.')) {
+                try {
+                    _statesObjects[id] = await getCachedObject(id, props.socket);
+
+                    if (_statesObjects[id] && (_statesObjects[id].type === 'channel' || _statesObjects[id].type === 'device')) {
+                        // find out if any writable state exists
+                        const subStates = await props.socket.getObjectViewSystem('state', `${id}.`, `${id}.\u9999`);
+                        Object.keys(subStates).forEach(sid => {
+                            if (
+                                subStates[sid].type === 'state' &&
+                                subStates[sid].common &&
+                                subStates[sid].common.write !== false &&
+                                !IGNORE_STATES.find(ends => sid.endsWith(ends))
+                            ) {
+                                _statesObjects[sid] = subStates[sid];
+                            }
+                        });
                     }
-                    _statesObjects[selectedStates[i]] = _statesObjects[selectedStates[i]] || null;
+                } catch (e) {
+                    console.error(`Cannot get object ${id}: ${e}`);
                 }
+                _statesObjects[id] = _statesObjects[id] || null;
             }
+        }
 
-            setStatesObjects(_statesObjects);
-        }, 300);
+        // Object.keys(_statesObjects).forEach(id => _statesObjects[id].type === 'state' && console.log(`+ ${id}`));
+
+        setStatesObjects(_statesObjects);
+        setWorking(false);
     };
 
     const getStateChip = id => {
-        if (statesObjects[id] === undefined && !timer.current) {
-            requestStates();
+        if (!statesObjects[id] || statesObjects[id].type !== 'state') {
             return null;
         }
 
-        if (statesObjects[id] === null) {
-            return null;
-        }
-
-        if (statesObjects[id] && statesObjects[id].common && statesObjects[id].common.write === false) {
+        if (statesObjects[id].common && statesObjects[id].common.write === false) {
             // do not show read-only states
             return null;
         }
 
         const label = <div>
-            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} />
+            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} icon={getIcon(id)} />
             {statesObjects[id] ? <div className={props.classes.chipSubText}>{id}</div> : null}
         </div>;
 
         return <Chip
             label={label}
             key={id}
-            className={props.classes.chip}
+            onDelete={() => {
+                const _exceptions = [...exceptions];
+                const pos = _exceptions.indexOf(id);
+                if (pos !== -1) {
+                    _exceptions.splice(pos, 1);
+                } else {
+                    _exceptions.push(id);
+                }
+                setExceptions(_exceptions);
+            }}
+            deleteIcon={exceptions.includes(id) ? <Add title={I18n.t('Include to list again')} /> : <Remove title={I18n.t('Exclude from list')} />}
+            className={Utils.clsx(props.classes.chip, exceptions.includes(id) && props.classes.chipException)}
         />;
     };
 
     useEffect(() => {
-        if (!props.open) {
-            timer.current && clearTimeout(timer.current);
-            timer.current = null;
-            return;
-        }
         try {
             setExpanded(JSON.parse(window.localStorage.getItem('fullcalendar.enumsDialog.expanded') || '[]'));
         } catch (e) {
@@ -113,15 +147,15 @@ const EnumsDialog = props => {
         }
 
         (async () => {
-            const objects = props.enumsObjects || enumsObjects || (await props.socket.getEnums());
+            const _enumsObjects = props.enumsObjects || enumsObjects || (await props.socket.getEnums());
             const _enumsTree = {
                 items: {},
             };
 
-            setEnumsObjects(objects);
+            setEnumsObjects(_enumsObjects);
 
             // Build enums tree
-            Object.values(objects).forEach(e => {
+            Object.values(_enumsObjects).forEach(e => {
                 const idArray = e._id.split('.');
                 let currentTree = _enumsTree;
                 idArray.forEach(id => {
@@ -140,26 +174,19 @@ const EnumsDialog = props => {
             setEnumsTree(_enumsTree);
             setSelectedEnums(props.selectedEnums || []);
         })();
-    }, [props.open]);
+    }, []);
 
     useEffect(() => {
+        setWorking(true);
         (async () => {
-            const objects = props.enumsObjects || enumsObjects || (await props.socket.getEnums());
+            const _enumsObjects = props.enumsObjects || enumsObjects || (await props.socket.getEnums());
             if (!enumsObjects) {
-                setEnumsObjects(objects);
+                setEnumsObjects(_enumsObjects);
             }
 
-            const states = selectedEnums.map(id => objects[id].common.members);
-            let intersection = [];
-            states.forEach((s, i) => {
-                if (intersection.length || i) {
-                    intersection = intersection.filter(j => s.includes(j));
-                } else {
-                    intersection = s;
-                }
-            });
-
-            setSelectedStates(intersection.filter((v, i, a) => a.indexOf(v) === i));
+            const states = buildOverlap(selectedEnums, _enumsObjects, []);
+            setSelectedStates(states);
+            await requestStates(states);
         })();
     }, [selectedEnums]);
 
@@ -214,7 +241,7 @@ const EnumsDialog = props => {
         </div>;
     };
 
-    return <Dialog open={props.open} onClose={props.onClose} fullWidth>
+    return <Dialog open={!0} onClose={props.onClose} fullWidth>
         <DialogTitle>{I18n.t('Select categories')}</DialogTitle>
         <DialogContent>
             <div
@@ -230,15 +257,16 @@ const EnumsDialog = props => {
                 </Paper>
                 <div style={{ marginLeft: 8, overflow: 'auto' }}>
                     <h4>{I18n.t('States as overlap of all selected categories')}</h4>
-                    {selectedStates.map(id => getStateChip(id))}
+                    {working && <LinearProgress />}
+                    {Object.keys(statesObjects).map(id => getStateChip(id))}
                 </div>
             </div>
         </DialogContent>
         <DialogActions>
             <Button
-                disabled={!selectedEnums.length}
+                disabled={!selectedEnums.length || (JSON.stringify(selectedEnums.sort()) === JSON.stringify(props.selectedEnums.sort()) && JSON.stringify(exceptions.sort()) === JSON.stringify(props.exceptions.sort()))}
                 onClick={() => {
-                    props.onSelect(selectedEnums);
+                    props.onSelect(selectedEnums, exceptions);
                     props.onClose();
                 }}
                 variant="contained"
@@ -260,13 +288,13 @@ const EnumsDialog = props => {
 };
 
 EnumsDialog.propTypes = {
-    open: PropTypes.bool,
     onClose: PropTypes.func,
     onSelect: PropTypes.func,
     selectedEnums: PropTypes.array,
     socket: PropTypes.object,
     classes: PropTypes.object,
     enumsObjects: PropTypes.object,
+    exceptions: PropTypes.array,
 };
 
 export default withStyles(style)(EnumsDialog);

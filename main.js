@@ -22,9 +22,24 @@ let funcs               = {};
 const recordingSimulations = {};
 const enums = {};
 const subscribed = [];
+const stateObjs = {};
 
 const imageCache = {};
 
+const IGNORE_STATES = [
+    'COMBINED_PARAMETER',
+    'ON_TIME',
+    'DURATION',
+    'DURATION_VALUE',
+    'RAMP_TIME_UNIT',
+    'PRESENCE_DETECTION_ACTIVE',
+    'PRESENCE_DETECTION',
+    'RESET_PRESENCE',
+    'RAMP_TIME_VALUE',
+    'DURATION_UNIT',
+    'MOTION_DETECTION_ACTIVE',
+    'RESET_MOTION'
+];
 
 function t(word) {
     if (language === 'de') {
@@ -52,7 +67,7 @@ function t(word) {
     }
 }
 
-function subscribeUnsubscribe() {
+async function subscribeUnsubscribe() {
     const toSubscribe = [];
     // collect all states
     Object.keys(recordingSimulations).forEach(id => {
@@ -65,12 +80,25 @@ function subscribeUnsubscribe() {
         }
     });
 
+    for (let i = 0; i < toSubscribe.length; i++) {
+        await getForeignObjectAsyncCached(toSubscribe[i]);
+    }
+
     // subscribe new
     toSubscribe.forEach(state => {
         if (!subscribed.includes(state)) {
             subscribed.push(state);
-            adapter.subscribeForeignStates(state);
-            adapter.log.debug(`+ Subscribed to ${state}`);
+            if (stateObjs[state]) {
+                if (stateObjs[state].type === 'channel' || stateObjs[state].type === 'device') {
+                    adapter.log.debug(`+ Subscribed to ${state}.*`);
+                    adapter.subscribeForeignStates(`${state}.*`);
+                } else if (stateObjs[state].type === 'state' && stateObjs[state].common && stateObjs[state].common.write !== false) {
+                    adapter.log.debug(`+ Subscribed to ${state}`);
+                    adapter.subscribeForeignStates(state);
+                } else {
+                    adapter.log.debug(`? Subscription to ${state} was ignored`);
+                }
+            }
         }
     });
 
@@ -79,15 +107,22 @@ function subscribeUnsubscribe() {
         const pos = subscribed.indexOf(state);
         if (pos === -1) {
             subscribed.splice(pos, 1);
-            adapter.unsubscribeForeignStates(state);
-            adapter.log.debug(`- Unsubscribed to ${state}`);
+            if (stateObjs[state].type === 'channel' || stateObjs[state].type === 'device') {
+                adapter.log.debug(`- Unsubscribed from ${state}.*`);
+                adapter.unsubscribeForeignStates(`${state}.*`);
+            } else if (stateObjs[state].type === 'state' && stateObjs[state].common && stateObjs[state].common.write !== false) {
+                adapter.log.debug(`- Unsubscribed from ${state}`);
+                adapter.unsubscribeForeignStates(state);
+            } else {
+                adapter.log.debug(`? Unsubscription from ${state} was ignored`);
+            }
         }
     });
 }
 
 const stopRecordSimulation = async id => {
     recordingSimulations[id].value = 'stop';
-    subscribeUnsubscribe();
+    await subscribeUnsubscribe();
 }
 
 function getObjectIcon(id, obj) {
@@ -113,14 +148,7 @@ function getObjectIcon(id, obj) {
                 icon = `adapter/${parts[0]}${icon.startsWith('/') ? '' : '/'}${icon}`;
             }
 
-            if (window.location.pathname.match(/adapter\/[^/]+\/[^/]+\.html/)) {
-                icon = `../../${icon}`;
-            } else if (window.location.pathname.match(/material\/[.\d]+/)) {
-                icon = `../../${icon}`;
-            } else
-            if (window.location.pathname.match(/material\//)) {
-                icon = `../${icon}`;
-            }
+            icon = `../../${icon}`;
             return icon;
         }
     } else {
@@ -134,64 +162,87 @@ async function getImage(id) {
         if (imageCache[id] !== undefined) {
             return imageCache[id];
         }
-        obj = await adapter.getForeignObjectAsync(id);
+        obj = await getForeignObjectAsyncCached(id);
     } else {
         obj = id;
     }
-    const stateId = obj._id;
-    if (imageCache[stateId] !== undefined) {
-        return imageCache[stateId];
-    }
-    if (obj && obj.common && obj.common.icon) {
-        imageCache[stateId] = getObjectIcon(obj);
-        return imageCache[stateId];
-    } else if (obj.type === 'state') {
-        // get parent name
-        let parts = obj._id.split('.');
-        parts.pop();
-        let parentId = parts.join('.');
-        obj = await adapter.getForeignObjectAsync(parentId);
+    if (obj) {
+        const stateId = obj._id;
+        if (imageCache[stateId] !== undefined) {
+            return imageCache[stateId];
+        }
         if (obj && obj.common && obj.common.icon) {
             imageCache[stateId] = getObjectIcon(obj);
             return imageCache[stateId];
-        } else if (!obj || (obj.type === 'channel' || obj.type === 'device')) {
-            parts = obj._id.split('.');
+        } else if (obj.type === 'state') {
+            // get parent name
+            let parts = obj._id.split('.');
             parts.pop();
-            parentId = parts.join('.');
-            obj = await adapter.getForeignObjectAsync(parentId);
+            let parentId = parts.join('.');
+            obj = await getForeignObjectAsyncCached(parentId);
+
             if (obj && obj.common && obj.common.icon) {
                 imageCache[stateId] = getObjectIcon(obj);
                 return imageCache[stateId];
+            } else if (!obj || (obj.type === 'channel' || obj.type === 'device')) {
+                parts = obj._id.split('.');
+                parts.pop();
+                parentId = parts.join('.');
+
+                obj = await getForeignObjectAsyncCached(parentId);
+
+                if (obj && obj.common && obj.common.icon) {
+                    imageCache[stateId] = getObjectIcon(obj);
+                    return imageCache[stateId];
+                }
             }
         }
     }
 
-    imageCache[stateId] = null;
+    imageCache[id] = null;
     return null;
+}
+
+function buildOverlap(enumIds, enumObjs, exceptions) {
+    // const states = selectedEnums.map(id => objects[id]?.common?.members);
+    const groups = {};
+    enumIds.forEach(enumId => {
+        const parts = enumId.split('.');
+        const categoryType = parts[1];
+        groups[categoryType] = groups[categoryType] || [];
+        if (enumObjs[enumId]) {
+            enumObjs[enumId].common?.members?.forEach(id => !exceptions.includes(id) && !groups[categoryType].includes(id) && groups[categoryType].push(id));
+        }
+    });
+
+    let intersection = [];
+    Object.keys(groups).forEach((groupId, i) => {
+        const group = groups[groupId];
+        if (i) {
+            intersection = intersection.filter(j => group.includes(j));
+        } else {
+            intersection = group;
+        }
+    });
+
+    // filter out duplicates
+    return intersection.filter((v, i) => intersection.indexOf(v) === i);
 }
 
 function collectAllStates(id) {
     recordingSimulations[id].allStates = recordingSimulations[id].native.record ? [...recordingSimulations[id].native.record.states] : [];
+    const states = recordingSimulations[id].allStates;
 
-    const enumList = recordingSimulations[id].native.record?.enums || [];
-    // combine all states
-    if (enumList) {
-        for (const k in enumList) {
-            const enumStates = enumList[k].map(id => (enums[id] && enums[id].common && enums[id].common.members) || []);
-            let intersection = [];
-            enumStates.forEach((s, i) => {
-                if (intersection.length || i) {
-                    intersection = intersection.filter(i => s.includes(i));
-                } else {
-                    intersection = s;
-                }
-            });
-            recordingSimulations[id].allStates.push(...intersection);
-        }
+    const lists = recordingSimulations[id].native.record?.enums || [];
+    for (const list of lists) {
+        const res = buildOverlap(
+            list || [],
+            enums,
+            recordingSimulations[id].native.record?.enumsExceptions || []);
+        res.forEach(id => !states.includes(id) && states.push(id));
     }
-    recordingSimulations[id].allStates.sort();
-    // remove duplicates
-    recordingSimulations[id].allStates = recordingSimulations[id].allStates.filter((item, pos) => recordingSimulations[id].allStates.indexOf(item) === pos);
+
+    return states;
 }
 
 async function startRecordSimulation(id) {
@@ -203,12 +254,12 @@ async function startRecordSimulation(id) {
     collectAllStates(id);
 
     if (recordingSimulations[id].native.record.start >= Date.now() || recordingSimulations[id].native.record.end < Date.now()) {
-        adapter.setForeignState(id, 'stop');
+        await adapter.setForeignStateAsync(id, 'stop');
         recordingSimulations[id].value = 'stop';
         return;
     }
 
-    subscribeUnsubscribe();
+    await subscribeUnsubscribe();
 }
 
 async function setSimulationStatus(id, value) {
@@ -229,7 +280,7 @@ async function setSimulationStatus(id, value) {
             });
         }
     } else if (value === 'pause') {
-        subscribeUnsubscribe();
+        await subscribeUnsubscribe();
     } else if (value === 'play') {
         recordingSimulations[id].native.events.forEach(event => {
             event.simulationStart = recordingSimulations[id].native.play && new Date(recordingSimulations[id].native.play.start);
@@ -253,6 +304,19 @@ function getText(obj) {
     return obj ? obj._id : '';
 }
 
+async function getForeignObjectAsyncCached(id) {
+    if (stateObjs[id] === undefined) {
+        try {
+            stateObjs[id] = await adapter.getForeignObjectAsync(id);
+        } catch (e) {
+            adapter.log.warn(`Cannot read object ${id}: ${e}`);
+        }
+        stateObjs[id] = stateObjs[id] || null;
+    }
+
+    return stateObjs[id];
+}
+
 function startAdapter(options) {
     options = options || {};
     options = Object.assign({}, options, {name: adapterName});
@@ -268,15 +332,34 @@ function startAdapter(options) {
                 return;
             }
 
-            if (stateId.startsWith('system.')) {
+            if (stateId.startsWith('system.') || stateId.startsWith('alexa2.') || IGNORE_STATES.find(s => stateId.endsWith(s))) {
                 return;
             }
 
+            // we can record only commands, as we must play back them later
             const ids = Object.keys(recordingSimulations);
             let stateObj;
             for (let i = 0; i < ids.length; i++) {
                 const simulation = recordingSimulations[ids[i]];
-                if (simulation.allStates.includes(stateId) && simulation.value === 'record') {
+
+                if (simulation.value === 'record') {
+                    // find out if this state is recorded
+                    const found = simulation.allStates.find(id => {
+                        if (id === stateId) {
+                            return true;
+                        } else if (
+                            stateId.startsWith(`${id}.`) &&
+                            stateObjs[id] &&
+                            (stateObjs[id].type === 'channel' || stateObjs[id].type === 'device')
+                        ) {
+                            return true;
+                        }
+                    });
+
+                    if (!found) {
+                        continue;
+                    }
+
                     // read current simulation
                     const profile = await adapter.getForeignObjectAsync(simulation._id);
 
@@ -286,17 +369,32 @@ function startAdapter(options) {
                     if (profile.native.interval === 'day') {
                         dow = '0-6';
                     }
+                    const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
 
-                    // Get information about object
-                    stateObj = stateObj || (await adapter.getForeignObjectAsync(stateId));
+                    // filter out same states
+                    if (profile.native.events.length) {
+                        const lastEvent = profile.native.events[profile.native.events.length - 1];
+                        if (lastEvent &&
+                            lastEvent.native &&
+                            lastEvent.native.oid === stateId &&
+                            lastEvent.native.startValue === state.val &&
+                            lastEvent.native.cron === cron
+                        ) {
+                            adapter.log.warn(`Ignore state "${stateId}" because it is the same as last one`);
+                            continue;
+                        }
+                    }
+
+                    // Get information about the object
+                    stateObj = await getForeignObjectAsyncCached(stateId);
+
                     const name = getText(stateObj) || stateId;
 
                     if (stateObj.common.write === false) {
-                        adapter.log.warn(`Cannot record state "${name}/${stateId}" because it is read-only`);
-                        return;
+                        // adapter.log.warn(`Cannot record state "${name}/${stateId}" because it is read-only`);
+                        continue;
                     }
 
-                    const cron = `* ${date.getMinutes()} ${date.getHours()} ? * ${dow}`;
                     profile.native.events.push({
                         _id: `${simulation._id}.event-${uuidv4()}`,
                         common: {
@@ -316,7 +414,7 @@ function startAdapter(options) {
                         type: 'schedule',
                     });
 
-                    adapter.log.debug(`Add event to simulation "${getText(simulation)}": ${stateId} => ${state.val}`);
+                    adapter.log.debug(`Add event to simulation "${getText(simulation)}": ${name}/${stateId} => ${state.val}`);
 
                     // save simulation
                     await adapter.setForeignObjectAsync(simulation._id, profile);
@@ -389,7 +487,7 @@ function startAdapter(options) {
                 if (recordingSimulations[id].value === 'record') {
                     await startRecordSimulation(id);
                 }
-                subscribeUnsubscribe();
+                await subscribeUnsubscribe();
             } else if (recordingSimulations[id]) {
                  await stopRecordSimulation(id);
                  delete recordingSimulations[id];
@@ -442,7 +540,7 @@ async function getStateName(id, state) {
     if (names[id]) {
         return {name: names[id], id};
     } else {
-        const obj = await adapter.getForeignObjectAsync(id)
+        const obj = await getForeignObjectAsyncCached(id);
         const enums = getRoomFunc(id);
         if (enums.func && enums.room) {
             names[id] = `${enums.func} / ${enums.room}`;
@@ -469,12 +567,8 @@ function stopEvent(event) {
 async function executeEvent(event, now) {
     adapter.log.debug(`executeEvent[${event.common.name}]: ${JSON.stringify(event.native)}`);
     event.lastExec = now || new Date().getTime();
-    let obj;
-    try {
-        obj = await adapter.getForeignObjectAsync(event.native.oid);
-    } catch (e) {
-        // ignore
-    }
+    const obj = await getForeignObjectAsyncCached(event.native.oid);
+
     if (!obj) {
         adapter.log.warn(`Object "${event.native.oid}" does not exist!`);
         return;

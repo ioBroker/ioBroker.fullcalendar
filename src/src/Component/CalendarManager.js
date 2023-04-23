@@ -71,6 +71,9 @@ const style = theme => ({
         backgroundColor: theme.palette.primary.main,
         color: 'white !important',
     },
+    tooltip: {
+        pointerEvents: 'none',
+    },
 });
 
 const CalendarManager = props => {
@@ -158,7 +161,7 @@ const CalendarManager = props => {
                                 <Add />
                             </Fab>
                             <div className={props.classes.divider} />
-                            {!alive && <Tooltip title={I18n.t('Instance inactive')}><Alert className={props.classes.alert} /></Tooltip>}
+                            {!alive && <Tooltip title={I18n.t('Instance inactive')} classes={{ popper: props.classes.tooltip }}><Alert className={props.classes.alert} /></Tooltip>}
                         </Toolbar>
                         <Tabs
                             value={calendars.find(c => c._id === calendarPrefix) ? calendarPrefix : `fullcalendar.${props.instance}`}
@@ -184,7 +187,7 @@ const CalendarManager = props => {
                                     label={<div className={props.classes.label}>
                                         {calendar.common.name}
                                         <div className={props.classes.divider} />
-                                        <Tooltip title={I18n.t('Edit name or delete calendar')}>
+                                        <Tooltip title={I18n.t('Edit name or delete calendar')} classes={{ popper: props.classes.tooltip }}>
                                             <IconButton
                                                 size="small"
                                                 className="edit"

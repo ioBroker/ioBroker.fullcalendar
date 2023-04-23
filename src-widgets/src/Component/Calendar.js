@@ -27,6 +27,9 @@ import { Utils, I18n } from '@iobroker/adapter-react-v5';
 
 import { RRule } from 'rrule';
 import SunCalc from 'suncalc2';
+
+import './styles.css';
+
 import {
     clientDateToServer, cron2obj, obj2cron, serverDateToClient,
 } from './Utils';

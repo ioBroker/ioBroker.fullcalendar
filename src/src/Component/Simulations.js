@@ -90,6 +90,9 @@ const style = theme => ({
         opacity: 0.7,
         fontStyle: 'italic',
     },
+    tooltip: {
+        pointerEvents: 'none',
+    },
 });
 
 const Simulations = props => {
@@ -188,7 +191,7 @@ const Simulations = props => {
     };
 
     const toCalendar = <div className={props.classes.toCalendar}>
-        <Tooltip title={I18n.t('You can export events to static calender')}>
+        <Tooltip title={I18n.t('You can export events to static calender')} classes={{ popper: props.classes.tooltip }}>
             <Button
                 variant="contained"
                 onClick={async () => {
@@ -351,10 +354,10 @@ const Simulations = props => {
                         <Add />
                     </Fab>
                     <div className={props.classes.divider} />
-                    {!props.alive && <Tooltip title={I18n.t('Instance inactive')}><Alert className={props.classes.alert} /></Tooltip>}
+                    {!props.alive && <Tooltip title={I18n.t('Instance inactive')} classes={{ popper: props.classes.tooltip }}><Alert className={props.classes.alert} /></Tooltip>}
                 </Toolbar>
                 <Tabs
-                    value={selectedSimulation || simulations[0]?._id}
+                    value={(selectedSimulation ? (simulations.find(s => s._id === selectedSimulation) ? selectedSimulation : simulations[0]?._id) : simulations[0]?._id) || ''}
                     onChange={(e, value) => {
                         window.localStorage.setItem('fullcalendar.selectedSimulation', value);
                         setSelectedSimulation(value);
@@ -370,7 +373,7 @@ const Simulations = props => {
                             <div className={props.classes.label}>
                                 <TextWithIcon value={simulation} lang={I18n.getLanguage()} />
                                 <div className={props.classes.divider} />
-                                <Tooltip title={I18n.t('Edit name and settings')}>
+                                <Tooltip title={I18n.t('Edit name and settings')} classes={{ popper: props.classes.tooltip }}>
                                     <IconButton
                                         className="edit"
                                         onClick={e => {
@@ -383,7 +386,7 @@ const Simulations = props => {
                                     </IconButton>
                                 </Tooltip>
                                 {simulationStates[simulation._id] === 'stop' &&
-                                    <Tooltip title={I18n.t('Start recording')}>
+                                    <Tooltip title={I18n.t('Start recording')} classes={{ popper: props.classes.tooltip }}>
                                         <span>
                                             <IconButton
                                                 onClick={async e => {
@@ -401,7 +404,7 @@ const Simulations = props => {
                                         </span>
                                     </Tooltip>}
                                 {simulationStates[simulation._id] === 'stop' && simulation.native.events.length > 0 &&
-                                    <Tooltip title={I18n.t('Start playing')}>
+                                    <Tooltip title={I18n.t('Start playing')} classes={{ popper: props.classes.tooltip }}>
                                         <span>
                                             <IconButton
                                                 onClick={async e => {
@@ -415,7 +418,7 @@ const Simulations = props => {
                                         </span>
                                     </Tooltip>}
                                 {(simulationStates[simulation._id] === 'record' || simulationStates[simulation._id] === 'pause') &&
-                                    <Tooltip title={I18n.t('Stop recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}>
+                                    <Tooltip title={I18n.t('Stop recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))} classes={{ popper: props.classes.tooltip }}>
                                         <span style={{ opacity: simulationStates[simulation._id] === 'pause' ? 0.5 : 1 }}>
                                             <IconButton
                                                 disabled={simulationStates[simulation._id] === 'pause'}
@@ -430,7 +433,7 @@ const Simulations = props => {
                                         </span>
                                     </Tooltip>}
                                 {simulationStates[simulation._id] === 'play' &&
-                                    <Tooltip title={I18n.t('Stop playing')}>
+                                    <Tooltip title={I18n.t('Stop playing')} classes={{ popper: props.classes.tooltip }}>
                                         <span>
                                             <IconButton
                                                 onClick={async e => {
@@ -444,7 +447,7 @@ const Simulations = props => {
                                         </span>
                                     </Tooltip>}
                                 {simulationStates[simulation._id] === 'record' &&
-                                    <Tooltip title={I18n.t('Pause recording')}>
+                                    <Tooltip title={I18n.t('Pause recording')} classes={{ popper: props.classes.tooltip }}>
                                         <span>
                                             <IconButton
                                                 onClick={async e => {
@@ -458,7 +461,7 @@ const Simulations = props => {
                                         </span>
                                     </Tooltip>}
                                 {simulationStates[simulation._id] === 'pause' &&
-                                    <Tooltip title={I18n.t('Resume recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))}>
+                                    <Tooltip title={I18n.t('Resume recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))} classes={{ popper: props.classes.tooltip }}>
                                         <span>
                                             <IconButton
                                                 onClick={async e => {

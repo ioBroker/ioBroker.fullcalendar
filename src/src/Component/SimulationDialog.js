@@ -1,11 +1,11 @@
 import { withStyles } from '@mui/styles';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import {
     Button,
     Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField,
-    IconButton, Chip, Tooltip,
+    IconButton, Chip, Tooltip, LinearProgress,
 } from '@mui/material';
 
 import {
@@ -16,7 +16,14 @@ import {
     Confirm, I18n, ColorPicker, SelectID, TextWithIcon,
 } from '@iobroker/adapter-react-v5';
 
-import { cron2obj, obj2cron } from './Utils';
+import {
+    IGNORE_STATES,
+    getIcon,
+    getCachedObject,
+    cron2obj,
+    obj2cron,
+    buildOverlap,
+} from './Utils';
 import EnumsDialog from './EnumsDialog';
 
 const styles = {
@@ -52,93 +59,96 @@ const styles = {
         animationTimingFunction: 'linear',
         animationIterationCount: 'infinite',
     },
+    tooltip: {
+        pointerEvents: 'none',
+    },
 };
 
 const SimulationDialog = props => {
-    const [simulation, setSimulation] = useState(null);
+    const [simulation, setSimulation] = useState(props.simulation);
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [idDialog, setIdDialog] = useState(false);
     const [enumsDialog, setEnumsDialog] = useState(false);
     const [enumStates, setEnumStates] = useState([]);
     const [enumsObjects, setEnumsObjects] = useState({});
     const [statesObjects, setStatesObjects] = useState({});
-    const timer = useRef(null);
+    const [working, setWorking] = useState(false);
+
+    const requestStates = async _enumStates => {
+        _enumStates = _enumStates || enumStates;
+        const _statesObjects = {};
+        for (let i = 0; i < _enumStates.length; i++) {
+            const id = _enumStates[i];
+            if (!_statesObjects[id] && !id.startsWith('alexa2.')) {
+                try {
+                    _statesObjects[id] = await getCachedObject(id, props.socket);
+
+                    console.log(`${id} => ${_statesObjects[id]}`);
+
+                    if (_statesObjects[id] && (_statesObjects[id].type === 'channel' || _statesObjects[id].type === 'device')) {
+                        // find out if any writable state exists
+                        const subStates = await props.socket.getObjectViewSystem('state', `${id}.`, `${id}.\u9999`);
+                        Object.keys(subStates).forEach(sid => {
+                            if (
+                                subStates[sid].type === 'state' &&
+                                subStates[sid].common &&
+                                subStates[sid].common.write !== false &&
+                                !IGNORE_STATES.find(ends => sid.endsWith(ends))
+                            ) {
+                                _statesObjects[sid] = subStates[sid];
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error(`Cannot get object ${id}: ${e}`);
+                }
+                _statesObjects[id] = _statesObjects[id] || null;
+            }
+        }
+
+        Object.keys(_statesObjects).forEach(id => _statesObjects[id] && _statesObjects[id].type === 'state' && console.log(`+ ${id}`));
+
+        setStatesObjects(_statesObjects);
+        setWorking(false);
+    };
 
     useEffect(() => {
-        setSimulation(props.simulation);
-        setEnumStates([]);
-        if (!Object.keys(enumsObjects).length) {
-            // request enums
-            props.socket.getEnums()
-                .then(_enums => setEnumsObjects(_enums));
-        }
-        return () => {
-            timer.current && clearTimeout(timer.current);
-            timer.current = null;
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!simulation) {
-            return;
-        }
+        setWorking(true);
 
         (async () => {
-            const _states = [];
-
-            console.log(simulation.native.record.enums);
-            const _enums = simulation.native.record.enums || [];
-
-            let objEnums = enumsObjects;
-            if (!Object.keys(objEnums).length) {
-                // request enums
-                objEnums = await props.socket.getEnums();
-                setEnumsObjects(objEnums);
+            let _enumsObjects = enumsObjects;
+            if (!Object.keys(enumsObjects).length) {
+                _enumsObjects = await props.socket.getEnums();
+                setEnumsObjects(_enumsObjects);
             }
 
-            for (const k in _enums) {
-                const _enumStates = _enums[k].map(id => objEnums[id]?.common?.members).filter(v => v);
-                let intersection = [];
-                _enumStates.forEach((s, i) => {
-                    if (intersection.length || i) {
-                        intersection = intersection.filter(j => s.includes(j));
-                    } else {
-                        intersection = s;
-                    }
-                });
-                _states.push(...intersection);
-            }
+            const lists = simulation?.native?.record?.enums || [];
+            const _enumStates = [];
+            lists.forEach(list => {
+                const res = buildOverlap(list, _enumsObjects, simulation?.native?.record?.enumsExceptions || []);
+                res.forEach(id => !_enumStates.includes(id) && _enumStates.push(id));
+            });
 
-            const _enumStates = _states.filter((v, i, a) => a.indexOf(v) === i);
+            // add normal states
             simulation?.native.record?.states.forEach(id => !_enumStates.includes(id) && _enumStates.push(id));
 
             setEnumStates(_enumStates);
+            await requestStates(_enumStates);
         })();
     }, [simulation?.native.record?.enums, simulation?.native.record?.states]);
 
-    const requestStates = () => {
-        timer.current && clearTimeout(timer.current);
-        timer.current = setTimeout(async () => {
-            timer.current = null;
-            const _statesObjects = JSON.parse(JSON.stringify(statesObjects));
-            for (let i = 0; i < enumStates.length; i++) {
-                if (!_statesObjects[enumStates[i]]) {
-                    try {
-                        _statesObjects[enumStates[i]] = await props.socket.getObject(enumStates[i]);
-                    } catch (e) {
-                        console.error(`Cannot get object for ${enumStates[i]}: ${e}`);
-                    }
-                    _statesObjects[enumStates[i]] = _statesObjects[enumStates[i]] || null;
-                }
-            }
-
-            setStatesObjects(_statesObjects);
-        }, 300);
-    };
-
     const getStateChip = (id, onDelete) => {
+        if (!statesObjects[id] || statesObjects[id].type !== 'state') {
+            return null;
+        }
+
+        if (statesObjects[id].common && statesObjects[id].common.write === false) {
+            // do not show read-only states
+            return null;
+        }
+
         const label = <div>
-            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} />
+            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} icon={getIcon(id)} />
             <div className={props.classes.chipSubText}>{id}</div>
         </div>;
 
@@ -208,7 +218,7 @@ const SimulationDialog = props => {
             </div>
             <h4 className={props.classes.headers}>
                 {I18n.t('States')}
-                <Tooltip title={I18n.t('Add states for recording')}>
+                <Tooltip title={I18n.t('Add states for recording')} classes={{ popper: props.classes.tooltip }}>
                     <IconButton
                         className={!enumStates.length && simulation?.native?.record?.states?.length ? props.classes.blink : ''}
                         size="small"
@@ -228,7 +238,7 @@ const SimulationDialog = props => {
             </div>
             <h4 className={props.classes.headers}>
                 {I18n.t('Categories')}
-                <Tooltip title={I18n.t('Add overlap of categories for recording')}>
+                <Tooltip title={I18n.t('Add overlap of categories for recording')} classes={{ popper: props.classes.tooltip }}>
                     <IconButton
                         className={!enumStates.length && simulation?.native?.record?.states?.length ? props.classes.blink : ''}
                         size="small"
@@ -261,13 +271,8 @@ const SimulationDialog = props => {
             </div>
             <h4 style={{ marginBottom: -0 }}>{I18n.t('Recorded states')}</h4>
             <div>
-                {enumStates.map(state => {
-                    if (statesObjects[state] === undefined && !timer.current) {
-                        requestStates();
-                    }
-
-                    return getStateChip(state);
-                })}
+                {working && <LinearProgress />}
+                {Object.keys(statesObjects).map(id => getStateChip(id))}
             </div>
         </DialogContent>
         <DialogActions>
@@ -342,26 +347,27 @@ const SimulationDialog = props => {
             onClose={() => setIdDialog(false)}
             socket={props.socket}
         />}
-        <EnumsDialog
+        {enumsDialog !== false ? <EnumsDialog
             socket={props.socket}
             enumsObjects={enumsObjects}
             instance={props.instance}
-            open={enumsDialog !== false}
             selectedEnums={typeof enumsDialog === 'number' ? simulation.native.record.enums[enumsDialog] : []}
-            onSelect={ids => {
+            exceptions={simulation.native.record.enumsExceptions || []}
+            onSelect={(enumIds, exceptions) => {
                 const _simulation = JSON.parse(JSON.stringify(simulation));
                 _simulation.native.record = _simulation.native.record || { enums: [], states: [] };
                 _simulation.native.record.enums = _simulation.native.record.enums || [];
+                _simulation.native.record.enumsExceptions = exceptions || [];
                 if (typeof enumsDialog === 'number') {
-                    _simulation.native.record.enums[enumsDialog] = ids;
+                    _simulation.native.record.enums[enumsDialog] = enumIds;
                 } else {
-                    _simulation.native.record.enums.push(ids);
+                    _simulation.native.record.enums.push(enumIds);
                 }
                 setSimulation(_simulation);
                 setEnumsDialog(false);
             }}
             onClose={() => setEnumsDialog(false)}
-        />
+        /> : null}
     </Dialog>;
 };
 
