@@ -453,7 +453,7 @@ const EventDialog = props => {
                                 {...params}
                                 variant="standard"
                                 className={props.classes.narrowText}
-                                helperText={props.t('Time in server time zone')}
+                                helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
                             />}
                             ampm={false}
                         />
