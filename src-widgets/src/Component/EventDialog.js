@@ -415,9 +415,9 @@ const EventDialog = props => {
                                         <span style={{ flexGrow: 1 }} />
                                         <span>
                                             {' '}
-- [
+                                            - [
                                             {astroEventTimes && astroEventTimes[astroType] ? astroEventTimes[astroType].toLocaleTimeString().replace(/:\d\d$/, '') : '??:??'}
-]
+                                            ]
                                         </span>
                                     </div>
                                 </MenuItem>)}
@@ -449,7 +449,12 @@ const EventDialog = props => {
                                 //
                                 }
                             }}
-                            renderInput={params => <TextField {...params} variant="standard" className={props.classes.narrowText} />}
+                            renderInput={params => <TextField
+                                {...params}
+                                variant="standard"
+                                className={props.classes.narrowText}
+                                helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
+                            />}
                             ampm={false}
                         />
                     </LocalizationProvider>}
@@ -593,7 +598,7 @@ const EventDialog = props => {
                                     newEvent.native.cron = obj2cron(newCronObject);
                                 } else if (e.target.value === 'monthly') {
                                     delete newEvent.native.start;
-                                    const newCronObject = cron2obj('0 0 ? 1-12 ?');
+                                    const newCronObject = cron2obj('0 0 * 1-12 *');
                                     const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
                                     newCronObject.hours = timeZoneCron.hours;
                                     newCronObject.minutes = timeZoneCron.minutes;

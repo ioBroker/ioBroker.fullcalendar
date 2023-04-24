@@ -22,7 +22,7 @@ import { I18n, TextWithIcon, Utils } from '@iobroker/adapter-react-v5';
 
 import {
     IGNORE_STATES,
-    getIcon,
+    getIconAsync,
     getCachedObject,
     buildOverlap,
 } from './Utils';
@@ -78,11 +78,16 @@ const EnumsDialog = props => {
             if (!_statesObjects[id] && !id.startsWith('alexa2.')) {
                 try {
                     _statesObjects[id] = await getCachedObject(id, props.socket);
+                    if (_statesObjects[id]?.common) {
+                        _statesObjects[id].common.icon = await getIconAsync(id, props.socket);
+                    }
 
                     if (_statesObjects[id] && (_statesObjects[id].type === 'channel' || _statesObjects[id].type === 'device')) {
                         // find out if any writable state exists
                         const subStates = await props.socket.getObjectViewSystem('state', `${id}.`, `${id}.\u9999`);
-                        Object.keys(subStates).forEach(sid => {
+                        const keys = Object.keys(subStates);
+                        for (let k = 0; k < keys.length; k++) {
+                            const sid = keys[k];
                             if (
                                 subStates[sid].type === 'state' &&
                                 subStates[sid].common &&
@@ -90,8 +95,12 @@ const EnumsDialog = props => {
                                 !IGNORE_STATES.find(ends => sid.endsWith(ends))
                             ) {
                                 _statesObjects[sid] = subStates[sid];
+                                // find icon
+                                if (_statesObjects[sid]?.common) {
+                                    _statesObjects[sid].common.icon = await getIconAsync(sid, props.socket);
+                                }
                             }
-                        });
+                        }
                     }
                 } catch (e) {
                     console.error(`Cannot get object ${id}: ${e}`);
@@ -117,7 +126,7 @@ const EnumsDialog = props => {
         }
 
         const label = <div>
-            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} icon={getIcon(id)} />
+            <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} />
             {statesObjects[id] ? <div className={props.classes.chipSubText}>{id}</div> : null}
         </div>;
 

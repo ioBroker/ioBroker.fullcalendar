@@ -91,7 +91,7 @@
   "Do you want to delete previously recorded events?": "Möchten Sie zuvor aufgezeichnete Ereignisse löschen?",
   "Delete events": "Ereignisse löschen",
   "Keep events": "Ereignisse behalten",
-  "Stop recording": "Höre auf, aufzunehmen",
+  "Stop recording": "Aufnahme stoppen",
   "Resume recording. Recording till %s": "Aufnahme fortsetzen. Aufnahme bis %s",
   "Pause recording": "Aufnahme pausieren",
   "Do you want to stop recording? You cannot restart it again.": "Möchten Sie die Aufnahme beenden? Sie können es nicht erneut starten.",
@@ -118,5 +118,7 @@
   "2.5 hours": "2,5 Std.",
   "3 hours": "3 Std.",
   "4 hours": "4 Std.",
-  "Stop recording. Recording till %s": "Höre auf, aufzunehmen. Aufnahme bis %s"
+  "Stop recording. Recording till %s": "Aufnahme beenden. Aufnahme wird um %s automatisch beendet.",
+  "Zoom": "Skala",
+  "min": "Min."
 }

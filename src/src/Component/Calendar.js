@@ -21,7 +21,13 @@ import plLocale from '@fullcalendar/core/locales/pl';
 import ukLocale from '@fullcalendar/core/locales/uk';
 import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
-import { Paper } from '@mui/material';
+import {
+    FormControl,
+    Paper,
+    Select,
+    InputLabel,
+    MenuItem,
+} from '@mui/material';
 
 import { Utils, I18n } from '@iobroker/adapter-react-v5';
 
@@ -40,6 +46,8 @@ const eventTypes = [
     { type: 'double', name: 'Double event' },
     { type: 'toggle', name: 'Toggle event' },
 ];
+
+const MINUTES = [1, 2, 3, 5, 10, 15, 20, 30, 60];
 
 const DraggableButton = ({ type, t, color }) => {
     const ref = useRef(null);
@@ -129,6 +137,7 @@ function dimColor(color) {
 
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
+    const [step, setStep] = useState(parseInt(window.localStorage.getItem('calendarStep'), 10) || 30);
     const storageName = props.storageName || 'calendar';
     const ref = useRef(null);
     const dblClick = useRef(null);
@@ -228,7 +237,7 @@ function Calendar(props) {
 
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
-                        extendedProps: { eventId: event._id, icon: event.common.icon },
+                        extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: time.getSeconds() },
                         title: name,
                         backgroundColor,
                         textColor,
@@ -259,7 +268,7 @@ function Calendar(props) {
                     }
 
                     events.push({
-                        extendedProps: { eventId: event._id, icon: event.common.icon },
+                        extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: time.getSeconds() },
                         title: name,
                         backgroundColor,
                         textColor,
@@ -271,7 +280,7 @@ function Calendar(props) {
                 });
             } else {
                 events.push({
-                    extendedProps: { eventId: event._id, icon: event.common.icon },
+                    extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: 0 },
                     title: name,
                     duration: initialDuration,
                     backgroundColor,
@@ -289,7 +298,7 @@ function Calendar(props) {
             }
 
             events.push({
-                extendedProps: { eventId: event._id, icon: event.common.icon },
+                extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: 0 },
                 title: name,
                 display: 'block',
                 backgroundColor,
@@ -391,6 +400,22 @@ function Calendar(props) {
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use ALT by dragging it to copy the events.')}</div>}
                         {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use double click on calendar to add new events.')}</div>}
+                        {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
+                        <FormControl fullWidth variant="standard">
+                            <InputLabel>{props.t('Zoom')}</InputLabel>
+                            <Select
+                                value={step}
+                                onChange={e => {
+                                    window.localStorage.setItem('calendarStep', e.target.value.toString());
+                                    setStep(e.target.value);
+                                }}
+                            >
+                                {MINUTES.map(minute => <MenuItem key={minute} value={minute}>
+                                    {minute}
+                                    {props.t('min')}
+                                </MenuItem>)}
+                            </Select>
+                        </FormControl>
                     </div>
                 </Paper>
                 {props.button}
@@ -409,6 +434,8 @@ function Calendar(props) {
                                     right: props.hideTopBlockButtons || props.isSimulation ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                                 }
                         }
+                        slotDuration={`00:${step.toString().padStart(2, '0')}:00`}
+                        eventMinHeight={20}
                         initialView={initialView}
                         initialDate={initialDate}
                         editable={!props.readOnly}
@@ -570,6 +597,12 @@ function Calendar(props) {
                                     if (title.length) {
                                         title[0].style.marginLeft = '23px';
                                     }
+                                }
+                            }
+                            if (info.event.extendedProps.seconds) {
+                                const cnt = info.el.getElementsByClassName('fc-event-time');
+                                if (cnt.length) {
+                                    cnt[0].innerText = `${cnt[0].innerText}:${info.event.extendedProps.seconds.toString().padStart(2, '0')}`;
                                 }
                             }
                         }}

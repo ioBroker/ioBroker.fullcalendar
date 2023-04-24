@@ -118,5 +118,7 @@
   "2.5 hours": "2,5 horas",
   "3 hours": "3 horas",
   "4 hours": "4 horas",
-  "Stop recording. Recording till %s": "Para de grabar. Grabando hasta %s"
+  "Stop recording. Recording till %s": "Para de grabar. Grabando hasta %s",
+  "Zoom": "Escala",
+  "min": "min."
 }

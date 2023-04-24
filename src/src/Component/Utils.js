@@ -240,12 +240,45 @@ async function getCachedObject(id, socket) {
     return objCache[id];
 }
 
+async function getIconAsync(id, socket) {
+    let obj = await getCachedObject(id, socket);
+    if (obj) {
+        if (obj.common?.icon) {
+            return obj.common?.icon;
+        }
+        if (obj.type === 'state' || obj.type === 'channel') {
+            // get parent
+            let parts = id.split('.');
+            parts.pop();
+            let parentId = parts.join('.');
+            obj = await getCachedObject(parentId, socket);
+
+            if (obj && obj.common?.icon) {
+                return obj.common?.icon;
+            }
+            if (obj && obj.type === 'channel') {
+                // get parent
+                parts = id.split('.');
+                parts.pop();
+                parentId = parts.join('.');
+                obj = await getCachedObject(parentId, socket);
+                if (obj && obj.common?.icon) {
+                    return obj.common?.icon;
+                }
+            }
+        }
+    }
+
+    return undefined;
+}
+
 export {
     cron2obj,
     obj2cron,
     serverDateToClient,
     clientDateToServer,
     getIcon,
+    getIconAsync,
     IGNORE_STATES,
     buildOverlap,
     getCachedObject,

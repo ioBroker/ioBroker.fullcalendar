@@ -118,5 +118,7 @@
   "2.5 hours": "2,5 часа",
   "3 hours": "3 часа",
   "4 hours": "4 часа",
-  "Stop recording. Recording till %s": "Остановить запись. Запись до %s"
+  "Stop recording. Recording till %s": "Остановить запись. Запись до %s",
+  "Zoom": "Масштаб",
+  "min": "мин."
 }

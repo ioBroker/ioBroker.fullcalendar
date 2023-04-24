@@ -118,5 +118,7 @@
   "2.5 hours": "2.5小时",
   "3 hours": "3小时",
   "4 hours": "4小时",
-  "Stop recording. Recording till %s": "停止录音。记录到 %s"
+  "Stop recording. Recording till %s": "停止录音。记录到 %s",
+  "Zoom": "规模",
+  "min": "分钟"
 }

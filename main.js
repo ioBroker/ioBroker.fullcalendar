@@ -203,7 +203,7 @@ async function getImage(id) {
     return null;
 }
 
-function buildOverlap(enumIds, enumObjs, exceptions) {
+function buildOverlap(enumIds, enumObjs, enumsExceptions) {
     // const states = selectedEnums.map(id => objects[id]?.common?.members);
     const groups = {};
     enumIds.forEach(enumId => {
@@ -211,7 +211,7 @@ function buildOverlap(enumIds, enumObjs, exceptions) {
         const categoryType = parts[1];
         groups[categoryType] = groups[categoryType] || [];
         if (enumObjs[enumId]) {
-            enumObjs[enumId].common?.members?.forEach(id => !exceptions.includes(id) && !groups[categoryType].includes(id) && groups[categoryType].push(id));
+            enumObjs[enumId].common?.members?.forEach(id => !enumsExceptions.includes(id) && !groups[categoryType].includes(id) && groups[categoryType].push(id));
         }
     });
 
@@ -351,6 +351,7 @@ function startAdapter(options) {
                             return true;
                         } else if (
                             stateId.startsWith(`${id}.`) &&
+                            !simulation.native.record.enumsExceptions.includes(id) &&
                             stateObjs[id] &&
                             (stateObjs[id].type === 'channel' || stateObjs[id].type === 'device')
                         ) {
@@ -377,6 +378,11 @@ function startAdapter(options) {
                     stateObj = await getForeignObjectAsyncCached(stateId);
 
                     const name = getText(stateObj) || stateId;
+
+                    if (stateObj.common.role && (stateObj.common.role.endsWith('.lock') || stateObj.common.role === 'lock')) {
+                        adapter.log.warn(`Cannot record state "${name}/${stateId}" because it has role "lock"`);
+                        return;
+                    }
 
                     if (stateObj.common.write === false) {
                         // adapter.log.warn(`Cannot record state "${name}/${stateId}" because it is read-only`);

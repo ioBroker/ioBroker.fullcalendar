@@ -1,7 +1,3 @@
-function sortNumbers(a, b) {
-    return a - b;
-}
-
 function oneCron2Array(str) {
     if (str === '*' || str === '?' || str === '') {
         return str;
@@ -126,7 +122,9 @@ function serverDateToClient(dateString, format /* , serverTimeZone */) {
     if (format === 'cron') {
         const cronObject = cron2obj(dateString);
         const date = new Date();
-        date.setHours(cronObject.hours[0], cronObject.minutes[0]);
+        date.setHours(cronObject.hours[0]);
+        date.setMinutes(cronObject.minutes[0]);
+        date.setSeconds(cronObject.seconds[0]);
         if (Array.isArray(cronObject.dows)) {
             date.setDate(date.getDate() + cronObject.dows[0] - date.getDay());
         }

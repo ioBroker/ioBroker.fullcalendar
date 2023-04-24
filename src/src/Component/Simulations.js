@@ -428,7 +428,7 @@ const Simulations = props => {
                                                 }}
                                                 size="small"
                                             >
-                                                <FiberManualRecord style={{ color: 'red' }} />
+                                                <Stop style={{ color: 'red' }} />
                                             </IconButton>
                                         </span>
                                     </Tooltip>}
