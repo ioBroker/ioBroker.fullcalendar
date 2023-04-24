@@ -47,5 +47,7 @@
   "hide_top_block_buttons": "Ocultar botones en el bloque superior",
   "hide_weekends": "Ocultar fines de semana",
   "Event will be deleted. Confirm?": "El evento será eliminado. ¿Confirmar?",
-  "calendar": "Calendario específico"
+  "calendar": "Calendario específico",
+  "day_step": "Escala de tiempo del día",
+  "day_step_minutes": "En minutos"
 }

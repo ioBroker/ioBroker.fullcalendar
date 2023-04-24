@@ -116,10 +116,11 @@ class FullCalendar extends Generic {
                     },
                     {
                         label: 'day_step',
-                        help: 'day_step_minutes',
+                        tooltip: 'day_step_minutes',
                         name: 'dayStep',
                         default: 30,
                         type: 'select',
+                        noTranslation: true,
                         hidden: data => data.viewMode !== 'timeGridDay' && data.viewMode !== 'timeGridWeek',
                         options: [
                             { label: '1', value: 1 },
@@ -132,7 +133,7 @@ class FullCalendar extends Generic {
                             { label: '30', value: 30 },
                             { label: '60', value: 60 },
                         ],
-                    }
+                    },
                 ],
             }],
             visDefaultStyle: {

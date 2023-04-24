@@ -47,5 +47,7 @@
   "hide_top_block_buttons": "Скрыть кнопки в верхнем блоке",
   "hide_weekends": "Скрыть выходные",
   "Event will be deleted. Confirm?": "Событие будет удалено. Подтверждать?",
-  "calendar": "Конкретный календарь"
+  "calendar": "Конкретный календарь",
+  "day_step": "Дневная шкала",
+  "day_step_minutes": "В минутах"
 }

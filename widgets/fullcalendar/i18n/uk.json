@@ -47,5 +47,7 @@
   "hide_top_block_buttons": "Сховати кнопки у верхньому блоці",
   "hide_weekends": "Приховати вихідні",
   "Event will be deleted. Confirm?": "Подію буде видалено. Підтвердити?",
-  "calendar": "Конкретний календар"
+  "calendar": "Конкретний календар",
+  "day_step": "Шкала денного часу",
+  "day_step_minutes": "За хвилини"
 }
