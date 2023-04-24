@@ -137,7 +137,7 @@ function dimColor(color) {
 
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
-    const [step, setStep] = useState(parseInt(window.localStorage.getItem('calendarStep'), 10) || 30);
+    const [step, setStep] = useState(props.dayStep || parseInt(window.localStorage.getItem('calendarStep'), 10) || 30);
     const storageName = props.storageName || 'calendar';
     const ref = useRef(null);
     const dblClick = useRef(null);
@@ -237,7 +237,12 @@ function Calendar(props) {
 
                     events.push({
                         // id: `${event._id}_${rruleTime.getTime()}`,
-                        extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: time.getSeconds() },
+                        extendedProps: {
+                            eventId: event._id,
+                            icon: event.common.icon,
+                            type: event.native.type,
+                            seconds: time.getSeconds(),
+                        },
                         title: name,
                         backgroundColor,
                         textColor,
@@ -268,7 +273,12 @@ function Calendar(props) {
                     }
 
                     events.push({
-                        extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: time.getSeconds() },
+                        extendedProps: {
+                            eventId: event._id,
+                            icon: event.common.icon,
+                            type: event.native.type,
+                            seconds: time.getSeconds(),
+                        },
                         title: name,
                         backgroundColor,
                         textColor,
@@ -280,7 +290,12 @@ function Calendar(props) {
                 });
             } else {
                 events.push({
-                    extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: 0 },
+                    extendedProps: {
+                        eventId: event._id,
+                        icon: event.common.icon,
+                        type: event.native.type,
+                        seconds: 0,
+                    },
                     title: name,
                     duration: initialDuration,
                     backgroundColor,
@@ -298,7 +313,12 @@ function Calendar(props) {
             }
 
             events.push({
-                extendedProps: { eventId: event._id, icon: event.common.icon, type: event.native.type, seconds: 0 },
+                extendedProps: {
+                    eventId: event._id,
+                    icon: event.common.icon,
+                    type: event.native.type,
+                    seconds: 0,
+                },
                 title: name,
                 display: 'block',
                 backgroundColor,
@@ -401,7 +421,7 @@ function Calendar(props) {
                         {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use double click on calendar to add new events.')}</div>}
                         {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
-                        <FormControl fullWidth variant="standard">
+                        {props.hideLeftBlockHint ? null : <FormControl fullWidth variant="standard">
                             <InputLabel>{props.t('Zoom')}</InputLabel>
                             <Select
                                 value={step}
@@ -415,7 +435,7 @@ function Calendar(props) {
                                     {props.t('min')}
                                 </MenuItem>)}
                             </Select>
-                        </FormControl>
+                        </FormControl>}
                     </div>
                 </Paper>
                 {props.button}
@@ -678,6 +698,7 @@ Calendar.propTypes = {
     simulationId: PropTypes.string,
     setEvent: PropTypes.func,
     button: PropTypes.any,
+    dayStep: PropTypes.number,
 };
 
 export default withTheme(withStyles(styles)(Calendar));

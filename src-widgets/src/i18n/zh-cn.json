@@ -47,5 +47,7 @@
   "hide_top_block_buttons": "隐藏顶部块中的按钮",
   "hide_weekends": "隐藏周末",
   "Event will be deleted. Confirm?": "事件将被删除。确认？",
-  "calendar": "具体日历"
+  "calendar": "具体日历",
+  "day_step": "日时间尺度",
+  "day_step_minutes": "几分钟内"
 }

@@ -114,6 +114,25 @@ class FullCalendar extends Generic {
                         default: '',
                         hidden: (data, index, style) => style && style.position !== 'relative',
                     },
+                    {
+                        label: 'day_step',
+                        help: 'day_step_minutes',
+                        name: 'dayStep',
+                        default: 30,
+                        type: 'select',
+                        hidden: data => data.viewMode !== 'timeGridDay' && data.viewMode !== 'timeGridWeek',
+                        options: [
+                            { label: '1', value: 1 },
+                            { label: '2', value: 2 },
+                            { label: '3', value: 3 },
+                            { label: '5', value: 5 },
+                            { label: '10', value: 10 },
+                            { label: '15', value: 15 },
+                            { label: '20', value: 20 },
+                            { label: '30', value: 30 },
+                            { label: '60', value: 60 },
+                        ],
+                    }
                 ],
             }],
             visDefaultStyle: {
@@ -245,6 +264,7 @@ class FullCalendar extends Generic {
                 hideWeekends={this.state.rxData.hideWeekends || false}
                 t={FullCalendar.t}
                 language={I18n.getLanguage()}
+                dayStep={this.state.rxData.dayStep || 30}
             />
         </div>;
 

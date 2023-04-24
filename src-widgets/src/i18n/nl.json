@@ -47,5 +47,7 @@
   "hide_top_block_buttons": "Verberg knoppen in het bovenste blok",
   "hide_weekends": "Weekends verbergen",
   "Event will be deleted. Confirm?": "Evenement wordt verwijderd. Bevestigen?",
-  "calendar": "Specifieke kalender"
+  "calendar": "Specifieke kalender",
+  "day_step": "Dag tijd schaal",
+  "day_step_minutes": "In minuten"
 }
