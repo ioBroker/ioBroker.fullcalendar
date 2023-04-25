@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "news": {
+      "2.2.1": {
+        "en": "Corrected stop of the recording",
+        "de": "Korrigierter Stopp der Aufnahme",
+        "ru": "Исправлена остановка записи",
+        "pt": "Parada correta da gravação",
+        "nl": "Vertaling:",
+        "fr": "Arrêt corrigé de l'enregistrement",
+        "it": "Stop corretto della registrazione",
+        "es": "Parada corregida de la grabación",
+        "pl": "Wykwalifikowany przystanek na nagrania",
+        "uk": "Виправлена зупинка запису",
+        "zh-cn": "更正"
+      },
       "2.2.0": {
         "en": "Added simulation of events",
         "de": "Simulation von Ereignissen hinzugefügt",
@@ -78,18 +91,6 @@
         "es": "Actualizado para usar con js-controller 2.x",
         "pl": "Zaktualizowano do użytku z js-kontrolerem 2.x",
         "zh-cn": "更新为与js-controller 2.x一起使用"
-      },
-      "1.0.0": {
-        "en": "Support of compact mode added",
-        "de": "Unterstützung des Kompaktmodus hinzugefügt",
-        "ru": "Добавлена поддержка компактного режима",
-        "pt": "Adicionado suporte ao modo compacto",
-        "nl": "Ondersteuning van compacte modus toegevoegd",
-        "fr": "Prise en charge du mode compact ajouté",
-        "it": "Supporto della modalità compatta aggiunto",
-        "es": "Soporte de modo compacto agregado",
-        "pl": "Dodano obsługę trybu kompaktowego",
-        "zh-cn": "支持紧凑模式"
       }
     },
     "title": "Calendar schedule",

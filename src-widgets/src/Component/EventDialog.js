@@ -375,7 +375,7 @@ const EventDialog = props => {
                     <InputLabel>{props.t('Time type')}</InputLabel>
                     <Select
                         value={event.native.astro ? 'astro' : 'time'}
-                        disabled={props.readOnly}
+                        disabled={props.readOnly || !event?.common.enabled}
                         onChange={e =>
                             changeEvent(newEvent => {
                                 if (e.target.value === 'astro') {
@@ -402,6 +402,7 @@ const EventDialog = props => {
                         <InputLabel>{props.t('Astronomic event')}</InputLabel>
                         <Select
                             value={event.native.astro || ''}
+                            disabled={props.readOnly || !event?.common.enabled}
                             onChange={e => changeEvent(newEvent => newEvent.native.astro = e.target.value)}
                             renderValue={value => props.t(value)}
                         >
@@ -428,7 +429,7 @@ const EventDialog = props => {
                         <TimePicker
                             label={props.t('Time')}
                             value={date || null}
-                            disabled={props.readOnly}
+                            disabled={props.readOnly || !event?.common.enabled}
                             onChange={_date => {
                                 if (!_date) {
                                     return;
@@ -465,7 +466,7 @@ const EventDialog = props => {
                     <InputLabel>{props.t('Offset')}</InputLabel>
                     <Select
                         value={event.native.offset || 0}
-                        disabled={props.readOnly}
+                        disabled={props.readOnly || !event?.common.enabled}
                         onChange={e =>
                             changeEvent(newEvent => newEvent.native.offset = e.target.value)}
                     >
@@ -507,7 +508,7 @@ const EventDialog = props => {
                     className={props.classes.randomTime}
                     label={props.t('Time random offset')}
                     value={event.native.timeRandomOffset || 0}
-                    disabled={props.readOnly}
+                    disabled={props.readOnly || !event?.common.enabled}
                     onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
                     variant="standard"
                     InputProps={{
@@ -528,9 +529,14 @@ const EventDialog = props => {
                     <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
                         value={event.native.type || ''}
-                        disabled={props.readOnly}
+                        disabled={props.readOnly || !event?.common.enabled}
                         onChange={e =>
-                            changeEvent(newEvent => newEvent.native.type = e.target.value)}
+                            changeEvent(newEvent => {
+                                if (newEvent.common.name === props.t(newEvent.native.type)) {
+                                    newEvent.common.name = props.t(e.target.value);
+                                }
+                                newEvent.native.type = e.target.value;
+                            })}
                         renderValue={value => props.t(value)}
                     >
                         {['single', 'double', 'toggle'].map(type =>
@@ -545,7 +551,7 @@ const EventDialog = props => {
                 {event.native.type !== 'single' && <TextField
                     label={props.t('Duration')}
                     value={duration}
-                    disabled={props.readOnly}
+                    disabled={props.readOnly || !event?.common.enabled}
                     onChange={e => setDuration(e.target.value)}
                     variant="standard"
                     className={props.classes.narrowText}
@@ -560,7 +566,7 @@ const EventDialog = props => {
                     <TextField
                         label="Object ID"
                         value={event.native.oid || ''}
-                        disabled={props.readOnly}
+                        disabled={props.readOnly || !event?.common.enabled}
                         onChange={e => changeEvent(newEvent => newEvent.native.oid = e.target.value)}
                         variant="standard"
                         helperText={getText(object?.common.name || '', props.language)}
@@ -580,7 +586,7 @@ const EventDialog = props => {
                     <InputLabel>{props.t('Period')}</InputLabel>
                     <Select
                         value={period || 'once'}
-                        disabled={props.readOnly}
+                        disabled={props.readOnly || !event?.common.enabled}
                         onChange={e => {
                             if (e.target.value === event.native.cron) {
                                 return;
@@ -631,7 +637,7 @@ const EventDialog = props => {
                             {daysOfWeek.map(value => <td key={value}>
                                 <Checkbox
                                     checked={cronObject?.dows?.includes(value) || false}
-                                    disabled={props.readOnly}
+                                    disabled={props.readOnly || !event?.common.enabled}
                                     onChange={e => {
                                         changeEvent(newEvent => {
                                             const newCronObject = cron2obj(newEvent.native.cron);
@@ -667,7 +673,7 @@ const EventDialog = props => {
                             {new Array(12).fill(null).map((value, i) => <td key={i}>
                                 <Checkbox
                                     checked={cronObject?.months?.includes(i + 1) || false}
-                                    disabled={props.readOnly}
+                                    disabled={props.readOnly || !event?.common.enabled}
                                     onChange={e => {
                                         changeEvent(newEvent => {
                                             const newCronObject = cron2obj(newEvent.native.cron);
@@ -690,7 +696,7 @@ const EventDialog = props => {
                 <TextField
                     label="Description"
                     value={event?.common.name || ''}
-                    disabled={props.readOnly}
+                    disabled={props.readOnly || !event?.common.enabled}
                     onChange={e =>
                         changeEvent(newEvent => newEvent.common.name = e.target.value)}
                     variant="standard"
@@ -700,7 +706,7 @@ const EventDialog = props => {
             <div className={props.classes.narrowColor}>
                 <ColorPicker
                     value={event.common.color || event.native.color || ''}
-                    disabled={props.readOnly}
+                    disabled={props.readOnly || !event?.common.enabled}
                     onChange={color =>
                         changeEvent(newEvent => newEvent.common.color = color)}
                     name={props.t('Color')}
