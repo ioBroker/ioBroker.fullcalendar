@@ -74,6 +74,14 @@ const style = theme => ({
     tooltip: {
         pointerEvents: 'none',
     },
+    eventsCount: {
+        position: 'absolute',
+        right: 5,
+        top: 2,
+        fontSize: 10,
+        opacity: 0.7,
+        fontStyle: 'italic',
+    },
 });
 
 const CalendarManager = props => {

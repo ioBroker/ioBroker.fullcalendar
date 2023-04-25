@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    useMemo,
+} from 'react';
 import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import { withStyles, withTheme } from '@mui/styles';
@@ -135,6 +140,27 @@ function dimColor(color) {
     return color;
 }
 
+function getCurrentScrollTime(el) {
+    const rect = el.getBoundingClientRect();
+    const slots = el.getElementsByClassName('fc-timegrid-slot');
+    for (let i = 0; i < slots.length; i++) {
+        const slotRect = slots[i].getBoundingClientRect();
+        if (slotRect.top > rect.top + 100) {
+            return slots[i].dataset.time;
+        }
+    }
+
+    return null;
+}
+
+function formatter(date) {
+    if (date.date.second) {
+        return `${date.date.hour}:${date.date.minute.toString().padStart(2, '0')}:${date.date.second.toString().padStart(2, '0')}`;
+    }
+
+    return `${date.date.hour}:${date.date.minute.toString().padStart(2, '0')}`;
+}
+
 function Calendar(props) {
     const [eventDialog, setEventDialog] = useState(null);
     const [step, setStep] = useState(props.dayStep || parseInt(window.localStorage.getItem('calendarStep'), 10) || 30);
@@ -143,6 +169,8 @@ function Calendar(props) {
     const dblClick = useRef(null);
     const scrollBackTimer = useRef(null);
     const scrollTimer = useRef(null);
+    const lastEventTime = useRef(null);
+
     const [calendarInterval, setCalendarInterval] = useState({
         start: null,
         end: null,
@@ -151,7 +179,9 @@ function Calendar(props) {
     let initialDate = !props.widget && window.localStorage.getItem(`${storageName}Start`) && false ?
         new Date(parseInt(window.localStorage.getItem(`${storageName}Start`), 10)) :
         new Date();
+
     let initialView = props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth';
+
     if (props.isSimulation) {
         initialDate = new Date();
         initialView = props.simulation?.native.interval === 'day' ? 'timeGridDay' : 'timeGridWeek';
@@ -163,133 +193,155 @@ function Calendar(props) {
     }
 
     // create events
-    const events = [];
-    props.events.forEach(event => {
-        if (!event) {
-            return;
-        }
-        // duration in ms
-        const initialDuration = event.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ?
-            event.native.intervals[0].timeOffset : 30;
+    const events = useMemo(() => {
+        const _events = [];
 
-        event.common.color = event.common.color || '#3a87b2';
+        props.events.forEach(event => {
+            if (!event) {
+                return;
+            }
+            // duration in ms
+            const initialDuration = event.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset ?
+                event.native.intervals[0].timeOffset : 30;
 
-        const backgroundColor = event.common.enabled ? event.common.color : dimColor(event.common.color);
-        let textColor = Utils.invertColor(event.common.color, true);
-        if (!event.common.enabled) {
-            textColor = dimColor(textColor);
-        }
+            event.common.color = event.common.color || '#3a87b2';
 
-        let name = event.common.name;
-        if (event.native.oid) {
-            let startValue = event.native.startValue;
-            if (typeof startValue === 'boolean') {
-                startValue = startValue ? I18n.t('ON') : I18n.t('OFF');
-            } else if (event.native.states && event.native.states[startValue]) {
-                startValue = event.native.states[startValue];
+            const backgroundColor = event.common.enabled ? event.common.color : dimColor(event.common.color);
+            let textColor = Utils.invertColor(event.common.color, true);
+            if (!event.common.enabled) {
+                textColor = dimColor(textColor);
             }
 
-            let endValue = event.native.intervals?.[0]?.value;
-            if (typeof endValue === 'boolean') {
-                endValue = endValue ? I18n.t('ON') : I18n.t('OFF');
-            } else if (event.native.states && event.native.states[endValue]) {
-                endValue = event.native.states[endValue];
+            let name = event.common.name;
+            if (event.native.oid) {
+                let startValue = event.native.startValue;
+                if (typeof startValue === 'boolean') {
+                    startValue = startValue ? I18n.t('ON') : I18n.t('OFF');
+                } else if (event.native.states && event.native.states[startValue]) {
+                    startValue = event.native.states[startValue];
+                }
+
+                let endValue = event.native.intervals?.[0]?.value;
+                if (typeof endValue === 'boolean') {
+                    endValue = endValue ? I18n.t('ON') : I18n.t('OFF');
+                } else if (event.native.states && event.native.states[endValue]) {
+                    endValue = event.native.states[endValue];
+                }
+
+                name = `${event.common.name} → ${startValue}`;
+                if (event.native.type === 'double') {
+                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${endValue}`;
+                }
+                if (event.native.type === 'toggle') {
+                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
+                }
             }
 
-            name = `${event.common.name} → ${startValue}`;
-            if (event.native.type === 'double') {
-                name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${endValue}`;
-            }
-            if (event.native.type === 'toggle') {
-                name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
-            }
-        }
+            if (event.native.cron) {
+                const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
+                const cronObject = cron2obj(event.native.cron);
+                start.setFullYear(new Date().getFullYear() - 1);
 
-        if (event.native.cron) {
-            const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
-            const cronObject = cron2obj(event.native.cron);
-            start.setFullYear(new Date().getFullYear() - 1);
+                if (Array.isArray(cronObject.months)) {
+                    const rule = new RRule({
+                        dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
+                        until: calendarInterval.end || new Date(),
+                        freq: RRule.WEEKLY,
+                        bymonth: cronObject.months,
+                        // tzid: TIME_ZONE,
+                    });
 
-            if (Array.isArray(cronObject.months)) {
-                const rule = new RRule({
-                    dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
-                    until: calendarInterval.end || new Date(),
-                    freq: RRule.WEEKLY,
-                    bymonth: cronObject.months,
-                    // tzid: TIME_ZONE,
-                });
+                    rule.between(
+                        calendarInterval.start || new Date(),
+                        calendarInterval.end || new Date(),
+                    ).forEach(rruleTime => {
+                        const time = event.native.astro ?
+                            SunCalc.getTimes(
+                                rruleTime,
+                                props.systemConfig.latitude,
+                                props.systemConfig.longitude,
+                            )[event.native.astro] :
+                            rruleTime;
 
-                rule.between(
-                    calendarInterval.start || new Date(),
-                    calendarInterval.end || new Date(),
-                ).forEach(rruleTime => {
-                    const time = event.native.astro ?
-                        SunCalc.getTimes(
-                            rruleTime,
-                            props.systemConfig.latitude,
-                            props.systemConfig.longitude,
-                        )[event.native.astro] :
-                        rruleTime;
+                        if (event.native.astro && event.native.offset) {
+                            time.setMinutes(time.getMinutes() + event.native.offset);
+                        }
 
-                    if (event.native.astro && event.native.offset) {
-                        time.setMinutes(time.getMinutes() + event.native.offset);
-                    }
+                        _events.push({
+                            // id: `${event._id}_${rruleTime.getTime()}`,
+                            extendedProps: {
+                                eventId: event._id,
+                                icon: event.common.icon,
+                                type: event.native.type,
+                                seconds: time.getSeconds(),
+                            },
+                            title: name,
+                            backgroundColor,
+                            textColor,
+                            start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                            allDay: false,
+                            display: 'block',
+                        });
+                    });
+                } else if (Array.isArray(cronObject.dows)) {
+                    const rule = new RRule({
+                        dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
+                        until: calendarInterval.end || new Date(),
+                        freq: RRule.WEEKLY,
+                        byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
+                    });
 
-                    events.push({
-                        // id: `${event._id}_${rruleTime.getTime()}`,
+                    rule.between(
+                        calendarInterval.start || new Date(),
+                        calendarInterval.end || new Date(),
+                    ).forEach(rruleTime => {
+                        const time = event.native.astro ?
+                            SunCalc.getTimes(rruleTime, props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
+                            rruleTime;
+
+                        if (event.native.astro && event.native.offset) {
+                            time.setMinutes(time.getMinutes() + event.native.offset);
+                        }
+
+                        _events.push({
+                            extendedProps: {
+                                eventId: event._id,
+                                icon: event.common.icon,
+                                type: event.native.type,
+                                seconds: time.getSeconds(),
+                            },
+                            title: name,
+                            backgroundColor,
+                            textColor,
+                            start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                            allDay: false,
+                            display: 'block',
+                        });
+                    });
+                } else {
+                    _events.push({
                         extendedProps: {
                             eventId: event._id,
                             icon: event.common.icon,
                             type: event.native.type,
-                            seconds: time.getSeconds(),
+                            seconds: 0,
                         },
                         title: name,
                         backgroundColor,
                         textColor,
-                        start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
-                        duration: initialDuration,
-                        allDay: false,
-                        display: 'block',
+                        icon: event.common.icon,
                     });
-                });
-            } else if (Array.isArray(cronObject.dows)) {
-                const rule = new RRule({
-                    dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
-                    until: calendarInterval.end || new Date(),
-                    freq: RRule.WEEKLY,
-                    byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
-                });
-
-                rule.between(
-                    calendarInterval.start || new Date(),
-                    calendarInterval.end || new Date(),
-                ).forEach(rruleTime => {
-                    const time = event.native.astro ?
-                        SunCalc.getTimes(rruleTime, props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
-                        rruleTime;
-
-                    if (event.native.astro && event.native.offset) {
-                        time.setMinutes(time.getMinutes() + event.native.offset);
-                    }
-
-                    events.push({
-                        extendedProps: {
-                            eventId: event._id,
-                            icon: event.common.icon,
-                            type: event.native.type,
-                            seconds: time.getSeconds(),
-                        },
-                        title: name,
-                        backgroundColor,
-                        textColor,
-                        start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
-                        duration: initialDuration,
-                        allDay: false,
-                        display: 'block',
-                    });
-                });
+                }
             } else {
-                events.push({
+                const timeStart = event.native.astro ?
+                    SunCalc.getTimes(new Date(), props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
+                    event.native.start;
+
+                if (event.native.astro && event.native.offset) {
+                    timeStart.setMinutes(timeStart.getMinutes() + event.native.offset);
+                }
+
+                _events.push({
                     extendedProps: {
                         eventId: event._id,
                         icon: event.common.icon,
@@ -297,37 +349,17 @@ function Calendar(props) {
                         seconds: 0,
                     },
                     title: name,
-                    duration: initialDuration,
+                    display: 'block',
                     backgroundColor,
                     textColor,
-                    icon: event.common.icon,
+                    start: serverDateToClient(timeStart, 'date', props.serverTimeZone),
+                    end: serverDateToClient(new Date(new Date(timeStart).getTime() + initialDuration), 'date', props.serverTimeZone),
                 });
             }
-        } else {
-            const timeStart = event.native.astro ?
-                SunCalc.getTimes(new Date(), props.systemConfig.latitude, props.systemConfig.longitude)[event.native.astro] :
-                event.native.start;
+        });
 
-            if (event.native.astro && event.native.offset) {
-                timeStart.setMinutes(timeStart.getMinutes() + event.native.offset);
-            }
-
-            events.push({
-                extendedProps: {
-                    eventId: event._id,
-                    icon: event.common.icon,
-                    type: event.native.type,
-                    seconds: 0,
-                },
-                title: name,
-                display: 'block',
-                backgroundColor,
-                textColor,
-                start: serverDateToClient(timeStart, 'date', props.serverTimeZone),
-                end: serverDateToClient(new Date(new Date(timeStart).getTime() + initialDuration), 'date', props.serverTimeZone),
-            });
-        }
-    });
+        return _events;
+    }, [props.events, props.serverTimeZone, props.systemConfig.latitude, props.systemConfig.longitude]);
 
     useEffect(() => {
         // update periodically the time
@@ -357,6 +389,15 @@ function Calendar(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // init last used event time
+    useEffect(() => {
+        lastEventTime.current = null;
+        setTimeout(() => {
+            const now = new Date();
+            ref.current?.getApi().scrollToTime(`${now.getHours().toString().padStart(2, '0')}:${(step > now.getMinutes() ? 0 : now.getMinutes() - step).toString().padStart(2, '0')}:00`);
+        }, 300);
+    }, [props.calendarPrefix, props.simulationId]);
+
     useEffect(() => {
         if (props.isSimulation) {
             const calendar = ref.current?.getApi();
@@ -367,6 +408,10 @@ function Calendar(props) {
     if (props.isSimulation && !props.simulation) {
         return null;
     }
+
+    const now = lastEventTime.current ? undefined : new Date();
+    const scrollTime = now ? `${now.getHours().toString().padStart(2, '0')}:${(step > now.getMinutes() ? 0 : now.getMinutes() - step).toString().padStart(2, '0')}:00` : undefined;
+    console.log(`SCROLL TIME: ${scrollTime}`);
 
     return <>
         <style>
@@ -388,7 +433,12 @@ function Calendar(props) {
             systemConfig={props.systemConfig}
             widget={props.widget}
             event={props.events.find(event => event._id === eventDialog)}
-            onClose={() => setEventDialog(null)}
+            onClose={() => {
+                setEventDialog(null);
+                const _now  = lastEventTime.current ? new Date(lastEventTime.current) : new Date();
+                const _scrollTime = `${now.getHours().toString().padStart(2, '0')}:${(step > now.getMinutes() ? 0 : _now.getMinutes() - step).toString().padStart(2, '0')}:00`;
+                setTimeout(() => ref.current?.getApi().scrollToTime(_scrollTime), 200);
+            }}
             socket={props.socket}
             updateEvents={props.updateEvents}
             setEvent={props.setEvent}
@@ -426,6 +476,12 @@ function Calendar(props) {
                             <Select
                                 value={step}
                                 onChange={e => {
+                                    if (ref.current?.elRef?.current) {
+                                        const curTime = getCurrentScrollTime(ref.current.elRef.current);
+                                        if (curTime) {
+                                            setTimeout(() => ref.current?.getApi().scrollToTime(curTime), 300);
+                                        }
+                                    }
                                     window.localStorage.setItem('calendarStep', e.target.value.toString());
                                     setStep(e.target.value);
                                 }}
@@ -454,6 +510,8 @@ function Calendar(props) {
                                     right: props.hideTopBlockButtons || props.isSimulation ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                                 }
                         }
+                        eventTimeFormat={props.isSimulation ? formatter : undefined}
+                        // scrollTime={scrollTime}
                         slotDuration={`00:${step.toString().padStart(2, '0')}:00`}
                         eventMinHeight={20}
                         initialView={initialView}
@@ -465,6 +523,7 @@ function Calendar(props) {
                         dayMaxEvents
                         eventResizableFromStart={!props.isSimulation}
                         eventDurationEditable={!props.isSimulation}
+                        defaultTimedEventDuration={`00:${step.toString().padStart(2, '0')}`}
                         events={events}
                         height="calc(100% - 20px)"
                         locales={[
@@ -482,6 +541,7 @@ function Calendar(props) {
                         locale={props.language}
                         datesSet={date => {
                             if (date.start.toString() !== calendarInterval.start?.toString() || date.end.toString() !== calendarInterval.end?.toString()) {
+                                lastEventTime.current = null;
                                 setCalendarInterval({
                                     start: date.start,
                                     end: date.end,
@@ -516,8 +576,12 @@ function Calendar(props) {
                         // eventContent={event => <MenuItem>
                         //     {event.event.title}
                         // </MenuItem>}
-                        eventClick={event => setEventDialog(event.event.extendedProps.eventId)}
+                        eventClick={event => {
+                            lastEventTime.current = new Date(event.event.start).getTime();
+                            setEventDialog(event.event.extendedProps.eventId);
+                        }}
                         eventResize={event => {
+                            lastEventTime.current = new Date(event.event.start).getTime();
                             const eventData = props.events.find(_event => _event._id === event.event.extendedProps.eventId);
                             if (eventData.native.intervals?.[0].timeOffset) {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
@@ -532,6 +596,7 @@ function Calendar(props) {
                         //    console.log(event);
                         // }}
                         eventDrop={async event => {
+                            lastEventTime.current = new Date(event.event.start).getTime();
                             const eventData = props.events.find(_event => _event._id === event.event.extendedProps.eventId);
                             if (eventData?.native?.cron) {
                                 const newEvent = JSON.parse(JSON.stringify(eventData));
@@ -594,6 +659,7 @@ function Calendar(props) {
                                     end: null,
                                 };
                             }
+                            lastEventTime.current = new Date(event.event.start).getTime();
                             await props.setEvent(newEvent._id, newEvent);
                             props.updateEvents();
                             setTimeout(() => setEventDialog(newEvent._id), 100);
@@ -617,12 +683,6 @@ function Calendar(props) {
                                     if (title.length) {
                                         title[0].style.marginLeft = '23px';
                                     }
-                                }
-                            }
-                            if (info.event.extendedProps.seconds) {
-                                const cnt = info.el.getElementsByClassName('fc-event-time');
-                                if (cnt.length) {
-                                    cnt[0].innerText = `${cnt[0].innerText}:${info.event.extendedProps.seconds.toString().padStart(2, '0')}`;
                                 }
                             }
                         }}
@@ -662,6 +722,8 @@ function Calendar(props) {
                             if (props.isSimulation) {
                                 newEvent.common.color = props.simulation.common.color || newEvent.common.color;
                             }
+
+                            lastEventTime.current = new Date(newEvent.native.start).getTime();
 
                             await props.setEvent(newEvent._id, newEvent);
                             await props.updateEvents();

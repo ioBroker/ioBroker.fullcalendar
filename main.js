@@ -125,6 +125,18 @@ const stopRecordSimulation = async id => {
     await subscribeUnsubscribe();
 }
 
+function stopPlaySimulation(id) {
+    recordingSimulations[id].value = 'stop';
+
+    // stop playing
+    recordingSimulations[id].native.events.forEach(event => {
+        if (events[event._id]) {
+            stopEvent(events[event._id]);
+            delete events[event._id];
+        }
+    });
+}
+
 function getObjectIcon(id, obj) {
     // If id is Object
     if (typeof id === 'object') {
@@ -253,7 +265,7 @@ async function startRecordSimulation(id) {
 
     collectAllStates(id);
 
-    if (recordingSimulations[id].native.record.start >= Date.now() || recordingSimulations[id].native.record.end < Date.now()) {
+    if (new Date(recordingSimulations[id].native.record.start).getTime() >= Date.now() || new Date(recordingSimulations[id].native.record.end).getTime() < Date.now()) {
         await adapter.setForeignStateAsync(id, 'stop');
         recordingSimulations[id].value = 'stop';
         return;
@@ -271,21 +283,15 @@ async function setSimulationStatus(id, value) {
         if (oldValue === 'record') {
             await stopRecordSimulation(id);
         } else if (oldValue === 'play') {
-            // stop playing
-            recordingSimulations[id].native.events.forEach(event => {
-                if (events[event._id]) {
-                    stopEvent(events[event._id]);
-                    delete events[event._id];
-                }
-            });
+            stopPlaySimulation(id);
         }
     } else if (value === 'pause') {
         await subscribeUnsubscribe();
     } else if (value === 'play') {
         recordingSimulations[id].native.events.forEach(event => {
-            event.simulationStart = recordingSimulations[id].native.play && new Date(recordingSimulations[id].native.play.start);
-            event.simulationEnd = recordingSimulations[id].native.play.end && new Date(recordingSimulations[id].native.play.end);
-            event.simulationDow = recordingSimulations[id].native.play.dow;
+            event.simulationStart = recordingSimulations[id].native.play?.start && new Date(recordingSimulations[id].native.play.start);
+            event.simulationEnd = recordingSimulations[id].native.play?.end && new Date(recordingSimulations[id].native.play.end);
+            event.simulationDow = recordingSimulations[id].native.play?.dow;
             events[event._id] = event;
             names[event._id] = event.common.name;
         });
@@ -886,9 +892,17 @@ async function main() {
     updateInterval = setInterval(() => {
         Object.keys(recordingSimulations).forEach(id => {
             if ((recordingSimulations[id].value === 'record' || recordingSimulations[id].value === 'pause') &&
-                recordingSimulations[id].native.record.end < Date.now()
+                new Date(recordingSimulations[id].native.record.end).getTime() < Date.now()
             ) {
+                adapter.setForeignState(id, 'stop');
                 stopRecordSimulation(id);
+            } else
+            if (recordingSimulations[id].value === 'play' &&
+                recordingSimulations[id].native.play?.end &&
+                new Date(recordingSimulations[id].native.play.end).getTime() < Date.now()
+            ) {
+                adapter.setForeignState(id, 'stop');
+                stopPlaySimulation(id);
             }
         });
     }, 60 * 1000); // every minute

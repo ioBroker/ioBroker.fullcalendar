@@ -23,9 +23,9 @@ Or you can record the whole week and can play it back on the next weeks during y
 
 How to use:
 - Go to simulation tab
-- Create new simulation by clicking on the "+" button and select type of simulation: day or week
-- Click record button and wait 24 hours or 7 days till simulation stops to record events
-- Now you can replay the simulation by clicking on the play button. Additionally, you can define to time when the simulation should be started.
+- Create the new simulation by clicking on the "+" button and select type of simulation: day or week
+- Click the record button and wait 24 hours or 7 days till simulation stops to record events
+- Now you can replay the simulation by clicking on the play button. Additionally, you can define the time when the simulation should be started.
 
 ## Todo
 - Week and day must scroll to the current time
@@ -35,6 +35,9 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Corrected stop of the recording
+
 ### 2.2.0 (2023-04-24)
 * (bluefox) Added simulation of events
 

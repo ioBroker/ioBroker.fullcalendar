@@ -27,7 +27,7 @@ class App extends GenericApp {
 
         if (window.location.port === '3000') {
             extendedProps.socket = { port: '8081' };
-            // window.socketUrl = 'http://192.168.178.45:8081';
+            window.socketUrl = 'http://192.168.178.45:8081';
         }
         if (window.socketUrl && window.socketUrl.startsWith(':')) {
             window.socketUrl = `${window.location.protocol}//${window.location.hostname}${window.socketUrl}`;
