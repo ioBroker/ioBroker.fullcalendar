@@ -42,7 +42,7 @@
         "react-icons": "^4.8.0",
         "react-scripts": "^5.0.1",
         "rrule": "^2.7.2",
-        "sass": "^1.62.0",
+        "sass": "^1.62.1",
         "suncalc2": "^1.8.1",
         "uuid": "^9.0.0"
     },
