@@ -4,7 +4,7 @@
     "private": true,
     "dependencies": {
         "@emotion/react": "^11.10.6",
-        "@emotion/styled": "^11.10.6",
+        "@emotion/styled": "^11.10.8",
         "@fullcalendar/core": "^6.1.5",
         "@fullcalendar/daygrid": "^6.1.5",
         "@fullcalendar/interaction": "^6.1.5",
