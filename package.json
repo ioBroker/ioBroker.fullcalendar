@@ -33,7 +33,7 @@
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
     "@alcalzone/release-script-plugin-license": "^3.5.9",
     "@iobroker/vis-2-widgets-react-dev": "^0.3.19",
-    "@iobroker/vis-2-widgets-testing": "^0.1.5",
+    "@iobroker/vis-2-widgets-testing": "^0.2.1",
     "gulp": "^4.0.2",
     "mocha": "^10.2.0"
   },
@@ -51,7 +51,8 @@
     "main.js"
   ],
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha --exit",
+    "test": "mocha ./test/*.engine.js --exit",
+    "test-gui": "mocha ./test/*.gui.js --exit",
     "build": "gulp",
     "prepublishOnly": "gulp",
     "release": "release-script",
