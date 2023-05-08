@@ -7,74 +7,28 @@ const setup = require('@iobroker/legacy-testing');
 let objects = null;
 let states  = null;
 let onStateChanged = null;
-let onObjectChanged = null;
-let sendToID = 1;
 
-const adapterShortName = setup.adapterName.substring(setup.adapterName.indexOf('.') + 1);
+const adapterShortName = setup.adapterName.split('.').pop();
 const runningMode = require('../io-package.json').common.mode;
 
 function checkConnectionOfAdapter(cb, counter) {
     counter = counter || 0;
     console.log(`Try check #${counter}`);
     if (counter > 30) {
-        cb && cb('Cannot check connection');
-        return;
+        return cb && cb('Cannot check connection');
     }
 
-    states.getState(`system.adapter.${adapterShortName}.0.alive`, function (err, state) {
-        if (err) console.error(err);
+    states.getState(`system.adapter.${adapterShortName}.0.alive`, (err, state) => {
+        err && console.error(err);
         if (state && state.val) {
             cb && cb();
         } else {
-            setTimeout(function () {
-                checkConnectionOfAdapter(cb, counter + 1);
-            }, 1000);
+            setTimeout(() => checkConnectionOfAdapter(cb, counter + 1), 1000);
         }
     });
 }
 
-function checkValueOfState(id, value, cb, counter) {
-    counter = counter || 0;
-    if (counter > 20) {
-        cb && cb('Cannot check value Of State ' + id);
-        return;
-    }
-
-    states.getState(id, (err, state) => {
-        if (err) console.error(err);
-        if (value === null && !state) {
-            cb && cb();
-        } else
-        if (state && (value === undefined || state.val === value)) {
-            cb && cb();
-        } else {
-            setTimeout(() =>
-                checkValueOfState(id, value, cb, counter + 1), 500);
-        }
-    });
-}
-
-function sendTo(target, command, message, callback) {
-    onStateChanged = (id, state) => {
-        if (id === 'messagebox.system.adapter.test.0') {
-            callback(state.message);
-        }
-    };
-
-    states.pushMessage(`system.adapter.${target}`, {
-        command:    command,
-        message:    message,
-        from:       'system.adapter.test.0',
-        callback: {
-            message: message,
-            id:      sendToID++,
-            ack:     false,
-            time:    Date.now(),
-        }
-    });
-}
-
-describe(`Test ${adapterShortName} adapter`, function() {
+describe(`Test ${adapterShortName} adapter`, function () {
     before(`Test ${adapterShortName} adapter: Start js-controller`, function (_done) {
         this.timeout(600000); // because of first install from npm
 
@@ -88,10 +42,11 @@ describe(`Test ${adapterShortName} adapter`, function() {
 
             await setup.setAdapterConfig(config.common, config.native);
 
-            setup.startController(true, function(id, obj) {}, function (id, state) {
-                    if (onStateChanged) onStateChanged(id, state);
-                },
-                function (_objects, _states) {
+            setup.startController(
+                true,
+                (id, obj) => {},
+                (id, state) => onStateChanged && onStateChanged(id, state),
+                (_objects, _states) => {
                     objects = _objects;
                     states  = _states;
                     _done();
