@@ -4,3 +4,5 @@ nbproject
 package-lock.json
 src/node_modules
 src/build
+tmp
+*.tgz
