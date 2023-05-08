@@ -29,11 +29,11 @@
     "suncalc2": "^1.8.1"
   },
   "devDependencies": {
-    "@iobroker/legacy-testing": "^0.2.6",
     "@alcalzone/release-script": "^3.5.9",
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
     "@alcalzone/release-script-plugin-license": "^3.5.9",
     "@iobroker/vis-2-widgets-react-dev": "^0.3.19",
+    "@iobroker/vis-2-widgets-testing": "^0.1.5",
     "gulp": "^4.0.2",
     "mocha": "^10.2.0"
   },

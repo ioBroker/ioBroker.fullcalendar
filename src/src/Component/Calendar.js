@@ -359,7 +359,7 @@ function Calendar(props) {
         });
 
         return _events;
-    }, [props.events, props.serverTimeZone, props.systemConfig.latitude, props.systemConfig.longitude]);
+    }, [props.events, props.serverTimeZone, props.systemConfig.latitude, props.systemConfig.longitude, calendarInterval.end, calendarInterval.start]);
 
     useEffect(() => {
         // update periodically the time
@@ -396,7 +396,7 @@ function Calendar(props) {
             const now = new Date();
             ref.current?.getApi().scrollToTime(`${now.getHours().toString().padStart(2, '0')}:${(step > now.getMinutes() ? 0 : now.getMinutes() - step).toString().padStart(2, '0')}:00`);
         }, 300);
-    }, [props.calendarPrefix, props.simulationId]);
+    }, [props.calendarPrefix, props.simulationId, step]);
 
     useEffect(() => {
         if (props.isSimulation) {
