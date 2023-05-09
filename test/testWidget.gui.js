@@ -5,7 +5,7 @@ describe('fullcalendar', () => {
     before(async function (){
         this.timeout(180000);
         // install js-controller, web and vis-2-beta
-        await helper.startIoBroker();
+        await helper.startIoBroker({startOwnAdapter: true});
         await helper.startBrowser(process.env.CI === 'true');
         await helper.createProject();
 
@@ -27,6 +27,8 @@ describe('fullcalendar', () => {
     after(async function () {
         this.timeout(5000);
         await helper.stopBrowser();
-        return helper.stopIoBroker();
+        console.log('BROWSER stopped');
+        await helper.stopIoBroker();
+        console.log('ioBroker stopped');
     });
 });
