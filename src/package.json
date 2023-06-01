@@ -11,7 +11,7 @@
         "@fullcalendar/list": "^6.1.6",
         "@fullcalendar/react": "^6.1.6",
         "@fullcalendar/rrule": "^6.1.6",
-        "@fullcalendar/timegrid": "^6.1.6",
+        "@fullcalendar/timegrid": "^6.1.8",
         "@iobroker/adapter-react-v5": "^4.0.26",
         "@material-icons/svg": "^1.0.33",
         "@mui/icons-material": "^5.11.16",
