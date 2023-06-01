@@ -6,7 +6,7 @@
         "@emotion/react": "^11.11.0",
         "@emotion/styled": "^11.11.0",
         "@fullcalendar/core": "^6.1.6",
-        "@fullcalendar/daygrid": "^6.1.6",
+        "@fullcalendar/daygrid": "^6.1.8",
         "@fullcalendar/interaction": "^6.1.6",
         "@fullcalendar/list": "^6.1.6",
         "@fullcalendar/react": "^6.1.6",
