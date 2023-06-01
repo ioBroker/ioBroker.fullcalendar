@@ -16,7 +16,7 @@
         "@material-icons/svg": "^1.0.33",
         "@mui/icons-material": "^5.11.16",
         "@mui/material": "^5.12.3",
-        "@mui/styles": "^5.12.3",
+        "@mui/styles": "^5.13.2",
         "@mui/x-date-pickers": "^5.0.20",
         "@sentry/browser": "^7.51.1",
         "@sentry/integrations": "^7.51.1",
