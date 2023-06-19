@@ -3,6 +3,7 @@
     "private": true,
     "version": "2.2.1",
     "dependencies": {
+        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
         "@fullcalendar/core": "^6.1.8",
