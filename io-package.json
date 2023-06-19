@@ -3,19 +3,6 @@
     "name": "fullcalendar",
     "version": "2.2.1",
     "news": {
-      "2.2.1": {
-        "en": "Corrected stop of the recording",
-        "de": "Korrigierter Stopp der Aufnahme",
-        "ru": "Исправлена остановка записи",
-        "pt": "Parada correta da gravação",
-        "nl": "Vertaling:",
-        "fr": "Arrêt corrigé de l'enregistrement",
-        "it": "Stop corretto della registrazione",
-        "es": "Parada corregida de la grabación",
-        "pl": "Wykwalifikowany przystanek na nagrania",
-        "uk": "Виправлена зупинка запису",
-        "zh-cn": "更正"
-      },
       "2.2.0": {
         "en": "Added simulation of events",
         "de": "Simulation von Ereignissen hinzugefügt",

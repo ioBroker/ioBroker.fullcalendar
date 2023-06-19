@@ -35,7 +35,7 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 2.2.1 (2023-04-25)
+### **WORK IN PROGRESS**
 * (bluefox) Corrected stop of the recording
 
 ### 2.2.0 (2023-04-24)
