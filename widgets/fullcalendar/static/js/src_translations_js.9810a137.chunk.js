@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkiobroker_vis_2_widgets_fullcalendar=self.webpackChunkiobroker_vis_2_widgets_fullcalendar||[]).push([["src_translations_js"],{43188:function(e,l,r){r.r(l);var s={en:r(86443),de:r(19837),ru:r(50482),pt:r(65909),nl:r(43573),fr:r(86115),it:r(79399),es:r(55117),pl:r(28130),uk:r(17138),"zh-cn":r(58246),prefix:"full_calendar_"};l.default=s}}]);
+//# sourceMappingURL=src_translations_js.9810a137.chunk.js.map
