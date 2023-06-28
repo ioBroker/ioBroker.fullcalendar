@@ -35,6 +35,9 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Compatibility with vis-2
+
 ### 2.2.2 (2023-06-19)
 * (bluefox) Corrected stop of the recording
 

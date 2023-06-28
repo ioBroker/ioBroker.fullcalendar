@@ -50,7 +50,7 @@ class CalendarsSelector extends React.Component {
             value={this.props.value || ''}
             onChange={e => this.props.onChange(e.target.value)}
         >
-            {this.state.list.map(item => <MenuItem key={item.value}>{item.label}</MenuItem>)}
+            {this.state.list.map(item => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}
         </Select>;
     }
 }

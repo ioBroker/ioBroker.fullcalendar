@@ -40,13 +40,14 @@ class App extends WidgetDemoApp {
     renderWidget() {
         return <div className={this.props.classes.app}>
             <FullCalendar
-                socket={this.socket}
-                themeType={this.state.themeType}
+                context={{
+                    socket: this.socket,
+                    systemConfig: this.state.systemConfig,
+                }}
                 style={{
                     width: 400,
                     height: 300,
                 }}
-                systemConfig={this.state.systemConfig}
                 data={{
                     instance: '0',
                 }}

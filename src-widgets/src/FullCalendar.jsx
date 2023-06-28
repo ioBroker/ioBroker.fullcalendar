@@ -52,7 +52,7 @@ class FullCalendar extends Generic {
                                 instance={data.instance}
                                 value={data.calendar}
                                 onChange={value => onDataChange({ calendar: value })}
-                                socket={props.socket}
+                                socket={props.context.socket}
                             />,
                         default: '',
                     },
@@ -161,7 +161,7 @@ class FullCalendar extends Generic {
 
     componentDidMount() {
         super.componentDidMount();
-        this.props.socket.subscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+        this.props.context.socket.subscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
 
         this.updateEvents();
     }
@@ -192,7 +192,7 @@ class FullCalendar extends Generic {
     };
 
     componentWillUnmount() {
-        this.props.socket.unsubscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+        this.props.context.socket.unsubscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
         super.componentWillUnmount();
     }
 
@@ -201,7 +201,7 @@ class FullCalendar extends Generic {
     }
 
     updateEvents = async () => {
-        const objects = await this.props.socket.getObjectViewCustom(
+        const objects = await this.props.context.socket.getObjectViewCustom(
             'schedule',
             'schedule',
             this.state.rxData.calendar ? `${this.state.rxData.calendar}.` : `fullcalendar.${this.state.rxData.instance}.`,
@@ -210,7 +210,7 @@ class FullCalendar extends Generic {
 
         let serverTimeZone = 0;
         try {
-            const state = await this.props.socket.getState(`fullcalendar.${this.state.rxData.instance}.info.timeZone`);
+            const state = await this.props.context.socket.getState(`fullcalendar.${this.state.rxData.instance}.info.timeZone`);
             serverTimeZone = state?.val || 0;
         } catch (e) {
             // ignore
@@ -247,10 +247,10 @@ class FullCalendar extends Generic {
         >
             <Calendar
                 widget
-                systemConfig={this.props.systemConfig?.common}
+                systemConfig={this.props.systemConfig ? this.props.systemConfig.common : this.props.context.systemConfig?.common}
                 key={this.state.rxData.viewMode}
                 events={this.state.events || []}
-                socket={this.props.socket}
+                socket={this.props.context.socket}
                 instance={this.state.rxData.instance}
                 changeEvents={this.changeEvents}
                 updateEvents={this.updateEvents}
@@ -278,11 +278,9 @@ class FullCalendar extends Generic {
 }
 
 FullCalendar.propTypes = {
-    systemConfig: PropTypes.object,
-    socket: PropTypes.object,
-    themeType: PropTypes.string,
     style: PropTypes.object,
     data: PropTypes.object,
+    context: PropTypes.object,
 };
 
 export default withStyles(styles)(withTheme(FullCalendar));
