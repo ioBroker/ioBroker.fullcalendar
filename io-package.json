@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.2.2",
+    "version": "2.2.3",
     "news": {
+      "2.2.3": {
+        "en": "Compatibility with vis-2",
+        "de": "Kompatibilität mit vis-2",
+        "ru": "Совместимость с vis-2",
+        "pt": "Compatibilidade com vis-2",
+        "nl": "Compatibiliteit met vis 2",
+        "fr": "Compatibilité avec vis-2",
+        "it": "Compatibilità con vis-2",
+        "es": "Compatibilidad con vis-2",
+        "pl": "Kompatybilność z wizją-2",
+        "uk": "Сумісність з вісом-2",
+        "zh-cn": "A. 与-2的兼容性"
+      },
       "2.2.2": {
         "en": "Corrected stop of the recording",
         "de": "Korrigierter Stopp der Aufnahme",
@@ -79,18 +92,6 @@
         "es": "Actualizado para usar con js-controller 3.3 y admin 5",
         "pl": "Zaktualizowano do użycia z js-controller 3.3 i administratorem 5",
         "zh-cn": "更新为与 js-controller 3.3 和 admin 5 一起使用"
-      },
-      "1.1.0": {
-        "en": "Updated to use with js-controller 2.x",
-        "de": "Aktualisiert zur Verwendung mit js-controller 2.x",
-        "ru": "Обновлен для использования с js-controller 2.x",
-        "pt": "Atualizado para uso com o js-controller 2.x",
-        "nl": "Bijgewerkt voor gebruik met js-controller 2.x",
-        "fr": "Mis à jour pour être utilisé avec js-controller 2.x",
-        "it": "Aggiornato per l'uso con js-controller 2.x",
-        "es": "Actualizado para usar con js-controller 2.x",
-        "pl": "Zaktualizowano do użytku z js-kontrolerem 2.x",
-        "zh-cn": "更新为与js-controller 2.x一起使用"
       }
     },
     "title": "Calendar schedule",
