@@ -159,8 +159,8 @@
       }
     },
     "visWidgets": {
-      "i18n": "component",
       "fullcalendar": {
+        "i18n": "component",
         "name": "fullcalendar",
         "url": "fullcalendar/customWidgets.js",
         "url1": "http://localhost:4173/customWidgets.js",
