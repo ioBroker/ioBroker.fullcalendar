@@ -55,7 +55,7 @@ const styles = {
         gap: 8,
     },
     timeType: {
-        width: 120,
+        width: 150,
     },
     narrowText: {
         width: 140,
@@ -140,8 +140,8 @@ async function getImage(id, socket) {
 }
 
 const EventDialog = props => {
-    const initialDuration = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].timeOffset ? props.event.native.intervals[0].timeOffset / 60000 : 0;
-    const initialEndValue = props.event.native.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].value !== undefined ? props.event.native.intervals[0].value : '';
+    const initialDuration = props.event?.native?.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].timeOffset ? props.event.native.intervals[0].timeOffset / 60000 : 0;
+    const initialEndValue = props.event?.native?.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].value !== undefined ? props.event.native.intervals[0].value : '';
     const [idDialog, setIdDialog] = useState(false);
     const [event, setEvent] = useState(props.event);
     const [object, setObject] = useState(null);
@@ -173,14 +173,14 @@ const EventDialog = props => {
 
         setAstroEventTimes(_astroEventTimes);
 
-        if (event.native.oid) {
-            if (!object || object._id !== event.native.oid) {
+        if (event.native?.oid) {
+            if (!object || object._id !== event.native?.oid) {
                 try {
                     // read object
-                    props.socket.getObject(event.native.oid)
+                    props.socket.getObject(event.native?.oid)
                         .then(obj => {
                             // update states if required
-                            if (JSON.stringify(event.native.states) !== JSON.stringify(obj.common.states)) {
+                            if (JSON.stringify(event.native?.states) !== JSON.stringify(obj.common.states)) {
                                 changeEvent(newEvent => newEvent.native.states = obj.common.states);
                             }
 
@@ -199,9 +199,9 @@ const EventDialog = props => {
         } else {
             setObject(null);
         }
-    }, [event.native.oid, props.socket, changeEvent, event.native.states, object, props.event.native.oid, props.systemConfig.latitude, props.systemConfig.longitude]);
+    }, [event.native?.oid, props.socket, changeEvent, event.native?.states, object, props.event?.native.oid, props.systemConfig.latitude, props.systemConfig.longitude]);
 
-    const cronObject = event.native.cron ? cron2obj(event.native.cron) : null;
+    const cronObject = event.native?.cron ? cron2obj(event.native.cron) : null;
     let period = 'once';
     if (Array.isArray(cronObject?.months)) {
         period = 'monthly';
@@ -213,9 +213,9 @@ const EventDialog = props => {
 
     if (event) {
         if (period === 'once') {
-            date = serverDateToClient(event.native.start, 'date', props.serverTimeZone);
+            date = serverDateToClient(event.native?.start, 'date', props.serverTimeZone);
         } else if (period === 'monthly' || period === 'daily') {
-            date = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone);
+            date = serverDateToClient(event.native?.cron, 'cron', props.serverTimeZone);
         }
     }
 
@@ -329,17 +329,21 @@ const EventDialog = props => {
 
     const daysOfWeek = props.systemConfig?.firstDayOfWeek === 'monday' ? [1, 2, 3, 4, 5, 6, 0] : [0, 1, 2, 3, 4, 5, 6];
 
-    const astroTime = event.native.astro && astroEventTimes ? astroEventTimes[event.native.astro] : '';
+    const astroTime = event.native?.astro && astroEventTimes ? astroEventTimes[event.native.astro] : '';
     const astroText = astroTime ? astroTime.toLocaleTimeString().replace(/:\d\d$/, '') : '';
     let astroTextOffset = '';
-    if (event.native.astro && event.native.offset && astroTime) {
+    if (event.native?.astro && event.native?.offset && astroTime) {
         const t = new Date(astroTime.getTime() + event.native.offset * 60000);
         astroTextOffset = t.toLocaleTimeString().replace(/:\d\d$/, '');
     }
 
-    let icon = event.common.icon;
+    let icon = event?.common.icon;
     if (icon && !icon.startsWith('data:image') && !icon.startsWith('http') && !icon.startsWith('/')) {
         icon = `../../${icon}`;
+    }
+
+    if (!props.event) {
+        return null;
     }
 
     return <Dialog open={!0} onClose={props.onClose} fullWidth>

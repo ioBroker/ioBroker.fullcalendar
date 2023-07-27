@@ -432,17 +432,20 @@ function Calendar(props) {
         {eventDialog ? <EventDialog
             systemConfig={props.systemConfig}
             widget={props.widget}
-            event={props.events.find(event => event._id === eventDialog)}
+            event={props.events.find(event => event?._id === eventDialog)}
             onClose={() => {
                 setEventDialog(null);
                 const _now  = lastEventTime.current ? new Date(lastEventTime.current) : new Date();
-                const _scrollTime = `${now.getHours().toString().padStart(2, '0')}:${(step > now.getMinutes() ? 0 : _now.getMinutes() - step).toString().padStart(2, '0')}:00`;
+                const _scrollTime = `${_now.getHours().toString().padStart(2, '0')}:${(step > _now.getMinutes() ? 0 : _now.getMinutes() - step).toString().padStart(2, '0')}:00`;
                 setTimeout(() => ref.current?.getApi().scrollToTime(_scrollTime), 200);
             }}
             socket={props.socket}
             updateEvents={props.updateEvents}
             setEvent={props.setEvent}
-            deleteEvent={props.deleteEvent}
+            deleteEvent={id => {
+                setEventDialog(null);
+                props.deleteEvent(id);
+            }}
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
             t={props.t}
