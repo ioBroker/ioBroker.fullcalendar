@@ -35,7 +35,7 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 2.2.4 (2023-07-27)
 * (bluefox) Compatibility with vis-2
 
 ### 2.2.2 (2023-06-19)

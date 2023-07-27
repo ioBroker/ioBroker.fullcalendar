@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.2.3",
+    "version": "2.2.4",
     "news": {
+      "2.2.4": {
+        "en": "Compatibility with vis-2",
+        "de": "Kompatibilität mit vis-2",
+        "ru": "Совместимость с vis-2",
+        "pt": "Compatibilidade com vis-2",
+        "nl": "Compatibiliteit met vis 2",
+        "fr": "Compatibilité avec vis-2",
+        "it": "Compatibilità con vis-2",
+        "es": "Compatibilidad con vis-2",
+        "pl": "Kompatybilność z wizją-2",
+        "uk": "Сумісність з вісом-2",
+        "zh-cn": "A. 与-2的兼容性"
+      },
       "2.2.2": {
         "en": "Corrected stop of the recording",
         "de": "Korrigierter Stopp der Aufnahme",
