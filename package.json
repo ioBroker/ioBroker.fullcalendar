@@ -24,7 +24,7 @@
     "schedule"
   ],
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.8",
+    "@iobroker/adapter-core": "^3.0.3",
     "later": "^1.2.0",
     "suncalc2": "^1.8.1",
     "uuid": "^9.0.0"
