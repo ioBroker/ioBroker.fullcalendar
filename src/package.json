@@ -36,7 +36,7 @@
         "react-ace": "^10.1.0",
         "react-dnd": "^16.0.1",
         "react-dnd-html5-backend": "^16.0.1",
-        "react-dnd-preview": "^8.0.1",
+        "react-dnd-preview": "^8.0.3",
         "react-dnd-touch-backend": "^16.0.1",
         "react-dom": "^18.2.0",
         "react-dropzone": "^14.2.3",
