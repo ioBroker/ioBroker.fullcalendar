@@ -27,7 +27,7 @@
     "@iobroker/adapter-core": "^3.0.3",
     "later": "^1.2.0",
     "suncalc2": "^1.8.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.6.0",
