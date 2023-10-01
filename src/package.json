@@ -45,7 +45,7 @@
         "rrule": "^2.7.2",
         "sass": "^1.64.2",
         "suncalc2": "^1.8.1",
-        "uuid": "^9.0.0"
+        "uuid": "^9.0.1"
     },
     "scripts": {
         "start": "react-scripts start",
