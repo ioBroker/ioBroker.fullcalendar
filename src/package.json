@@ -18,7 +18,7 @@
         "@mui/icons-material": "^5.14.14",
         "@mui/material": "^5.14.14",
         "@mui/styles": "^5.14.14",
-        "@mui/x-date-pickers": "^6.16.2",
+        "@mui/x-date-pickers": "^6.17.0",
         "@sentry/browser": "^7.74.1",
         "@sentry/integrations": "^7.74.1",
         "eslint": "^8.51.0",
