@@ -21,7 +21,7 @@
         "@mui/x-date-pickers": "^6.16.2",
         "@sentry/browser": "^7.74.1",
         "@sentry/integrations": "^7.74.1",
-        "eslint": "^8.51.0",
+        "eslint": "^8.52.0",
         "eslint-config-airbnb": "^19.0.4",
         "eslint-plugin-eqeqeq-fix": "^1.0.3",
         "eslint-plugin-import": "^2.28.1",
