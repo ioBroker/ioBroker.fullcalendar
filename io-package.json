@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "news": {
+      "2.3.1": {
+        "en": "Packages were updated\nCorrected vis-2 widget",
+        "de": "Pakete wurden aktualisiert\nKorrigiert vis-2 Widget",
+        "ru": "Пакеты были обновлены\nИсправлен виджет vis-2",
+        "pt": "Pacotes foram atualizados\nCorrigido vis-2 widget",
+        "nl": "Packages werden geüpload\nVertaling:",
+        "fr": "Les paquets ont été mis à jour\nCorrigé vis-2 widget",
+        "it": "I pacchetti sono stati aggiornati\nCorretto vis-2 widget",
+        "es": "Se actualizaron los paquetes\nCorregido vis-2 widget",
+        "pl": "Pakiety zostały zaktualizowane\nPoprawka wizowa 2",
+        "uk": "Пакети оновлено\nCorrected vis-2 віджет",
+        "zh-cn": "包装更新\n更正"
+      },
       "2.2.6": {
         "en": "Compatibility with vis-2",
         "de": "Kompatibilität mit vis-2",
