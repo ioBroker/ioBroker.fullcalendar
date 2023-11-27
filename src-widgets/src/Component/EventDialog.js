@@ -649,6 +649,7 @@ const EventDialog = props => {
                         <tr>
                             {daysOfWeek.map(value => <td key={value}>
                                 <Checkbox
+                                    aria-label="day"
                                     checked={cronObject?.dows?.includes(value) || false}
                                     disabled={props.readOnly || !event?.common.enabled}
                                     onChange={e => {
@@ -685,6 +686,7 @@ const EventDialog = props => {
                         <tr>
                             {new Array(12).fill(null).map((value, i) => <td key={i}>
                                 <Checkbox
+                                    aria-label="month"
                                     checked={cronObject?.months?.includes(i + 1) || false}
                                     disabled={props.readOnly || !event?.common.enabled}
                                     onChange={e => {

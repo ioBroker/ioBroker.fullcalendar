@@ -92,6 +92,7 @@ const PlaySimulationDialog = props => {
                         <tr>
                             {[0, 1, 2, 3, 4, 5, 6].map(value => <td key={value}>
                                 <Checkbox
+                                    aria-label="play simulation"
                                     checked={playSimulation.dow.includes(value)}
                                     disabled={props.readOnly}
                                     onChange={e => {
