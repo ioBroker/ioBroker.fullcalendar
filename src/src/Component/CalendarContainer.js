@@ -73,6 +73,7 @@ const CalendarContainer = props => {
         }
         return props.socket.setObject(id, event);
     };
+
     const deleteEvent = async id => {
         if (props.isSimulation) {
             const _simulationObject = JSON.parse(JSON.stringify(simulationObject));

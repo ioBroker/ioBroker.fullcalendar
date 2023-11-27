@@ -229,6 +229,14 @@ class FullCalendar extends Generic {
         this.setState({ events });
     };
 
+    setEvent = async (id, event) => {
+        await this.props.context.socket.setObject(id, event);
+    };
+
+    deleteEvent = async id => {
+        await this.props.context.socket.delObject(id);
+    };
+
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
@@ -252,8 +260,11 @@ class FullCalendar extends Generic {
                 events={this.state.events || []}
                 socket={this.props.context.socket}
                 instance={this.state.rxData.instance}
+                calendarPrefix={`fullcalendar.${this.state.rxData.instance}`}
                 changeEvents={this.changeEvents}
                 updateEvents={this.updateEvents}
+                setEvent={this.setEvent}
+                deleteEvent={this.deleteEvent}
                 serverTimeZone={this.state.serverTimeZone || 0}
                 readOnly={this.state.rxData.readOnly || false}
                 hideLeftBlock={this.state.rxData.hideLeftBlock || false}

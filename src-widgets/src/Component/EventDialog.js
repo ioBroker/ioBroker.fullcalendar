@@ -13,12 +13,13 @@ import 'moment/locale/pl';
 import 'moment/locale/pt';
 import 'moment/locale/uk';
 import SunCalc from 'suncalc2';
+import dayjs from 'dayjs';
 
 import {
     Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, TextField,
 } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import { Cancel, Delete, Save } from '@mui/icons-material';
@@ -79,6 +80,9 @@ const styles = {
     randomTime: {
         marginLeft: 16,
         width: 133,
+    },
+    timeSelector: {
+        marginLeft: 16,
     },
 };
 
@@ -373,6 +377,7 @@ const EventDialog = props => {
             </div>
             <div className={props.classes.field}>
                 <FormControl
+                    style={{ width: 180 }}
                     variant="standard"
                     className={props.classes.timeType}
                 >
@@ -400,6 +405,7 @@ const EventDialog = props => {
                 </FormControl>
                 {event.native.astro ?
                     <FormControl
+                        style={{ width: 250 }}
                         className={props.classes.narrowText}
                         variant="standard"
                     >
@@ -429,10 +435,12 @@ const EventDialog = props => {
                         </Select>
                     </FormControl>
 
-                    : <LocalizationProvider dateAdapter={AdapterMoment}>
+                    : <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <TimePicker
                             label={props.t('Time')}
-                            value={date || null}
+                            variant="standard"
+                            className={props.classes.timeSelector}
+                            value={date ? dayjs(date) : null}
                             disabled={props.readOnly || !event?.common.enabled}
                             onChange={_date => {
                                 if (!_date) {
@@ -457,7 +465,7 @@ const EventDialog = props => {
                             renderInput={params => <TextField
                                 {...params}
                                 variant="standard"
-                                className={props.classes.narrowText}
+                                className={`${props.classes.narrowText} ${props.classes.timeSelector}`}
                                 helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
                             />}
                             ampm={false}
@@ -465,6 +473,7 @@ const EventDialog = props => {
                     </LocalizationProvider>}
                 {event.native.astro ? <FormControl
                     variant="standard"
+                    style={{ width: 95 }}
                     className={props.classes.width60}
                 >
                     <InputLabel>{props.t('Offset')}</InputLabel>

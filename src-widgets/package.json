@@ -19,6 +19,7 @@
         "@mui/material": "^5.14.14",
         "@mui/styles": "^5.14.14",
         "@mui/x-date-pickers": "^6.16.2",
+        "dayjs": "^1.11.10",
         "eslint-plugin-eqeqeq-fix": "^1.0.3",
         "eslint-plugin-only-warn": "^1.1.0",
         "moment": "^2.29.4",

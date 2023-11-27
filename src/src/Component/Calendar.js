@@ -762,6 +762,7 @@ Calendar.propTypes = {
     isSimulation: PropTypes.bool,
     simulationId: PropTypes.string,
     setEvent: PropTypes.func,
+    deleteEvent: PropTypes.func,
     button: PropTypes.any,
     dayStep: PropTypes.number,
 };
