@@ -610,13 +610,13 @@ function Calendar(props) {
                                 const newCron = cron2obj(newEvent.native.cron);
                                 const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
                                 const date = new Date(event.event.start).getDate();
-                                const month = new Date(event.event.start).getMonth();
+                                const month = new Date(event.event.start).getMonth() + 1;
                                 const dow = new Date(event.event.start).getDay();
                                 if (Array.isArray(newCron.months)) {
                                     if (event.delta.days) {
                                         newCron.dates = [date];
                                     }
-                                    if (event.delta.months) {
+                                    if (!newCron.months.includes(month)) {
                                         newCron.months = [month];
                                     }
                                     newCron.dows = '*';
@@ -660,6 +660,12 @@ function Calendar(props) {
                                 },
                                 type: 'schedule',
                             };
+                            const time = new Date(newEvent.native.start);
+                            if (!time.getMinutes() && !time.getHours()) {
+                                time.setHours(12);
+                                newEvent.native.start = clientDateToServer(time, 'date', props.serverTimeZone);
+                            }
+
                             if (event.event.extendedProps.type !== 'single') {
                                 newEvent.native.intervals = [{
                                     timeOffset: 30 * 60 * 1000,

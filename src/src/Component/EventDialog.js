@@ -632,7 +632,7 @@ const EventDialog = props => {
                                     let newCronObject;
                                     if (start) {
                                         newCronObject = cron2obj(`0 0 ${new Date(start).getDate()} ${new Date(start).getMonth() + 1} *`);
-                                    delete newEvent.native.start;
+                                        delete newEvent.native.start;
                                     } else {
                                         newCronObject = cron2obj('0 0 1-31 1-12 *');
                                     }
@@ -671,13 +671,13 @@ const EventDialog = props => {
                                     checked={cronObject?.dows?.includes(value) || false}
                                     disabled={props.readOnly || !event?.common.enabled}
                                     onChange={e => changeEvent(newEvent => {
-                                            const newCronObject = cron2obj(newEvent.native.cron);
-                                            if (e.target.checked) {
-                                                newCronObject.dows.push(value);
-                                            } else {
-                                                newCronObject.dows = newCronObject.dows.filter(dow => dow !== value);
-                                            }
-                                            newEvent.native.cron = obj2cron(newCronObject);
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (e.target.checked) {
+                                            newCronObject.dows.push(value);
+                                        } else {
+                                            newCronObject.dows = newCronObject.dows.filter(dow => dow !== value);
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
                                     })}
                                     size="small"
                                 />
@@ -711,6 +711,9 @@ const EventDialog = props => {
                                             newCronObject.months.push(i + 1);
                                         } else {
                                             newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
+                                            if (!newCronObject.months.length) {
+                                                newCronObject.months = [1];
+                                            }
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     })}
@@ -745,6 +748,9 @@ const EventDialog = props => {
                                             newCronObject.dates = newCronObject.dates.filter(day => day);
                                         } else {
                                             newCronObject.dates = newCronObject.dates.filter(day => day !== i + 1);
+                                            if (!newCronObject.dates.length) {
+                                                newCronObject.dates = [1];
+                                            }
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     })}
@@ -774,6 +780,9 @@ const EventDialog = props => {
                                                 newCronObject.dates = newCronObject.dates.filter(day => day);
                                             } else {
                                                 newCronObject.dates = newCronObject.dates.filter(day => day !== i + 13);
+                                                if (!newCronObject.dates.length) {
+                                                    newCronObject.dates = [1];
+                                                }
                                             }
                                             newEvent.native.cron = obj2cron(newCronObject);
                                         });
@@ -806,6 +815,9 @@ const EventDialog = props => {
                                             newCronObject.dates = newCronObject.dates.filter(day => day);
                                         } else {
                                             newCronObject.dates = newCronObject.dates.filter(day => day !== i + 25);
+                                            if (!newCronObject.dates.length) {
+                                                newCronObject.dates = [1];
+                                            }
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     })}
@@ -871,7 +883,14 @@ const EventDialog = props => {
             {!props.readOnly ? <Button
                 variant="contained"
                 color="primary"
-                disabled={!changed || (period === 'monthly' && (!cronObject.dates?.length || cronObject.dates.includes(0)))}
+                disabled={!changed ||
+                    (period === 'monthly' &&
+                        (
+                            !cronObject.dates?.length ||
+                            cronObject.dates.includes(0) ||
+                            !cronObject.months?.length
+                        )
+                    )}
                 startIcon={<Save />}
                 onClick={async () => {
                     if (event.native.type === 'single') {
