@@ -38,7 +38,7 @@ const typeDescriptions = {
     toggle: 'toggle_description',
 };
 
-const styles = {
+const styles = theme => ({
     field: {
         padding: '2px 0px',
     },
@@ -84,7 +84,10 @@ const styles = {
     timeSelector: {
         marginLeft: 16,
     },
-};
+    days: {
+        backgroundColor: theme.palette.mode === 'dark' ? '#656565' : '#dadada',
+    },
+});
 
 const astroTypes = [
     'sunrise',
@@ -207,8 +210,17 @@ const EventDialog = props => {
 
     const cronObject = event.native?.cron ? cron2obj(event.native.cron) : null;
     let period = 'once';
+    let maxMonthDay = 29;
+
     if (Array.isArray(cronObject?.months)) {
         period = 'monthly';
+        const month30 = [4, 6, 9, 11];
+        const month31 = [1, 3, 5, 7, 8, 10, 12];
+        if (cronObject.months?.find(month => month31.includes(month))) {
+            maxMonthDay = 31;
+        } else if (cronObject.months?.find(month => month30.includes(month))) {
+            maxMonthDay = 30;
+        }
     } else if (Array.isArray(cronObject?.dows)) {
         period = 'daily';
     }
@@ -616,8 +628,14 @@ const EventDialog = props => {
                                     newCronObject.minutes = timeZoneCron.minutes;
                                     newEvent.native.cron = obj2cron(newCronObject);
                                 } else if (e.target.value === 'monthly') {
+                                    const start = newEvent.native.start;
+                                    let newCronObject;
+                                    if (start) {
+                                        newCronObject = cron2obj(`0 0 ${new Date(start).getDate()} ${new Date(start).getMonth() + 1} *`);
                                     delete newEvent.native.start;
-                                    const newCronObject = cron2obj('0 0 * 1-12 *');
+                                    } else {
+                                        newCronObject = cron2obj('0 0 1-31 1-12 *');
+                                    }
                                     const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
                                     newCronObject.hours = timeZoneCron.hours;
                                     newCronObject.minutes = timeZoneCron.minutes;
@@ -652,8 +670,7 @@ const EventDialog = props => {
                                     aria-label="day"
                                     checked={cronObject?.dows?.includes(value) || false}
                                     disabled={props.readOnly || !event?.common.enabled}
-                                    onChange={e => {
-                                        changeEvent(newEvent => {
+                                    onChange={e => changeEvent(newEvent => {
                                             const newCronObject = cron2obj(newEvent.native.cron);
                                             if (e.target.checked) {
                                                 newCronObject.dows.push(value);
@@ -661,8 +678,7 @@ const EventDialog = props => {
                                                 newCronObject.dows = newCronObject.dows.filter(dow => dow !== value);
                                             }
                                             newEvent.native.cron = obj2cron(newCronObject);
-                                        });
-                                    }}
+                                    })}
                                     size="small"
                                 />
                             </td>)}
@@ -689,13 +705,75 @@ const EventDialog = props => {
                                     aria-label="month"
                                     checked={cronObject?.months?.includes(i + 1) || false}
                                     disabled={props.readOnly || !event?.common.enabled}
+                                    onChange={e => changeEvent(newEvent => {
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (e.target.checked) {
+                                            newCronObject.months.push(i + 1);
+                                        } else {
+                                            newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
+                                    })}
+                                    size="small"
+                                />
+                            </td>)}
+                        </tr>
+                    </tbody>
+                </table>
+                <table>
+                    <thead>
+                        <tr className={props.classes.days}>
+                            {new Array(12).fill(null).map((value, i) => <td
+                                key={i}
+                                className={props.classes.tableCell}
+                            >
+                                {i + 1}
+                            </td>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr className={props.classes.days}>
+                            {new Array(12).fill(null).map((value, i) => <td key={i}>
+                                <Checkbox
+                                    aria-label="day"
+                                    checked={cronObject?.dates?.includes(i + 1) || false}
+                                    disabled={props.readOnly || !event?.common.enabled}
+                                    onChange={e => changeEvent(newEvent => {
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (e.target.checked) {
+                                            newCronObject.dates.push(i + 1);
+                                            newCronObject.dates = newCronObject.dates.filter(day => day);
+                                        } else {
+                                            newCronObject.dates = newCronObject.dates.filter(day => day !== i + 1);
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
+                                    })}
+                                    size="small"
+                                />
+                            </td>)}
+                        </tr>
+                        <tr className={props.classes.days}>
+                            {new Array(12).fill(null).map((value, i) => <td
+                                key={i}
+                                className={props.classes.tableCell}
+                            >
+                                {i + 13}
+                            </td>)}
+                        </tr>
+                        <tr className={props.classes.days}>
+                            {new Array(12).fill(null).map((value, i) => <td key={i}>
+                                <Checkbox
+                                    aria-label="day"
+                                    checked={cronObject?.dates?.includes(i + 13) || false}
+                                    disabled={props.readOnly || !event?.common.enabled}
                                     onChange={e => {
                                         changeEvent(newEvent => {
                                             const newCronObject = cron2obj(newEvent.native.cron);
                                             if (e.target.checked) {
-                                                newCronObject.months.push(i + 1);
+                                                newCronObject.dates.push(i + 13);
+                                                newCronObject.dates = newCronObject.dates.filter(day => day);
                                             } else {
-                                                newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
+                                                newCronObject.dates = newCronObject.dates.filter(day => day !== i + 13);
                                             }
                                             newEvent.native.cron = obj2cron(newCronObject);
                                         });
@@ -703,6 +781,58 @@ const EventDialog = props => {
                                     size="small"
                                 />
                             </td>)}
+                        </tr>
+                        <tr className={props.classes.days}>
+                            {new Array(11).fill(null).map((value, i) => <td
+                                key={i}
+                                className={props.classes.tableCell}
+                            >
+                                {maxMonthDay < i + 25 ? null : i + 25}
+                            </td>)}
+                            <td className={props.classes.tableCell}>
+                                {props.t('All')}
+                            </td>
+                        </tr>
+                        <tr className={props.classes.days}>
+                            {new Array(11).fill(null).map((value, i) => <td key={i}>
+                                {maxMonthDay < i + 25 ? null : <Checkbox
+                                    aria-label="day"
+                                    checked={cronObject?.dates?.includes(i + 25) || false}
+                                    disabled={props.readOnly || !event?.common.enabled}
+                                    onChange={e => changeEvent(newEvent => {
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (e.target.checked) {
+                                            newCronObject.dates.push(i + 25);
+                                            newCronObject.dates = newCronObject.dates.filter(day => day);
+                                        } else {
+                                            newCronObject.dates = newCronObject.dates.filter(day => day !== i + 25);
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
+                                    })}
+                                    size="small"
+                                />}
+                            </td>)}
+                            <td>
+                                <Checkbox
+                                    aria-label="all"
+                                    checked={cronObject?.dates?.length === maxMonthDay}
+                                    indeterminate={cronObject?.dates?.length !== maxMonthDay && !cronObject?.dates.includes(0)}
+                                    disabled={props.readOnly || !event?.common.enabled}
+                                    onChange={() => changeEvent(newEvent => {
+                                        const newCronObject = cron2obj(newEvent.native.cron);
+                                        if (newCronObject?.dates?.length !== maxMonthDay) {
+                                            newCronObject.dates = [];
+                                            for (let i = 0; i < maxMonthDay; i++) {
+                                                newCronObject.dates.push(i + 1);
+                                            }
+                                        } else {
+                                            newCronObject.dates = [1];
+                                        }
+                                        newEvent.native.cron = obj2cron(newCronObject);
+                                    })}
+                                    size="small"
+                                />
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -741,7 +871,7 @@ const EventDialog = props => {
             {!props.readOnly ? <Button
                 variant="contained"
                 color="primary"
-                disabled={!changed}
+                disabled={!changed || (period === 'monthly' && (!cronObject.dates?.length || cronObject.dates.includes(0)))}
                 startIcon={<Save />}
                 onClick={async () => {
                     if (event.native.type === 'single') {

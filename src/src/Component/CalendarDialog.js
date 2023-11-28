@@ -6,7 +6,7 @@ import {
     Dialog, DialogActions, DialogContent, DialogTitle, TextField,
 } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const styles = {
     field: {
@@ -17,15 +17,14 @@ const styles = {
 };
 
 const CalendarDialog = props => {
-    const [calendar, setCalendar] = useState(null);
+    const [calendar, setCalendar] = useState(props.calendar);
     const [deleteDialog, setDeleteDialog] = useState(false);
 
-    useEffect(() => {
-        setCalendar(props.calendar);
-    }, [props.open]);
+    if (!calendar) {
+        return null;
+    }
 
-    if (!calendar) return null;
-    return <Dialog open={props.open} onClose={props.onClose}>
+    return <Dialog open={!0} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Edit calendar name')}</DialogTitle>
         <DialogContent>
             <div className={props.classes.field}>
@@ -105,7 +104,6 @@ const CalendarDialog = props => {
 };
 
 CalendarDialog.propTypes = {
-    open: PropTypes.bool,
     onClose: PropTypes.func,
     calendar: PropTypes.object,
     socket: PropTypes.object,

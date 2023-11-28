@@ -490,6 +490,7 @@ const Simulations = props => {
             }}
         >
             <CalendarContainer
+                key={selectedSimulation}
                 systemConfig={props.systemConfig}
                 socket={props.socket}
                 instance={props.instance}

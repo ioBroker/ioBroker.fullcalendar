@@ -98,6 +98,11 @@ const CalendarManager = props => {
             `fullcalendar.${props.instance}.Calendars.\u9999`,
         );
         setCalendars(Object.values(objects));
+        // check that selected calendar exists, else select default
+        if (!Object.keys(objects).includes(calendarPrefix)) {
+            window.localStorage.removeItem('fullcalendar.calendar');
+            setCalendarPrefix(`fullcalendar.${props.instance}`);
+        }
     };
 
     const changeCalendarType = () => setIsSimulations(_isSimulations => {
@@ -214,6 +219,7 @@ const CalendarManager = props => {
                     </Paper>
                 </div>
                 <CalendarContainer
+                    key={calendarPrefix}
                     systemConfig={props.systemConfig}
                     socket={props.socket}
                     instance={props.instance}
@@ -222,8 +228,7 @@ const CalendarManager = props => {
                     language={I18n.getLanguage()}
                 />
             </div>}
-        <CalendarDialog
-            open={!!calendarDialog}
+        {calendarDialog ? <CalendarDialog
             onClose={() => setCalendarDialog(null)}
             calendarPrefix={calendarPrefix}
             setCalendarPrefix={setCalendarPrefix}
@@ -231,7 +236,7 @@ const CalendarManager = props => {
             socket={props.socket}
             instance={props.instance}
             updateCalendars={updateCalendars}
-        />
+        /> : null}
     </div>;
 };
 

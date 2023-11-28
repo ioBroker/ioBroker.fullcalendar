@@ -246,8 +246,9 @@ function Calendar(props) {
                     const rule = new RRule({
                         dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
                         until: calendarInterval.end || new Date(),
-                        freq: RRule.WEEKLY,
+                        freq: RRule.MONTHLY,
                         bymonth: cronObject.months,
+                        bymonthday: cronObject.dates,
                         // tzid: TIME_ZONE,
                     });
 
@@ -608,6 +609,25 @@ function Calendar(props) {
                                 }
                                 const newCron = cron2obj(newEvent.native.cron);
                                 const timeZoneCron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
+                                const date = new Date(event.event.start).getDate();
+                                const month = new Date(event.event.start).getMonth();
+                                const dow = new Date(event.event.start).getDay();
+                                if (Array.isArray(newCron.months)) {
+                                    if (event.delta.days) {
+                                        newCron.dates = [date];
+                                    }
+                                    if (event.delta.months) {
+                                        newCron.months = [month];
+                                    }
+                                    newCron.dows = '*';
+                                } else if (Array.isArray(newCron.dows)) {
+                                    newCron.months = '*';
+                                    newCron.dates = '*';
+                                    if (event.delta.days) {
+                                        newCron.dows = [dow];
+                                    }
+                                }
+
                                 newCron.hours = timeZoneCron.hours;
                                 newCron.minutes = timeZoneCron.minutes;
                                 newEvent.native.cron = obj2cron(newCron);

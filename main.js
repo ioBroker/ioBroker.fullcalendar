@@ -672,12 +672,18 @@ function calculateNext() {
 
         // if daily
         if (event.native.cron) {
+            let cron = event.native.cron;
+            if (cron.split(' ').length === 6) {
+                const parts = cron.split(' ');
+                parts.shift();
+                cron = parts.join(' ');
+            }
             if (!event.parsed) {
                 if (event.native.astro) {
-                    // take last second of this day
-                    event.parsed = later.parse.cron(event.native.cron.replace(/^\d\d? \d\d? /, '59 59 23 '), true);
+                    // take the last second of this day
+                    event.parsed = later.parse.cron(cron.replace(/^\d\d? \d\d? /, '59 59 23 '), true);
                 } else {
-                    event.parsed = later.parse.cron(event.native.cron);
+                    event.parsed = later.parse.cron(cron);
                 }
             }
             let date = later.schedule(event.parsed).next();
@@ -692,7 +698,7 @@ function calculateNext() {
             if (date.simulationEnd && date.simulationEnd.getTime() < date.getTime()) {
                 continue;
             }
-            if (date.simulationDow && date.simulationDow.indexOf(date.getDay()) === -1) {
+            if (date.simulationDow && !date.simulationDow.includes(date.getDay())) {
                 continue;
             }
             // console.log(date);

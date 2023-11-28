@@ -87,5 +87,6 @@
   "nauticalDawn": "Aube nautique",
   "nauticalDusk": "Crépuscule nautique",
   "night": "Nuit",
-  "nightEnd": "Fin de la nuit"
+  "nightEnd": "Fin de la nuit",
+  "Please select instance": "Veuillez sélectionner une instance"
 }

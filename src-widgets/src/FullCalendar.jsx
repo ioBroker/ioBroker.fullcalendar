@@ -161,8 +161,6 @@ class FullCalendar extends Generic {
 
     componentDidMount() {
         super.componentDidMount();
-        this.props.context.socket.subscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
-
         this.updateEvents();
     }
 
@@ -192,7 +190,8 @@ class FullCalendar extends Generic {
     };
 
     componentWillUnmount() {
-        this.props.context.socket.unsubscribeObject(this.state.rxData.calendar ? `${this.state.rxData.calendar}.*` : `fullcalendar.${this.state.rxData.instance}.*`, this.onEventsChanged);
+        this.subscribed && this.props.context.socket.unsubscribeObject(this.subscribed, this.onEventsChanged);
+        this.subscribed = null;
         super.componentWillUnmount();
     }
 
@@ -201,6 +200,25 @@ class FullCalendar extends Generic {
     }
 
     updateEvents = async () => {
+        let subscribed;
+        if (this.state.rxData.calendar) {
+            subscribed = `${this.state.rxData.calendar}.*`;
+        } else if (this.state.rxData.instance || this.state.rxData.instance === 0) {
+            subscribed = `fullcalendar.${this.state.rxData.instance}.*`;
+        } else {
+            subscribed = '';
+        }
+
+        if (this.subscribed !== subscribed) {
+            this.subscribed && (await this.props.context.socket.unsubscribeObject(this.subscribed, this.onEventsChanged));
+            this.subscribed = subscribed;
+            this.subscribed && (await this.props.context.socket.subscribeObject(this.subscribed, this.onEventsChanged));
+        }
+        if (!this.subscribed) {
+            this.setState({ events: [] });
+            return;
+        }
+
         const objects = await this.props.context.socket.getObjectViewCustom(
             'schedule',
             'schedule',
@@ -243,42 +261,52 @@ class FullCalendar extends Generic {
         if (!this.widgetRef.current?.offsetWidth) {
             this.forceUpdate();
         }
-
         /* let width = (this.widgetRef.current?.offsetWidth || 0) - (this.state.rxData.hideDow ? 0 : 80);
         if (width < 0) {
             width = 0;
         } */
 
-        const content = <div
-            className={this.props.classes.content}
-            ref={this.widgetRef}
-        >
-            <Calendar
-                widget
-                systemConfig={this.props.systemConfig ? this.props.systemConfig.common : this.props.context.systemConfig?.common}
-                key={this.state.rxData.viewMode}
-                events={this.state.events || []}
-                socket={this.props.context.socket}
-                instance={this.state.rxData.instance}
-                calendarPrefix={`fullcalendar.${this.state.rxData.instance}`}
-                changeEvents={this.changeEvents}
-                updateEvents={this.updateEvents}
-                setEvent={this.setEvent}
-                deleteEvent={this.deleteEvent}
-                serverTimeZone={this.state.serverTimeZone || 0}
-                readOnly={this.state.rxData.readOnly || false}
-                hideLeftBlock={this.state.rxData.hideLeftBlock || false}
-                hideTopBlock={this.state.rxData.hideTopBlock || false}
-                hideLeftBlockHint={this.state.rxData.hideLeftBlockHint || false}
-                hideTopBlockButtons={this.state.rxData.hideTopBlockButtons || false}
-                viewMode={this.state.rxData.viewMode || null}
-                storageName={`fc_${this.props.id}`}
-                hideWeekends={this.state.rxData.hideWeekends || false}
-                t={FullCalendar.t}
-                language={I18n.getLanguage()}
-                dayStep={this.state.rxData.dayStep || 30}
-            />
-        </div>;
+        let content;
+
+        if (!this.state.rxData.instance && this.state.rxData.instance !== 0) {
+            content = <div
+                className={this.props.classes.content}
+                ref={this.widgetRef}
+            >
+                {FullCalendar.t('Please select instance')}
+            </div>;
+        } else {
+            content = <div
+                className={this.props.classes.content}
+                ref={this.widgetRef}
+            >
+                <Calendar
+                    widget
+                    systemConfig={this.props.systemConfig ? this.props.systemConfig.common : this.props.context.systemConfig?.common}
+                    key={this.state.rxData.viewMode}
+                    events={this.state.events || []}
+                    socket={this.props.context.socket}
+                    instance={this.state.rxData.instance}
+                    calendarPrefix={`fullcalendar.${this.state.rxData.instance}`}
+                    changeEvents={this.changeEvents}
+                    updateEvents={this.updateEvents}
+                    setEvent={this.setEvent}
+                    deleteEvent={this.deleteEvent}
+                    serverTimeZone={this.state.serverTimeZone || 0}
+                    readOnly={this.state.rxData.readOnly || false}
+                    hideLeftBlock={this.state.rxData.hideLeftBlock || false}
+                    hideTopBlock={this.state.rxData.hideTopBlock || false}
+                    hideLeftBlockHint={this.state.rxData.hideLeftBlockHint || false}
+                    hideTopBlockButtons={this.state.rxData.hideTopBlockButtons || false}
+                    viewMode={this.state.rxData.viewMode || null}
+                    storageName={`fc_${this.props.id}`}
+                    hideWeekends={this.state.rxData.hideWeekends || false}
+                    t={FullCalendar.t}
+                    language={I18n.getLanguage()}
+                    dayStep={this.state.rxData.dayStep || 30}
+                />
+            </div>;
+        }
 
         if (this.state.rxStyle.position === 'relative') {
             return this.wrapContent(content, null, { height: 'calc(100% - 24px)', width: 'calc(100% - 24px)' }, null, null, { Card, CardContent });

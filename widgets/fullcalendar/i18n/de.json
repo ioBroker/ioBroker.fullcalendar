@@ -10,7 +10,7 @@
   "Events": "Ereignisse",
   "Period": "Zeitraum",
   "Save": "Speichern",
-  "Single event": "Einzelveranstaltung",
+  "Single event": "Einzelereignis",
   "Use ALT by dragging it to copy the events.": "Verwenden Sie ALT, indem Sie es ziehen, um die Ereignisse zu kopieren.",
   "fullcalendar": "Kalender",
   "hide_left_block": "Linken Block ausblenden",
@@ -87,5 +87,6 @@
   "nauticalDawn": "Nautische Morgendämmerung",
   "nauticalDusk": "Nautische Dämmerung",
   "night": "Nacht",
-  "nightEnd": "Ende der Nacht"
+  "nightEnd": "Ende der Nacht",
+  "Please select instance": "Bitte wählen Sie eine Instanz aus"
 }

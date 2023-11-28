@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -6,125 +6,152 @@ import { I18n } from '@iobroker/adapter-react-v5';
 
 import Calendar from './Calendar';
 
-const CalendarContainer = props => {
-    const [events, setEvents] = useState([]);
-    const [serverTimeZone, setServerTimeZone] = useState(0);
-    const [subscribed, setSubscribed] = useState(false);
-    const [simulationObject, setSimulationObject] = useState(null);
+class CalendarContainer extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            events: [],
+            serverTimeZone: 0,
+            simulationObject: null,
+            isSimulation: props.isSimulation,
+            calendarPrefix: props.calendarPrefix,
+        };
+    }
 
-    const onEventsChanged = (id, obj) => {
-        const _events = JSON.parse(JSON.stringify(events));
-        const eventPos = _events.findIndex(e => e._id === id);
+    onEventsChanged = (id, obj) => {
+        const events = JSON.parse(JSON.stringify(this.state.events));
+        const eventPos = events.findIndex(e => e._id === id);
+        let changed = false;
         if (eventPos !== -1) {
             if (obj) {
-                _events[eventPos] = obj;
+                events[eventPos] = obj;
             } else {
-                _events.splice(eventPos, 1);
+                events.splice(eventPos, 1);
             }
-        } else {
-            _events.push(obj);
+            changed = true;
+        } else if (obj) {
+            events.push(obj);
+            changed = true;
         }
-        setEvents(_events);
+        changed && this.setState({ events });
     };
 
-    const updateEvents = async () => {
+    updateEvents = async () => {
         let objects;
-        if (props.isSimulation) {
-            const _simulationObject = await props.socket.getObject(props.simulationId);
-            setSimulationObject(_simulationObject);
-            objects = Object.values(_simulationObject?.native?.events || []);
+        let simulationObject = null;
+        if (this.props.isSimulation) {
+            simulationObject = await this.props.socket.getObject(this.props.simulationId);
+            objects = Object.values(simulationObject?.native?.events || []);
         } else {
-            objects = Object.values(await props.socket.getObjectViewCustom(
+            objects = Object.values(await this.props.socket.getObjectViewCustom(
                 'schedule',
                 'schedule',
-                `${props.calendarPrefix}.`,
-                `${props.calendarPrefix}.\u9999`,
+                `${this.props.calendarPrefix}.`,
+                `${this.props.calendarPrefix}.\u9999`,
             ));
-            if (props.calendarPrefix.match(/^fullcalendar\.[0-9]+$/)) {
+            if (this.props.calendarPrefix.match(/^fullcalendar\.[0-9]+$/)) {
                 objects = objects.filter(o => !o._id.match(/^fullcalendar\.[0-9]\.Calendars/));
             }
         }
 
-        let _serverTimeZone = 0;
+        let serverTimeZone = 0;
         try {
-            const state = await props.socket.getState('fullcalendar.0.info.timeZone');
-            _serverTimeZone = state?.val || 0;
+            const state = await this.props.socket.getState('fullcalendar.0.info.timeZone');
+            serverTimeZone = state?.val || 0;
         } catch (e) {
             // ignore
         }
-        setEvents(objects);
-        setServerTimeZone(_serverTimeZone);
+        this.setState({ events: objects, serverTimeZone, simulationObject });
     };
 
-    const changeEvents = _events => {
-        setEvents(_events);
-    };
+    changeEvents = events => this.setState({ events });
 
-    const setEvent = async (id, event) => {
-        if (props.isSimulation) {
-            const _simulationObject = JSON.parse(JSON.stringify(simulationObject));
-            const eventPos = _simulationObject.native.events.findIndex(e => e._id === id);
+    setEvent = async (id, event) => {
+        if (this.props.isSimulation) {
+            const simulationObject = JSON.parse(JSON.stringify(this.state.simulationObject));
+            const eventPos = simulationObject.native.events.findIndex(e => e._id === id);
             if (eventPos !== -1) {
-                _simulationObject.native.events[eventPos] = event;
+                simulationObject.native.events[eventPos] = event;
             } else {
-                _simulationObject.native.events.push(event);
+                simulationObject.native.events.push(event);
             }
-            return props.socket.setObject(props.simulationId, _simulationObject);
+            return this.props.socket.setObject(this.props.simulationId, simulationObject);
         }
-        return props.socket.setObject(id, event);
+
+        return this.props.socket.setObject(id, event);
     };
 
-    const deleteEvent = async id => {
-        if (props.isSimulation) {
-            const _simulationObject = JSON.parse(JSON.stringify(simulationObject));
-            const eventPos = _simulationObject.native.events.findIndex(e => e._id === id);
+    deleteEvent = async id => {
+        if (this.props.isSimulation) {
+            const simulationObject = JSON.parse(JSON.stringify(this.state.simulationObject));
+            const eventPos = simulationObject.native.events.findIndex(e => e._id === id);
             if (eventPos !== -1) {
-                _simulationObject.native.events.splice(eventPos, 1);
+                simulationObject.native.events.splice(eventPos, 1);
             }
-            await props.socket.setObject(props.simulationId, _simulationObject);
+            await this.props.socket.setObject(this.props.simulationId, simulationObject);
         }
-        return props.socket.delObject(id);
+
+        return this.props.socket.delObject(id);
     };
 
-    useEffect(() => {
-        props.socket.subscribeObject(`${props.calendarPrefix}.*`, onEventsChanged);
-        setSubscribed(true);
+    async onPropertyChanged() {
+        const subscribed = this.props.calendarPrefix ? `${this.props.calendarPrefix}.*` : null;
 
-        updateEvents();
+        if (subscribed !== this.subscribed) {
+            this.subscribed && (await this.props.socket.unsubscribeObject(this.subscribed, this.onEventsChanged));
+            this.subscribed = subscribed;
+            this.subscribed && (await this.props.socket.subscribeObject(this.subscribed, this.onEventsChanged));
+        }
 
-        return () => {
-            if (subscribed) {
-                props.socket.unsubscribeObject(`${props.calendarPrefix}.*`, onEventsChanged);
+        await this.updateEvents();
+    }
+
+    async componentWillUnmount() {
+        if (this.subscribed) {
+            await this.props.socket.unsubscribeObject(this.subscribed, this.onEventsChanged);
+            this.subscribed = null;
+        }
+        this.updateTimeout && clearTimeout(this.updateTimeout);
+        this.updateTimeout = null;
+    }
+
+    async componentDidMount() {
+        await this.onPropertyChanged();
+    }
+
+    render() {
+        if (this.state.calendarPrefix !== this.props.calendarPrefix || this.state.isSimulation !== this.props.isSimulation) {
+            if (!this.updateTimeout) {
+                this.updateTimeout = setTimeout(() =>
+                    this.setState({ calendarPrefix: this.props.calendarPrefix, isSimulation: this.props.isSimulation }, async () => {
+                        this.updateTimeout = null;
+                        await this.onPropertyChanged();
+                    }), 100);
             }
-        };
-    }, [props.calendarPrefix, props.isSimulation, props.simulationId, props.simulations]);
+        }
 
-    return <>
-        <Calendar
-            systemConfig={props.systemConfig}
-            events={events || []}
-            socket={props.socket}
-            instance={props.instance}
-            calendarPrefix={props.calendarPrefix}
-            changeEvents={changeEvents}
-            updateEvents={updateEvents}
-            setEvent={setEvent}
-            deleteEvent={deleteEvent}
-            serverTimeZone={serverTimeZone}
+        return <Calendar
+            systemConfig={this.props.systemConfig}
+            events={this.state.events || []}
+            socket={this.props.socket}
+            instance={this.props.instance}
+            calendarPrefix={this.props.calendarPrefix}
+            changeEvents={this.changeEvents}
+            updateEvents={this.updateEvents}
+            setEvent={this.setEvent}
+            deleteEvent={this.deleteEvent}
+            serverTimeZone={this.state.serverTimeZone}
             t={I18n.t}
             language={I18n.getLanguage()}
-            isSimulation={props.isSimulation}
-            simulationId={props.simulationId}
-            simulation={props.simulation}
-            simulations={props.simulations}
-            readOnly={props.readOnly}
-            button={props.button}
-        />
-        {/* <pre>
-            {JSON.stringify(this.state.events, null, 2)}
-        </pre> */}
-    </>;
-};
+            isSimulation={this.props.isSimulation}
+            simulationId={this.props.simulationId}
+            simulation={this.props.simulation}
+            simulations={this.props.simulations}
+            readOnly={this.props.readOnly}
+            button={this.props.button}
+        />;
+    }
+}
 
 CalendarContainer.propTypes = {
     systemConfig: PropTypes.object,
