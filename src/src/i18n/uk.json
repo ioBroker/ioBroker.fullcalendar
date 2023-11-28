@@ -120,5 +120,7 @@
   "4 hours": "4 години",
   "Stop recording. Recording till %s": "Зупинити запис. Запис до %s",
   "Zoom": "Масштаб",
-  "min": "хвилин"
+  "min": "хвилин",
+  "Object ID": "ID об'єкта",
+  "All": "все"
 }

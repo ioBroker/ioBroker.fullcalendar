@@ -589,7 +589,7 @@ const EventDialog = props => {
                 <div className={props.classes.selectId}>
                     <Icon src={icon || ''} style={{ width: 32, height: 32 }} />
                     <TextField
-                        label="Object ID"
+                        label={props.t('Object ID')}
                         value={event.native.oid || ''}
                         disabled={props.readOnly || !event?.common.enabled}
                         onChange={e => changeEvent(newEvent => newEvent.native.oid = e.target.value)}

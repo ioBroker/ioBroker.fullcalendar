@@ -120,5 +120,7 @@
   "4 hours": "4 uur",
   "Stop recording. Recording till %s": "Stop met opnemen. Opnemen tot %s",
   "Zoom": "Schaal",
-  "min": "min."
+  "min": "min.",
+  "Object ID": "Object-ID",
+  "All": "Alle"
 }

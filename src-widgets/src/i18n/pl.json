@@ -88,5 +88,9 @@
   "nauticalDusk": "Nautyczny zmierzch",
   "night": "Noc",
   "nightEnd": "Koniec nocy",
-  "Please select instance": "Wybierz instancję"
+  "Please select instance": "Wybierz instancję",
+  "All": "Wszystko",
+  "Checked means ON, unchecked means OFF": "Zaznaczone oznacza WŁ., niezaznaczone oznacza WYŁ",
+  "Object ID": "Identyfikator obiektu",
+  "Desired value": "Pożądana wartość"
 }

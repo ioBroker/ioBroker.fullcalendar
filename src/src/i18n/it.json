@@ -120,5 +120,7 @@
   "4 hours": "4 ore",
   "Stop recording. Recording till %s": "Interrompi la registrazione. Registrazione fino a %s",
   "Zoom": "Scala",
-  "min": "min."
+  "min": "min.",
+  "Object ID": "Identificativo dell'oggetto",
+  "All": "Tutto"
 }

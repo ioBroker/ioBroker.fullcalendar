@@ -88,5 +88,9 @@
   "nauticalDusk": "Crépuscule nautique",
   "night": "Nuit",
   "nightEnd": "Fin de la nuit",
-  "Please select instance": "Veuillez sélectionner une instance"
+  "Please select instance": "Veuillez sélectionner une instance",
+  "All": "Tous",
+  "Checked means ON, unchecked means OFF": "Coché signifie ON, décoché signifie OFF",
+  "Object ID": "ID d'objet",
+  "Desired value": "Valeur souhaitée"
 }

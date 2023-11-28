@@ -120,5 +120,7 @@
   "4 hours": "4 Std.",
   "Stop recording. Recording till %s": "Aufnahme beenden. Aufnahme wird um %s automatisch beendet.",
   "Zoom": "Skala",
-  "min": "Min."
+  "min": "Min.",
+  "Object ID": "Objekt Identifikation",
+  "All": "Alle"
 }

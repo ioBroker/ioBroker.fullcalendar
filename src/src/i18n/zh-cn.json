@@ -120,5 +120,7 @@
   "4 hours": "4小时",
   "Stop recording. Recording till %s": "停止录音。记录到 %s",
   "Zoom": "规模",
-  "min": "分钟"
+  "min": "分钟",
+  "Object ID": "对象ID",
+  "All": "全部"
 }

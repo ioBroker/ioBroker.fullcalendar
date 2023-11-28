@@ -120,5 +120,7 @@
   "4 hours": "4 horas",
   "Stop recording. Recording till %s": "Para de grabar. Grabando hasta %s",
   "Zoom": "Escala",
-  "min": "min."
+  "min": "min.",
+  "Object ID": "ID de objeto",
+  "All": "Todo"
 }

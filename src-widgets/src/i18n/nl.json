@@ -88,5 +88,9 @@
   "nauticalDusk": "Nautische schemering",
   "night": "Nacht",
   "nightEnd": "Einde van de nacht",
-  "Please select instance": "Selecteer een exemplaar"
+  "Please select instance": "Selecteer een exemplaar",
+  "All": "Alle",
+  "Checked means ON, unchecked means OFF": "Aangevinkt betekent AAN, niet aangevinkt betekent UIT",
+  "Object ID": "Object-ID",
+  "Desired value": "Gewenste waarde"
 }
