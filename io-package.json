@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.1",
+    "version": "2.3.2",
     "news": {
+      "2.3.2": {
+        "en": "Corrected monthly events",
+        "de": "Berichtigte monatliche Ereignisse",
+        "ru": "Исправлены ежемесячные мероприятия",
+        "pt": "Eventos mensais corrigidos",
+        "nl": "Vertaling:",
+        "fr": "Actes mensuels corrigés",
+        "it": "Eventi mensili corretti",
+        "es": "Actos mensuales corregidos",
+        "pl": "Comiesięczne wydarzenia",
+        "uk": "Виправлені щомісячні події",
+        "zh-cn": "每月事件的更正"
+      },
       "2.3.1": {
         "en": "Packages were updated\nCorrected vis-2 widget",
         "de": "Pakete wurden aktualisiert\nKorrigiert vis-2 Widget",
@@ -80,19 +93,6 @@
         "pl": "Poprawa wizy 2",
         "uk": "Виправлено vis-2 віджети",
         "zh-cn": "更正"
-      },
-      "2.0.5": {
-        "en": "New material design\nLicense changed to MIT\nAllowed deletion of events",
-        "de": "Neues Materialdesign\nLizenz geändert in MIT\nErlaubte Löschung von Ereignissen",
-        "ru": "Новый дизайн материала\nЛицензия изменена на MIT\nРазрешено удаление событий",
-        "pt": "Novo design de material\nLicença alterada para MIT\nEliminação permitida de eventos",
-        "nl": "Nieuw materiaal\nVerandering van MIT\nVerwijdering van gebeurtenissen",
-        "fr": "Nouveau design\nLicence changée en MIT\nSuppression autorisée des événements",
-        "it": "Nuovo design del materiale\nLicenza modificata in MIT\nCancellazione degli eventi",
-        "es": "Nuevo diseño de materiales\nLa licencia cambió a MIT\nSupresión de los acontecimientos",
-        "pl": "Nowy projekt\nLicense zmieniła się na MIT\nDelecja zdarzeń",
-        "uk": "Дизайн нового матеріалу\nЛіцензія змінено на MIT\nДозволено видалення заходів",
-        "zh-cn": "新材料设计\n液体变化\n允许删除事件"
       }
     },
     "title": "Calendar schedule",
