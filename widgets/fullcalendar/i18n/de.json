@@ -88,5 +88,9 @@
   "nauticalDusk": "Nautische Dämmerung",
   "night": "Nacht",
   "nightEnd": "Ende der Nacht",
-  "Please select instance": "Bitte wählen Sie eine Instanz aus"
+  "Please select instance": "Bitte wählen Sie eine Instanz aus",
+  "All": "Alle",
+  "Checked means ON, unchecked means OFF": "Aktiviert bedeutet EIN, deaktiviert bedeutet AUS",
+  "Object ID": "Objekt Identifikation",
+  "Desired value": "Gewünschter Wert"
 }

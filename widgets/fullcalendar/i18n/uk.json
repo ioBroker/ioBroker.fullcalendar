@@ -88,5 +88,9 @@
   "nauticalDusk": "Морські сутінки",
   "night": "ніч",
   "nightEnd": "Кінець ночі",
-  "Please select instance": "Виберіть екземпляр"
+  "Please select instance": "Виберіть екземпляр",
+  "All": "все",
+  "Checked means ON, unchecked means OFF": "Позначено означає УВІМКНЕНО, не позначено означає ВИМКНЕНО",
+  "Object ID": "ID об'єкта",
+  "Desired value": "Бажане значення"
 }

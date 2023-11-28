@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.3",
+    "version": "2.3.4",
     "news": {
+      "2.3.4": {
+        "en": "Corrected monthly events",
+        "de": "Berichtigte monatliche Ereignisse",
+        "ru": "Исправлены ежемесячные мероприятия",
+        "pt": "Eventos mensais corrigidos",
+        "nl": "Vertaling:",
+        "fr": "Actes mensuels corrigés",
+        "it": "Eventi mensili corretti",
+        "es": "Actos mensuales corregidos",
+        "pl": "Comiesięczne wydarzenia",
+        "uk": "Виправлені щомісячні події",
+        "zh-cn": "每月事件的更正"
+      },
       "2.3.1": {
         "en": "Packages were updated\nCorrected vis-2 widget",
         "de": "Pakete wurden aktualisiert\nKorrigiert vis-2 Widget",

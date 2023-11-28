@@ -88,5 +88,9 @@
   "nauticalDusk": "Морские сумерки",
   "night": "Ночь",
   "nightEnd": "Ночной конец",
-  "Please select instance": "Пожалуйста, выберите экземпляр"
+  "Please select instance": "Пожалуйста, выберите экземпляр",
+  "All": "Все",
+  "Checked means ON, unchecked means OFF": "Установленный флажок означает ВКЛ., снятый флажок означает ВЫКЛ.",
+  "Object ID": "Идентификатор объекта",
+  "Desired value": "Желаемое значение"
 }

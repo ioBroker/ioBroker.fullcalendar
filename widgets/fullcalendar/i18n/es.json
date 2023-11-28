@@ -88,5 +88,9 @@
   "nauticalDusk": "Anochecer náutico",
   "night": "Noche",
   "nightEnd": "Fin de la noche",
-  "Please select instance": "Por favor seleccione instancia"
+  "Please select instance": "Por favor seleccione instancia",
+  "All": "Todo",
+  "Checked means ON, unchecked means OFF": "Marcado significa ENCENDIDO, no marcado significa APAGADO",
+  "Object ID": "ID de objeto",
+  "Desired value": "Valor deseado"
 }

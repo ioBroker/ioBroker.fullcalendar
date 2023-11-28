@@ -88,5 +88,9 @@
   "nauticalDusk": "航海黄昏",
   "night": "夜晚",
   "nightEnd": "晚上结束",
-  "Please select instance": "请选择实例"
+  "Please select instance": "请选择实例",
+  "All": "全部",
+  "Checked means ON, unchecked means OFF": "勾选表示开启，不勾选表示关闭",
+  "Object ID": "对象ID",
+  "Desired value": "期望值"
 }
