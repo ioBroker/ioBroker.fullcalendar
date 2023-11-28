@@ -711,6 +711,9 @@ const EventDialog = props => {
                                             newCronObject.months.push(i + 1);
                                         } else {
                                             newCronObject.months = newCronObject.months.filter(month => month !== i + 1);
+                                            if (!newCronObject.months.length) {
+                                                newCronObject.months = [1];
+                                            }
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     })}
@@ -745,6 +748,9 @@ const EventDialog = props => {
                                             newCronObject.dates = newCronObject.dates.filter(day => day);
                                         } else {
                                             newCronObject.dates = newCronObject.dates.filter(day => day !== i + 1);
+                                            if (!newCronObject.dates.length) {
+                                                newCronObject.dates = [1];
+                                            }
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     })}
@@ -774,6 +780,9 @@ const EventDialog = props => {
                                                 newCronObject.dates = newCronObject.dates.filter(day => day);
                                             } else {
                                                 newCronObject.dates = newCronObject.dates.filter(day => day !== i + 13);
+                                                if (!newCronObject.dates.length) {
+                                                    newCronObject.dates = [1];
+                                                }
                                             }
                                             newEvent.native.cron = obj2cron(newCronObject);
                                         });
@@ -806,6 +815,9 @@ const EventDialog = props => {
                                             newCronObject.dates = newCronObject.dates.filter(day => day);
                                         } else {
                                             newCronObject.dates = newCronObject.dates.filter(day => day !== i + 25);
+                                            if (!newCronObject.dates.length) {
+                                                newCronObject.dates = [1];
+                                            }
                                         }
                                         newEvent.native.cron = obj2cron(newCronObject);
                                     })}
