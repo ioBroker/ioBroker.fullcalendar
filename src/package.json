@@ -10,7 +10,7 @@
         "@fullcalendar/daygrid": "^6.1.10",
         "@fullcalendar/interaction": "^6.1.9",
         "@fullcalendar/list": "^6.1.9",
-        "@fullcalendar/react": "^6.1.9",
+        "@fullcalendar/react": "^6.1.10",
         "@fullcalendar/rrule": "^6.1.9",
         "@fullcalendar/timegrid": "^6.1.9",
         "@iobroker/adapter-react-v5": "^4.7.5",
