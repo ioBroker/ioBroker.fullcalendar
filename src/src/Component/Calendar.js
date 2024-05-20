@@ -121,7 +121,7 @@ const styles = () => ({
     },
     leftMargin: {
         marginLeft: 4,
-    }
+    },
 });
 
 function dimColor(color) {

@@ -15,7 +15,6 @@ class CalendarContainer extends React.Component {
             simulationObject: null,
             isSimulation: props.isSimulation,
             calendarPrefix: props.calendarPrefix,
-            updateEvents: false,
         };
     }
 
