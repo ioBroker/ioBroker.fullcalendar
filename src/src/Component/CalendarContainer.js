@@ -15,6 +15,7 @@ class CalendarContainer extends React.Component {
             simulationObject: null,
             isSimulation: props.isSimulation,
             calendarPrefix: props.calendarPrefix,
+            updateEvents: false,
         };
     }
 
@@ -120,7 +121,10 @@ class CalendarContainer extends React.Component {
     }
 
     render() {
-        if (this.state.calendarPrefix !== this.props.calendarPrefix || this.state.isSimulation !== this.props.isSimulation) {
+        if (this.state.calendarPrefix !== this.props.calendarPrefix ||
+            this.state.isSimulation !== this.props.isSimulation ||
+            (this.state.isSimulation && JSON.stringify(this.state.events) !== JSON.stringify(this.props.simulation?.native?.events))
+        ) {
             if (!this.updateTimeout) {
                 this.updateTimeout = setTimeout(() =>
                     this.setState({ calendarPrefix: this.props.calendarPrefix, isSimulation: this.props.isSimulation }, async () => {
@@ -131,10 +135,9 @@ class CalendarContainer extends React.Component {
         }
 
         return <Calendar
-            systemConfig={this.props.systemConfig}
             events={this.state.events || []}
+            systemConfig={this.props.systemConfig}
             socket={this.props.socket}
-            instance={this.props.instance}
             calendarPrefix={this.props.calendarPrefix}
             changeEvents={this.changeEvents}
             updateEvents={this.updateEvents}
@@ -147,6 +150,7 @@ class CalendarContainer extends React.Component {
             simulationId={this.props.simulationId}
             simulation={this.props.simulation}
             simulations={this.props.simulations}
+            simulationState={this.props.simulationState}
             readOnly={this.props.readOnly}
             button={this.props.button}
         />;
@@ -156,12 +160,12 @@ class CalendarContainer extends React.Component {
 CalendarContainer.propTypes = {
     systemConfig: PropTypes.object,
     socket: PropTypes.object,
-    instance: PropTypes.any,
     calendarPrefix: PropTypes.string,
     isSimulation: PropTypes.bool,
     simulationId: PropTypes.string,
     simulation: PropTypes.object,
     simulations: PropTypes.array,
+    simulationState: PropTypes.string,
     readOnly: PropTypes.bool,
     button: PropTypes.any,
 };
