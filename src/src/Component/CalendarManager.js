@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import { v4 as uuidv4 } from 'uuid';
+import ReactSplit, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 
 import {
     IconButton, Tab, Tabs, Paper, Tooltip, Toolbar, Fab,
@@ -63,6 +64,7 @@ const style = theme => ({
     },
     tabRoot: {
         padding: '0 6px',
+        maxWidth: '100%',
     },
     alert: {
         color: theme.palette.error.main,
@@ -90,6 +92,7 @@ const CalendarManager = props => {
     const [calendars, setCalendars] = useState([]);
     const [isSimulations, setIsSimulations] = useState(window.localStorage.getItem('fullcalendar.tab') === '1' ? 1 : 0);
     const [alive, setAlive] = useState(false);
+    const [splitSizes, setSplitSizes] = useState(window.localStorage.getItem('fullcalendar.splitSizes') ? JSON.parse(window.localStorage.getItem('fullcalendar.splitSizes')) : [15, 85]);
 
     const updateCalendars = async () => {
         const objects = await props.socket.getObjectViewSystem(
@@ -140,60 +143,70 @@ const CalendarManager = props => {
             alive={alive}
         /> :
             <div className={props.classes.container}>
-                <div className={props.classes.calendars}>
-                    <Paper className={props.classes.calendarsPaper}>
-                        <Tabs
-                            value={0}
-                            onChange={changeCalendarType}
-                            className={props.classes.tabs}
-                        >
-                            <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
-                            <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} className={props.classes.simulations} />
-                        </Tabs>
-                        <Toolbar variant="dense" className={props.classes.toolbar}>
-                            <Fab
-                                size="small"
-                                title={I18n.t('Add new calendar')}
-                                color="primary"
-                                onClick={async () => {
-                                    const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
-                                    await props.socket.setObject(id, {
-                                        type: 'folder',
-                                        common: {
-                                            name: 'NewCalendar',
-                                        },
-                                        native: {},
-                                    });
-                                    await updateCalendars();
-                                    setCalendarPrefix(id);
-                                    window.localStorage.setItem('fullcalendar.calendar', id);
-                                    setTimeout(() => setCalendarDialog(id), 300);
-                                }}
-                                variant="contained"
+                <ReactSplit
+                    direction={SplitDirection.Horizontal}
+                    initialSizes={splitSizes}
+                    minWidths={[195, 500]}
+                    onResizeFinished={(gutterIdx, newSplitSizes) => {
+                        setSplitSizes(newSplitSizes);
+                        window.localStorage.setItem('fullcalendar.splitSizes', JSON.stringify(newSplitSizes));
+                    }}
+                    theme={props.themeType === 'dark' ? GutterTheme.Dark : GutterTheme.Light}
+                    gutterClassName={props.themeType === 'dark' ? 'Dark visGutter' : 'Light visGutter'}
+                >
+                    <div className={props.classes.calendars}>
+                        <Paper className={props.classes.calendarsPaper}>
+                            <Tabs
+                                value={0}
+                                onChange={changeCalendarType}
+                                className={props.classes.tabs}
                             >
-                                <Add />
-                            </Fab>
-                            <div className={props.classes.divider} />
-                            {!alive && <Tooltip title={I18n.t('Instance inactive')} classes={{ popper: props.classes.tooltip }}><Alert className={props.classes.alert} /></Tooltip>}
-                        </Toolbar>
-                        <Tabs
-                            value={calendars.find(c => c._id === calendarPrefix) ? calendarPrefix : `fullcalendar.${props.instance}`}
-                            onChange={(e, value) => {
-                                window.localStorage.setItem('fullcalendar.calendar', value);
-                                setCalendarPrefix(value);
-                            }}
-                            className={props.classes.tabs}
-                            orientation="vertical"
-                        >
-                            <Tab
-                                classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
-                                label={<div className={props.classes.label}>
-                                    {I18n.t('Default')}
-                                </div>}
-                                value={`fullcalendar.${props.instance}`}
-                            />
-                            {calendars.map(calendar =>
+                                <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
+                                <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} className={props.classes.simulations} />
+                            </Tabs>
+                            <Toolbar variant="dense" className={props.classes.toolbar}>
+                                <Fab
+                                    size="small"
+                                    title={I18n.t('Add new calendar')}
+                                    color="primary"
+                                    onClick={async () => {
+                                        const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
+                                        await props.socket.setObject(id, {
+                                            type: 'folder',
+                                            common: {
+                                                name: 'NewCalendar',
+                                            },
+                                            native: {},
+                                        });
+                                        await updateCalendars();
+                                        setCalendarPrefix(id);
+                                        window.localStorage.setItem('fullcalendar.calendar', id);
+                                        setTimeout(() => setCalendarDialog(id), 300);
+                                    }}
+                                    variant="contained"
+                                >
+                                    <Add />
+                                </Fab>
+                                <div className={props.classes.divider} />
+                                {!alive && <Tooltip title={I18n.t('Instance inactive')} classes={{ popper: props.classes.tooltip }}><Alert className={props.classes.alert} /></Tooltip>}
+                            </Toolbar>
+                            <Tabs
+                                value={calendars.find(c => c._id === calendarPrefix) ? calendarPrefix : `fullcalendar.${props.instance}`}
+                                onChange={(e, value) => {
+                                    window.localStorage.setItem('fullcalendar.calendar', value);
+                                    setCalendarPrefix(value);
+                                }}
+                                className={props.classes.tabs}
+                                orientation="vertical"
+                            >
                                 <Tab
+                                    classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
+                                    label={<div className={props.classes.label}>
+                                        {I18n.t('Default')}
+                                    </div>}
+                                    value={`fullcalendar.${props.instance}`}
+                                />
+                                {calendars.map(calendar => <Tab
                                     component="div"
                                     key={calendar._id}
                                     classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
@@ -215,18 +228,19 @@ const CalendarManager = props => {
                                     </div>}
                                     value={calendar._id}
                                 />)}
-                        </Tabs>
-                    </Paper>
-                </div>
-                <CalendarContainer
-                    key={calendarPrefix}
-                    systemConfig={props.systemConfig}
-                    socket={props.socket}
-                    instance={props.instance}
-                    calendarPrefix={calendarPrefix}
-                    t={I18n.t}
-                    language={I18n.getLanguage()}
-                />
+                            </Tabs>
+                        </Paper>
+                    </div>
+                    <CalendarContainer
+                        key={calendarPrefix}
+                        systemConfig={props.systemConfig}
+                        socket={props.socket}
+                        instance={props.instance}
+                        calendarPrefix={calendarPrefix}
+                        t={I18n.t}
+                        language={I18n.getLanguage()}
+                    />
+                </ReactSplit>
             </div>}
         {calendarDialog ? <CalendarDialog
             onClose={() => setCalendarDialog(null)}
@@ -245,6 +259,7 @@ CalendarManager.propTypes = {
     instance: PropTypes.any.isRequired,
     systemConfig: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
+    themeType: PropTypes.string,
 };
 
 export default withStyles(style)(CalendarManager);

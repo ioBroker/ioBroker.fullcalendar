@@ -52,6 +52,7 @@ class App extends GenericApp {
                         socket={this.socket}
                         instance={this.instance}
                         alive={this.state.alive}
+                        themeType={this.state.themeType}
                     />
                 </div>
             </ThemeProvider>
