@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.4",
+    "version": "2.3.5",
     "news": {
+      "2.3.5": {
+        "en": "Corrected vis-2 widget",
+        "de": "Korrigiert vis-2 Widget",
+        "ru": "Исправленный виджет vis-2",
+        "pt": "Corrigido vis-2 widget",
+        "nl": "Gecorrigeerd vis-2 widget",
+        "fr": "Widget vis-2 corrigé",
+        "it": "Corretto vis-2 widget",
+        "es": "Corregido vis-2 widget",
+        "pl": "Poprawiony widżet vis-2",
+        "uk": "Corrected vis-2 віджет",
+        "zh-cn": "已校正相对 2 部件"
+      },
       "2.3.4": {
         "en": "Corrected monthly events",
         "de": "Berichtigte monatliche Ereignisse",
@@ -69,19 +82,6 @@
         "zh-cn": "增加事件模拟"
       },
       "2.0.8": {
-        "en": "Corrected vis-2 widgets",
-        "de": "Korrigierte vis-2 Widgets",
-        "ru": "Исправленные виджеты vis-2",
-        "pt": "Vis-2 widgets corrigidos",
-        "nl": "Vertaling:",
-        "fr": "Widgets vis-2 corrigés",
-        "it": "Corretti widget vis-2",
-        "es": "Widgets corregidos vis-2",
-        "pl": "Poprawa wizy 2",
-        "uk": "Виправлено vis-2 віджети",
-        "zh-cn": "更正"
-      },
-      "2.0.6": {
         "en": "Corrected vis-2 widgets",
         "de": "Korrigierte vis-2 Widgets",
         "ru": "Исправленные виджеты vis-2",
