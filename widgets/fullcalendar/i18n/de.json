@@ -92,5 +92,6 @@
   "All": "Alle",
   "Checked means ON, unchecked means OFF": "Aktiviert bedeutet EIN, deaktiviert bedeutet AUS",
   "Object ID": "Objekt Identifikation",
-  "Desired value": "Gewünschter Wert"
+  "Desired value": "Gewünschter Wert",
+  "Description": "Beschreibung"
 }

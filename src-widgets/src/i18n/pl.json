@@ -92,5 +92,6 @@
   "All": "Wszystko",
   "Checked means ON, unchecked means OFF": "Zaznaczone oznacza WŁ., niezaznaczone oznacza WYŁ",
   "Object ID": "Identyfikator obiektu",
-  "Desired value": "Pożądana wartość"
+  "Desired value": "Pożądana wartość",
+  "Description": "Opis"
 }

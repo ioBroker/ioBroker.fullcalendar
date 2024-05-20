@@ -92,5 +92,6 @@
   "All": "все",
   "Checked means ON, unchecked means OFF": "Позначено означає УВІМКНЕНО, не позначено означає ВИМКНЕНО",
   "Object ID": "ID об'єкта",
-  "Desired value": "Бажане значення"
+  "Desired value": "Бажане значення",
+  "Description": "опис"
 }

@@ -83,6 +83,8 @@ const styles = theme => ({
     },
     timeSelector: {
         marginLeft: 16,
+        marginTop: 8,
+        width: 120,
     },
     days: {
         backgroundColor: theme.palette.mode === 'dark' ? '#656565' : '#dadada',
@@ -255,12 +257,10 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => changeEvent(newEvent => newEvent.native[field] = e.target.checked)}
                 />}
-                label={
-                    <div>
-                        <div>{props.t(name)}</div>
-                        <div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div>
-                    </div>
-                }
+                label={<div>
+                    <div>{props.t(name)}</div>
+                    <div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div>
+                </div>}
             />;
         }
 
@@ -307,12 +307,10 @@ const EventDialog = props => {
                     disabled={props.readOnly}
                     onChange={e => setEndValue(e.target.checked)}
                 />}
-                label={
-                    <div>
-                        <div>{props.t('End value')}</div>
-                        <div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div>
-                    </div>
-                }
+                label={<div>
+                    <div>{props.t('End value')}</div>
+                    <div style={{ fontSize: 10, fontStyle: 'italic' }}>{props.t('Checked means ON, unchecked means OFF')}</div>
+                </div>}
             />;
         }
 
@@ -449,6 +447,22 @@ const EventDialog = props => {
 
                     : <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <TimePicker
+                            sx={theme => ({
+                                borderBottom: `1px solid ${theme.palette.text.primary}`,
+                                '& fieldset': {
+                                    display: 'none',
+                                },
+                                '& input': {
+                                    padding: `${theme.spacing(1.5)} 0 4px 0`,
+                                },
+                                '& .MuiInputAdornment-root': {
+                                    marginLeft: 0,
+                                    marginTop: 1, // it is already in spaces
+                                },
+                                '& label': {
+                                    transform: 'translate(0px, -9px) scale(0.75)',
+                                },
+                            })}
                             label={props.t('Time')}
                             variant="standard"
                             className={props.classes.timeSelector}
@@ -851,7 +865,7 @@ const EventDialog = props => {
             </div>}
             <div className={props.classes.field}>
                 <TextField
-                    label="Description"
+                    label={props.t('Description')}
                     value={event?.common.name || ''}
                     disabled={props.readOnly || !event?.common.enabled}
                     onChange={e =>

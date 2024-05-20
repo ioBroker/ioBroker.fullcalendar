@@ -92,5 +92,6 @@
   "All": "全部",
   "Checked means ON, unchecked means OFF": "勾选表示开启，不勾选表示关闭",
   "Object ID": "对象ID",
-  "Desired value": "期望值"
+  "Desired value": "期望值",
+  "Description": "描述"
 }

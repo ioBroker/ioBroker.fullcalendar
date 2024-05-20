@@ -92,5 +92,6 @@
   "All": "Все",
   "Checked means ON, unchecked means OFF": "Установленный флажок означает ВКЛ., снятый флажок означает ВЫКЛ.",
   "Object ID": "Идентификатор объекта",
-  "Desired value": "Желаемое значение"
+  "Desired value": "Желаемое значение",
+  "Description": "Описание"
 }

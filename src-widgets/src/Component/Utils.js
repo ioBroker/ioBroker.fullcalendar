@@ -1,3 +1,5 @@
+import {Utils} from "@iobroker/adapter-react-v5";
+
 function oneCron2Array(str) {
     if (str === '*' || str === '?' || str === '') {
         return str;
@@ -244,7 +246,10 @@ async function getIconAsync(id, socket) {
     let obj = await getCachedObject(id, socket);
     if (obj) {
         if (obj.common?.icon) {
-            return obj.common?.icon;
+            if (obj.common.iconConverted) {
+                return obj.common.icon;
+            }
+            return Utils.getObjectIcon(obj);
         }
         if (obj.type === 'state' || obj.type === 'channel') {
             // get parent
@@ -253,17 +258,23 @@ async function getIconAsync(id, socket) {
             let parentId = parts.join('.');
             obj = await getCachedObject(parentId, socket);
 
-            if (obj && obj.common?.icon) {
-                return obj.common?.icon;
+            if (obj?.common?.icon) {
+                if (obj.common.iconConverted) {
+                    return obj.common.icon;
+                }
+                return Utils.getObjectIcon(obj);
             }
-            if (obj && obj.type === 'channel') {
+            if (obj?.type === 'channel') {
                 // get parent
                 parts = id.split('.');
                 parts.pop();
                 parentId = parts.join('.');
                 obj = await getCachedObject(parentId, socket);
-                if (obj && obj.common?.icon) {
-                    return obj.common?.icon;
+                if (obj?.common?.icon) {
+                    if (obj.common.iconConverted) {
+                        return obj.common.icon;
+                    }
+                    return Utils.getObjectIcon(obj);
                 }
             }
         }

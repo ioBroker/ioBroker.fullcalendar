@@ -92,5 +92,6 @@
   "All": "All",
   "Checked means ON, unchecked means OFF": "Checked means ON, unchecked means OFF",
   "Object ID": "Object ID",
-  "Desired value": "Desired value"
+  "Desired value": "Desired value",
+  "Description": "Description"
 }

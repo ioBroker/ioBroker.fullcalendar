@@ -92,5 +92,6 @@
   "All": "Todo",
   "Checked means ON, unchecked means OFF": "Marcado significa ENCENDIDO, no marcado significa APAGADO",
   "Object ID": "ID de objeto",
-  "Desired value": "Valor deseado"
+  "Desired value": "Valor deseado",
+  "Description": "Descripción"
 }
