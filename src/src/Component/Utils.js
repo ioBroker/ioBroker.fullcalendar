@@ -1,4 +1,4 @@
-import {Utils} from "@iobroker/adapter-react-v5";
+import { Utils } from '@iobroker/adapter-react-v5';
 
 function oneCron2Array(str) {
     if (str === '*' || str === '?' || str === '') {
