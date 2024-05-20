@@ -480,7 +480,7 @@ function Calendar(props) {
                         {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use double click on calendar to add new events.')}</div>}
                         {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
-                        {props.hideLeftBlockHint || currentView !== 'dayGridMonth' || currentView !== 'listMonth' ? null : <FormControl fullWidth variant="standard">
+                        {props.hideLeftBlockHint || currentView === 'dayGridMonth' || currentView === 'listMonth' ? null : <FormControl fullWidth variant="standard">
                             <InputLabel>{props.t('Zoom')}</InputLabel>
                             <Select
                                 value={step}
@@ -497,7 +497,7 @@ function Calendar(props) {
                             >
                                 {MINUTES.map(minute => <MenuItem key={minute} value={minute}>
                                     {minute}
-                                    <span className={this.props.classes.leftMargin}>{props.t('min')}</span>
+                                    <span className={props.classes.leftMargin}>{props.t('min')}</span>
                                 </MenuItem>)}
                             </Select>
                         </FormControl>}
@@ -511,16 +511,13 @@ function Calendar(props) {
                         ref={ref}
                         plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
                         weekends={!props.hideWeekends}
-                        headerToolbar={
-                            props.hideTopBlock ? false :
-                                {
-                                    left: props.hideTopBlockButtons || props.isSimulation ? '' : 'prev,next today',
-                                    center: props.isSimulation ? '' : 'title',
-                                    right: props.hideTopBlockButtons || props.isSimulation ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
-                                }
-                        }
+                        headerToolbar={props.hideTopBlock ? false : {
+                            left: props.hideTopBlockButtons || props.isSimulation ? '' : 'prev,next today',
+                            center: props.isSimulation ? '' : 'title',
+                            right: props.hideTopBlockButtons || props.isSimulation ? '' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+                        }}
                         eventTimeFormat={props.isSimulation ? formatter : undefined}
-                        // scrollTime={scrollTime}
+                        scrollTime={props.isSimulation && props.simulationState === 'record' ? scrollTime : undefined}
                         slotDuration={`00:${step.toString().padStart(2, '0')}:00`}
                         eventMinHeight={20}
                         initialView={initialView}
@@ -784,7 +781,6 @@ Calendar.propTypes = {
     hideWeekends: PropTypes.bool,
     viewMode: PropTypes.bool,
     updateEvents: PropTypes.func,
-    // instance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     t: PropTypes.func.isRequired,
     widget: PropTypes.bool,
     language: PropTypes.string.isRequired,
