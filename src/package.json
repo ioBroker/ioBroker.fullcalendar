@@ -1,6 +1,6 @@
 {
     "name": "fullcalendar-admin",
-    "version": "2.3.5",
+    "version": "2.3.6",
     "private": true,
     "dependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
