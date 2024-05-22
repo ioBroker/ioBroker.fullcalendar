@@ -44,27 +44,35 @@ const IGNORE_STATES = [
 function t(word) {
     if (language === 'de') {
         return word === 'OFF' ? 'AUS' : 'EIN';
-    } else if (language === 'ru') {
-        return word === 'OFF' ? 'ВЫКЛ' : 'ВКЛ';
-    } else if (language === 'pt') {
-        return word === 'OFF' ? 'DESLIGADO' : 'LIGADO';
-    } else if (language === 'nl') {
-        return word === 'OFF' ? 'UIT' : 'AAN';
-    } else if (language === 'fr') {
-        return word === 'OFF' ? 'ÉTEINT' : 'ALLUMÉ';
-    } else if (language === 'it') {
-        return word === 'OFF' ? 'SPENTO' : 'ACCESO';
-    } else if (language === 'es') {
-        return word === 'OFF' ? 'APAGADO' : 'ENCENDIDO';
-    } else if (language === 'pl') {
-        return word === 'OFF' ? 'WYŁĄCZONY' : 'WŁĄCZONY';
-    } else if (language === 'zh-cn') {
-        return word === 'OFF' ? '关' : '开';
-    } else if (language === 'uk') {
-        return word === 'OFF' ? 'ВИМКНЕНО' : 'УВІМКНЕНО';
-    } else {
-        return word;
     }
+    if (language === 'ru') {
+        return word === 'OFF' ? 'ВЫКЛ' : 'ВКЛ';
+    }
+    if (language === 'pt') {
+        return word === 'OFF' ? 'DESLIGADO' : 'LIGADO';
+    }
+    if (language === 'nl') {
+        return word === 'OFF' ? 'UIT' : 'AAN';
+    }
+    if (language === 'fr') {
+        return word === 'OFF' ? 'ÉTEINT' : 'ALLUMÉ';
+    }
+    if (language === 'it') {
+        return word === 'OFF' ? 'SPENTO' : 'ACCESO';
+    }
+    if (language === 'es') {
+        return word === 'OFF' ? 'APAGADO' : 'ENCENDIDO';
+    }
+    if (language === 'pl') {
+        return word === 'OFF' ? 'WYŁĄCZONY' : 'WŁĄCZONY';
+    }
+    if (language === 'zh-cn') {
+        return word === 'OFF' ? '关' : '开';
+    }
+    if (language === 'uk') {
+        return word === 'OFF' ? 'ВИМКНЕНО' : 'УВІМКНЕНО';
+    }
+    return word;
 }
 
 async function subscribeUnsubscribe() {
@@ -396,7 +404,7 @@ function startAdapter(options) {
                     }
 
                     const prevEvent = lastEvent[ids[i]];
-                    lastEvent[ids[i]] = {id: stateId, value: state.val, ts: Date.now()};
+                    lastEvent[ids[i]] = { id: stateId, value: state.val, ts: Date.now() };
 
                     // filter out same states
                     if (prevEvent && prevEvent.id === stateId && prevEvent.value === state.val && Date.now() - prevEvent.ts < 500) {
@@ -586,8 +594,12 @@ async function executeEvent(event, now) {
         event.timer = setTimeout((_event, _obj) => {
             if (_event.native.type === 'toggle') {
                 let value = _event.native.startValue;
-                if (_obj.common.type === 'number' || obj.common.type === 'boolean') {
-                    value = !value;
+                if (_obj.common.type === 'number') {
+                    if (_obj.common.min && _obj.common.max) {
+                        value = value === _obj.common.max ? _obj.common.min : obj.common.max;
+                    } else {
+                        value = !value;
+                    }
                 } else if (_obj.common.type === 'boolean') {
                     value = !value;
                 } else if (_obj.common.type === 'string') {

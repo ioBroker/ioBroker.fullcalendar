@@ -90,7 +90,7 @@ const DraggableButton = ({ type, t, color }) => {
     </div>;
 };
 
-const styles = () => ({
+const styles = {
     container: {
         display: 'flex',
         width: '100%',
@@ -122,7 +122,7 @@ const styles = () => ({
     leftMargin: {
         marginLeft: 4,
     },
-});
+};
 
 function dimColor(color) {
     if (!color) {

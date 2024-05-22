@@ -41,8 +41,8 @@
   "Interval": "Intervall",
   "Name": "Name",
   "Ok": "OK",
-  "Play": "Spielen",
-  "Play simulation": "Simulation spielen",
+  "Play": "Abspielen",
+  "Play simulation": "Simulation abspielen",
   "Record": "Aufzeichnen",
   "Record simulation": "Simulation aufzeichnen",
   "Record simulation description": "Simulationsbeschreibung aufzeichnen",
@@ -123,5 +123,6 @@
   "min": "Min.",
   "Object ID": "Objekt Identifikation",
   "All": "Alle",
-  "Description": "Beschreibung"
+  "Description": "Beschreibung",
+  "First value": "Erster Wert"
 }
