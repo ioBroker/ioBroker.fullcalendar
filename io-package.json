@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.9",
+    "version": "2.3.10",
     "news": {
+      "2.3.10": {
+        "en": "Small UI fixes",
+        "de": "Kleine UI Fixes",
+        "ru": "Маленькие UI исправления",
+        "pt": "Pequenas correções UI",
+        "nl": "Kleine UI-fixes",
+        "fr": "Petites corrections d'assurance-chômage",
+        "it": "Piccolo UI correzioni",
+        "es": "Pequeña UI",
+        "pl": "Małe poprawki interfejsu użytkownika",
+        "uk": "Маленькі UI кріплення",
+        "zh-cn": "小型 UI 修正"
+      },
       "2.3.9": {
         "en": "Corrected vis-2 widget",
         "de": "Korrigiert vis-2 Widget",
@@ -80,19 +93,6 @@
         "pl": "Symulacja zdarzeń na temat wydarzeń",
         "uk": "Додано моделювання подій",
         "zh-cn": "增加事件模拟"
-      },
-      "2.0.8": {
-        "en": "Corrected vis-2 widgets",
-        "de": "Korrigierte vis-2 Widgets",
-        "ru": "Исправленные виджеты vis-2",
-        "pt": "Vis-2 widgets corrigidos",
-        "nl": "Vertaling:",
-        "fr": "Widgets vis-2 corrigés",
-        "it": "Corretti widget vis-2",
-        "es": "Widgets corregidos vis-2",
-        "pl": "Poprawa wizy 2",
-        "uk": "Виправлено vis-2 віджети",
-        "zh-cn": "更正"
       }
     },
     "title": "Calendar schedule",
