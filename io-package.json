@@ -3,19 +3,6 @@
     "name": "fullcalendar",
     "version": "2.3.15",
     "news": {
-      "2.3.15": {
-        "en": "Small UI fixes on widget",
-        "de": "Kleine UI fixiert auf Widget",
-        "ru": "Малые UI фиксации на виджете",
-        "pt": "Pequenas correções UI no widget",
-        "nl": "Kleine UI fixes op widget",
-        "fr": "Petite UI corrige sur widget",
-        "it": "Piccolo UI correzioni su widget",
-        "es": "Pequeña UI se fija en widget",
-        "pl": "Małe poprawki interfejsu użytkownika na widgecie",
-        "uk": "Маленькі UI виправляє на віджет",
-        "zh-cn": "部件上的小型 UI 修正"
-      },
       "2.3.10": {
         "en": "Small UI fixes",
         "de": "Kleine UI Fixes",

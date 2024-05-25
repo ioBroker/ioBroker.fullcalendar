@@ -611,7 +611,12 @@ const EventDialog = props => {
                         helperText={getText(object?.common.name || '', props.language)}
                         fullWidth
                     />
-                    <Button onClick={() => setIdDialog(true)}>...</Button>
+                    <Button
+                        disabled={props.readOnly || !event?.common.enabled}
+                        onClick={() => setIdDialog(true)}
+                    >
+                        ...
+                    </Button>
                 </div>
             </div>
             <div className={props.classes.field}>
