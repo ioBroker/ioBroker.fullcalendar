@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Aangevinkt betekent AAN, niet aangevinkt betekent UIT",
   "Object ID": "Object-ID",
   "Desired value": "Gewenste waarde",
-  "Description": "Beschrijving"
+  "Description": "Beschrijving",
+  "min": "min.",
+  "default": "standaard"
 }

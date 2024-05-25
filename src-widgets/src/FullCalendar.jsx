@@ -283,7 +283,7 @@ class FullCalendar extends Generic {
                 <Calendar
                     widget
                     systemConfig={this.props.systemConfig ? this.props.systemConfig.common : this.props.context.systemConfig?.common}
-                    key={this.state.rxData.viewMode}
+                    key={`${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`}
                     events={this.state.events || []}
                     socket={this.props.context.socket}
                     instance={this.state.rxData.instance}

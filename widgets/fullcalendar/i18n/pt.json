@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Marcado significa LIGADO, desmarcado significa DESLIGADO",
   "Object ID": "ID do objeto",
   "Desired value": "Valor desejado",
-  "Description": "Descrição"
+  "Description": "Descrição",
+  "min": "min.",
+  "default": "padrão"
 }

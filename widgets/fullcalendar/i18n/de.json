@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Aktiviert bedeutet EIN, deaktiviert bedeutet AUS",
   "Object ID": "Objekt Identifikation",
   "Desired value": "Gewünschter Wert",
-  "Description": "Beschreibung"
+  "Description": "Beschreibung",
+  "min": "Min.",
+  "default": "Standard"
 }

@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Selezionato significa ON, non selezionato significa OFF",
   "Object ID": "Identificativo dell'oggetto",
   "Desired value": "Valore desiderato",
-  "Description": "Descrizione"
+  "Description": "Descrizione",
+  "min": "min.",
+  "default": "predefinito"
 }

@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Coché signifie ON, décoché signifie OFF",
   "Object ID": "ID d'objet",
   "Desired value": "Valeur souhaitée",
-  "Description": "Description"
+  "Description": "Description",
+  "min": "min.",
+  "default": "défaut"
 }

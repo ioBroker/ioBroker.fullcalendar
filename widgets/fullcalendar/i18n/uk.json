@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Позначено означає УВІМКНЕНО, не позначено означає ВИМКНЕНО",
   "Object ID": "ID об'єкта",
   "Desired value": "Бажане значення",
-  "Description": "опис"
+  "Description": "опис",
+  "min": "хви.",
+  "default": "за замовчуванням"
 }

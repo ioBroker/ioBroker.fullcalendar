@@ -93,5 +93,7 @@
   "Checked means ON, unchecked means OFF": "Установленный флажок означает ВКЛ., снятый флажок означает ВЫКЛ.",
   "Object ID": "Идентификатор объекта",
   "Desired value": "Желаемое значение",
-  "Description": "Описание"
+  "Description": "Описание",
+  "min": "мин.",
+  "default": "по умолчанию"
 }

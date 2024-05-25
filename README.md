@@ -35,6 +35,9 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Small UI fixes on widget
+
 ### 2.3.10 (2024-05-22)
 * (bluefox) Small UI fixes
 
