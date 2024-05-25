@@ -53,6 +53,7 @@ class FullCalendar extends Generic {
                                 value={data.calendar}
                                 onChange={value => onDataChange({ calendar: value })}
                                 socket={props.context.socket}
+                                t={FullCalendar.t}
                             />,
                         default: '',
                     },
