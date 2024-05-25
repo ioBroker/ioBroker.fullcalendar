@@ -5,8 +5,6 @@ import { MenuItem, Select } from '@mui/material';
 
 import { I18n } from '@iobroker/adapter-react-v5';
 
-import { VisRxWidget } from '@iobroker/vis-2-widgets-react-dev';
-
 class CalendarsSelector extends React.Component {
     constructor(props) {
         super(props);
