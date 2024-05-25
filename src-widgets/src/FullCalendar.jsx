@@ -141,6 +141,7 @@ class FullCalendar extends Generic {
                 width: '100%',
                 height: 355,
                 position: 'relative',
+                absoluteWidth: 500,
             },
             visPrev: 'widgets/fullcalendar/img/prev_fullcalendar.png',
         };
