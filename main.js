@@ -176,28 +176,32 @@ function getObjectIcon(id, obj) {
     }
 }
 
-async function getImage(id) {
+async function getImage(idOrObj) {
     let obj;
-    if (typeof id === 'string') {
+    let id;
+    if (typeof idOrObj === 'string') {
+        id = idOrObj;
         if (imageCache[id] !== undefined) {
             return imageCache[id];
         }
         obj = await getForeignObjectAsyncCached(id);
     } else {
-        obj = id;
+        obj = idOrObj;
     }
     if (obj) {
         const stateId = obj._id;
         if (imageCache[stateId] !== undefined) {
             return imageCache[stateId];
         }
-        if (obj && obj.common && obj.common.icon) {
+
+        if (obj.common && obj.common.icon) {
             imageCache[stateId] = getObjectIcon(obj);
             return imageCache[stateId];
         } else if (obj.type === 'state') {
             // get parent name
             let parts = obj._id.split('.');
             parts.pop();
+
             let parentId = parts.join('.');
             obj = await getForeignObjectAsyncCached(parentId);
 
@@ -205,7 +209,7 @@ async function getImage(id) {
                 imageCache[stateId] = getObjectIcon(obj);
                 return imageCache[stateId];
             } else if (!obj || (obj.type === 'channel' || obj.type === 'device')) {
-                parts = obj._id.split('.');
+                parts = parentId.split('.');
                 parts.pop();
                 parentId = parts.join('.');
 
