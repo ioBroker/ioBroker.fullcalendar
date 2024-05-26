@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.16",
+    "version": "2.3.17",
     "news": {
+      "2.3.17": {
+        "en": "Corrected the simulation",
+        "de": "Die Simulation wurde korrigiert",
+        "ru": "Исправлено моделирование",
+        "pt": "Corrigido a simulação",
+        "nl": "Correctie van de simulatie",
+        "fr": "Correction de la simulation",
+        "it": "Corretto la simulazione",
+        "es": "Corregido la simulación",
+        "pl": "Korekta symulacji",
+        "uk": "Виправлено моделювання",
+        "zh-cn": "纠正了模拟"
+      },
       "2.3.16": {
         "en": "Small UI fixes on widget",
         "de": "Kleine UI fixiert auf Widget",

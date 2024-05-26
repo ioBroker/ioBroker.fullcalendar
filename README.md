@@ -35,7 +35,7 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 2.3.17 (2024-05-26)
 * (bluefox) Corrected the simulation
 
 ### 2.3.16 (2024-05-25)
