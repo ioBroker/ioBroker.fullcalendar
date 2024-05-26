@@ -122,5 +122,7 @@
   "Zoom": "Scale",
   "min": "min.",
   "Object ID": "Object ID",
-  "All": "All"
+  "All": "All",
+  "Description": "Description",
+  "First value": "First value"
 }

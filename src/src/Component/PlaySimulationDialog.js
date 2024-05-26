@@ -42,10 +42,26 @@ const PlaySimulationDialog = props => {
     return <Dialog open={!0} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Play simulation')}</DialogTitle>
         <DialogContent>
-            <div className={props.classes.field}>
-                <LocalizationProvider dateAdapter={AdapterMoment}>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+                <div className={props.classes.field} style={{ width: '100%', marginBottom: 20, marginTop: 10 }}>
                     <DateTimePicker
                         label="Start"
+                        sx={theme => ({
+                            borderBottom: `1px solid ${theme.palette.text.primary}`,
+                            '& fieldset': {
+                                display: 'none',
+                            },
+                            '& input': {
+                                padding: `${theme.spacing(1.5)} 0 4px 0`,
+                            },
+                            '& .MuiInputAdornment-root': {
+                                marginLeft: 0,
+                                marginTop: 1, // it is already in spaces
+                            },
+                            '& label': {
+                                transform: 'translate(0px, -9px) scale(0.75)',
+                            },
+                        })}
                         renderInput={params => <TextField {...params} variant="standard" />}
                         value={playSimulation.start}
                         onChange={date => setPlaySimulation({ ...playSimulation, start: date })}
@@ -54,28 +70,42 @@ const PlaySimulationDialog = props => {
                             style: { width: '100%' },
                         }}
                     />
-                </LocalizationProvider>
-                {playSimulation.start && <IconButton
-                    onClick={() => setPlaySimulation({ ...playSimulation, start: null })}
-                >
-                    <Delete />
-                </IconButton>}
-            </div>
-            <div className={props.classes.field}>
-                <LocalizationProvider dateAdapter={AdapterMoment}>
+                    {playSimulation.start && <IconButton
+                        onClick={() => setPlaySimulation({ ...playSimulation, start: null })}
+                    >
+                        <Delete />
+                    </IconButton>}
+                </div>
+                <div className={props.classes.field} style={{ width: '100%', marginBottom: 30 }}>
                     <DateTimePicker
                         label="End"
+                        sx={theme => ({
+                            borderBottom: `1px solid ${theme.palette.text.primary}`,
+                            '& fieldset': {
+                                display: 'none',
+                            },
+                            '& input': {
+                                padding: `${theme.spacing(1.5)} 0 4px 0`,
+                            },
+                            '& .MuiInputAdornment-root': {
+                                marginLeft: 0,
+                                marginTop: 1, // it is already in spaces
+                            },
+                            '& label': {
+                                transform: 'translate(0px, -9px) scale(0.75)',
+                            },
+                        })}
                         renderInput={params => <TextField {...params} variant="standard" />}
                         value={playSimulation.end}
                         onChange={date => setPlaySimulation({ ...playSimulation, end: date })}
                     />
-                </LocalizationProvider>
-                {playSimulation.end && <IconButton
-                    onClick={() => setPlaySimulation({ ...playSimulation, end: null })}
-                >
-                    <Delete />
-                </IconButton>}
-            </div>
+                    {playSimulation.end && <IconButton
+                        onClick={() => setPlaySimulation({ ...playSimulation, end: null })}
+                    >
+                        <Delete />
+                    </IconButton>}
+                </div>
+            </LocalizationProvider>
             <div>
                 <table>
                     <thead>

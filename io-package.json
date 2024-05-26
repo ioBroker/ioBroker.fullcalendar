@@ -1,8 +1,60 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.4",
+    "version": "2.3.17",
     "news": {
+      "2.3.17": {
+        "en": "Corrected the simulation",
+        "de": "Die Simulation wurde korrigiert",
+        "ru": "Исправлено моделирование",
+        "pt": "Corrigido a simulação",
+        "nl": "Correctie van de simulatie",
+        "fr": "Correction de la simulation",
+        "it": "Corretto la simulazione",
+        "es": "Corregido la simulación",
+        "pl": "Korekta symulacji",
+        "uk": "Виправлено моделювання",
+        "zh-cn": "纠正了模拟"
+      },
+      "2.3.16": {
+        "en": "Small UI fixes on widget",
+        "de": "Kleine UI fixiert auf Widget",
+        "ru": "Малые UI фиксации на виджете",
+        "pt": "Pequenas correções UI no widget",
+        "nl": "Kleine UI fixes op widget",
+        "fr": "Petite UI corrige sur widget",
+        "it": "Piccolo UI correzioni su widget",
+        "es": "Pequeña UI se fija en widget",
+        "pl": "Małe poprawki interfejsu użytkownika na widgecie",
+        "uk": "Маленькі UI виправляє на віджет",
+        "zh-cn": "部件上的小型 UI 修正"
+      },
+      "2.3.10": {
+        "en": "Small UI fixes",
+        "de": "Kleine UI Fixes",
+        "ru": "Маленькие UI исправления",
+        "pt": "Pequenas correções UI",
+        "nl": "Kleine UI-fixes",
+        "fr": "Petites corrections d'assurance-chômage",
+        "it": "Piccolo UI correzioni",
+        "es": "Pequeña UI",
+        "pl": "Małe poprawki interfejsu użytkownika",
+        "uk": "Маленькі UI кріплення",
+        "zh-cn": "小型 UI 修正"
+      },
+      "2.3.9": {
+        "en": "Corrected vis-2 widget",
+        "de": "Korrigiert vis-2 Widget",
+        "ru": "Исправленный виджет vis-2",
+        "pt": "Corrigido vis-2 widget",
+        "nl": "Gecorrigeerd vis-2 widget",
+        "fr": "Widget vis-2 corrigé",
+        "it": "Corretto vis-2 widget",
+        "es": "Corregido vis-2 widget",
+        "pl": "Poprawiony widżet vis-2",
+        "uk": "Corrected vis-2 віджет",
+        "zh-cn": "已校正相对 2 部件"
+      },
       "2.3.4": {
         "en": "Corrected monthly events",
         "de": "Berichtigte monatliche Ereignisse",
@@ -41,58 +93,6 @@
         "pl": "Kompatybilność z wizją-2",
         "uk": "Сумісність з вісом-2",
         "zh-cn": "A. 与-2的兼容性"
-      },
-      "2.2.2": {
-        "en": "Corrected stop of the recording",
-        "de": "Korrigierter Stopp der Aufnahme",
-        "ru": "Исправлена остановка записи",
-        "pt": "Parada correta da gravação",
-        "nl": "Vertaling:",
-        "fr": "Arrêt corrigé de l'enregistrement",
-        "it": "Stop corretto della registrazione",
-        "es": "Parada corregida de la grabación",
-        "pl": "Wykwalifikowany przystanek na nagrania",
-        "uk": "Виправлена зупинка запису",
-        "zh-cn": "更正"
-      },
-      "2.2.0": {
-        "en": "Added simulation of events",
-        "de": "Simulation von Ereignissen hinzugefügt",
-        "ru": "Добавлена симуляция событий",
-        "pt": "Adicionado simulação de eventos",
-        "nl": "Toegevoegd simulatie van gebeurtenissen",
-        "fr": "Ajout de la simulation des événements",
-        "it": "Aggiunta simulazione di eventi",
-        "es": "Se agregó simulación de eventos",
-        "pl": "Symulacja zdarzeń na temat wydarzeń",
-        "uk": "Додано моделювання подій",
-        "zh-cn": "增加事件模拟"
-      },
-      "2.0.8": {
-        "en": "Corrected vis-2 widgets",
-        "de": "Korrigierte vis-2 Widgets",
-        "ru": "Исправленные виджеты vis-2",
-        "pt": "Vis-2 widgets corrigidos",
-        "nl": "Vertaling:",
-        "fr": "Widgets vis-2 corrigés",
-        "it": "Corretti widget vis-2",
-        "es": "Widgets corregidos vis-2",
-        "pl": "Poprawa wizy 2",
-        "uk": "Виправлено vis-2 віджети",
-        "zh-cn": "更正"
-      },
-      "2.0.6": {
-        "en": "Corrected vis-2 widgets",
-        "de": "Korrigierte vis-2 Widgets",
-        "ru": "Исправленные виджеты vis-2",
-        "pt": "Vis-2 widgets corrigidos",
-        "nl": "Vertaling:",
-        "fr": "Widgets vis-2 corrigés",
-        "it": "Corretti widget vis-2",
-        "es": "Widgets corregidos vis-2",
-        "pl": "Poprawa wizy 2",
-        "uk": "Виправлено vis-2 віджети",
-        "zh-cn": "更正"
       }
     },
     "title": "Calendar schedule",
