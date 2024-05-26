@@ -53,6 +53,7 @@ class FullCalendar extends Generic {
                                 value={data.calendar}
                                 onChange={value => onDataChange({ calendar: value })}
                                 socket={props.context.socket}
+                                t={FullCalendar.t}
                             />,
                         default: '',
                     },
@@ -140,6 +141,7 @@ class FullCalendar extends Generic {
                 width: '100%',
                 height: 355,
                 position: 'relative',
+                absoluteWidth: 500,
             },
             visPrev: 'widgets/fullcalendar/img/prev_fullcalendar.png',
         };
@@ -283,7 +285,7 @@ class FullCalendar extends Generic {
                 <Calendar
                     widget
                     systemConfig={this.props.systemConfig ? this.props.systemConfig.common : this.props.context.systemConfig?.common}
-                    key={this.state.rxData.viewMode}
+                    key={`${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`}
                     events={this.state.events || []}
                     socket={this.props.context.socket}
                     instance={this.state.rxData.instance}

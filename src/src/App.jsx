@@ -1,8 +1,7 @@
 import React from 'react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
-import GenericApp from '@iobroker/adapter-react-v5/GenericApp';
-import { Loader } from '@iobroker/adapter-react-v5';
+import { Loader, GenericApp } from '@iobroker/adapter-react-v5';
 
 import CalendarManager from './Component/CalendarManager';
 
@@ -40,7 +39,7 @@ class App extends GenericApp {
         if (!this.state.loaded) {
             return <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
-                    <Loader theme={this.state.themeType} />
+                    <Loader themeType={this.state.themeType} />
                 </ThemeProvider>
             </StyledEngineProvider>;
         }
@@ -53,6 +52,7 @@ class App extends GenericApp {
                         socket={this.socket}
                         instance={this.instance}
                         alive={this.state.alive}
+                        themeType={this.state.themeType}
                     />
                 </div>
             </ThemeProvider>

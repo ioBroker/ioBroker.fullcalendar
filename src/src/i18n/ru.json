@@ -41,9 +41,9 @@
   "Interval": "Интервал",
   "Name": "Имя",
   "Ok": "Хорошо",
-  "Play": "Играть",
-  "Play simulation": "Играть в симулятор",
-  "Record": "Записывать",
+  "Play": "Проиграть",
+  "Play simulation": "Проиграть симуляцию",
+  "Record": "Записать",
   "Record simulation": "Запись симуляции",
   "Record simulation description": "Записать описание симуляции",
   "Select enums": "Выберите перечисления",
@@ -122,5 +122,7 @@
   "Zoom": "Масштаб",
   "min": "мин.",
   "Object ID": "Идентификатор объекта",
-  "All": "Все"
+  "All": "Все",
+  "Description": "Описание",
+  "First value": "Первое значение"
 }

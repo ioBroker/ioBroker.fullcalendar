@@ -79,7 +79,10 @@ const EnumsDialog = props => {
                 try {
                     _statesObjects[id] = await getCachedObject(id, props.socket);
                     if (_statesObjects[id]?.common) {
-                        _statesObjects[id].common.icon = await getIconAsync(id, props.socket);
+                        if (!_statesObjects[id].common.iconConverted) {
+                            _statesObjects[id].common.iconConverted = true;
+                            _statesObjects[id].common.icon = await getIconAsync(id, props.socket);
+                        }
                     }
 
                     if (_statesObjects[id] && (_statesObjects[id].type === 'channel' || _statesObjects[id].type === 'device')) {
@@ -97,7 +100,10 @@ const EnumsDialog = props => {
                                 _statesObjects[sid] = subStates[sid];
                                 // find icon
                                 if (_statesObjects[sid]?.common) {
-                                    _statesObjects[sid].common.icon = await getIconAsync(sid, props.socket);
+                                    if (!_statesObjects[sid].common.iconConverted) {
+                                        _statesObjects[sid].common.iconConverted = true;
+                                        _statesObjects[sid].common.icon = await getIconAsync(sid, props.socket);
+                                    }
                                 }
                             }
                         }
@@ -187,6 +193,7 @@ const EnumsDialog = props => {
 
     useEffect(() => {
         setWorking(true);
+
         (async () => {
             const _enumsObjects = props.enumsObjects || enumsObjects || (await props.socket.getEnums());
             if (!enumsObjects) {

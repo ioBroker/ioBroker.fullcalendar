@@ -80,6 +80,7 @@
   "30 min": "30 min.",
   "45 min": "45 min.",
   "1 hour": "1 hour",
+  "min": "min.",
   "Today %s is at %s.": "Today \"%s\" is at %s.",
   "With offset at %s.": "With offset at %s.",
   "1.5 hours": "1.5 hours",
@@ -92,5 +93,7 @@
   "All": "All",
   "Checked means ON, unchecked means OFF": "Checked means ON, unchecked means OFF",
   "Object ID": "Object ID",
-  "Desired value": "Desired value"
+  "Desired value": "Desired value",
+  "Description": "Description",
+  "default": "default"
 }
