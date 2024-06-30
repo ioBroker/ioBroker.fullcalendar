@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 
 import {
@@ -18,7 +17,7 @@ import {
     Remove,
 } from '@mui/icons-material';
 
-import { I18n, TextWithIcon, Utils } from '@iobroker/adapter-react-v5';
+import { I18n, TextWithIcon } from '@iobroker/adapter-react-v5';
 
 import {
     IGNORE_STATES,
@@ -27,7 +26,7 @@ import {
     buildOverlap,
 } from './Utils';
 
-const style = {
+const styles = {
     accordion: {
         paddingLeft: 20,
     },
@@ -133,7 +132,7 @@ const EnumsDialog = props => {
 
         const label = <div>
             <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} />
-            {statesObjects[id] ? <div className={props.classes.chipSubText}>{id}</div> : null}
+            {statesObjects[id] ? <div style={styles.chipSubText}>{id}</div> : null}
         </div>;
 
         return <Chip
@@ -150,7 +149,10 @@ const EnumsDialog = props => {
                 setExceptions(_exceptions);
             }}
             deleteIcon={exceptions.includes(id) ? <Add title={I18n.t('Include to list again')} /> : <Remove title={I18n.t('Exclude from list')} />}
-            className={Utils.clsx(props.classes.chip, exceptions.includes(id) && props.classes.chipException)}
+            style={{
+                ...styles.chip,
+                ...(exceptions.includes(id) ? styles.chipException : undefined),
+            }}
         />;
     };
 
@@ -232,7 +234,7 @@ const EnumsDialog = props => {
 
         return <div style={{ borderTop: '1px dashed grey', marginTop: 4 }} key={tree.object._id}>
             <Accordion
-                className={props.classes.accordion}
+                style={styles.accordion}
                 expanded={expanded.includes(tree.object._id)}
                 onClick={e => {
                     e.stopPropagation();
@@ -247,10 +249,10 @@ const EnumsDialog = props => {
                     setExpanded(_expanded);
                 }}
             >
-                <AccordionSummary expandIcon={<ExpandMore />} className={props.classes.accordionSummary}>
+                <AccordionSummary expandIcon={<ExpandMore />} style={styles.accordionSummary}>
                     <TextWithIcon value={tree.object} lang={I18n.getLanguage()} />
                 </AccordionSummary>
-                <AccordionDetails className={props.classes.accordionDetails}>
+                <AccordionDetails style={styles.accordionDetails}>
                     {Object.keys(tree.items).map(key => renderEnums(tree.items[key]))}
                 </AccordionDetails>
             </Accordion>
@@ -268,7 +270,7 @@ const EnumsDialog = props => {
                     flexDirection: 'row',
                 }}
             >
-                <Paper className={props.classes.content}>
+                <Paper style={styles.content}>
                     {enumsTree.items?.enum && Object.keys(enumsTree.items.enum.items).map(id => renderEnums(enumsTree.items.enum.items[id], id))}
                 </Paper>
                 <div style={{ marginLeft: 8, overflow: 'auto' }}>
@@ -308,9 +310,8 @@ EnumsDialog.propTypes = {
     onSelect: PropTypes.func,
     selectedEnums: PropTypes.array,
     socket: PropTypes.object,
-    classes: PropTypes.object,
     enumsObjects: PropTypes.object,
     exceptions: PropTypes.array,
 };
 
-export default withStyles(style)(EnumsDialog);
+export default EnumsDialog;

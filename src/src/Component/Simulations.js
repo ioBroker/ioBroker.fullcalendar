@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 
@@ -16,7 +15,7 @@ import {
     DialogActions,
     DialogContentText,
     DialogContent,
-    Dialog, DialogTitle,
+    Dialog, DialogTitle, Box,
 } from '@mui/material';
 
 import {
@@ -28,14 +27,14 @@ import {
 } from '@mui/icons-material';
 
 import {
-    I18n, Utils, Confirm, TextWithIcon,
+    I18n, Confirm, TextWithIcon,
 } from '@iobroker/adapter-react-v5';
 
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
 import PlaySimulationDialog from './PlaySimulationDialog';
 
-const style = theme => ({
+const styles = {
     container: {
         display: 'flex',
         width: '100%',
@@ -65,23 +64,25 @@ const style = theme => ({
     divider: {
         flexGrow: 1,
     },
-    toolbar: {
+    toolbar: theme => ({
         backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
         padding: '2px 5px',
-    },
-    simulations: {
+    }),
+    simulations: theme => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#131b2680' : '#b6d3ff80',
-    },
+    }),
     tabRoot: {
         padding: '0 6px',
     },
-    alert: {
-        color: theme.palette.error.main,
-    },
-    selected: {
+    alert: theme => ({
+        '& svg': {
+            color: theme.palette.error.main,
+        },
+    }),
+    selected: theme => ({
         backgroundColor: theme.palette.primary.main,
         color: 'white !important',
-    },
+    }),
     eventsCount: {
         position: 'absolute',
         right: 5,
@@ -93,7 +94,7 @@ const style = theme => ({
     tooltip: {
         pointerEvents: 'none',
     },
-});
+};
 
 const Simulations = props => {
     const [simulations, setSimulations] = useState([]);
@@ -190,8 +191,8 @@ const Simulations = props => {
         props.socket.setState(id, 'play');
     };
 
-    const toCalendar = <div className={props.classes.toCalendar}>
-        <Tooltip title={I18n.t('You can export events to static calender')} classes={{ popper: props.classes.tooltip }}>
+    const toCalendar = <div style={styles.toCalendar}>
+        <Tooltip title={I18n.t('You can export events to static calender')} componentsProps={{ popper: { sx: styles.tooltip } }}>
             <Button
                 variant="contained"
                 onClick={async () => {
@@ -221,7 +222,7 @@ const Simulations = props => {
         </Tooltip>
     </div>;
 
-    return <div className={Utils.clsx(props.classes.container, props.classes.simulations)}>
+    return <Box component="div" style={styles.container} sx={styles.simulations}>
         <div>
             {dialogSimulation && <SimulationDialog
                 socket={props.socket}
@@ -305,16 +306,16 @@ const Simulations = props => {
                     setStopRecordDialog(false);
                 }}
             />}
-            <Paper className={props.classes.calendarsPaper}>
+            <Paper style={styles.calendarsPaper}>
                 <Tabs
                     value={1}
                     onChange={props.changeCalendarType}
-                    className={props.classes.tabs}
+                    style={styles.tabs}
                 >
                     <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
-                    <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} className={props.classes.simulations} />
+                    <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} style={styles.simulations} />
                 </Tabs>
-                <Toolbar variant="dense" className={props.classes.toolbar}>
+                <Toolbar variant="dense" sx={styles.toolbar}>
                     <Fab
                         color="primary"
                         size="small"
@@ -353,8 +354,10 @@ const Simulations = props => {
                     >
                         <Add />
                     </Fab>
-                    <div className={props.classes.divider} />
-                    {!props.alive && <Tooltip title={I18n.t('Instance inactive')} classes={{ popper: props.classes.tooltip }}><Alert className={props.classes.alert} /></Tooltip>}
+                    <div style={styles.divider} />
+                    {!props.alive && <Tooltip title={I18n.t('Instance inactive')} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                        <Box component="span" sx={styles.alert}><Alert /></Box>
+                    </Tooltip>}
                 </Toolbar>
                 <Tabs
                     value={(selectedSimulation ? (simulations.find(s => s._id === selectedSimulation) ? selectedSimulation : simulations[0]?._id) : simulations[0]?._id) || ''}
@@ -363,120 +366,121 @@ const Simulations = props => {
                         setSelectedSimulation(value);
                     }}
                     orientation="vertical"
-                    className={props.classes.tabs}
+                    style={styles.tabs}
                 >
                     {simulations.map(simulation => <Tab
-                        classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
+                        sx={{
+                            ...styles.tabRoot,
+                            '& .MuiTab-selected': styles.selected,
+                        }}
                         component="div"
                         value={simulation._id}
-                        label={
-                            <div className={props.classes.label}>
-                                <TextWithIcon value={simulation} lang={I18n.getLanguage()} />
-                                <div className={props.classes.divider} />
-                                <Tooltip title={I18n.t('Edit name and settings')} classes={{ popper: props.classes.tooltip }}>
-                                    <IconButton
-                                        className="edit"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setDialogSimulation(simulation._id);
-                                        }}
-                                        size="small"
-                                    >
-                                        <Edit />
-                                    </IconButton>
-                                </Tooltip>
-                                {simulationStates[simulation._id] === 'stop' &&
-                                    <Tooltip title={I18n.t('Start recording')} classes={{ popper: props.classes.tooltip }}>
-                                        <span>
-                                            <IconButton
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    if (simulation.native.events.length) {
-                                                        setRecordDialog(simulation._id);
-                                                    } else {
-                                                        await recordSimulation(simulation._id);
-                                                    }
-                                                }}
-                                                size="small"
-                                            >
-                                                <FiberManualRecord />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                {simulationStates[simulation._id] === 'stop' && simulation.native.events.length > 0 &&
-                                    <Tooltip title={I18n.t('Start playing')} classes={{ popper: props.classes.tooltip }}>
-                                        <span>
-                                            <IconButton
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    setDialogSimulationPlay(simulation._id);
-                                                }}
-                                                size="small"
-                                            >
-                                                <PlayArrow />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                {(simulationStates[simulation._id] === 'record' || simulationStates[simulation._id] === 'pause') &&
-                                    <Tooltip title={I18n.t('Stop recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))} classes={{ popper: props.classes.tooltip }}>
-                                        <span style={{ opacity: simulationStates[simulation._id] === 'pause' ? 0.5 : 1 }}>
-                                            <IconButton
-                                                disabled={simulationStates[simulation._id] === 'pause'}
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    setStopRecordDialog(simulation._id);
-                                                }}
-                                                size="small"
-                                            >
-                                                <Stop style={{ color: 'red' }} />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                {simulationStates[simulation._id] === 'play' &&
-                                    <Tooltip title={I18n.t('Stop playing')} classes={{ popper: props.classes.tooltip }}>
-                                        <span>
-                                            <IconButton
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    props.socket.setState(simulation._id, 'stop');
-                                                }}
-                                                size="small"
-                                            >
-                                                <Stop style={{ color: 'green' }} />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                {simulationStates[simulation._id] === 'record' &&
-                                    <Tooltip title={I18n.t('Pause recording')} classes={{ popper: props.classes.tooltip }}>
-                                        <span>
-                                            <IconButton
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    props.socket.setState(simulation._id, 'pause');
-                                                }}
-                                                size="small"
-                                            >
-                                                <Pause />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                {simulationStates[simulation._id] === 'pause' &&
-                                    <Tooltip title={I18n.t('Resume recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))} classes={{ popper: props.classes.tooltip }}>
-                                        <span>
-                                            <IconButton
-                                                onClick={async e => {
-                                                    e.stopPropagation();
-                                                    props.socket.setState(simulation._id, 'record');
-                                                }}
-                                                size="small"
-                                            >
-                                                <Pause style={{ color: 'yellow' }} />
-                                            </IconButton>
-                                        </span>
-                                    </Tooltip>}
-                                <div className={props.classes.eventsCount}>{simulation.native.events?.length}</div>
-                            </div>
-                        }
+                        label={<Box component="div" sx={styles.label}>
+                            <TextWithIcon value={simulation} lang={I18n.getLanguage()} />
+                            <div style={styles.divider} />
+                            <Tooltip title={I18n.t('Edit name and settings')} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                <IconButton
+                                    className="edit"
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        setDialogSimulation(simulation._id);
+                                    }}
+                                    size="small"
+                                >
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
+                            {simulationStates[simulation._id] === 'stop' &&
+                                <Tooltip title={I18n.t('Start recording')} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                    <span>
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                if (simulation.native.events.length) {
+                                                    setRecordDialog(simulation._id);
+                                                } else {
+                                                    await recordSimulation(simulation._id);
+                                                }
+                                            }}
+                                            size="small"
+                                        >
+                                            <FiberManualRecord />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>}
+                            {simulationStates[simulation._id] === 'stop' && simulation.native.events.length > 0 &&
+                                <Tooltip title={I18n.t('Start playing')} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                    <span>
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                setDialogSimulationPlay(simulation._id);
+                                            }}
+                                            size="small"
+                                        >
+                                            <PlayArrow />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>}
+                            {(simulationStates[simulation._id] === 'record' || simulationStates[simulation._id] === 'pause') &&
+                                <Tooltip title={I18n.t('Stop recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                    <span style={{ opacity: simulationStates[simulation._id] === 'pause' ? 0.5 : 1 }}>
+                                        <IconButton
+                                            disabled={simulationStates[simulation._id] === 'pause'}
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                setStopRecordDialog(simulation._id);
+                                            }}
+                                            size="small"
+                                        >
+                                            <Stop style={{ color: 'red' }} />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>}
+                            {simulationStates[simulation._id] === 'play' &&
+                                <Tooltip title={I18n.t('Stop playing')} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                    <span>
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                props.socket.setState(simulation._id, 'stop');
+                                            }}
+                                            size="small"
+                                        >
+                                            <Stop style={{ color: 'green' }} />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>}
+                            {simulationStates[simulation._id] === 'record' &&
+                                <Tooltip title={I18n.t('Pause recording')} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                    <span>
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                props.socket.setState(simulation._id, 'pause');
+                                            }}
+                                            size="small"
+                                        >
+                                            <Pause />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>}
+                            {simulationStates[simulation._id] === 'pause' &&
+                                <Tooltip title={I18n.t('Resume recording. Recording till %s', moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'))} componentsProps={{ popper: { sx: styles.tooltip } }}>
+                                    <span>
+                                        <IconButton
+                                            onClick={async e => {
+                                                e.stopPropagation();
+                                                props.socket.setState(simulation._id, 'record');
+                                            }}
+                                            size="small"
+                                        >
+                                            <Pause style={{ color: 'yellow' }} />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>}
+                            <div style={styles.eventsCount}>{simulation.native.events?.length}</div>
+                        </Box>}
                         key={simulation._id}
                     />)}
                 </Tabs>
@@ -505,17 +509,16 @@ const Simulations = props => {
                 button={toCalendar}
             />
         </div>}
-    </div>;
+    </Box>;
 };
 
 Simulations.propTypes = {
     socket: PropTypes.object.isRequired,
     instance: PropTypes.any.isRequired,
     systemConfig: PropTypes.object.isRequired,
-    classes: PropTypes.object.isRequired,
     updateCalendars: PropTypes.func.isRequired,
     changeCalendarType: PropTypes.func.isRequired,
     setCalendarPrefix: PropTypes.func.isRequired,
 };
 
-export default withStyles(style)(Simulations);
+export default Simulations;

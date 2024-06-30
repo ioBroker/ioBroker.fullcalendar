@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import { v4 as uuidv4 } from 'uuid';
 import ReactSplit, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 
 import {
-    IconButton, Tab, Tabs, Paper, Tooltip, Toolbar, Fab,
+    IconButton, Tab, Tabs,
+    Paper, Tooltip, Toolbar, Fab, Box,
 } from '@mui/material';
 
 import {
@@ -22,7 +22,7 @@ import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog from './CalendarDialog';
 
-const style = theme => ({
+const style = {
     tabs: {
     },
     column: {
@@ -40,10 +40,10 @@ const style = theme => ({
     container: {
         display: 'flex', width: '100%', flex: 1,
     },
-    toolbar: {
+    toolbar: theme => ({
         backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
         padding: '2px 5px',
-    },
+    }),
     label: {
         width: '100%',
         textAlign: 'left',
@@ -59,20 +59,23 @@ const style = theme => ({
     divider: {
         flexGrow: 1,
     },
-    simulations: {
+    simulations: theme => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#131b2680' : '#b6d3ff80',
-    },
+    }),
     tabRoot: {
         padding: '0 6px',
         maxWidth: '100%',
     },
-    alert: {
-        color: theme.palette.error.main,
-    },
-    selected: {
+    alert: theme => ({
+        display: 'inline-block',
+        '& svg': {
+            color: theme.palette.error.main,
+        },
+    }),
+    selected: theme => ({
         backgroundColor: theme.palette.primary.main,
         color: 'white !important',
-    },
+    }),
     tooltip: {
         pointerEvents: 'none',
     },
@@ -84,7 +87,7 @@ const style = theme => ({
         opacity: 0.7,
         fontStyle: 'italic',
     },
-});
+};
 
 const CalendarManager = props => {
     const [calendarPrefix, setCalendarPrefix] = useState(window.localStorage.getItem('fullcalendar.calendar') || `fullcalendar.${props.instance}`);
@@ -132,7 +135,7 @@ const CalendarManager = props => {
         };
     }, []);
 
-    return <div className={props.classes.column}>
+    return <div style={styles.column}>
         {isSimulations ? <Simulations
             systemConfig={props.systemConfig}
             socket={props.socket}
@@ -142,7 +145,7 @@ const CalendarManager = props => {
             setCalendarPrefix={setCalendarPrefix}
             alive={alive}
         /> :
-            <div className={props.classes.container}>
+            <div style={styles.container}>
                 <ReactSplit
                     direction={SplitDirection.Horizontal}
                     initialSizes={splitSizes}
@@ -154,17 +157,17 @@ const CalendarManager = props => {
                     theme={props.themeType === 'dark' ? GutterTheme.Dark : GutterTheme.Light}
                     gutterClassName={props.themeType === 'dark' ? 'Dark visGutter' : 'Light visGutter'}
                 >
-                    <div className={props.classes.calendars}>
-                        <Paper className={props.classes.calendarsPaper}>
+                    <div style={styles.calendars}>
+                        <Paper style={styles.calendarsPaper}>
                             <Tabs
                                 value={0}
                                 onChange={changeCalendarType}
-                                className={props.classes.tabs}
+                                style={styles.tabs}
                             >
                                 <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
-                                <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} className={props.classes.simulations} />
+                                <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} sx={styles.simulations} />
                             </Tabs>
-                            <Toolbar variant="dense" className={props.classes.toolbar}>
+                            <Toolbar variant="dense" sx={styles.toolbar}>
                                 <Fab
                                     size="small"
                                     title={I18n.t('Add new calendar')}
@@ -187,8 +190,15 @@ const CalendarManager = props => {
                                 >
                                     <Add />
                                 </Fab>
-                                <div className={props.classes.divider} />
-                                {!alive && <Tooltip title={I18n.t('Instance inactive')} classes={{ popper: props.classes.tooltip }}><Alert className={props.classes.alert} /></Tooltip>}
+                                <div style={styles.divider} />
+                                {!alive && <Tooltip
+                                    title={I18n.t('Instance inactive')}
+                                    componentsProps={{ popper: { sx: styles.tooltip } }}
+                                >
+                                    <Box component="div" sx={styles.alert}>
+                                        <Alert />
+                                    </Box>
+                                </Tooltip>}
                             </Toolbar>
                             <Tabs
                                 value={calendars.find(c => c._id === calendarPrefix) ? calendarPrefix : `fullcalendar.${props.instance}`}
@@ -196,24 +206,30 @@ const CalendarManager = props => {
                                     window.localStorage.setItem('fullcalendar.calendar', value);
                                     setCalendarPrefix(value);
                                 }}
-                                className={props.classes.tabs}
+                                style={styles.tabs}
                                 orientation="vertical"
                             >
                                 <Tab
-                                    classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
-                                    label={<div className={props.classes.label}>
+                                    sx={{
+                                        ...styles.tabRoot,
+                                        '& .MuiTab-selected': styles.selected,
+                                    }}
+                                    label={<Box component="div" sx={styles.label}>
                                         {I18n.t('Default')}
-                                    </div>}
+                                    </Box>}
                                     value={`fullcalendar.${props.instance}`}
                                 />
                                 {calendars.map(calendar => <Tab
                                     component="div"
                                     key={calendar._id}
-                                    classes={{ root: props.classes.tabRoot, selected: props.classes.selected }}
-                                    label={<div className={props.classes.label}>
+                                    sx={{
+                                        ...styles.tabRoot,
+                                        '& .MuiTab-selected': styles.selected,
+                                    }}
+                                    label={<Box component="div" sx={styles.label}>
                                         {calendar.common.name}
-                                        <div className={props.classes.divider} />
-                                        <Tooltip title={I18n.t('Edit name or delete calendar')} classes={{ popper: props.classes.tooltip }}>
+                                        <div style={styles.divider} />
+                                        <Tooltip title={I18n.t('Edit name or delete calendar')} componentsProps={{ popper: { sx: styles.tooltip } }}>
                                             <IconButton
                                                 size="small"
                                                 className="edit"
@@ -225,7 +241,7 @@ const CalendarManager = props => {
                                                 <Edit />
                                             </IconButton>
                                         </Tooltip>
-                                    </div>}
+                                    </Box>}
                                     value={calendar._id}
                                 />)}
                             </Tabs>
@@ -258,7 +274,6 @@ CalendarManager.propTypes = {
     socket: PropTypes.object.isRequired,
     instance: PropTypes.any.isRequired,
     systemConfig: PropTypes.object.isRequired,
-    classes: PropTypes.object.isRequired,
     themeType: PropTypes.string,
 };
 

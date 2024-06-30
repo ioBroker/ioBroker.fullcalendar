@@ -1,4 +1,3 @@
-import { withStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -49,12 +48,8 @@ const styles = {
     headers: {
         marginBottom: -5,
     },
-    '@keyframes blinker': {
-        from: { opacity: 'red' },
-        to: { color: 'inherit' },
-    },
     blink: {
-        animationName: '$blinker',
+        animationName: 'fullcalendar-blinker',
         animationDuration: '1s',
         animationTimingFunction: 'linear',
         animationIterationCount: 'infinite',
@@ -156,14 +151,14 @@ const SimulationDialog = props => {
 
         const label = <div>
             <TextWithIcon value={statesObjects[id] || id} title={id} lang={I18n.getLanguage()} />
-            <div className={props.classes.chipSubText}>{id}</div>
+            <div style={styles.chipSubText}>{id}</div>
         </div>;
 
         return <Chip
             onDelete={onDelete}
             label={label}
             key={id}
-            className={props.classes.chip}
+            style={styles.chip}
         />;
     };
 
@@ -177,9 +172,21 @@ const SimulationDialog = props => {
     );
 
     return <Dialog open={!0} onClose={props.onClose}>
+        <style>
+            {`
+@keyframes fullcalendar-blinker {
+    from {
+        opacity: red;
+    }
+    to {
+        color: inherit;
+    }
+}
+`}
+        </style>
         <DialogTitle>{I18n.t('Edit simulation')}</DialogTitle>
         <DialogContent>
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 <TextField
                     label={I18n.t('Name')}
                     value={simulation.common.name || ''}
@@ -212,7 +219,7 @@ const SimulationDialog = props => {
                     </Select>
                 </FormControl>
             </div>
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 <ColorPicker
                     label={I18n.t('Default color')}
                     value={simulation.common.color}
@@ -223,11 +230,11 @@ const SimulationDialog = props => {
                     }}
                 />
             </div>
-            <h4 className={props.classes.headers}>
+            <h4 style={styles.headers}>
                 {I18n.t('States')}
-                <Tooltip title={I18n.t('Add states for recording')} classes={{ popper: props.classes.tooltip }}>
+                <Tooltip title={I18n.t('Add states for recording')} componentsProps={{ popper: { sx: styles.tooltip } }}>
                     <IconButton
-                        className={!enumStates.length && simulation?.native?.record?.states?.length ? props.classes.blink : ''}
+                        style={!enumStates.length && simulation?.native?.record?.states?.length ? styles.blink : undefined}
                         size="small"
                         onClick={() => setIdDialog(true)}
                         color="primary"
@@ -243,11 +250,11 @@ const SimulationDialog = props => {
                     setSimulation(_simulation);
                 }))}
             </div>
-            <h4 className={props.classes.headers}>
+            <h4 style={styles.headers}>
                 {I18n.t('Categories')}
-                <Tooltip title={I18n.t('Add overlap of categories for recording')} classes={{ popper: props.classes.tooltip }}>
+                <Tooltip title={I18n.t('Add overlap of categories for recording')} componentsProps={{ popper: { sx: styles.tooltip } }}>
                     <IconButton
-                        className={!enumStates.length && simulation?.native?.record?.states?.length ? props.classes.blink : ''}
+                        style={!enumStates.length && simulation?.native?.record?.states?.length ? styles.blink : undefined}
                         size="small"
                         onClick={() => setEnumsDialog(true)}
                         color="primary"
@@ -271,8 +278,8 @@ const SimulationDialog = props => {
                         }}
                         label={label}
                         key={i}
-                        classes={{ label: props.classes.chipLabel }}
-                        className={props.classes.chip}
+                        sx={{ '& .MuiChip-label': styles.chipLabel }}
+                        style={styles.chip}
                     />;
                 })}
             </div>
@@ -385,4 +392,4 @@ SimulationDialog.propTypes = {
     socket: PropTypes.object,
 };
 
-export default withStyles(styles)(SimulationDialog);
+export default SimulationDialog;

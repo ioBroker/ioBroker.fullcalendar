@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/locale/de';
 import 'moment/locale/ru';
@@ -9,14 +11,13 @@ import 'moment/locale/nl';
 import 'moment/locale/pl';
 import 'moment/locale/pt';
 import 'moment/locale/uk';
-import { I18n } from '@iobroker/adapter-react-v5';
 import {
-    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField,
+    Button, Checkbox, Dialog, DialogActions,
+    DialogContent, DialogTitle, IconButton, TextField,
+    Box,
 } from '@mui/material';
-import { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Cancel, Delete, PlayCircle } from '@mui/icons-material';
-import { withStyles } from '@mui/styles';
+import { I18n } from '@iobroker/adapter-react-v5';
 
 const { LocalizationProvider, DateTimePicker } = require('@mui/x-date-pickers');
 const { AdapterMoment } = require('@mui/x-date-pickers/AdapterMoment');
@@ -43,7 +44,7 @@ const PlaySimulationDialog = props => {
         <DialogTitle>{I18n.t('Play simulation')}</DialogTitle>
         <DialogContent>
             <LocalizationProvider dateAdapter={AdapterMoment}>
-                <div className={props.classes.field} style={{ width: '100%', marginBottom: 20, marginTop: 10 }}>
+                <Box component="div" sx={styles.field} style={{ width: '100%', marginBottom: 20, marginTop: 10 }}>
                     <DateTimePicker
                         label="Start"
                         sx={theme => ({
@@ -75,8 +76,8 @@ const PlaySimulationDialog = props => {
                     >
                         <Delete />
                     </IconButton>}
-                </div>
-                <div className={props.classes.field} style={{ width: '100%', marginBottom: 30 }}>
+                </Box>
+                <Box component="div" sx={styles.field} style={{ width: '100%', marginBottom: 30 }}>
                     <DateTimePicker
                         label="End"
                         sx={theme => ({
@@ -104,7 +105,7 @@ const PlaySimulationDialog = props => {
                     >
                         <Delete />
                     </IconButton>}
-                </div>
+                </Box>
             </LocalizationProvider>
             <div>
                 <table>
@@ -112,7 +113,7 @@ const PlaySimulationDialog = props => {
                         <tr>
                             {[0, 1, 2, 3, 4, 5, 6].map(value => <td
                                 key={value}
-                                className={props.classes.tableCell}
+                                style={styles.tableCell}
                             >
                                 {moment().day(value).format('ddd')}
                             </td>)}
@@ -171,4 +172,4 @@ PlaySimulationDialog.propTypes = {
     readOnly: PropTypes.bool,
 };
 
-export default withStyles(styles)(PlaySimulationDialog);
+export default PlaySimulationDialog;

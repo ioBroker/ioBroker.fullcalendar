@@ -6,7 +6,6 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
-import { withStyles, withTheme } from '@mui/styles';
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -460,10 +459,10 @@ function Calendar(props) {
             simulationId={props.simulationId}
             simulation={props.simulation}
         /> : null}
-        <div className={props.classes.container}>
-            {!props.hideLeftBlock && !props.readOnly && <div className={props.classes.leftBlock}>
-                <Paper elevation={4} className={props.classes.leftPaper}>
-                    <div className={props.classes.leftContent}>
+        <div style={styles.container}>
+            {!props.hideLeftBlock && !props.readOnly && <div style={styles.leftBlock}>
+                <Paper elevation={4} style={styles.leftPaper}>
+                    <div style={styles.leftContent}>
                         <h4>{props.t('Events')}</h4>
                         {_eventTypes.map((type, index) =>
                             <DraggableButton
@@ -475,11 +474,11 @@ function Calendar(props) {
                                 color={props.isSimulation ? props.simulation?.common?.color : undefined}
                             />)}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Drag and drop the events above to create a new one.')}</div>}
-                        {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
+                        {props.hideLeftBlockHint ? null : <hr style={styles.hr} />}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use ALT by dragging it to copy the events.')}</div>}
-                        {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
+                        {props.hideLeftBlockHint ? null : <hr style={styles.hr} />}
                         {props.hideLeftBlockHint ? null : <div>{props.t('Use double click on calendar to add new events.')}</div>}
-                        {props.hideLeftBlockHint ? null : <hr className={props.classes.hr} />}
+                        {props.hideLeftBlockHint ? null : <hr style={styles.hr} />}
                         {props.hideLeftBlockHint || currentView === 'dayGridMonth' || currentView === 'listMonth' ? null : <FormControl fullWidth variant="standard">
                             <InputLabel>{props.t('Zoom')}</InputLabel>
                             <Select
@@ -497,7 +496,7 @@ function Calendar(props) {
                             >
                                 {MINUTES.map(minute => <MenuItem key={minute} value={minute}>
                                     {minute}
-                                    <span className={props.classes.leftMargin}>{props.t('min')}</span>
+                                    <span style={styles.leftMargin}>{props.t('min')}</span>
                                 </MenuItem>)}
                             </Select>
                         </FormControl>}
@@ -505,8 +504,8 @@ function Calendar(props) {
                 </Paper>
                 {props.button}
             </div>}
-            <div className={props.classes.calendarBlock}>
-                <div className={props.classes.calendar}>
+            <div style={styles.calendarBlock}>
+                <div style={styles.calendar}>
                     <FullCalendar
                         ref={ref}
                         plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
@@ -794,4 +793,4 @@ Calendar.propTypes = {
     dayStep: PropTypes.number,
 };
 
-export default withTheme(withStyles(styles)(Calendar));
+export default Calendar;

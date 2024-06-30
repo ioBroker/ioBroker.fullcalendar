@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@mui/styles';
 
 import { Card, CardContent } from '@mui/material';
 
@@ -12,14 +11,14 @@ import { VisRxWidget } from '@iobroker/vis-2-widgets-react-dev';
 import Calendar from './Component/Calendar';
 import CalendarsSelector from './Component/CalendarsSelector';
 
-const styles = () => ({
+const styles = {
     content: {
         display: 'flex',
         width: '100%',
         height: '100%',
         overflow: 'auto',
     },
-});
+};
 
 const Generic = window.visRxWidget || VisRxWidget;
 
@@ -272,14 +271,14 @@ class FullCalendar extends Generic {
 
         if (!this.state.rxData.instance && this.state.rxData.instance !== 0) {
             content = <div
-                className={this.props.classes.content}
+                style={styles.content}
                 ref={this.widgetRef}
             >
                 {FullCalendar.t('Please select instance')}
             </div>;
         } else {
             content = <div
-                className={this.props.classes.content}
+                style={styles.content}
                 ref={this.widgetRef}
             >
                 <Calendar
@@ -324,4 +323,4 @@ FullCalendar.propTypes = {
     context: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(FullCalendar));
+export default FullCalendar;

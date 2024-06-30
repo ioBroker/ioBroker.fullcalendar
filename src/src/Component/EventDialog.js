@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 import moment from 'moment';
 import 'moment/locale/de';
 import 'moment/locale/ru';
@@ -16,7 +15,10 @@ import SunCalc from 'suncalc2';
 import dayjs from 'dayjs';
 
 import {
-    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, Select, TextField,
+    Box,
+    Button, Checkbox, Dialog, DialogActions, DialogContent,
+    DialogTitle, FormControl, FormControlLabel,
+    InputAdornment, InputLabel, MenuItem, Select, TextField,
 } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -25,7 +27,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 
 import {
-    ColorPicker, SelectID, Confirm, Icon, Utils,
+    ColorPicker, SelectID,
+    Confirm, Icon, Utils,
 } from '@iobroker/adapter-react-v5';
 
 import {
@@ -38,7 +41,7 @@ const typeDescriptions = {
     toggle: 'toggle_description',
 };
 
-const styles = theme => ({
+const styles = {
     field: {
         padding: '2px 0px',
     },
@@ -86,10 +89,10 @@ const styles = theme => ({
         marginTop: 8,
         width: 120,
     },
-    days: {
+    days: theme => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#656565' : '#dadada',
-    },
-});
+    }),
+};
 
 const astroTypes = [
     'sunrise',
@@ -251,7 +254,7 @@ const EventDialog = props => {
             }
 
             return <FormControlLabel
-                className={props.classes.narrowText2}
+                style={styles.narrowText2}
                 control={<Checkbox
                     checked={!!event.native[field]}
                     disabled={props.readOnly}
@@ -266,7 +269,7 @@ const EventDialog = props => {
 
         if (object.common.states) {
             return <FormControl
-                className={props.classes.narrowText2}
+                style={styles.narrowText2}
                 variant="standard"
             >
                 <InputLabel>{props.t(name)}</InputLabel>
@@ -282,7 +285,7 @@ const EventDialog = props => {
         }
 
         return <TextField
-            className={props.classes.narrowText2}
+            style={styles.narrowText2}
             label={props.t(name)}
             value={event.native[field] || ''}
             disabled={props.readOnly}
@@ -301,7 +304,7 @@ const EventDialog = props => {
             }
 
             return <FormControlLabel
-                className={props.classes.narrowText2}
+                style={styles.narrowText2}
                 control={<Checkbox
                     checked={!!endValue}
                     disabled={props.readOnly}
@@ -316,7 +319,7 @@ const EventDialog = props => {
 
         if (object.common.states) {
             return <FormControl
-                className={props.classes.narrowText2}
+                style={styles.narrowText2}
                 variant="standard"
             >
                 <InputLabel>{props.t('End value')}</InputLabel>
@@ -337,7 +340,7 @@ const EventDialog = props => {
             disabled={props.readOnly}
             onChange={e => setEndValue(e.target.value)}
             variant="standard"
-            className={props.classes.narrowText2}
+            style={styles.narrowText2}
         />;
     };
 
@@ -374,7 +377,7 @@ const EventDialog = props => {
                 onClose={() => setIdDialog(false)}
                 socket={props.socket}
             />}
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 <FormControlLabel
                     control={<Checkbox
                         checked={!!event?.common.enabled}
@@ -385,11 +388,10 @@ const EventDialog = props => {
                     label={props.t('Active')}
                 />
             </div>
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 <FormControl
-                    style={{ width: 180 }}
+                    style={{ ...styles.timeType, width: 180 }}
                     variant="standard"
-                    className={props.classes.timeType}
                 >
                     <InputLabel>{props.t('Time type')}</InputLabel>
                     <Select
@@ -415,8 +417,7 @@ const EventDialog = props => {
                 </FormControl>
                 {event.native.astro ?
                     <FormControl
-                        style={{ width: 250 }}
-                        className={props.classes.narrowText}
+                        style={{ ...styles.narrowText, width: 250 }}
                         variant="standard"
                     >
                         <InputLabel>{props.t('Astronomic event')}</InputLabel>
@@ -465,7 +466,7 @@ const EventDialog = props => {
                             })}
                             label={props.t('Time')}
                             variant="standard"
-                            className={props.classes.timeSelector}
+                            style={styles.timeSelector}
                             value={date ? dayjs(date) : null}
                             disabled={props.readOnly || !event?.common.enabled}
                             onChange={_date => {
@@ -491,7 +492,10 @@ const EventDialog = props => {
                             renderInput={params => <TextField
                                 {...params}
                                 variant="standard"
-                                className={`${props.classes.narrowText} ${props.classes.timeSelector}`}
+                                style={{
+                                    ...styles.narrowText,
+                                    ...styles.timeSelector,
+                                }}
                                 helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
                             />}
                             ampm={false}
@@ -499,8 +503,7 @@ const EventDialog = props => {
                     </LocalizationProvider>}
                 {event.native.astro ? <FormControl
                     variant="standard"
-                    style={{ width: 95 }}
-                    className={props.classes.width60}
+                    style={{ ...styles.width60, width: 95 }}
                 >
                     <InputLabel>{props.t('Offset')}</InputLabel>
                     <Select
@@ -544,7 +547,7 @@ const EventDialog = props => {
                 </FormControl> : null}
 
                 {props.isSimulation && <TextField
-                    className={props.classes.randomTime}
+                    style={styles.randomTime}
                     label={props.t('Time random offset')}
                     value={event.native.timeRandomOffset || 0}
                     disabled={props.readOnly || !event?.common.enabled}
@@ -555,15 +558,15 @@ const EventDialog = props => {
                     }}
                 />}
             </div>
-            {event.native.astro ? <div className={props.classes.field}>
+            {event.native.astro ? <div style={styles.field}>
                 {props.t('Today %s is at %s.', props.t(event.native.astro), astroText)}
                 &nbsp;
                 {event.native.offset ? props.t('With offset at %s.', astroTextOffset) : null}
             </div> : null}
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 {!props.isSimulation && <FormControl
                     variant="standard"
-                    className={props.classes.narrowText2}
+                    style={styles.narrowText2}
                 >
                     <InputLabel>{props.t('Event type')}</InputLabel>
                     <Select
@@ -582,7 +585,7 @@ const EventDialog = props => {
                             <MenuItem key={type} value={type}>
                                 <div>
                                     <div>{props.t(type)}</div>
-                                    <div className={props.classes.typeDescription}>{props.t(typeDescriptions[type])}</div>
+                                    <div style={styles.typeDescription}>{props.t(typeDescriptions[type])}</div>
                                 </div>
                             </MenuItem>)}
                     </Select>
@@ -593,14 +596,14 @@ const EventDialog = props => {
                     disabled={props.readOnly || !event?.common.enabled}
                     onChange={e => setDuration(e.target.value)}
                     variant="standard"
-                    className={props.classes.narrowText}
+                    style={styles.narrowText}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
                     }}
                 />}
             </div>
-            <div className={props.classes.field}>
-                <div className={props.classes.selectId}>
+            <div style={styles.field}>
+                <div style={styles.selectId}>
                     <Icon src={icon || ''} style={{ width: 32, height: 32 }} />
                     <TextField
                         label={props.t('Object ID')}
@@ -619,11 +622,11 @@ const EventDialog = props => {
                     </Button>
                 </div>
             </div>
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 {valueField('startValue', event.native.type === 'toggle' ? 'First value' : (event.native.type === 'single' ? 'Desired value' : 'Start value'))}
                 {event.native.type === 'double' && endValueField()}
             </div>
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 {!props.isSimulation && <FormControl
                     variant="standard"
                 >
@@ -667,16 +670,16 @@ const EventDialog = props => {
                     </Select>
                 </FormControl>}
                 {period === 'daily' && (!props.isSimulation || props.simulation.native.interval === 'week') && <table
-                    className={props.classes.dayTable}
-                    style={
-                        props.isSimulation ? { marginLeft: 0 } : undefined
-                    }
+                    style={{
+                        ...styles.dayTable,
+                        marginLeft: props.isSimulation ? 0 : undefined,
+                    }}
                 >
                     <thead>
                         <tr>
                             {daysOfWeek.map(value => <td
                                 key={value}
-                                className={props.classes.tableCell}
+                                style={styles.tableCell}
                             >
                                 {moment().day(value).format('ddd')}
                             </td>)}
@@ -705,13 +708,13 @@ const EventDialog = props => {
                     </tbody>
                 </table>}
             </div>
-            {period === 'monthly' && <div className={props.classes.field}>
+            {period === 'monthly' && <div style={styles.field}>
                 <table>
                     <thead>
                         <tr>
                             {new Array(12).fill(null).map((value, i) => <td
                                 key={i}
-                                className={props.classes.tableCell}
+                                style={styles.tableCell}
                             >
                                 {moment().month(i).format('MMM')}
                             </td>)}
@@ -744,17 +747,17 @@ const EventDialog = props => {
                 </table>
                 <table>
                     <thead>
-                        <tr className={props.classes.days}>
+                        <Box component="tr" sx={styles.days}>
                             {new Array(12).fill(null).map((value, i) => <td
                                 key={i}
-                                className={props.classes.tableCell}
+                                style={styles.tableCell}
                             >
                                 {i + 1}
                             </td>)}
-                        </tr>
+                        </Box>
                     </thead>
                     <tbody>
-                        <tr className={props.classes.days}>
+                        <Box component="tr" sx={styles.days}>
                             {new Array(12).fill(null).map((value, i) => <td key={i}>
                                 <Checkbox
                                     aria-label="day"
@@ -776,16 +779,16 @@ const EventDialog = props => {
                                     size="small"
                                 />
                             </td>)}
-                        </tr>
-                        <tr className={props.classes.days}>
+                        </Box>
+                        <Box component="tr" sx={styles.days}>
                             {new Array(12).fill(null).map((value, i) => <td
                                 key={i}
-                                className={props.classes.tableCell}
+                                style={styles.tableCell}
                             >
                                 {i + 13}
                             </td>)}
-                        </tr>
-                        <tr className={props.classes.days}>
+                        </Box>
+                        <Box component="tr" sx={styles.days}>
                             {new Array(12).fill(null).map((value, i) => <td key={i}>
                                 <Checkbox
                                     aria-label="day"
@@ -809,19 +812,19 @@ const EventDialog = props => {
                                     size="small"
                                 />
                             </td>)}
-                        </tr>
-                        <tr className={props.classes.days}>
+                        </Box>
+                        <Box component="tr" sx={styles.days}>
                             {new Array(11).fill(null).map((value, i) => <td
                                 key={i}
-                                className={props.classes.tableCell}
+                                style={styles.tableCell}
                             >
                                 {maxMonthDay < i + 25 ? null : i + 25}
                             </td>)}
-                            <td className={props.classes.tableCell}>
+                            <td style={styles.tableCell}>
                                 {props.t('All')}
                             </td>
-                        </tr>
-                        <tr className={props.classes.days}>
+                        </Box>
+                        <Box component="tr" sx={styles.days}>
                             {new Array(11).fill(null).map((value, i) => <td key={i}>
                                 {maxMonthDay < i + 25 ? null : <Checkbox
                                     aria-label="day"
@@ -864,11 +867,11 @@ const EventDialog = props => {
                                     size="small"
                                 />
                             </td>
-                        </tr>
+                        </Box>
                     </tbody>
                 </table>
             </div>}
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 <TextField
                     label={props.t('Description')}
                     value={event?.common.name || ''}
@@ -879,7 +882,7 @@ const EventDialog = props => {
                     fullWidth
                 />
             </div>
-            <div className={props.classes.narrowColor}>
+            <div style={styles.narrowColor}>
                 <ColorPicker
                     value={event.common.color || event.native.color || ''}
                     disabled={props.readOnly || !event?.common.enabled}
@@ -969,7 +972,6 @@ const EventDialog = props => {
 
 EventDialog.propTypes = {
     systemConfig: PropTypes.object,
-    classes: PropTypes.object.isRequired,
     socket: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
     event: PropTypes.object,
@@ -983,4 +985,4 @@ EventDialog.propTypes = {
     deleteEvent: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles)(EventDialog);
+export default EventDialog;

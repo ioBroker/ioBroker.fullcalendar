@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Confirm, I18n } from '@iobroker/adapter-react-v5';
 import { Cancel, Delete, Save } from '@mui/icons-material';
@@ -5,8 +6,6 @@ import {
     Button,
     Dialog, DialogActions, DialogContent, DialogTitle, TextField,
 } from '@mui/material';
-import { withStyles } from '@mui/styles';
-import { useState } from 'react';
 
 const styles = {
     field: {
@@ -27,7 +26,7 @@ const CalendarDialog = props => {
     return <Dialog open={!0} onClose={props.onClose}>
         <DialogTitle>{I18n.t('Edit calendar name')}</DialogTitle>
         <DialogContent>
-            <div className={props.classes.field}>
+            <div style={styles.field}>
                 <TextField
                     label={I18n.t('Name')}
                     value={calendar.common.name || ''}
@@ -113,4 +112,4 @@ CalendarDialog.propTypes = {
     updateCalendars: PropTypes.func,
 };
 
-export default withStyles(styles)(CalendarDialog);
+export default CalendarDialog;
