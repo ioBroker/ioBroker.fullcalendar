@@ -6,7 +6,7 @@
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
         "@devbookhq/splitter": "^1.4.2",
         "@fullcalendar/core": "^6.1.13",
-        "@fullcalendar/daygrid": "^6.1.13",
+        "@fullcalendar/daygrid": "^6.1.14",
         "@fullcalendar/interaction": "^6.1.14",
         "@fullcalendar/list": "^6.1.13",
         "@fullcalendar/react": "^6.1.13",
