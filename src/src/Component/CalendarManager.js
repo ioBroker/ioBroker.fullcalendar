@@ -22,7 +22,7 @@ import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog from './CalendarDialog';
 
-const style = {
+const styles = {
     tabs: {
     },
     column: {
@@ -277,4 +277,4 @@ CalendarManager.propTypes = {
     themeType: PropTypes.string,
 };
 
-export default withStyles(style)(CalendarManager);
+export default CalendarManager;
