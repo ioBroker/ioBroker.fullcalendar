@@ -35,6 +35,9 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Removed withStyles package
+
 ### 2.3.17 (2024-05-26)
 * (bluefox) Corrected the simulation
 

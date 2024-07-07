@@ -305,6 +305,7 @@ class FullCalendar extends Generic {
                     t={FullCalendar.t}
                     language={I18n.getLanguage()}
                     dayStep={this.state.rxData.dayStep || 30}
+                    theme={this.props.context.theme}
                 />
             </div>;
         }
