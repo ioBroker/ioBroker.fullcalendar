@@ -3,19 +3,6 @@
     "name": "fullcalendar",
     "version": "2.4.0",
     "news": {
-      "2.4.0": {
-        "en": "Removed withStyles package",
-        "de": "MitStyles-Paket entfernt",
-        "ru": "Удаленный пакет со Стайлз",
-        "pt": "Removido com pacote Estilos",
-        "nl": "Verwijderd metStyles pakket",
-        "fr": "Enlever avec le paquetStyles",
-        "it": "Rimosso con pacchettoStyles",
-        "es": "Retire el paquete de estilos",
-        "pl": "Usunięty z pakietem Styles",
-        "uk": "Видаліть пакет \"Стиль\"",
-        "zh-cn": "用 Styles 软件包删除"
-      },
       "2.3.17": {
         "en": "Corrected the simulation",
         "de": "Die Simulation wurde korrigiert",
