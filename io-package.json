@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.3.17",
+    "version": "2.4.0",
     "news": {
+      "2.4.0": {
+        "en": "Removed withStyles package",
+        "de": "MitStyles-Paket entfernt",
+        "ru": "Удаленный пакет со Стайлз",
+        "pt": "Removido com pacote Estilos",
+        "nl": "Verwijderd metStyles pakket",
+        "fr": "Enlever avec le paquetStyles",
+        "it": "Rimosso con pacchettoStyles",
+        "es": "Retire el paquete de estilos",
+        "pl": "Usunięty z pakietem Styles",
+        "uk": "Видаліть пакет \"Стиль\"",
+        "zh-cn": "用 Styles 软件包删除"
+      },
       "2.3.17": {
         "en": "Corrected the simulation",
         "de": "Die Simulation wurde korrigiert",
@@ -80,19 +93,6 @@
         "pl": "Pakiety zostały zaktualizowane\nPoprawka wizowa 2",
         "uk": "Пакети оновлено\nCorrected vis-2 віджет",
         "zh-cn": "包装更新\n更正"
-      },
-      "2.2.6": {
-        "en": "Compatibility with vis-2",
-        "de": "Kompatibilität mit vis-2",
-        "ru": "Совместимость с vis-2",
-        "pt": "Compatibilidade com vis-2",
-        "nl": "Compatibiliteit met vis 2",
-        "fr": "Compatibilité avec vis-2",
-        "it": "Compatibilità con vis-2",
-        "es": "Compatibilidad con vis-2",
-        "pl": "Kompatybilność z wizją-2",
-        "uk": "Сумісність з вісом-2",
-        "zh-cn": "A. 与-2的兼容性"
       }
     },
     "title": "Calendar schedule",
