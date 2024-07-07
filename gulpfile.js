@@ -94,6 +94,7 @@ gulp.task('widget-3-copy', () => Promise.all([
         'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Chip_Chip_*.*',
         'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Dialog_Dialog_*.*',
         'src-widgets/build/static/js/*mui_styled-engine_index_js-node_modules_mui_system_esm_*.*',
+        'src-widgets/build/static/js/*mui_material_styles_styled_*.*',
         'src-widgets/build/static/js/*mui_x-date-pickers_TimePicker_TimePicker*.*',
         'src-widgets/build/static/js/*mui_x-date-pickers_AdapterMoment*.*',
         'src-widgets/build/static/js/*react-transition-group_esm_CSSTransition*.*',
