@@ -1,7 +1,7 @@
 {
     "name": "iobroker.vis-2-widgets-fullcalendar",
     "private": true,
-    "version": "2.4.0",
+    "version": "2.4.1",
     "dependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
         "@fullcalendar/core": "^6.1.14",
