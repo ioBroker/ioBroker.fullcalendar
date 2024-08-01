@@ -36,7 +36,7 @@
     "@iobroker/vis-2-widgets-react-dev": "^2.0.1",
     "@iobroker/vis-2-widgets-testing": "^1.0.4",
     "gulp": "^4.0.2",
-    "mocha": "^10.6.0"
+    "mocha": "^10.7.0"
   },
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.fullcalendar/issues"
