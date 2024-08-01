@@ -7,7 +7,7 @@
         "@devbookhq/splitter": "^1.4.2",
         "@fullcalendar/core": "^6.1.15",
         "@fullcalendar/daygrid": "^6.1.14",
-        "@fullcalendar/interaction": "^6.1.14",
+        "@fullcalendar/interaction": "^6.1.15",
         "@fullcalendar/list": "^6.1.14",
         "@fullcalendar/react": "^6.1.14",
         "@fullcalendar/rrule": "^6.1.15",
