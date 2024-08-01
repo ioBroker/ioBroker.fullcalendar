@@ -19,7 +19,7 @@
         "@mui/system": "^5.16.6",
         "@mui/x-date-pickers": "^7.9.0",
         "dayjs": "^1.11.12",
-        "@sentry/browser": "^8.15.0",
+        "@sentry/browser": "^8.22.0",
         "eslint": "^8.57.0",
         "eslint-config-airbnb": "^19.0.4",
         "eslint-plugin-eqeqeq-fix": "^1.0.3",
