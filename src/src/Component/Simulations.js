@@ -231,6 +231,7 @@ const Simulations = props => {
                 selectedSimulation={selectedSimulation}
                 setSelectedSimulation={setSelectedSimulation}
                 onClose={() => setDialogSimulation(null)}
+                theme={props.theme}
                 onDelete={async id => {
                     try {
                         if (selectedSimulation === id) {

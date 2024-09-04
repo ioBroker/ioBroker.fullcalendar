@@ -349,6 +349,7 @@ const SimulationDialog = props => {
         {idDialog && <SelectID
             imagePrefix="../.."
             multiSelect
+            theme={props.theme}
             selected={simulation.native.record.states}
             onOk={ids => {
                 const _simulation = JSON.parse(JSON.stringify(simulation));
@@ -390,6 +391,7 @@ SimulationDialog.propTypes = {
     onDelete: PropTypes.func,
     simulation: PropTypes.object,
     socket: PropTypes.object,
+    theme: PropTypes.object,
 };
 
 export default SimulationDialog;

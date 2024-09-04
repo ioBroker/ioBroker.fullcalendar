@@ -8,6 +8,7 @@ import {
 } from '@iobroker/adapter-react-v5';
 
 import { VisRxWidget } from '@iobroker/vis-2-widgets-react-dev';
+
 import Calendar from './Component/Calendar';
 import CalendarsSelector from './Component/CalendarsSelector';
 

@@ -139,6 +139,7 @@ const CalendarManager = props => {
         {isSimulations ? <Simulations
             systemConfig={props.systemConfig}
             socket={props.socket}
+            theme={props.theme}
             instance={props.instance}
             updateCalendars={updateCalendars}
             changeCalendarType={changeCalendarType}
@@ -251,6 +252,7 @@ const CalendarManager = props => {
                         key={calendarPrefix}
                         systemConfig={props.systemConfig}
                         socket={props.socket}
+                        theme={props.theme}
                         instance={props.instance}
                         calendarPrefix={calendarPrefix}
                         t={I18n.t}
@@ -275,6 +277,7 @@ CalendarManager.propTypes = {
     instance: PropTypes.any.isRequired,
     systemConfig: PropTypes.object.isRequired,
     themeType: PropTypes.string,
+    theme: PropTypes.object,
 };
 
 export default CalendarManager;
