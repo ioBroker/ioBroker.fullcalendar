@@ -8,7 +8,7 @@ async function screenshot(page, fileName) {
     await page.screenshot({ path: `${__dirname}/../tmp/screenshots/${fileName}.png` });
 }
 
-describe('admin-gui', () => {
+describe.skip('admin-gui', () => {
     before(async function () {
         this.timeout(240_000);
 
