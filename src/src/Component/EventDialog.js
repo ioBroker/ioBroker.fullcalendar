@@ -84,11 +84,12 @@ const styles = {
         marginLeft: 16,
         width: 133,
     },
-    timeSelector: {
-        marginLeft: 16,
-        marginTop: 8,
+    timeSelector: theme => ({
+        marginLeft: '16px',
+        marginTop: '7.5px',
         width: 120,
-    },
+        borderBottomColor: theme.palette.mode === 'dark' ? '#FFFFFFB2' : '#000000B2',
+    }),
     days: theme => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#656565' : '#dadada',
     }),
@@ -368,6 +369,7 @@ const EventDialog = props => {
         <DialogContent>
             {idDialog && <SelectID
                 imagePrefix="../.."
+                theme={props.theme}
                 selected={event.native.oid}
                 disabled={props.readOnly}
                 onOk={id => {
@@ -463,10 +465,10 @@ const EventDialog = props => {
                                 '& label': {
                                     transform: 'translate(0px, -9px) scale(0.75)',
                                 },
+                                '&.MuiFormControl-root': styles.timeSelector,
                             })}
                             label={props.t('Time')}
                             variant="standard"
-                            style={styles.timeSelector}
                             value={date ? dayjs(date) : null}
                             disabled={props.readOnly || !event?.common.enabled}
                             onChange={_date => {
@@ -494,7 +496,6 @@ const EventDialog = props => {
                                 variant="standard"
                                 style={{
                                     ...styles.narrowText,
-                                    ...styles.timeSelector,
                                 }}
                                 helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
                             />}
@@ -553,8 +554,10 @@ const EventDialog = props => {
                     disabled={props.readOnly || !event?.common.enabled}
                     onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
                     variant="standard"
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                    slotProps={{
+                        input: {
+                            endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                        },
                     }}
                 />}
             </div>
@@ -597,8 +600,10 @@ const EventDialog = props => {
                     onChange={e => setDuration(e.target.value)}
                     variant="standard"
                     style={styles.narrowText}
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
+                    slotProps={{
+                        input: {
+                            endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
+                        },
                     }}
                 />}
             </div>
@@ -979,6 +984,7 @@ EventDialog.propTypes = {
     updateEvents: PropTypes.func.isRequired,
     serverTimeZone: PropTypes.number.isRequired,
     t: PropTypes.func.isRequired,
+    theme: PropTypes.object,
     language: PropTypes.string.isRequired,
     widget: PropTypes.bool,
     setEvent: PropTypes.func.isRequired,

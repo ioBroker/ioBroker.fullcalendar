@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Card, CardContent } from '@mui/material';
-
 import {
     I18n,
 } from '@iobroker/adapter-react-v5';
 
-import { VisRxWidget } from '@iobroker/vis-2-widgets-react-dev';
 import Calendar from './Component/Calendar';
 import CalendarsSelector from './Component/CalendarsSelector';
 
@@ -20,7 +17,7 @@ const styles = {
     },
 };
 
-const Generic = window.visRxWidget || VisRxWidget;
+const Generic = window.visRxWidget;
 
 class FullCalendar extends Generic {
     static getWidgetInfo() {
@@ -311,7 +308,7 @@ class FullCalendar extends Generic {
         }
 
         if (this.state.rxStyle.position === 'relative') {
-            return this.wrapContent(content, null, { height: 'calc(100% - 24px)', width: 'calc(100% - 24px)' }, null, null, { Card, CardContent });
+            return this.wrapContent(content, null, { height: 'calc(100% - 24px)', width: 'calc(100% - 24px)' });
         }
 
         return content;
