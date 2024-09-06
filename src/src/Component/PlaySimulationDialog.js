@@ -69,7 +69,7 @@ const PlaySimulationDialog = props => {
                         slotProps={{
                             input: {
                                 fullWidth: true,
-                                style: {width: '100%'},
+                                style: { width: '100%' },
                             },
                         }}
                     />

@@ -314,7 +314,7 @@ const Simulations = props => {
                     style={styles.tabs}
                 >
                     <Tab title={I18n.t('Calendars')} icon={<CalendarMonth />} />
-                    <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} style={styles.simulations} />
+                    <Tab title={I18n.t('Simulations')} icon={<SimulationIcon />} sx={styles.simulations} />
                 </Tabs>
                 <Toolbar variant="dense" sx={styles.toolbar}>
                     <Fab
@@ -504,6 +504,7 @@ const Simulations = props => {
                 simulation={simulations.find(s => s._id === selectedSimulation)}
                 simulations={simulations}
                 t={I18n.t}
+                theme={props.theme}
                 language={I18n.getLanguage()}
                 readOnly={simulationStates[selectedSimulation] === 'play'}
                 simulationState={simulationStates[selectedSimulation]}
