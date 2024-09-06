@@ -7,8 +7,6 @@ import {
     I18n,
 } from '@iobroker/adapter-react-v5';
 
-import { VisRxWidget } from '@iobroker/vis-2-widgets-react-dev';
-
 import Calendar from './Component/Calendar';
 import CalendarsSelector from './Component/CalendarsSelector';
 
@@ -21,7 +19,7 @@ const styles = {
     },
 };
 
-const Generic = window.visRxWidget || VisRxWidget;
+const Generic = window.visRxWidget;
 
 class FullCalendar extends Generic {
     static getWidgetInfo() {
