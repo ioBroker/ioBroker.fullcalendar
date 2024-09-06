@@ -24,7 +24,10 @@ const { AdapterMoment } = require('@mui/x-date-pickers/AdapterMoment');
 
 const styles = {
     field: {
-        '& .MuiFormControl-root': { width: '100%' }, display: 'flex', alignItems: 'end', gap: 20,
+        '& .MuiFormControl-root': { width: '100%' },
+        display: 'flex',
+        alignItems: 'end',
+        gap: '20px',
     },
     tableCell: {
         textAlign: 'center',
@@ -44,7 +47,11 @@ const PlaySimulationDialog = props => {
         <DialogTitle>{I18n.t('Play simulation')}</DialogTitle>
         <DialogContent>
             <LocalizationProvider dateAdapter={AdapterMoment}>
-                <Box component="div" sx={styles.field} style={{ width: '100%', marginBottom: 20, marginTop: 10 }}>
+                <Box
+                    component="div"
+                    sx={styles.field}
+                    style={{ width: '100%', marginBottom: 20, marginTop: 10 }}
+                >
                     <DateTimePicker
                         label="Start"
                         sx={theme => ({
@@ -62,16 +69,13 @@ const PlaySimulationDialog = props => {
                             '& label': {
                                 transform: 'translate(0px, -9px) scale(0.75)',
                             },
+                            '&.MuiTextField-root': {
+                                width: '100%',
+                            },
                         })}
                         renderInput={params => <TextField {...params} variant="standard" />}
                         value={playSimulation.start}
                         onChange={date => setPlaySimulation({ ...playSimulation, start: date })}
-                        slotProps={{
-                            input: {
-                                fullWidth: true,
-                                style: { width: '100%' },
-                            },
-                        }}
                     />
                     {playSimulation.start && <IconButton
                         onClick={() => setPlaySimulation({ ...playSimulation, start: null })}
