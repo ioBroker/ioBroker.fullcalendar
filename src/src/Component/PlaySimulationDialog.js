@@ -66,9 +66,11 @@ const PlaySimulationDialog = props => {
                         renderInput={params => <TextField {...params} variant="standard" />}
                         value={playSimulation.start}
                         onChange={date => setPlaySimulation({ ...playSimulation, start: date })}
-                        InputProps={{
-                            fullWidth: true,
-                            style: { width: '100%' },
+                        slotProps={{
+                            input: {
+                                fullWidth: true,
+                                style: {width: '100%'},
+                            },
                         }}
                     />
                     {playSimulation.start && <IconButton
