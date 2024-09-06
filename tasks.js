@@ -58,6 +58,7 @@ function copyAllFilesWidget() {
 
     copyFiles([
         'src-widgets/build/static/js/*mui_material_styles_styled_js-node_modules_mui_material_styles_useTheme*.*',
+        'src-widgets/build/static/js/*mui_material_styles_useTheme_js-node_modules*.*',
         'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_DialogActions*.*',
         'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Chip_Chip_*.*',
         'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Dialog_Dialog_*.*',
