@@ -1,5 +1,6 @@
 const engineHelper = require('./engineHelper');
 const guiHelper = require('./guiHelper');
+const { existsSync } = require('node:fs');
 const {
     deleteFoldersRecursive,
 } = require('@iobroker/build-tools');
@@ -14,7 +15,9 @@ describe('admin-gui', () => {
     before(async function () {
         this.timeout(240_000);
         // Clean tmp folder
-        deleteFoldersRecursive(`${__dirname}/../tmp`);
+        if (existsSync(`${__dirname}/../tmp/iobroker-data`)) {
+            deleteFoldersRecursive(`${__dirname}/../tmp/iobroker-data`);
+        }
 
         // install js-controller, web and vis-2-beta
         await engineHelper.startIoBroker();
