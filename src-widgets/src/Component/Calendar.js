@@ -454,6 +454,7 @@ function Calendar(props) {
             serverTimeZone={props.serverTimeZone}
             readOnly={props.readOnly}
             t={props.t}
+            theme={props.theme}
             language={props.language}
             isSimulation={props.isSimulation}
             simulationId={props.simulationId}

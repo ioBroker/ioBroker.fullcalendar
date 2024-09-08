@@ -1,8 +1,12 @@
 const helper = require('@iobroker/vis-2-widgets-testing');
+const { deleteFoldersRecursive } = require("@iobroker/build-tools");
 const adapterName = require('../package.json').name.split('.').pop();
 
 describe('fullcalendar', () => {
     before(async function (){
+        // Clean tmp folder
+        deleteFoldersRecursive(`${__dirname}/../tmp`);
+
         this.timeout(180000);
         // install js-controller, web and vis-2-beta
         await helper.startIoBroker({ startOwnAdapter: true });

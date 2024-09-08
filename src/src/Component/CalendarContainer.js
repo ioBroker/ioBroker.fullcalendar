@@ -140,6 +140,7 @@ class CalendarContainer extends React.Component {
             calendarPrefix={this.props.calendarPrefix}
             changeEvents={this.changeEvents}
             updateEvents={this.updateEvents}
+            theme={this.props.theme}
             setEvent={this.setEvent}
             deleteEvent={this.deleteEvent}
             serverTimeZone={this.state.serverTimeZone}
@@ -167,6 +168,7 @@ CalendarContainer.propTypes = {
     simulationState: PropTypes.string,
     readOnly: PropTypes.bool,
     button: PropTypes.any,
+    theme: PropTypes.object,
 };
 
 export default CalendarContainer;

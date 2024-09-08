@@ -50,6 +50,7 @@ class App extends GenericApp {
                     <CalendarManager
                         systemConfig={this._systemConfig}
                         socket={this.socket}
+                        theme={this.state.theme}
                         instance={this.instance}
                         alive={this.state.alive}
                         themeType={this.state.themeType}

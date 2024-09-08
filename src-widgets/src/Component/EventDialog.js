@@ -368,6 +368,7 @@ const EventDialog = props => {
         <DialogContent>
             {idDialog && <SelectID
                 imagePrefix="../.."
+                theme={props.theme}
                 selected={event.native.oid}
                 disabled={props.readOnly}
                 onOk={id => {
@@ -553,8 +554,10 @@ const EventDialog = props => {
                     disabled={props.readOnly || !event?.common.enabled}
                     onChange={e => changeEvent(newEvent => newEvent.native.timeRandomOffset = parseInt(e.target.value))}
                     variant="standard"
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                    slotProps={{
+                        input: {
+                            endAdornment: <InputAdornment position="end">{props.t('ms')}</InputAdornment>,
+                        },
                     }}
                 />}
             </div>
@@ -597,8 +600,10 @@ const EventDialog = props => {
                     onChange={e => setDuration(e.target.value)}
                     variant="standard"
                     style={styles.narrowText}
-                    InputProps={{
-                        endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
+                    slotProps={{
+                        input: {
+                            endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
+                        },
                     }}
                 />}
             </div>
@@ -979,6 +984,7 @@ EventDialog.propTypes = {
     updateEvents: PropTypes.func.isRequired,
     serverTimeZone: PropTypes.number.isRequired,
     t: PropTypes.func.isRequired,
+    theme: PropTypes.object,
     language: PropTypes.string.isRequired,
     widget: PropTypes.bool,
     setEvent: PropTypes.func.isRequired,

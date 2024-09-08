@@ -30,7 +30,7 @@ function checkConnectionOfAdapter(cb, counter) {
 
 describe(`Test ${adapterShortName} adapter`, function () {
     before(`Test ${adapterShortName} adapter: Start js-controller`, function (_done) {
-        this.timeout(600000); // because of first install from npm
+        this.timeout(600000); // because of first installation from npm
 
         setup.setupController(async function () {
             const config = await setup.getAdapterConfig();
