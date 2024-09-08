@@ -2,7 +2,7 @@ const helper = require('@iobroker/vis-2-widgets-testing');
 const { deleteFoldersRecursive } = require("@iobroker/build-tools");
 const adapterName = require('../package.json').name.split('.').pop();
 
-describe.only('fullcalendar', () => {
+describe('fullcalendar', () => {
     before(async function (){
         // Clean tmp folder
         deleteFoldersRecursive(`${__dirname}/../tmp`);
