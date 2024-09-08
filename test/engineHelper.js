@@ -42,7 +42,7 @@ function startIoBroker(options) {
         await setup.setOfflineState('system.adapter.admin.0.alive', { val: false });
 
         setup.setupController(
-            null,
+            ['admin'],
             async systemConfig => {
                 // disable statistics and set license accepted
                 systemConfig.common.licenseConfirmed = true;
@@ -55,6 +55,8 @@ function startIoBroker(options) {
                     config.native.port = 18081;
                     config.common.enabled = true;
                     await setup.setAdapterConfig(config.common, config.native, 0, 'admin');
+                } else {
+                    throw new Error('Cannot get admin config');
                 }
 
                 setup.startController(
