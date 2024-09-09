@@ -35,7 +35,7 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 2.4.3 (2024-09-09)
 * (bluefox) Removed withStyles package
 
 ### 2.3.17 (2024-05-26)

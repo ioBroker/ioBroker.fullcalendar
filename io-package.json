@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.4.2",
+    "version": "2.4.3",
     "news": {
+      "2.4.3": {
+        "en": "Removed withStyles package",
+        "de": "MitStyles-Paket entfernt",
+        "ru": "Удаленный пакет со Стайлз",
+        "pt": "Removido com pacote Estilos",
+        "nl": "Verwijderd metStyles pakket",
+        "fr": "Enlever avec le paquetStyles",
+        "it": "Rimosso con pacchettoStyles",
+        "es": "Retire el paquete de estilos",
+        "pl": "Usunięty z pakietem Styles",
+        "uk": "Видаліть пакет \"Стиль\"",
+        "zh-cn": "用 Styles 软件包删除"
+      },
       "2.4.2": {
         "en": "Removed withStyles package",
         "de": "MitStyles-Paket entfernt",
@@ -80,19 +93,6 @@
         "pl": "Comiesięczne wydarzenia",
         "uk": "Виправлені щомісячні події",
         "zh-cn": "每月事件的更正"
-      },
-      "2.3.1": {
-        "en": "Packages were updated\nCorrected vis-2 widget",
-        "de": "Pakete wurden aktualisiert\nKorrigiert vis-2 Widget",
-        "ru": "Пакеты были обновлены\nИсправлен виджет vis-2",
-        "pt": "Pacotes foram atualizados\nCorrigido vis-2 widget",
-        "nl": "Packages werden geüpload\nVertaling:",
-        "fr": "Les paquets ont été mis à jour\nCorrigé vis-2 widget",
-        "it": "I pacchetti sono stati aggiornati\nCorretto vis-2 widget",
-        "es": "Se actualizaron los paquetes\nCorregido vis-2 widget",
-        "pl": "Pakiety zostały zaktualizowane\nPoprawka wizowa 2",
-        "uk": "Пакети оновлено\nCorrected vis-2 віджет",
-        "zh-cn": "包装更新\n更正"
       }
     },
     "title": "Calendar schedule",

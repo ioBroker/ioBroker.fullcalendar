@@ -84,11 +84,12 @@ const styles = {
         marginLeft: 16,
         width: 133,
     },
-    timeSelector: {
-        marginLeft: 16,
-        marginTop: 8,
+    timeSelector: theme => ({
+        marginLeft: '16px',
+        marginTop: '7.5px',
         width: 120,
-    },
+        borderBottomColor: theme.palette.mode === 'dark' ? '#FFFFFFB2' : '#000000B2',
+    }),
     days: theme => ({
         backgroundColor: theme.palette.mode === 'dark' ? '#656565' : '#dadada',
     }),
@@ -464,10 +465,10 @@ const EventDialog = props => {
                                 '& label': {
                                     transform: 'translate(0px, -9px) scale(0.75)',
                                 },
+                                '&.MuiFormControl-root': styles.timeSelector,
                             })}
                             label={props.t('Time')}
                             variant="standard"
-                            style={styles.timeSelector}
                             value={date ? dayjs(date) : null}
                             disabled={props.readOnly || !event?.common.enabled}
                             onChange={_date => {
@@ -495,7 +496,6 @@ const EventDialog = props => {
                                 variant="standard"
                                 style={{
                                     ...styles.narrowText,
-                                    ...styles.timeSelector,
                                 }}
                                 helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
                             />}
