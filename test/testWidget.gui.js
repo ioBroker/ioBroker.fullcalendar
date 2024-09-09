@@ -7,7 +7,7 @@ describe('fullcalendar', () => {
     before(async function (){
         // Clean tmp folder
         if (existsSync(`${__dirname}/../tmp/iobroker-data`)) {
-            deleteFoldersRecursive(`${__dirname}/../tmp/iobroker-data`);
+            // deleteFoldersRecursive(`${__dirname}/../tmp/iobroker-data`);
         }
         this.timeout(180000);
         // install js-controller, web and vis-2-beta
