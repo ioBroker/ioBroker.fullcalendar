@@ -67,6 +67,7 @@ function copyAllFilesWidget() {
         'src-widgets/build/static/js/*mui_x-date-pickers_TimePicker_TimePicker*.*',
         'src-widgets/build/static/js/*mui_x-date-pickers_AdapterMoment*.*',
         'src-widgets/build/static/js/*react-transition-group_esm_CSSTransition*.*',
+        'src-widgets/build/static/js/*mui_material_utils_createSvgIcon*.*',
         'src-widgets/build/static/js/*suncalc2_suncalc2*.*',
         ...buildHelper.copyFiles(`src-widgets/`),
     ], `widgets/${adapterName}/static/js`);
