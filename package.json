@@ -57,7 +57,7 @@
   "scripts": {
     "test": "mocha ./test/*.engine.js --exit",
     "test-gui": "mocha ./test/*.gui.js --exit",
-    "prepublishOnly": "gulp",
+    "prepublishOnly": "node tasks",
     "release": "release-script",
     "release-patch": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
