@@ -38,7 +38,7 @@
     "@iobroker/vis-2-widgets-react-dev": "^4.0.3",
     "@iobroker/vis-2-widgets-testing": "^1.0.4",
     "colorette": "^2.0.20",
-    "mocha": "^10.7.3",
+    "mocha": "^10.8.2",
     "puppeteer": "^23.4.1"
   },
   "bugs": {
