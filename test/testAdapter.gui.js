@@ -1,15 +1,10 @@
-const engineHelper = require('./engineHelper');
-const guiHelper = require('./guiHelper');
+const engineHelper = require('@iobroker/legacy-testing/engineHelper');
+const guiHelper = require('@iobroker/legacy-testing/guiHelper');
 const { existsSync } = require('node:fs');
 const {
     deleteFoldersRecursive,
 } = require('@iobroker/build-tools');
 let gPage;
-
-async function screenshot(page, fileName) {
-    page = page || gPage;
-    await page.screenshot({ path: `${__dirname}/../tmp/screenshots/${fileName}.png` });
-}
 
 describe.skip('admin-gui', () => {
     before(async function () {
@@ -28,7 +23,7 @@ describe.skip('admin-gui', () => {
     it('Check admin fullcalendar', async function () {
         this.timeout(120_000);
         await gPage.waitForSelector('.MuiButtonBase-root', { timeout: 120_000 });
-        await screenshot(gPage, '00_started');
+        await guiHelper.screenshot(gPage, '00_started');
     });
 
     after(async function () {

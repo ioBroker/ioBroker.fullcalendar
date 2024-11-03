@@ -30,7 +30,7 @@ function checkConnectionOfAdapter(cb, counter) {
 
 describe(`Test ${adapterShortName} adapter`, function () {
     before(`Test ${adapterShortName} adapter: Start js-controller`, function (_done) {
-        this.timeout(600000); // because of first installation from npm
+        this.timeout(600000); // because of the first installation from npm
 
         setup.setupController(async function () {
             const config = await setup.getAdapterConfig();
@@ -55,7 +55,7 @@ describe(`Test ${adapterShortName} adapter`, function () {
     });
 
     it(`Test ${adapterShortName} instance object: it must exists`, function (done) {
-        objects.getObject(`system.adapter.${adapterShortName}.0`, function (err, obj) {
+        objects.getObject(`system.adapter.${adapterShortName}.0`, (err, obj) => {
             expect(err).to.be.null;
             expect(obj).to.be.an('object');
             expect(obj).not.to.be.null;
