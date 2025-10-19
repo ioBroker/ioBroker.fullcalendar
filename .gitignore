@@ -6,3 +6,6 @@ src/node_modules
 src/build
 tmp
 *.tgz
+
+#ignore .commitinfo created by ioBroker release script
+.commitinfo
