@@ -136,6 +136,7 @@
     "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
     "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "adminTab": {
       "singleton": false,
       "name": "Calendar",
