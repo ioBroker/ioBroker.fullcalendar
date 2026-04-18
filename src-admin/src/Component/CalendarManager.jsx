@@ -22,7 +22,9 @@ const styles = {
         alignItems: 'start',
         height: '100%',
     },
-    calendars: {},
+    calendars: {
+        height: '100%',
+    },
     calendarsPaper: {
         minHeight: '100%',
     },

@@ -25,8 +25,8 @@ import {
 import { Cancel, Delete, PlayCircle } from '@mui/icons-material';
 import { I18n } from '@iobroker/adapter-react-v5';
 
-const { LocalizationProvider, DateTimePicker } = require('@mui/x-date-pickers');
-const { AdapterMoment } = require('@mui/x-date-pickers/AdapterMoment');
+import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 const styles = {
     field: {

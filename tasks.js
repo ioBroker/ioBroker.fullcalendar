@@ -26,17 +26,18 @@ function sync2files(src, dst) {
 function buildWidgets() {
     // sync src and src-widgets
     sync2files(
-        `${__dirname}/src-widgets/src/Component/Calendar.js`,
-        `${__dirname}/src-admin/src/Component/Calendar.js`,
+        `${__dirname}/src-widgets/src/Component/Calendar.jsx`,
+        `${__dirname}/src-admin/src/Component/Calendar.jsx`,
     );
     sync2files(
-        `${__dirname}/src-widgets/src/Component/EventDialog.js`,
-        `${__dirname}/src-admin/src/Component/EventDialog.js`,
+        `${__dirname}/src-widgets/src/Component/EventDialog.jsx`,
+        `${__dirname}/src-admin/src/Component/EventDialog.jsx`,
     );
     sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src-admin/src/Component/Utils.js`);
     sync2files(`${__dirname}/src-widgets/src/Component/styles.css`, `${__dirname}/src-admin/src/Component/styles.css`);
-
-    return buildHelper.buildWidgets(__dirname, `${__dirname}/src-widgets/`);
+    return buildReact(`${__dirname}/src-widgets`, { rootDir: __dirname, vite: true }).catch(() =>
+        console.error('Error by build'),
+    );
 }
 
 // TASKS
@@ -270,7 +271,9 @@ if (process.argv.includes('--0-widget-clean')) {
         npmInstall(`${__dirname}/src-admin/`).catch(e => console.error(`Cannot execute npm install: ${e}`));
     }
 } else if (process.argv.includes('--2-build')) {
-    buildReact(`${__dirname}/src-admin/`).catch(e => console.error(`Cannot execute npm run build: ${e}`));
+    buildReact(`${__dirname}/src-admin/`, { rootDir: __dirname, vite: true }).catch(e =>
+        console.error(`Cannot execute npm run build: ${e}`),
+    );
 } else if (process.argv.includes('--3-copy')) {
     copyAllFiles();
 } else if (process.argv.includes('--4-patch')) {
@@ -278,7 +281,7 @@ if (process.argv.includes('--0-widget-clean')) {
 } else if (process.argv.includes('--build')) {
     deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png']);
     npmInstall(`${__dirname}/src-admin/`)
-        .then(() => buildReact(`${__dirname}/src-admin/`))
+        .then(() => buildReact(`${__dirname}/src-admin/`, { rootDir: __dirname, vite: true }))
         .then(() => {
             copyAllFiles();
             patch();
@@ -292,7 +295,7 @@ if (process.argv.includes('--0-widget-clean')) {
             deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png']);
             return npmInstall(`${__dirname}/src-admin/`);
         })
-        .then(() => buildReact(`${__dirname}/src-admin/`))
+        .then(() => buildReact(`${__dirname}/src-admin/`, { rootDir: __dirname, vite: true }))
         .then(() => {
             copyAllFiles();
             patch();

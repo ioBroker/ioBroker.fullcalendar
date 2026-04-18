@@ -5,3 +5,4 @@ src/node_modules
 src/build
 tmp
 *.tgz
+/src-widgets/.__mf__temp/
