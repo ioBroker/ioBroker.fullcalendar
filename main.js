@@ -1,11 +1,11 @@
 // you have to require the utils module and call adapter function
-const utils       = require('@iobroker/adapter-core'); // Get common adapter utils
+const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 
 const adapterName = require('./package.json').name.split('.').pop();
-const timeUtils   = require('./lib/utils');
-const later       = require('later');
-const SunCalc     = require('suncalc2');
-const uuidv4      = require('uuid').v4;
+const timeUtils = require('./lib/utils');
+const later = require('later');
+const SunCalc = require('suncalc2');
+const uuidv4 = require('uuid').v4;
 let adapter;
 
 let events;
@@ -16,9 +16,9 @@ let timeZoneInterval;
 let updateInterval;
 let language;
 
-const names             = {};
-let rooms               = {};
-let funcs               = {};
+const names = {};
+let rooms = {};
+let funcs = {};
 const recordingSimulations = {};
 const enums = {};
 const subscribed = [];
@@ -38,7 +38,7 @@ const IGNORE_STATES = [
     'RAMP_TIME_VALUE',
     'DURATION_UNIT',
     'MOTION_DETECTION_ACTIVE',
-    'RESET_MOTION'
+    'RESET_MOTION',
 ];
 
 function t(word) {
@@ -100,7 +100,11 @@ async function subscribeUnsubscribe() {
                 if (stateObjs[state].type === 'channel' || stateObjs[state].type === 'device') {
                     adapter.log.debug(`+ Subscribed to ${state}.*`);
                     adapter.subscribeForeignStates(`${state}.*`);
-                } else if (stateObjs[state].type === 'state' && stateObjs[state].common && stateObjs[state].common.write !== false) {
+                } else if (
+                    stateObjs[state].type === 'state' &&
+                    stateObjs[state].common &&
+                    stateObjs[state].common.write !== false
+                ) {
                     adapter.log.debug(`+ Subscribed to ${state}`);
                     adapter.subscribeForeignStates(state);
                 } else {
@@ -118,7 +122,11 @@ async function subscribeUnsubscribe() {
             if (stateObjs[state].type === 'channel' || stateObjs[state].type === 'device') {
                 adapter.log.debug(`- Unsubscribed from ${state}.*`);
                 adapter.unsubscribeForeignStates(`${state}.*`);
-            } else if (stateObjs[state].type === 'state' && stateObjs[state].common && stateObjs[state].common.write !== false) {
+            } else if (
+                stateObjs[state].type === 'state' &&
+                stateObjs[state].common &&
+                stateObjs[state].common.write !== false
+            ) {
                 adapter.log.debug(`- Unsubscribed from ${state}`);
                 adapter.unsubscribeForeignStates(state);
             } else {
@@ -131,7 +139,7 @@ async function subscribeUnsubscribe() {
 const stopRecordSimulation = async id => {
     recordingSimulations[id].value = 'stop';
     await subscribeUnsubscribe();
-}
+};
 
 function stopPlaySimulation(id) {
     recordingSimulations[id].value = 'stop';
@@ -157,8 +165,7 @@ function getObjectIcon(id, obj) {
         // If UTF-8 icon
         if (typeof icon === 'string' && icon.length <= 2) {
             return icon;
-        } else
-        if (icon.startsWith('data:image')) {
+        } else if (icon.startsWith('data:image')) {
             return icon;
         } else {
             const parts = id.split('.');
@@ -208,7 +215,7 @@ async function getImage(idOrObj) {
             if (obj && obj.common && obj.common.icon) {
                 imageCache[stateId] = getObjectIcon(obj);
                 return imageCache[stateId];
-            } else if (!obj || (obj.type === 'channel' || obj.type === 'device')) {
+            } else if (!obj || obj.type === 'channel' || obj.type === 'device') {
                 parts = parentId.split('.');
                 parts.pop();
                 parentId = parts.join('.');
@@ -235,7 +242,12 @@ function buildOverlap(enumIds, enumObjs, enumsExceptions) {
         const categoryType = parts[1];
         groups[categoryType] = groups[categoryType] || [];
         if (enumObjs[enumId]) {
-            enumObjs[enumId].common?.members?.forEach(id => !enumsExceptions.includes(id) && !groups[categoryType].includes(id) && groups[categoryType].push(id));
+            enumObjs[enumId].common?.members?.forEach(
+                id =>
+                    !enumsExceptions.includes(id) &&
+                    !groups[categoryType].includes(id) &&
+                    groups[categoryType].push(id),
+            );
         }
     });
 
@@ -254,15 +266,14 @@ function buildOverlap(enumIds, enumObjs, enumsExceptions) {
 }
 
 function collectAllStates(id) {
-    recordingSimulations[id].allStates = recordingSimulations[id].native.record ? [...recordingSimulations[id].native.record.states] : [];
+    recordingSimulations[id].allStates = recordingSimulations[id].native.record
+        ? [...recordingSimulations[id].native.record.states]
+        : [];
     const states = recordingSimulations[id].allStates;
 
     const lists = recordingSimulations[id].native.record?.enums || [];
     for (const list of lists) {
-        const res = buildOverlap(
-            list || [],
-            enums,
-            recordingSimulations[id].native.record?.enumsExceptions || []);
+        const res = buildOverlap(list || [], enums, recordingSimulations[id].native.record?.enumsExceptions || []);
         res.forEach(id => !states.includes(id) && states.push(id));
     }
 
@@ -277,7 +288,10 @@ async function startRecordSimulation(id) {
 
     collectAllStates(id);
 
-    if (new Date(recordingSimulations[id].native.record.start).getTime() >= Date.now() || new Date(recordingSimulations[id].native.record.end).getTime() < Date.now()) {
+    if (
+        new Date(recordingSimulations[id].native.record.start).getTime() >= Date.now() ||
+        new Date(recordingSimulations[id].native.record.end).getTime() < Date.now()
+    ) {
         await adapter.setForeignStateAsync(id, 'stop');
         recordingSimulations[id].value = 'stop';
         return;
@@ -301,8 +315,10 @@ async function setSimulationStatus(id, value) {
         await subscribeUnsubscribe();
     } else if (value === 'play') {
         recordingSimulations[id].native.events.forEach(event => {
-            event.simulationStart = recordingSimulations[id].native.play?.start && new Date(recordingSimulations[id].native.play.start);
-            event.simulationEnd = recordingSimulations[id].native.play?.end && new Date(recordingSimulations[id].native.play.end);
+            event.simulationStart =
+                recordingSimulations[id].native.play?.start && new Date(recordingSimulations[id].native.play.start);
+            event.simulationEnd =
+                recordingSimulations[id].native.play?.end && new Date(recordingSimulations[id].native.play.end);
             event.simulationDow = recordingSimulations[id].native.play?.dow;
             events[event._id] = event;
             names[event._id] = event.common.name;
@@ -339,7 +355,7 @@ let lastEvent = {};
 
 function startAdapter(options) {
     options = options || {};
-    options = Object.assign({}, options, {name: adapterName});
+    options = Object.assign({}, options, { name: adapterName });
 
     adapter = new utils.Adapter(options);
     adapter.on('stateChange', async (stateId, state) => {
@@ -352,7 +368,11 @@ function startAdapter(options) {
                 return;
             }
 
-            if (stateId.startsWith('system.') || stateId.startsWith('alexa2.') || IGNORE_STATES.find(s => stateId.endsWith(s))) {
+            if (
+                stateId.startsWith('system.') ||
+                stateId.startsWith('alexa2.') ||
+                IGNORE_STATES.find(s => stateId.endsWith(s))
+            ) {
                 return;
             }
 
@@ -397,7 +417,10 @@ function startAdapter(options) {
 
                     const name = getText(stateObj) || stateId;
 
-                    if (stateObj.common.role && (stateObj.common.role.endsWith('.lock') || stateObj.common.role === 'lock')) {
+                    if (
+                        stateObj.common.role &&
+                        (stateObj.common.role.endsWith('.lock') || stateObj.common.role === 'lock')
+                    ) {
                         adapter.log.warn(`Cannot record state "${name}/${stateId}" because it has role "lock"`);
                         return;
                     }
@@ -411,8 +434,15 @@ function startAdapter(options) {
                     lastEvent[ids[i]] = { id: stateId, value: state.val, ts: Date.now() };
 
                     // filter out same states
-                    if (prevEvent && prevEvent.id === stateId && prevEvent.value === state.val && Date.now() - prevEvent.ts < 500) {
-                        adapter.log.warn(`Ignore state "${name} / ${stateId}" because it is the same as last one (${state.val}, ${cron})`);
+                    if (
+                        prevEvent &&
+                        prevEvent.id === stateId &&
+                        prevEvent.value === state.val &&
+                        Date.now() - prevEvent.ts < 500
+                    ) {
+                        adapter.log.warn(
+                            `Ignore state "${name} / ${stateId}" because it is the same as last one (${state.val}, ${cron})`,
+                        );
                         continue;
                     }
 
@@ -435,7 +465,9 @@ function startAdapter(options) {
                         type: 'schedule',
                     });
 
-                    adapter.log.debug(`Add event to simulation "${getText(simulation)}": ${name}/${stateId} => ${state.val}`);
+                    adapter.log.debug(
+                        `Add event to simulation "${getText(simulation)}": ${name}/${stateId} => ${state.val}`,
+                    );
 
                     // save simulation
                     await adapter.setForeignObjectAsync(simulation._id, profile);
@@ -510,8 +542,8 @@ function startAdapter(options) {
                 }
                 await subscribeUnsubscribe();
             } else if (recordingSimulations[id]) {
-                 await stopRecordSimulation(id);
-                 delete recordingSimulations[id];
+                await stopRecordSimulation(id);
+                delete recordingSimulations[id];
             }
             return;
         }
@@ -521,9 +553,15 @@ function startAdapter(options) {
                 systemConfig = obj;
             }
 
-            if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
-                systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
-                adapter.log.warn('Please specify longitude and latitude in system settings, else astro events will not work');
+            if (
+                systemConfig.common.latitude === undefined ||
+                systemConfig.common.latitude === null ||
+                systemConfig.common.longitude === undefined ||
+                systemConfig.common.longitude === null
+            ) {
+                adapter.log.warn(
+                    'Please specify longitude and latitude in system settings, else astro events will not work',
+                );
             }
             language = systemConfig.common.language;
 
@@ -559,7 +597,7 @@ function startAdapter(options) {
 
 async function getStateName(id, state) {
     if (names[id]) {
-        return {name: names[id], id};
+        return { name: names[id], id };
     } else {
         const obj = await getForeignObjectAsyncCached(id);
         const enums = getRoomFunc(id);
@@ -574,7 +612,7 @@ async function getStateName(id, state) {
             name += ` = ${state.val}`;
             // todo: generate for window/door/light/dimmer automatically opened/closed/set to
         }
-        return {name, id};
+        return { name, id };
     }
 }
 
@@ -595,54 +633,62 @@ async function executeEvent(event, now) {
         return;
     }
     if (event.native.type !== 'single' && event.native.intervals && event.native.intervals.length) {
-        event.timer = setTimeout((_event, _obj) => {
-            if (_event.native.type === 'toggle') {
-                let value = _event.native.startValue;
-                if (_obj.common.type === 'number') {
-                    if (_obj.common.min && _obj.common.max) {
-                        value = value === _obj.common.max ? _obj.common.min : obj.common.max;
-                    } else {
+        event.timer = setTimeout(
+            (_event, _obj) => {
+                if (_event.native.type === 'toggle') {
+                    let value = _event.native.startValue;
+                    if (_obj.common.type === 'number') {
+                        if (_obj.common.min && _obj.common.max) {
+                            value = value === _obj.common.max ? _obj.common.min : obj.common.max;
+                        } else {
+                            value = !value;
+                        }
+                    } else if (_obj.common.type === 'boolean') {
                         value = !value;
+                    } else if (_obj.common.type === 'string') {
+                        if (_event.native.startValue === 'on') {
+                            value = 'off';
+                        } else if (_event.native.startValue === 'ON') {
+                            value = 'OFF';
+                        } else if (_obj.common.min && _obj.common.max) {
+                            value = value === _obj.common.max ? _obj.common.min : obj.common.max;
+                        } else {
+                            // do nothing
+                            adapter.log.warn(`Cannot detect toggle value for string: ${value} in ${_obj._id}`);
+                            return;
+                        }
                     }
-                } else if (_obj.common.type === 'boolean') {
-                    value = !value;
-                } else if (_obj.common.type === 'string') {
-                    if (_event.native.startValue === 'on') {
-                        value = 'off';
-                    } else if (_event.native.startValue === 'ON') {
-                        value = 'OFF';
-                    } else if (_obj.common.min && _obj.common.max) {
-                        value = value === _obj.common.max ? _obj.common.min : obj.common.max;
-                    } else {
-                        // do nothing
-                        adapter.log.warn(`Cannot detect toggle value for string: ${value} in ${_obj._id}`);
-                        return;
+                    adapter.setForeignState(_obj._id, value);
+                } else {
+                    const interval = _event.native.intervals[0] || {};
+                    if (_obj.common.type === 'number') {
+                        if (typeof interval.value !== 'number') {
+                            interval.value = parseFloat(interval.value);
+                        }
+                    } else if (obj.common.type === 'boolean') {
+                        if (typeof interval.value !== 'boolean') {
+                            interval.value =
+                                interval.value === 'true' ||
+                                interval.value === '1' ||
+                                interval.value === 1 ||
+                                interval.value === 'on' ||
+                                interval.value === 'ON';
+                        }
+                    } else if (obj.common.type === 'string') {
+                        if (typeof interval.value !== 'string') {
+                            interval.value = interval.value.toString();
+                        }
                     }
+                    adapter.setForeignState(_obj._id, interval.value);
                 }
-                adapter.setForeignState(_obj._id, value);
-            } else {
-                const interval = _event.native.intervals[0] || {};
-                if (_obj.common.type === 'number') {
-                    if (typeof interval.value !== 'number') {
-                        interval.value = parseFloat(interval.value);
-                    }
-                } else if (obj.common.type === 'boolean') {
-                    if (typeof interval.value !== 'boolean') {
-                        interval.value =
-                            interval.value === 'true' ||
-                            interval.value === '1' ||
-                            interval.value === 1 ||
-                            interval.value === 'on' ||
-                            interval.value === 'ON';
-                    }
-                } else if (obj.common.type === 'string') {
-                    if (typeof interval.value !== 'string') {
-                        interval.value = interval.value.toString();
-                    }
-                }
-                adapter.setForeignState(_obj._id, interval.value);
-            }
-        }, parseInt((event.native.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset) || 1000, 10), event, obj);
+            },
+            parseInt(
+                (event.native.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset) || 1000,
+                10,
+            ),
+            event,
+            obj,
+        );
     }
 
     if (obj.common.type === 'number') {
@@ -668,7 +714,7 @@ async function executeEvent(event, now) {
 }
 
 // const YYYY_MM_            = 'YYYY_MM_'.length;
-const YYYY_MM_DDTHH_mm    = 'YYYY_MM_DDTHH_mm'.length;
+const YYYY_MM_DDTHH_mm = 'YYYY_MM_DDTHH_mm'.length;
 const YYYY_MM_DDTHH_mm_ss = 'YYYY_MM_DDTHH_mm_ss'.length;
 // const DDTHH_mm_ss         = 'DDTHH_mm_ss'.length;
 
@@ -676,7 +722,7 @@ function calculateNext() {
     nextTimer && clearTimeout(nextTimer);
 
     let timeout = null;
-    const nowObj  = new Date();
+    const nowObj = new Date();
     const nowTick = nowObj.getTime();
     let diff;
 
@@ -705,7 +751,14 @@ function calculateNext() {
             let date = later.schedule(event.parsed).next();
 
             if (event.native.astro) {
-                date = timeUtils.getAstroTime(event.native.astro, event.native.offset, date, SunCalc, systemConfig, adapterConfig);
+                date = timeUtils.getAstroTime(
+                    event.native.astro,
+                    event.native.offset,
+                    date,
+                    SunCalc,
+                    systemConfig,
+                    adapterConfig,
+                );
             }
 
             if (date.simulationStart && date.simulationStart.getTime() > date.getTime()) {
@@ -720,14 +773,16 @@ function calculateNext() {
             // console.log(date);
 
             if (event.native.timeRandomOffset) {
-                date = new Date(date.getTime() + Math.round(Math.random() * event.native.timeRandomOffset * (Math.random() > 0.5 ? 1 : -1)));
+                date = new Date(
+                    date.getTime() +
+                        Math.round(Math.random() * event.native.timeRandomOffset * (Math.random() > 0.5 ? 1 : -1)),
+                );
             }
 
             if (date) {
                 diff = date.getTime() - nowTick;
                 if (diff >= -2000 && diff < 2000) {
-                    executeEvent(event, nowTick)
-                        .then(() => {});
+                    executeEvent(event, nowTick).then(() => {});
                     date = later.schedule(event.parsed).next(1, new Date(nowTick + 2000));
                 }
 
@@ -739,11 +794,19 @@ function calculateNext() {
                     timeout = diff;
                 }
             }
-        } else { // once
+        } else {
+            // once
             // expected 2017-09-12T12:12:00
             let time;
             if (event.native.astro) {
-                time = timeUtils.getAstroTime(event.native.astro, event.native.offset, timeUtils.parseISOLocal(event.native.start), SunCalc, systemConfig, adapterConfig);
+                time = timeUtils.getAstroTime(
+                    event.native.astro,
+                    event.native.offset,
+                    timeUtils.parseISOLocal(event.native.start),
+                    SunCalc,
+                    systemConfig,
+                    adapterConfig,
+                );
             } else {
                 time = timeUtils.parseISOLocal(event.native.start);
             }
@@ -754,16 +817,16 @@ function calculateNext() {
 
             // console.log(time);
 
-            if (nowObj.getFullYear() === time.getFullYear() &&
+            if (
+                nowObj.getFullYear() === time.getFullYear() &&
                 nowObj.getMonth() === time.getMonth() &&
                 nowObj.getDate() === time.getDate() &&
                 nowObj.getHours() === time.getHours() &&
                 nowObj.getMinutes() === time.getMinutes() &&
-                (Math.abs(nowObj.getSeconds() - time.getSeconds()) < 2) &&
+                Math.abs(nowObj.getSeconds() - time.getSeconds()) < 2 &&
                 (!event.lastExec || nowTick - event.lastExec > 1999)
             ) {
-                executeEvent(event, nowTick)
-                    .then(() => {});
+                executeEvent(event, nowTick).then(() => {});
             } else {
                 time = time.getTime();
 
@@ -814,15 +877,19 @@ function getRoomFunc(id) {
             break;
         }
     }
-    return {func, room};
+    return { func, room };
 }
 
 async function readEnums() {
     rooms = {};
-    Object.keys(enums).filter(id => id.startsWith('enum.rooms.')).forEach(id => rooms[id] = enums[id]);
+    Object.keys(enums)
+        .filter(id => id.startsWith('enum.rooms.'))
+        .forEach(id => (rooms[id] = enums[id]));
 
     funcs = {};
-    Object.keys(enums).filter(id => id.startsWith('enum.functions.')).forEach(id => funcs[id] = enums[id]);
+    Object.keys(enums)
+        .filter(id => id.startsWith('enum.functions.'))
+        .forEach(id => (funcs[id] = enums[id]));
 }
 
 function setTimeZone() {
@@ -836,7 +903,7 @@ async function main() {
 
     setTimeZone();
 
-    const result = await adapter.getObjectViewAsync('system', 'enum', {startkey: 'enum.', endkey: 'enum.\u9999'});
+    const result = await adapter.getObjectViewAsync('system', 'enum', { startkey: 'enum.', endkey: 'enum.\u9999' });
     if (result) {
         for (let i = 0; i < result.rows.length; i++) {
             if (result.rows[i].value && result.rows[i].value.common && result.rows[i].value.common.members) {
@@ -848,12 +915,17 @@ async function main() {
 
     // fix old design
     const design = await adapter.getForeignObjectAsync('_design/schedule');
-    if (!design || !design.views || !design.views.schedule || design.views.schedule.map !== 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }') {
+    if (
+        !design ||
+        !design.views ||
+        !design.views.schedule ||
+        design.views.schedule.map !== "function(doc) { if (doc.type === 'schedule') emit(doc._id, doc); }"
+    ) {
         await adapter.setForeignObjectAsync('_design/schedule', {
             language: 'javascript',
             views: {
                 schedule: {
-                    map: 'function(doc) { if (doc.type === \'schedule\') emit(doc._id, doc); }',
+                    map: "function(doc) { if (doc.type === 'schedule') emit(doc._id, doc); }",
                 },
             },
         });
@@ -885,9 +957,15 @@ async function main() {
     try {
         systemConfig = await adapter.getForeignObjectAsync('system.config');
         adapterConfig = await adapter.getForeignObjectAsync(`system.adapter.fullcalendar.${adapter.instance}`);
-        if (systemConfig.common.latitude === undefined || systemConfig.common.latitude === null ||
-            systemConfig.common.longitude === undefined || systemConfig.common.longitude === null) {
-            adapter.log.warn('Please specify longitude and latitude in system settings, else astro events will not work');
+        if (
+            systemConfig.common.latitude === undefined ||
+            systemConfig.common.latitude === null ||
+            systemConfig.common.longitude === undefined ||
+            systemConfig.common.longitude === null
+        ) {
+            adapter.log.warn(
+                'Please specify longitude and latitude in system settings, else astro events will not work',
+            );
         }
         language = systemConfig.common.language;
     } catch (e) {
@@ -913,13 +991,14 @@ async function main() {
 
     updateInterval = setInterval(() => {
         Object.keys(recordingSimulations).forEach(id => {
-            if ((recordingSimulations[id].value === 'record' || recordingSimulations[id].value === 'pause') &&
+            if (
+                (recordingSimulations[id].value === 'record' || recordingSimulations[id].value === 'pause') &&
                 new Date(recordingSimulations[id].native.record.end).getTime() < Date.now()
             ) {
                 adapter.setForeignState(id, 'stop');
                 stopRecordSimulation(id);
-            } else
-            if (recordingSimulations[id].value === 'play' &&
+            } else if (
+                recordingSimulations[id].value === 'play' &&
                 recordingSimulations[id].native.play?.end &&
                 new Date(recordingSimulations[id].native.play.end).getTime() < Date.now()
             ) {

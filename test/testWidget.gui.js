@@ -1,5 +1,5 @@
 const helper = require('@iobroker/vis-2-widgets-testing');
-const { deleteFoldersRecursive } = require("@iobroker/build-tools");
+// const { deleteFoldersRecursive } = require("@iobroker/build-tools");
 const { existsSync } = require('node:fs');
 const adapterName = require('../package.json').name.split('.').pop();
 

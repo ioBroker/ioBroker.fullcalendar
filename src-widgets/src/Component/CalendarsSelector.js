@@ -23,11 +23,12 @@ class CalendarsSelector extends React.Component {
     componentDidMount() {
         if (this.props.instance) {
             // read possible calenders
-            this.props.socket.getObjectViewSystem(
-                'folder',
-                `fullcalendar.${this.props.instance}.Calendars.`,
-                `fullcalendar.${this.props.instance}.Calendars.\u9999`,
-            )
+            this.props.socket
+                .getObjectViewSystem(
+                    'folder',
+                    `fullcalendar.${this.props.instance}.Calendars.`,
+                    `fullcalendar.${this.props.instance}.Calendars.\u9999`,
+                )
                 .then(objects => {
                     const list = Object.keys(objects).map(id => ({
                         value: id,
@@ -40,14 +41,23 @@ class CalendarsSelector extends React.Component {
     }
 
     render() {
-        return <Select
-            variant="standard"
-            fullWidth
-            value={this.props.value || '_'}
-            onChange={e => this.props.onChange(e.target.value === '_' ? '' : e.target.value)}
-        >
-            {this.state.list.map(item => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}
-        </Select>;
+        return (
+            <Select
+                variant="standard"
+                fullWidth
+                value={this.props.value || '_'}
+                onChange={e => this.props.onChange(e.target.value === '_' ? '' : e.target.value)}
+            >
+                {this.state.list.map(item => (
+                    <MenuItem
+                        key={item.value}
+                        value={item.value}
+                    >
+                        {item.label}
+                    </MenuItem>
+                ))}
+            </Select>
+        );
     }
 }
 
