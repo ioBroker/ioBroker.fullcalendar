@@ -6,8 +6,6 @@
 
 const fs = require('node:fs');
 const { deleteFoldersRecursive, npmInstall, buildReact, copyFiles } = require('@iobroker/build-tools');
-const adapterName = require('./package.json').name.replace('iobroker.', '');
-const buildHelper = require('@iobroker/vis-2-widgets-react-dev/buildHelper');
 
 function sync2files(src, dst) {
     const srcTxt = fs.readFileSync(src).toString('utf8');
@@ -47,52 +45,36 @@ function cleanWidget() {
 }
 
 function copyAllFilesWidget() {
-    copyFiles([`src-widgets/build/*.js`], `widgets/${adapterName}`);
-    copyFiles([`src-widgets/build/img/*`], `widgets/${adapterName}/img`);
-    copyFiles([`src-widgets/build/*.map`], `widgets/${adapterName}`);
-
-    let files = [`src-widgets/build/static/*`, ...buildHelper.ignoreFiles(`src-widgets/`)];
-    copyFiles(files, `widgets/${adapterName}/static`);
     copyFiles(
-        [
-            'src-widgets/build/static/js/*emotion_styled_dist*',
-            'src-widgets/build/static/js/*react-transition-group_esm*',
-            'src-widgets/build/static/js/*mui_system_colorManipulator*',
-        ],
-        `widgets/${adapterName}/static/js`,
-    );
+        ['src-widgets/build/**/*', '!src-widgets/build/index.html', '!src-widgets/build/mf-manifest.json'],
+        'widgets/fullcalendar/',
+        {
+            process: (fileData, fileName) => {
+                if (fileName.includes('installSVGRenderer')) {
+                    // zrender has an error. It uses isFunction before it is defined
+                    // here is a code:
+                    //    bind = protoFunction && isFunction(protoFunction.bind) ? protoFunction.call.bind(protoFunction.bind) : bindPolyfill;
+                    // and later comes the definition of isFunction:
+                    //   isFunction = function(value) {
+                    //     return typeof value === "function";
+                    //   };
 
-    copyFiles(
-        [
-            'src-widgets/build/static/js/*mui_material_styles_styled_js-node_modules_mui_material_styles_useTheme*.*',
-            'src-widgets/build/static/js/*mui_material_styles_useTheme_js-node_modules*.*',
-            'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_DialogActions*.*',
-            'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Chip_Chip_*.*',
-            'src-widgets/build/static/js/*mui_material_Button_Button_js-node_modules_mui_material_Dialog_Dialog_*.*',
-            'src-widgets/build/static/js/*mui_styled-engine_index_js-node_modules_mui_system_esm_*.*',
-            'src-widgets/build/static/js/*mui_material_styles_styled_*.*',
-            'src-widgets/build/static/js/*mui_x-date-pickers_TimePicker_TimePicker*.*',
-            'src-widgets/build/static/js/*mui_x-date-pickers_AdapterMoment*.*',
-            'src-widgets/build/static/js/*react-transition-group_esm_CSSTransition*.*',
-            'src-widgets/build/static/js/*mui_material_utils_createSvgIcon*.*',
-            'src-widgets/build/static/js/*suncalc2_suncalc2*.*',
-            ...buildHelper.copyFiles(`src-widgets/`),
-        ],
-        `widgets/${adapterName}/static/js`,
-    );
-
-    copyFiles([`src-widgets/src/i18n/*.json`], `widgets/${adapterName}/i18n`);
-
-    return new Promise(resolve =>
-        setTimeout(() => {
-            if (
-                fs.existsSync(`widgets/${adapterName}/static/media`) &&
-                !fs.readdirSync(`widgets/${adapterName}/static/media`).length
-            ) {
-                fs.rmdirSync(`widgets/${adapterName}/static/media`);
-            }
-            resolve(null);
-        }, 500),
+                    // Minified code looks like:
+                    //   ut = ra && Y(ra.bind)
+                    // Where Y is isFunction and ra is protoFunction
+                    fileData = fileData.toString();
+                    const match = fileData.match(/\w+\s*=\s*\w+\s*&&\s*(\w)\(\w+.bind\)/);
+                    if (match) {
+                        // place before match[0] the definition of isFunction
+                        fileData = fileData.replace(
+                            match[0],
+                            `${match[1]}=value=>typeof value === "function";${match[0]}`,
+                        ); // prevent error
+                    }
+                    return fileData;
+                }
+            },
+        },
     );
 }
 

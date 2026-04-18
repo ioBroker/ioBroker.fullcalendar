@@ -1,0 +1,284 @@
+{
+  "_DefaultPropsProvider-XYnvdTOt.js": {
+    "file": "assets/DefaultPropsProvider-XYnvdTOt.js",
+    "name": "DefaultPropsProvider",
+    "imports": [
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js"
+    ]
+  },
+  "_TextField-CpmA-DnZ.js": {
+    "file": "assets/TextField-CpmA-DnZ.js",
+    "name": "TextField",
+    "imports": [
+      "_defaultTheme-CaQBKbzT.js",
+      "_index-DvUGxIFq.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_createSvgIcon-DGfav3wW.js",
+      "_useTheme-6qHn8Vyq.js",
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "__commonjsHelpers-Cpj98o6Y.js": {
+    "file": "assets/_commonjsHelpers-Cpj98o6Y.js",
+    "name": "_commonjsHelpers"
+  },
+  "_createGrid-BIU-egYT.js": {
+    "file": "assets/createGrid-BIU-egYT.js",
+    "name": "createGrid",
+    "imports": [
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_index-DvUGxIFq.js"
+    ]
+  },
+  "_createSvgIcon-DGfav3wW.js": {
+    "file": "assets/createSvgIcon-DGfav3wW.js",
+    "name": "createSvgIcon",
+    "imports": [
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_defaultTheme-CaQBKbzT.js"
+    ]
+  },
+  "_defaultTheme-CaQBKbzT.js": {
+    "file": "assets/defaultTheme-CaQBKbzT.js",
+    "name": "defaultTheme",
+    "imports": [
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js": {
+    "file": "assets/fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+    "name": "fullcalendar__loadShare__react__loadShare__",
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js": {
+    "file": "assets/fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js",
+    "name": "fullcalendar__mf_v__runtimeInit__mf_v__"
+  },
+  "_getColorSchemeSelector-C1WqGkJ4.js": {
+    "file": "assets/getColorSchemeSelector-C1WqGkJ4.js",
+    "name": "getColorSchemeSelector",
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js"
+    ]
+  },
+  "_index-BEpFHtMA.js": {
+    "file": "assets/index-BEpFHtMA.js",
+    "name": "index",
+    "isDynamicEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "_index-DQiceR5U.js": {
+    "file": "assets/index-DQiceR5U.js",
+    "name": "index",
+    "isDynamicEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "_index-DYG376EV.js": {
+    "file": "assets/index-DYG376EV.js",
+    "name": "index",
+    "isDynamicEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js"
+    ]
+  },
+  "_index-DvUGxIFq.js": {
+    "file": "assets/index-DvUGxIFq.js",
+    "name": "index",
+    "imports": [
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_DefaultPropsProvider-XYnvdTOt.js"
+    ]
+  },
+  "_index.cjs-DgT9IskJ.js": {
+    "file": "assets/index.cjs-DgT9IskJ.js",
+    "name": "index.cjs"
+  },
+  "_preload-helper-PPVm8Dsz.js": {
+    "file": "assets/preload-helper-PPVm8Dsz.js",
+    "name": "preload-helper"
+  },
+  "_tslib.es6-Di4_HT9Y.js": {
+    "file": "assets/tslib.es6-Di4_HT9Y.js",
+    "name": "tslib.es6",
+    "imports": [
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "_useTheme-6qHn8Vyq.js": {
+    "file": "assets/useTheme-6qHn8Vyq.js",
+    "name": "useTheme",
+    "imports": [
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_defaultTheme-CaQBKbzT.js"
+    ]
+  },
+  "index.html": {
+    "file": "assets/index-BV1aHYMi.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_index.cjs-DgT9IskJ.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "node_modules/@iobroker/adapter-react-v5/build/index.js": {
+    "file": "assets/index-CFz54d3_.js",
+    "name": "index",
+    "src": "node_modules/@iobroker/adapter-react-v5/build/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_defaultTheme-CaQBKbzT.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_tslib.es6-Di4_HT9Y.js",
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_useTheme-6qHn8Vyq.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "node_modules/@mui/icons-material/esm/index.js": {
+    "file": "assets/index-DdMw1zJ2.js",
+    "name": "index",
+    "src": "node_modules/@mui/icons-material/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_createSvgIcon-DGfav3wW.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js",
+      "_defaultTheme-CaQBKbzT.js"
+    ]
+  },
+  "node_modules/@mui/material/index.js": {
+    "file": "assets/index-CyrxrR-B.js",
+    "name": "index",
+    "src": "node_modules/@mui/material/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_defaultTheme-CaQBKbzT.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_TextField-CpmA-DnZ.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_createSvgIcon-DGfav3wW.js",
+      "_useTheme-6qHn8Vyq.js",
+      "_index-DvUGxIFq.js",
+      "_createGrid-BIU-egYT.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js",
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "node_modules/@mui/system/esm/index.js": {
+    "file": "assets/index-hrzkI21u.js",
+    "name": "index",
+    "src": "node_modules/@mui/system/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_index-DvUGxIFq.js",
+      "_createGrid-BIU-egYT.js",
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ]
+  },
+  "node_modules/__mf__virtual/fullcalendar__H_A_I__hostAutoInit__H_A_I__.js": {
+    "file": "assets/hostInit-D6momM_S.js",
+    "name": "hostInit",
+    "src": "node_modules/__mf__virtual/fullcalendar__H_A_I__hostAutoInit__H_A_I__.js",
+    "isEntry": true,
+    "imports": [
+      "_preload-helper-PPVm8Dsz.js"
+    ],
+    "dynamicImports": [
+      "virtual:mf-REMOTE_ENTRY_ID"
+    ]
+  },
+  "src/FullCalendar.jsx": {
+    "file": "assets/FullCalendar-Ct_HXqsn.js",
+    "name": "FullCalendar",
+    "src": "src/FullCalendar.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_DefaultPropsProvider-XYnvdTOt.js",
+      "_fullcalendar__loadShare__react__loadShare__-tokQnSgq.js",
+      "_getColorSchemeSelector-C1WqGkJ4.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js",
+      "_TextField-CpmA-DnZ.js",
+      "_tslib.es6-Di4_HT9Y.js",
+      "__commonjsHelpers-Cpj98o6Y.js",
+      "_index-DvUGxIFq.js",
+      "_createSvgIcon-DGfav3wW.js",
+      "_defaultTheme-CaQBKbzT.js",
+      "_useTheme-6qHn8Vyq.js"
+    ],
+    "css": [
+      "assets/FullCalendar-DRKqq0fW.css"
+    ]
+  },
+  "src/translations.ts": {
+    "file": "assets/translations-CS-x783U.js",
+    "name": "translations",
+    "src": "src/translations.ts",
+    "isDynamicEntry": true
+  },
+  "virtual:mf-REMOTE_ENTRY_ID": {
+    "file": "customWidgets.js",
+    "name": "customWidgets",
+    "src": "virtual:mf-REMOTE_ENTRY_ID",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index.cjs-DgT9IskJ.js",
+      "virtual:mf-exposes",
+      "_preload-helper-PPVm8Dsz.js",
+      "_fullcalendar__mf_v__runtimeInit__mf_v__-CdxiMOBu.js"
+    ],
+    "dynamicImports": [
+      "node_modules/@iobroker/adapter-react-v5/build/index.js",
+      "node_modules/@mui/icons-material/esm/index.js",
+      "node_modules/@mui/material/index.js",
+      "node_modules/@mui/system/esm/index.js",
+      "_index-DQiceR5U.js",
+      "_index-BEpFHtMA.js",
+      "_index-DYG376EV.js"
+    ]
+  },
+  "virtual:mf-exposes": {
+    "file": "assets/virtualExposes-DrvPLhyc.js",
+    "name": "virtualExposes",
+    "src": "virtual:mf-exposes",
+    "isEntry": true,
+    "imports": [
+      "_preload-helper-PPVm8Dsz.js"
+    ],
+    "dynamicImports": [
+      "src/FullCalendar.jsx",
+      "src/translations.ts"
+    ]
+  }
+}
