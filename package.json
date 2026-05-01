@@ -39,7 +39,7 @@
         "@iobroker/vis-2-widgets-testing": "^1.0.6",
         "colorette": "^2.0.20",
         "mocha": "^11.7.5",
-        "puppeteer": "^24.41.0",
+        "puppeteer": "^24.42.0",
         "typescript": "^5.9.3"
     },
     "bugs": {
