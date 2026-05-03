@@ -108,6 +108,8 @@ How to use:
 ### 0.1.0 (2017-03-20)
 * (bluefox) initial commit
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 The MIT License (MIT)
 
