@@ -22,6 +22,10 @@ export default defineConfig(() => {
             alias: {
                 react: path.resolve(__dirname, 'node_modules/react'),
                 'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+                // Calendar/EventDialog/Utils are shared verbatim with src-widgets (see sync2files in tasks.js).
+                // vis-2 only supports @iobroker/adapter-react-v5, so the shared sources import that name;
+                // in the admin it is served by its successor @iobroker/gui-components (React 19 ready).
+                '@iobroker/adapter-react-v5': path.resolve(__dirname, 'node_modules/@iobroker/gui-components'),
             },
         },
         server: {

@@ -6,3 +6,5 @@ src/build
 tmp
 *.tgz
 /src-widgets/.__mf__temp/
+# compiled adapter backend (src/*.ts => build/), rebuilt by `npm run build-backend`
+/build/

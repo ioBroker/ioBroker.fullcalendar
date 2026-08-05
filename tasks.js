@@ -5,33 +5,59 @@
 'use strict';
 
 const fs = require('node:fs');
+const { fork } = require('node:child_process');
 const { deleteFoldersRecursive, npmInstall, buildReact, copyFiles } = require('@iobroker/build-tools');
 
+/** Compile the adapter backend: src/*.ts => build/*.js */
+function buildBackend() {
+    return new Promise((resolve, reject) => {
+        const script = `${__dirname}/node_modules/typescript/bin/tsc`;
+        if (!fs.existsSync(script)) {
+            reject(new Error(`Cannot find execution file: ${script}`));
+            return;
+        }
+        const child = fork(script, ['-p', `${__dirname}/tsconfig.build.json`], { stdio: 'pipe', cwd: __dirname });
+        child.stdout?.on('data', data => console.log(data.toString()));
+        child.stderr?.on('data', data => console.log(data.toString()));
+        child.on('close', code => (code ? reject(new Error(`tsc exit code: ${code}`)) : resolve()));
+    });
+}
+
 function sync2files(src, dst) {
-    const srcTxt = fs.readFileSync(src).toString('utf8');
-    const destTxt = fs.readFileSync(dst).toString('utf8');
+    let srcTxt = fs.readFileSync(src).toString('utf8');
+    let destTxt = fs.readFileSync(dst).toString('utf8');
     if (srcTxt !== destTxt) {
         const srcs = fs.statSync(src);
         const dest = fs.statSync(dst);
         if (srcs.mtime > dest.mtime) {
+            if (dst.inlcudes('widgets')) {
+                srcTxt = srcTxt.replace(/gui-components/g, 'adapter-react-v5');
+            } else {
+                srcTxt = srcTxt.replace(/adapter-react-v5/g, 'gui-components');
+            }
             fs.writeFileSync(dst, srcTxt);
         } else {
+            if (src.inlcudes('widgets')) {
+                destTxt = destTxt.replace(/gui-components/g, 'adapter-react-v5');
+            } else {
+                destTxt = destTxt.replace(/adapter-react-v5/g, 'gui-components');
+            }
             fs.writeFileSync(src, destTxt);
         }
     }
 }
 
 function buildWidgets() {
-    // sync src and src-widgets
-    sync2files(
-        `${__dirname}/src-widgets/src/Component/Calendar.jsx`,
-        `${__dirname}/src-admin/src/Component/Calendar.jsx`,
-    );
-    sync2files(
-        `${__dirname}/src-widgets/src/Component/EventDialog.jsx`,
-        `${__dirname}/src-admin/src/Component/EventDialog.jsx`,
-    );
-    sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src-admin/src/Component/Utils.js`);
+    // sync src and src-widgets. Stop it till vis-2 is not updated to react 19
+    // sync2files(
+    //     `${__dirname}/src-widgets/src/Component/Calendar.tsx`,
+    //     `${__dirname}/src-admin/src/Component/Calendar.tsx`,
+    // );
+    // sync2files(
+    //     `${__dirname}/src-widgets/src/Component/EventDialog.tsx`,
+    //     `${__dirname}/src-admin/src/Component/EventDialog.tsx`,
+    // );
+    sync2files(`${__dirname}/src-widgets/src/Component/Utils.ts`, `${__dirname}/src-admin/src/Component/Utils.ts`);
     sync2files(`${__dirname}/src-widgets/src/Component/styles.css`, `${__dirname}/src-admin/src/Component/styles.css`);
     return buildReact(`${__dirname}/src-widgets`, { rootDir: __dirname, vite: true }).catch(() =>
         console.error('Error by build'),
@@ -231,7 +257,12 @@ function patch() {
     }
 }
 
-if (process.argv.includes('--0-widget-clean')) {
+if (process.argv.includes('--backend-build')) {
+    buildBackend().catch(e => {
+        console.error(`Cannot build backend: ${e}`);
+        process.exit(1);
+    });
+} else if (process.argv.includes('--0-widget-clean')) {
     cleanWidget();
 } else if (process.argv.includes('--1-widget-npm')) {
     npmInstall(`${__dirname}/src-widgets/`, { force: true }).catch(e =>
@@ -281,5 +312,6 @@ if (process.argv.includes('--0-widget-clean')) {
         .then(() => {
             copyAllFiles();
             patch();
-        });
+        })
+        .then(() => buildBackend());
 }

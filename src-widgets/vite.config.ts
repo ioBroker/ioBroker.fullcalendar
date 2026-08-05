@@ -17,7 +17,7 @@ const config = {
             filename: 'customWidgets.js',
             exposes: {
                 './FullCalendar': './src/FullCalendar',
-                './translations': './src/translations.js',
+                './translations': './src/translations',
             },
             remotes: {},
             shared: moduleFederationShared(pack),
