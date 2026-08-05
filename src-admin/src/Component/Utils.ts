@@ -72,6 +72,8 @@ export interface CalendarEventNative {
     states?: Record<string, string>;
     /** random jitter in ms */
     timeRandomOffset?: number;
+    /** @deprecated events created by older versions stored the color here instead of in `common` */
+    color?: string;
     durationEditable?: boolean;
     record?: {
         states: string[];

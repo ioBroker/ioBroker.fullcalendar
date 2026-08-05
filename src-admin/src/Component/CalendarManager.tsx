@@ -3,9 +3,9 @@ import type { CSSProperties, JSX } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ReactSplit, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 
-import { IconButton, Tab, Tabs, Paper, Tooltip, Toolbar, Fab, Box } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 
-import { Add, Edit, ReportProblem as Alert, PlaylistPlay as SimulationIcon, CalendarMonth } from '@mui/icons-material';
+import { Edit } from '@mui/icons-material';
 
 import { I18n } from '@iobroker/gui-components';
 import type { AdminConnection, IobTheme, ThemeType } from '@iobroker/gui-components';
@@ -13,11 +13,10 @@ import type { AdminConnection, IobTheme, ThemeType } from '@iobroker/gui-compone
 import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog from './CalendarDialog';
+import { SidePanel, SidePanelItem } from './SidePanel';
 import type { CalendarObject } from './CalendarDialog';
 
-// mixes plain inline styles with MUI `sx` entries (incl. theme callbacks), hence `any`
-const styles: Record<string, any> = {
-    tabs: {},
+const styles: Record<string, CSSProperties> = {
     column: {
         width: '100%',
         display: 'flex',
@@ -28,60 +27,13 @@ const styles: Record<string, any> = {
     calendars: {
         height: '100%',
     },
-    calendarsPaper: {
-        minHeight: '100%',
-    },
     container: {
         display: 'flex',
         width: '100%',
         flex: 1,
     },
-    toolbar: (theme: IobTheme) => ({
-        backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
-        padding: '2px 5px',
-    }),
-    label: {
-        width: '100%',
-        textAlign: 'left',
-        display: 'flex',
-        alignItems: 'center',
-        '& .edit': {
-            opacity: 0,
-        },
-        '&:hover .edit': {
-            opacity: 1,
-        },
-    },
-    divider: {
-        flexGrow: 1,
-    },
-    simulations: (theme: IobTheme) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#131b2680' : '#b6d3ff80',
-    }),
-    tabRoot: {
-        padding: '0 6px',
-        maxWidth: '100%',
-    },
-    alert: (theme: IobTheme) => ({
-        display: 'inline-block',
-        '& svg': {
-            color: theme.palette.error.main,
-        },
-    }),
-    selected: (theme: IobTheme) => ({
-        backgroundColor: theme.palette.primary.main,
-        color: 'white !important',
-    }),
     tooltip: {
         pointerEvents: 'none',
-    },
-    eventsCount: {
-        position: 'absolute',
-        right: 5,
-        top: 2,
-        fontSize: 10,
-        opacity: 0.7,
-        fontStyle: 'italic',
     },
 };
 
@@ -175,127 +127,66 @@ const CalendarManager = (props: CalendarManagerProps): JSX.Element => {
                         gutterClassName={props.themeType === 'dark' ? 'Dark visGutter' : 'Light visGutter'}
                     >
                         <div style={styles.calendars}>
-                            <Paper style={styles.calendarsPaper}>
-                                <Tabs
-                                    value={0}
-                                    onChange={changeCalendarType}
-                                    style={styles.tabs}
-                                >
-                                    <Tab
-                                        title={I18n.t('Calendars')}
-                                        icon={<CalendarMonth />}
-                                    />
-                                    <Tab
-                                        title={I18n.t('Simulations')}
-                                        icon={<SimulationIcon />}
-                                        sx={styles.simulations}
-                                    />
-                                </Tabs>
-                                <Toolbar
-                                    variant="dense"
-                                    sx={styles.toolbar}
-                                >
-                                    <Fab
-                                        size="small"
-                                        title={I18n.t('Add new calendar')}
-                                        color="primary"
-                                        onClick={async () => {
-                                            const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
-                                            await props.socket.setObject(id, {
-                                                type: 'folder',
-                                                common: {
-                                                    name: 'NewCalendar',
-                                                },
-                                                native: {},
-                                            } as unknown as ioBroker.Object);
-                                            await updateCalendars();
-                                            setCalendarPrefix(id);
-                                            window.localStorage.setItem('fullcalendar.calendar', id);
-                                            setTimeout(() => setCalendarDialog(id), 300);
-                                        }}
-                                    >
-                                        <Add />
-                                    </Fab>
-                                    <div style={styles.divider} />
-                                    {!alive && (
-                                        <Tooltip
-                                            title={I18n.t('Instance inactive')}
-                                            slotProps={{ popper: { sx: styles.tooltip } }}
-                                        >
-                                            <Box
-                                                component="div"
-                                                sx={styles.alert}
-                                            >
-                                                <Alert />
-                                            </Box>
-                                        </Tooltip>
-                                    )}
-                                </Toolbar>
-                                <Tabs
-                                    value={
-                                        calendars.find(c => c._id === calendarPrefix)
-                                            ? calendarPrefix
-                                            : `fullcalendar.${props.instance}`
-                                    }
-                                    onChange={(_e, value: string) => {
-                                        window.localStorage.setItem('fullcalendar.calendar', value);
-                                        setCalendarPrefix(value);
+                            <SidePanel
+                                isSimulations={false}
+                                onChangeMode={changeCalendarType}
+                                title={I18n.t('Calendars')}
+                                addTitle={I18n.t('Add new calendar')}
+                                alive={alive}
+                                onAdd={async () => {
+                                    const id = `fullcalendar.${props.instance}.Calendars.Calendar-${uuidv4()}`;
+                                    await props.socket.setObject(id, {
+                                        type: 'folder',
+                                        common: {
+                                            name: 'NewCalendar',
+                                        },
+                                        native: {},
+                                    } as unknown as ioBroker.Object);
+                                    await updateCalendars();
+                                    setCalendarPrefix(id);
+                                    window.localStorage.setItem('fullcalendar.calendar', id);
+                                    setTimeout(() => setCalendarDialog(id), 300);
+                                }}
+                            >
+                                <SidePanelItem
+                                    name={I18n.t('Default')}
+                                    selected={!calendars.find(c => c._id === calendarPrefix)}
+                                    onClick={() => {
+                                        const id = `fullcalendar.${props.instance}`;
+                                        window.localStorage.setItem('fullcalendar.calendar', id);
+                                        setCalendarPrefix(id);
                                     }}
-                                    style={styles.tabs}
-                                    orientation="vertical"
-                                >
-                                    <Tab
-                                        sx={{
-                                            ...styles.tabRoot,
-                                            '& .MuiTab-selected': styles.selected,
+                                />
+                                {calendars.map(calendar => (
+                                    <SidePanelItem
+                                        key={calendar._id}
+                                        name={calendar.common.name}
+                                        color={calendar.common.color}
+                                        icon={calendar.common.icon}
+                                        selected={calendar._id === calendarPrefix}
+                                        onClick={() => {
+                                            window.localStorage.setItem('fullcalendar.calendar', calendar._id);
+                                            setCalendarPrefix(calendar._id);
                                         }}
-                                        label={
-                                            <Box
-                                                component="div"
-                                                sx={styles.label}
+                                        actions={
+                                            <Tooltip
+                                                title={I18n.t('Edit name or delete calendar')}
+                                                slotProps={{ popper: { sx: styles.tooltip } }}
                                             >
-                                                {I18n.t('Default')}
-                                            </Box>
-                                        }
-                                        value={`fullcalendar.${props.instance}`}
-                                    />
-                                    {calendars.map(calendar => (
-                                        <Tab
-                                            component="div"
-                                            key={calendar._id}
-                                            sx={{
-                                                ...styles.tabRoot,
-                                                '& .MuiTab-selected': styles.selected,
-                                            }}
-                                            label={
-                                                <Box
-                                                    component="div"
-                                                    sx={styles.label}
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={e => {
+                                                        setCalendarDialog(calendar._id);
+                                                        e.stopPropagation();
+                                                    }}
                                                 >
-                                                    {calendar.common.name}
-                                                    <div style={styles.divider} />
-                                                    <Tooltip
-                                                        title={I18n.t('Edit name or delete calendar')}
-                                                        slotProps={{ popper: { sx: styles.tooltip } }}
-                                                    >
-                                                        <IconButton
-                                                            size="small"
-                                                            className="edit"
-                                                            onClick={e => {
-                                                                setCalendarDialog(calendar._id);
-                                                                e.stopPropagation();
-                                                            }}
-                                                        >
-                                                            <Edit />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </Box>
-                                            }
-                                            value={calendar._id}
-                                        />
-                                    ))}
-                                </Tabs>
-                            </Paper>
+                                                    <Edit />
+                                                </IconButton>
+                                            </Tooltip>
+                                        }
+                                    />
+                                ))}
+                            </SidePanel>
                         </div>
                         <CalendarContainer
                             key={calendarPrefix}

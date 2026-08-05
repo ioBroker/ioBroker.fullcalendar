@@ -6,12 +6,7 @@ import moment from 'moment';
 import {
     Button,
     IconButton,
-    Tab,
-    Tabs,
-    Paper,
-    Toolbar,
     Tooltip,
-    Fab,
     DialogActions,
     DialogContentText,
     DialogContent,
@@ -19,29 +14,22 @@ import {
     DialogTitle,
     Box,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
-import {
-    Edit,
-    FiberManualRecord,
-    Pause,
-    Add,
-    PlayArrow,
-    Delete,
-    Check,
-    ReportProblem as Alert,
-    Stop,
-    CalendarMonth,
-    PlaylistPlay as SimulationIcon,
-} from '@mui/icons-material';
+import { Edit, FiberManualRecord, Pause, PlayArrow, Delete, Check, Stop } from '@mui/icons-material';
 
-import { I18n, Confirm, TextWithIcon } from '@iobroker/gui-components';
+import { I18n, Confirm } from '@iobroker/gui-components';
 import type { AdminConnection, IobTheme } from '@iobroker/gui-components';
 
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
 import PlaySimulationDialog from './PlaySimulationDialog';
+import { SidePanel, SidePanelItem } from './SidePanel';
 import type { PlaySettings } from './PlaySimulationDialog';
 import type { Simulation, SimulationStatus } from './Utils';
+
+/** Width of the left panel. Unlike the calendars view, the simulations view has no splitter */
+const PANEL_WIDTH = 260;
 
 // mixes plain inline styles with MUI `sx` entries (incl. theme callbacks), hence `any`
 const styles: Record<string, any> = {
@@ -50,55 +38,13 @@ const styles: Record<string, any> = {
         width: '100%',
         flex: 1,
     },
-    tabs: {},
     toCalendar: {
         paddingLeft: 20,
     },
-    calendarsPaper: {
-        minHeight: '100%',
-    },
-    label: {
-        width: '100%',
-        textAlign: 'left',
-        display: 'flex',
-        alignItems: 'center',
-        '& .edit': {
-            opacity: 0,
-        },
-        '&:hover .edit': {
-            opacity: 1,
-        },
-    },
-    divider: {
-        flexGrow: 1,
-    },
-    toolbar: (theme: IobTheme) => ({
-        backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
-        padding: '2px 5px',
-    }),
+    /** Faint tint that tells the simulations view apart from the calendars view */
     simulations: (theme: IobTheme) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#131b2680' : '#b6d3ff80',
+        backgroundColor: alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.04 : 0.05),
     }),
-    tabRoot: {
-        padding: '0 6px',
-    },
-    alert: (theme: IobTheme) => ({
-        '& svg': {
-            color: theme.palette.error.main,
-        },
-    }),
-    selected: (theme: IobTheme) => ({
-        backgroundColor: theme.palette.primary.main,
-        color: 'white !important',
-    }),
-    eventsCount: {
-        position: 'absolute',
-        right: 5,
-        top: 2,
-        fontSize: 10,
-        opacity: 0.7,
-        fontStyle: 'italic',
-    },
     tooltip: {
         pointerEvents: 'none',
     },
@@ -257,6 +203,12 @@ const Simulations = (props: SimulationsProps): JSX.Element => {
         </div>
     );
 
+    /** The stored selection can point to a deleted simulation - then the first one is highlighted */
+    const effectiveSimulation: string =
+        (selectedSimulation && simulations.find(s => s._id === selectedSimulation)
+            ? selectedSimulation
+            : simulations[0]?._id) || '';
+
     return (
         <Box
             component="div"
@@ -350,259 +302,206 @@ const Simulations = (props: SimulationsProps): JSX.Element => {
                         }}
                     />
                 )}
-                <Paper style={styles.calendarsPaper}>
-                    <Tabs
-                        value={1}
-                        onChange={props.changeCalendarType}
-                        style={styles.tabs}
-                    >
-                        <Tab
-                            title={I18n.t('Calendars')}
-                            icon={<CalendarMonth />}
-                        />
-                        <Tab
-                            title={I18n.t('Simulations')}
-                            icon={<SimulationIcon />}
-                            sx={styles.simulations}
-                        />
-                    </Tabs>
-                    <Toolbar
-                        variant="dense"
-                        sx={styles.toolbar}
-                    >
-                        <Fab
-                            color="primary"
-                            size="small"
-                            title={I18n.t('Create new simulation')}
-                            onClick={async () => {
-                                const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
-                                await props.socket.setObject(id, {
-                                    common: {
-                                        name: I18n.t('Simulation %s', simulations.length + 1),
-                                        role: 'state',
-                                        type: 'string',
-                                        states: ['stop', 'record', 'play', 'pause'],
-                                        color: '#3A87AD',
-                                    },
-                                    native: {
-                                        events: [],
-                                        interval: 'day',
-                                        record: {
-                                            states: [],
-                                            enums: [],
-                                            start: null,
-                                            end: null,
-                                        },
-                                    },
-                                    type: 'state',
-                                } as unknown as ioBroker.Object);
-                                await props.socket.setState(id, 'stop');
+                <SidePanel
+                    isSimulations
+                    onChangeMode={props.changeCalendarType}
+                    title={I18n.t('Simulations')}
+                    addTitle={I18n.t('Create new simulation')}
+                    alive={props.alive}
+                    width={PANEL_WIDTH}
+                    onAdd={async () => {
+                        const id = `fullcalendar.${props.instance}.Simulations.${uuidv4()}`;
+                        await props.socket.setObject(id, {
+                            common: {
+                                name: I18n.t('Simulation %s', simulations.length + 1),
+                                role: 'state',
+                                type: 'string',
+                                states: ['stop', 'record', 'play', 'pause'],
+                                color: '#3A87AD',
+                            },
+                            native: {
+                                events: [],
+                                interval: 'day',
+                                record: {
+                                    states: [],
+                                    enums: [],
+                                    start: null,
+                                    end: null,
+                                },
+                            },
+                            type: 'state',
+                        } as unknown as ioBroker.Object);
+                        await props.socket.setState(id, 'stop');
 
-                                window.localStorage.setItem('fullcalendar.selectedSimulation', id);
-                                setTimeout(() => {
-                                    setSelectedSimulation(id);
-                                    setDialogSimulation(id);
-                                }, 300);
+                        window.localStorage.setItem('fullcalendar.selectedSimulation', id);
+                        setTimeout(() => {
+                            setSelectedSimulation(id);
+                            setDialogSimulation(id);
+                        }, 300);
+                    }}
+                >
+                    {simulations.map(simulation => (
+                        <SidePanelItem
+                            key={simulation._id}
+                            name={(simulation.common.name as string) || simulation._id}
+                            color={simulation.common.color}
+                            icon={simulation.common.icon}
+                            count={simulation.native.events?.length || 0}
+                            selected={simulation._id === effectiveSimulation}
+                            onClick={() => {
+                                window.localStorage.setItem('fullcalendar.selectedSimulation', simulation._id);
+                                setSelectedSimulation(simulation._id);
                             }}
-                        >
-                            <Add />
-                        </Fab>
-                        <div style={styles.divider} />
-                        {!props.alive && (
-                            <Tooltip
-                                title={I18n.t('Instance inactive')}
-                                slotProps={{ popper: { sx: styles.tooltip } }}
-                            >
-                                <Box
-                                    component="span"
-                                    sx={styles.alert}
-                                >
-                                    <Alert />
-                                </Box>
-                            </Tooltip>
-                        )}
-                    </Toolbar>
-                    <Tabs
-                        value={
-                            (selectedSimulation
-                                ? simulations.find(s => s._id === selectedSimulation)
-                                    ? selectedSimulation
-                                    : simulations[0]?._id
-                                : simulations[0]?._id) || ''
-                        }
-                        onChange={(_e, value: string) => {
-                            window.localStorage.setItem('fullcalendar.selectedSimulation', value);
-                            setSelectedSimulation(value);
-                        }}
-                        orientation="vertical"
-                        style={styles.tabs}
-                    >
-                        {simulations.map(simulation => (
-                            <Tab
-                                sx={{
-                                    ...styles.tabRoot,
-                                    '& .MuiTab-selected': styles.selected,
-                                }}
-                                component="div"
-                                value={simulation._id}
-                                label={
-                                    <Box
-                                        component="div"
-                                        sx={styles.label}
+                            actions={
+                                <>
+                                    <Tooltip
+                                        title={I18n.t('Edit name and settings')}
+                                        slotProps={{ popper: { sx: styles.tooltip } }}
                                     >
-                                        <TextWithIcon
-                                            value={simulation as unknown as ioBroker.Object}
-                                            lang={I18n.getLanguage()}
-                                        />
-                                        <div style={styles.divider} />
+                                        <IconButton
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setDialogSimulation(simulation._id);
+                                            }}
+                                            size="small"
+                                        >
+                                            <Edit />
+                                        </IconButton>
+                                    </Tooltip>
+                                    {simulationStates[simulation._id] === 'stop' && (
                                         <Tooltip
-                                            title={I18n.t('Edit name and settings')}
+                                            title={I18n.t('Start recording')}
                                             slotProps={{ popper: { sx: styles.tooltip } }}
                                         >
-                                            <IconButton
-                                                className="edit"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    setDialogSimulation(simulation._id);
-                                                }}
-                                                size="small"
-                                            >
-                                                <Edit />
-                                            </IconButton>
-                                        </Tooltip>
-                                        {simulationStates[simulation._id] === 'stop' && (
-                                            <Tooltip
-                                                title={I18n.t('Start recording')}
-                                                slotProps={{ popper: { sx: styles.tooltip } }}
-                                            >
-                                                <span>
-                                                    <IconButton
-                                                        onClick={async e => {
-                                                            e.stopPropagation();
-                                                            if (simulation.native.events.length) {
-                                                                setRecordDialog(simulation._id);
-                                                            } else {
-                                                                await recordSimulation(simulation._id);
-                                                            }
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <FiberManualRecord />
-                                                    </IconButton>
-                                                </span>
-                                            </Tooltip>
-                                        )}
-                                        {simulationStates[simulation._id] === 'stop' &&
-                                            simulation.native.events.length > 0 && (
-                                                <Tooltip
-                                                    title={I18n.t('Start playing')}
-                                                    slotProps={{ popper: { sx: styles.tooltip } }}
-                                                >
-                                                    <span>
-                                                        <IconButton
-                                                            onClick={e => {
-                                                                e.stopPropagation();
-                                                                setDialogSimulationPlay(simulation._id);
-                                                            }}
-                                                            size="small"
-                                                        >
-                                                            <PlayArrow />
-                                                        </IconButton>
-                                                    </span>
-                                                </Tooltip>
-                                            )}
-                                        {(simulationStates[simulation._id] === 'record' ||
-                                            simulationStates[simulation._id] === 'pause') && (
-                                            <Tooltip
-                                                title={I18n.t(
-                                                    'Stop recording. Recording till %s',
-                                                    moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'),
-                                                )}
-                                                slotProps={{ popper: { sx: styles.tooltip } }}
-                                            >
-                                                <span
-                                                    style={{
-                                                        opacity: simulationStates[simulation._id] === 'pause' ? 0.5 : 1,
+                                            <span>
+                                                <IconButton
+                                                    onClick={async e => {
+                                                        e.stopPropagation();
+                                                        if (simulation.native.events.length) {
+                                                            setRecordDialog(simulation._id);
+                                                        } else {
+                                                            await recordSimulation(simulation._id);
+                                                        }
                                                     }}
+                                                    size="small"
                                                 >
-                                                    <IconButton
-                                                        disabled={simulationStates[simulation._id] === 'pause'}
-                                                        onClick={e => {
-                                                            e.stopPropagation();
-                                                            setStopRecordDialog(simulation._id);
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <Stop style={{ color: 'red' }} />
-                                                    </IconButton>
-                                                </span>
-                                            </Tooltip>
-                                        )}
-                                        {simulationStates[simulation._id] === 'play' && (
+                                                    <FiberManualRecord />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    )}
+                                    {simulationStates[simulation._id] === 'stop' &&
+                                        simulation.native.events.length > 0 && (
                                             <Tooltip
-                                                title={I18n.t('Stop playing')}
+                                                title={I18n.t('Start playing')}
                                                 slotProps={{ popper: { sx: styles.tooltip } }}
                                             >
                                                 <span>
                                                     <IconButton
                                                         onClick={e => {
                                                             e.stopPropagation();
-                                                            void props.socket.setState(simulation._id, 'stop');
+                                                            setDialogSimulationPlay(simulation._id);
                                                         }}
                                                         size="small"
                                                     >
-                                                        <Stop style={{ color: 'green' }} />
+                                                        <PlayArrow />
                                                     </IconButton>
                                                 </span>
                                             </Tooltip>
                                         )}
-                                        {simulationStates[simulation._id] === 'record' && (
-                                            <Tooltip
-                                                title={I18n.t('Pause recording')}
-                                                slotProps={{ popper: { sx: styles.tooltip } }}
+                                </>
+                            }
+                            status={
+                                <>
+                                    {(simulationStates[simulation._id] === 'record' ||
+                                        simulationStates[simulation._id] === 'pause') && (
+                                        <Tooltip
+                                            title={I18n.t(
+                                                'Stop recording. Recording till %s',
+                                                moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'),
+                                            )}
+                                            slotProps={{ popper: { sx: styles.tooltip } }}
+                                        >
+                                            <span
+                                                style={{
+                                                    opacity: simulationStates[simulation._id] === 'pause' ? 0.5 : 1,
+                                                }}
                                             >
-                                                <span>
-                                                    <IconButton
-                                                        onClick={e => {
-                                                            e.stopPropagation();
-                                                            void props.socket.setState(simulation._id, 'pause');
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <Pause />
-                                                    </IconButton>
-                                                </span>
-                                            </Tooltip>
-                                        )}
-                                        {simulationStates[simulation._id] === 'pause' && (
-                                            <Tooltip
-                                                title={I18n.t(
-                                                    'Resume recording. Recording till %s',
-                                                    moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'),
-                                                )}
-                                                slotProps={{ popper: { sx: styles.tooltip } }}
-                                            >
-                                                <span>
-                                                    <IconButton
-                                                        onClick={e => {
-                                                            e.stopPropagation();
-                                                            void props.socket.setState(simulation._id, 'record');
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <Pause style={{ color: 'yellow' }} />
-                                                    </IconButton>
-                                                </span>
-                                            </Tooltip>
-                                        )}
-                                        <div style={styles.eventsCount}>{simulation.native.events?.length}</div>
-                                    </Box>
-                                }
-                                key={simulation._id}
-                            />
-                        ))}
-                    </Tabs>
-                </Paper>
+                                                <IconButton
+                                                    disabled={simulationStates[simulation._id] === 'pause'}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        setStopRecordDialog(simulation._id);
+                                                    }}
+                                                    size="small"
+                                                >
+                                                    <Stop style={{ color: 'red' }} />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    )}
+                                    {simulationStates[simulation._id] === 'play' && (
+                                        <Tooltip
+                                            title={I18n.t('Stop playing')}
+                                            slotProps={{ popper: { sx: styles.tooltip } }}
+                                        >
+                                            <span>
+                                                <IconButton
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        void props.socket.setState(simulation._id, 'stop');
+                                                    }}
+                                                    size="small"
+                                                >
+                                                    <Stop style={{ color: 'green' }} />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    )}
+                                    {simulationStates[simulation._id] === 'record' && (
+                                        <Tooltip
+                                            title={I18n.t('Pause recording')}
+                                            slotProps={{ popper: { sx: styles.tooltip } }}
+                                        >
+                                            <span>
+                                                <IconButton
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        void props.socket.setState(simulation._id, 'pause');
+                                                    }}
+                                                    size="small"
+                                                >
+                                                    <Pause />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    )}
+                                    {simulationStates[simulation._id] === 'pause' && (
+                                        <Tooltip
+                                            title={I18n.t(
+                                                'Resume recording. Recording till %s',
+                                                moment(simulation.native.record.end).format('DD.MM.YYYY HH:mm:ss'),
+                                            )}
+                                            slotProps={{ popper: { sx: styles.tooltip } }}
+                                        >
+                                            <span>
+                                                <IconButton
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        void props.socket.setState(simulation._id, 'record');
+                                                    }}
+                                                    size="small"
+                                                >
+                                                    <Pause style={{ color: 'yellow' }} />
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    )}
+                                </>
+                            }
+                        />
+                    ))}
+                </SidePanel>
             </div>
             {selectedSimulation && (
                 <div

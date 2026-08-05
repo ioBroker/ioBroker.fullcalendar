@@ -36,7 +36,7 @@ How to use:
 -->
 ## Changelog
 ### **WORK IN PROGRESS**
-* (bluefox) Migrated GUI to vite
+* (bluefox) Migrated GUI to React19
 
 ### 2.4.5 (2024-09-09)
 * (bluefox) Corrected SelectID Dialog

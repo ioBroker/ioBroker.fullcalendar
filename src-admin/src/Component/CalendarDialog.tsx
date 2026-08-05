@@ -17,7 +17,8 @@ const styles: Record<string, CSSProperties> = {
 export interface CalendarObject {
     _id: string;
     type: 'folder';
-    common: { name: string };
+    /** `color` and `icon` are not edited here, but can be set on the object, e.g. in the object browser */
+    common: { name: string; color?: string; icon?: string };
     native: Record<string, unknown>;
 }
 
