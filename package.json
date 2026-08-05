@@ -58,7 +58,7 @@
     "scripts": {
         "test": "npm run build-backend && mocha ./test/*.engine.js --exit",
         "test:package": "mocha ./test/testPackageFiles.engine.js --exit",
-        "test:integration": "mocha ./test/*.*.js --exit",
+        "test:integration": "mocha ./test/testAdapter.engine.js --exit",
         "test-gui": "mocha ./test/*.gui.js --exit",
         "lint": "eslint -c eslint.config.mjs",
         "check-ts": "tsc --noEmit",
