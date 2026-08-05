@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "news": {
+      "3.0.1": {
+        "en": "Migrated GUI to React19",
+        "de": "GUI auf React19 migriert",
+        "ru": "Перенесен графический интерфейс на React19.",
+        "pt": "Interface gráfica migrada para React19",
+        "nl": "GUI gemigreerd naar React19",
+        "fr": "Interface graphique migrée vers React19",
+        "it": "Interfaccia grafica migrata a React19",
+        "es": "Se migró la interfaz gráfica de usuario a React19.",
+        "pl": "Migracja GUI do React19",
+        "uk": "Перенесено графічний інтерфейс на React19",
+        "zh-cn": "将 GUI 迁移到 React19"
+      },
       "2.4.5": {
         "en": "Corrected SelectID Dialog",
         "de": "Behobener Dialog zur Auswahl",
