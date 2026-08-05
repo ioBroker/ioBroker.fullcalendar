@@ -19,6 +19,7 @@ export default [
             'packages/**/*',
             'src-www/**/*',
             'admin/**/*',
+            'widgets/**/*',
             'node_modules/**/*',
             'test/**/*',
             'build/**/*',
