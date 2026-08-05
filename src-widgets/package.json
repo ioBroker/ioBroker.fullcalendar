@@ -1,7 +1,7 @@
 {
     "name": "iobroker.vis-2-widgets-fullcalendar",
     "private": true,
-    "version": "2.4.5",
+    "version": "3.0.0",
     "dependencies": {
         "@fullcalendar/core": "^6.1.21",
         "@fullcalendar/daygrid": "^6.1.21",

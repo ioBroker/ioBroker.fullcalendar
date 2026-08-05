@@ -35,7 +35,7 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.0.0 (2026-08-05)
 * (bluefox) Migrated GUI to React19
 
 ### 2.4.5 (2024-09-09)
