@@ -1,5 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
-import type { JSX } from 'react';
+import { useEffect, useState, useCallback, type JSX } from 'react';
 import moment from 'moment';
 import 'moment/locale/de';
 import 'moment/locale/ru';
@@ -34,18 +33,19 @@ import { TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 
-import {
-    ColorPicker,
-    SelectID,
-    Confirm,
-    Icon,
-    Utils,
-    type IobTheme,
-    type Connection,
-} from '@iobroker/adapter-react-v5';
+import { ColorPicker, SelectID, Confirm, Icon, Utils, type IobTheme, type Connection } from '@iobroker/gui-components';
 
-import { clientDateToServer, cron2obj, obj2cron, serverDateToClient } from './Utils';
-import type { AstroName, CalendarEvent, CronObjectArrays, EventType, Simulation, SocketLike } from './Utils';
+import {
+    clientDateToServer,
+    cron2obj,
+    obj2cron,
+    serverDateToClient,
+    type AstroName,
+    type CalendarEvent,
+    type CronObjectArrays,
+    type EventType,
+    type Simulation,
+} from './Utils';
 
 const typeDescriptions: Record<EventType, string> = {
     single: 'single_description',
@@ -132,7 +132,7 @@ function getText(text: ioBroker.StringOrTranslated | undefined, lang: ioBroker.L
     return text;
 }
 
-async function getImage(id: string | ioBroker.Object, socket: SocketLike): Promise<string | null> {
+async function getImage(id: string | ioBroker.Object, socket: Connection): Promise<string | null> {
     let obj: ioBroker.Object | null | undefined;
     if (typeof id === 'string') {
         obj = await socket.getObject(id);
@@ -167,7 +167,7 @@ async function getImage(id: string | ioBroker.Object, socket: SocketLike): Promi
 
 export interface EventDialogProps {
     event: CalendarEvent;
-    socket: SocketLike;
+    socket: Connection;
     systemConfig: ioBroker.SystemConfigCommon;
     serverTimeZone: number;
     language: ioBroker.Languages;
@@ -292,9 +292,9 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
 
     if (event) {
         if (period === 'once') {
-            date = serverDateToClient(event.native?.start!, 'date', props.serverTimeZone);
+            date = serverDateToClient(event.native?.start, 'date', props.serverTimeZone);
         } else if (period === 'monthly' || period === 'daily') {
-            date = serverDateToClient(event.native?.cron!, 'cron', props.serverTimeZone);
+            date = serverDateToClient(event.native?.cron, 'cron', props.serverTimeZone);
         }
     }
 
@@ -388,7 +388,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
         );
     };
 
-    const endValueField = () => {
+    const endValueField = (): React.JSX.Element | null => {
         if (!object) {
             return null;
         }
@@ -499,8 +499,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             setIdDialog(false);
                         }}
                         onClose={() => setIdDialog(false)}
-                        // the caller always passes a real connection, `SocketLike` only declares what this dialog uses
-                        socket={props.socket as unknown as Connection}
+                        socket={props.socket}
                     />
                 ) : null}
                 <div style={styles.field}>
@@ -554,9 +553,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             <Select
                                 value={event.native.astro || ''}
                                 disabled={!!props.readOnly || !event?.common.enabled}
-                                onChange={e =>
-                                    changeEvent(newEvent => (newEvent.native.astro = e.target.value as AstroName))
-                                }
+                                onChange={e => changeEvent(newEvent => (newEvent.native.astro = e.target.value))}
                                 renderValue={value => props.t(value)}
                             >
                                 {astroTypes.map(astroType => (
@@ -646,9 +643,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             <Select
                                 value={event.native.offset || 0}
                                 disabled={props.readOnly || !event?.common.enabled}
-                                onChange={e =>
-                                    changeEvent(newEvent => (newEvent.native.offset = e.target.value as number))
-                                }
+                                onChange={e => changeEvent(newEvent => (newEvent.native.offset = e.target.value))}
                             >
                                 {[
                                     { label: 'none', value: 0 },
@@ -731,7 +726,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                         ) {
                                             newEvent.common.name = props.t(e.target.value);
                                         }
-                                        newEvent.native.type = e.target.value as EventType;
+                                        newEvent.native.type = e.target.value;
                                     })
                                 }
                                 renderValue={value => props.t(value)}
@@ -1197,25 +1192,24 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                         }
                         startIcon={<Save />}
                         onClick={async () => {
-                            if (event.native.type === 'single') {
-                                if (event.native.intervals) {
-                                    delete event.native.intervals;
+                            const newEvent = { ...event };
+                            if (newEvent.native.type === 'single') {
+                                if (newEvent.native.intervals) {
+                                    delete newEvent.native.intervals;
                                 }
-                            } else if (event.native.type === 'double') {
-                                event.native.intervals = event.native.intervals || [];
-                                event.native.intervals[0] = event.native.intervals[0] || {};
-                                event.native.intervals[0].timeOffset =
-                                    (parseFloat(duration as unknown as string) || 1) * 60000;
-                                event.native.intervals[0].value = endValue;
-                            } else if (event.native.type === 'toggle') {
-                                event.native.intervals = event.native.intervals || [];
-                                event.native.intervals[0] = event.native.intervals[0] || {};
-                                event.native.intervals[0].timeOffset =
-                                    (parseFloat(duration as unknown as string) || 1) * 60000;
+                            } else if (newEvent.native.type === 'double') {
+                                newEvent.native.intervals = newEvent.native.intervals || [];
+                                newEvent.native.intervals[0] = newEvent.native.intervals[0] || {};
+                                newEvent.native.intervals[0].timeOffset = (parseFloat(duration as string) || 1) * 60000;
+                                newEvent.native.intervals[0].value = endValue;
+                            } else if (newEvent.native.type === 'toggle') {
+                                newEvent.native.intervals = newEvent.native.intervals || [];
+                                newEvent.native.intervals[0] = newEvent.native.intervals[0] || {};
+                                newEvent.native.intervals[0].timeOffset = (parseFloat(duration as string) || 1) * 60000;
                             }
 
-                            await props.setEvent(event._id, event);
-                            props.updateEvents();
+                            await props.setEvent(newEvent._id, newEvent);
+                            await props.updateEvents();
                             props.onClose();
                         }}
                     >
@@ -1239,11 +1233,11 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                     suppressQuestionMinutes={5}
                     dialogName="deleteConfirmDialog"
                     ok={props.t('Delete')}
-                    onClose={isYes => {
+                    onClose={async isYes => {
                         if (isYes) {
                             try {
                                 props.deleteEvent(event._id);
-                                props.updateEvents();
+                                await props.updateEvents();
                             } catch (e) {
                                 window.alert(`Cannot delete event: ${e}`);
                             }

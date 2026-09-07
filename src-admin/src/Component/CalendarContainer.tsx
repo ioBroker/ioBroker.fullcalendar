@@ -1,8 +1,6 @@
-import React from 'react';
-import type { JSX } from 'react';
+import React, { type JSX } from 'react';
 
-import { I18n } from '@iobroker/gui-components';
-import type { AdminConnection, IobTheme } from '@iobroker/gui-components';
+import { I18n, type AdminConnection, type IobTheme } from '@iobroker/gui-components';
 
 import Calendar from './Calendar';
 import type { CalendarEvent, Simulation, SimulationStatus } from './Utils';
@@ -106,11 +104,11 @@ class CalendarContainer extends React.Component<CalendarContainerProps, Calendar
             } else {
                 simulationObject.native.events.push(event);
             }
-            await this.props.socket.setObject(this.props.simulationId!, simulationObject as unknown as ioBroker.Object);
+            await this.props.socket.setObject(this.props.simulationId!, simulationObject);
             return;
         }
 
-        await this.props.socket.setObject(id, event as unknown as ioBroker.Object);
+        await this.props.socket.setObject(id, event);
     };
 
     deleteEvent = async (id: string): Promise<void> => {
@@ -120,7 +118,7 @@ class CalendarContainer extends React.Component<CalendarContainerProps, Calendar
             if (eventPos !== -1) {
                 simulationObject.native.events.splice(eventPos, 1);
             }
-            await this.props.socket.setObject(this.props.simulationId!, simulationObject as unknown as ioBroker.Object);
+            await this.props.socket.setObject(this.props.simulationId!, simulationObject);
         }
 
         await this.props.socket.delObject(id);

@@ -1,7 +1,6 @@
 // @ts-expect-error no types
 import react from '@vitejs/plugin-react';
 import commonjs from 'vite-plugin-commonjs';
-import vitetsConfigPaths from 'vite-tsconfig-paths';
 import { federation } from '@module-federation/vite';
 import { moduleFederationShared } from '@iobroker/types-vis-2/modulefederation.vis.config';
 import { readFileSync } from 'node:fs';
@@ -30,9 +29,13 @@ const config = {
             promiseImportName: (i: number): string => `__tla_${i}`,
         }),
         react(),
-        vitetsConfigPaths(),
         commonjs(),
     ],
+    resolve: {
+        tsconfigPaths: true,
+        // Same set as the shared modules above: the fallback copies inside the widget bundle must be unique too
+        dedupe: ['react', 'react-dom', '@emotion/react', '@mui/material', '@mui/system', '@mui/icons-material'],
+    },
     server: {
         port: 3000,
         proxy: {

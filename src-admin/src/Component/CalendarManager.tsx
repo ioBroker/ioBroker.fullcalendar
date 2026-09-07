@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { CSSProperties, JSX } from 'react';
+import { useEffect, useState, type CSSProperties, type JSX } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ReactSplit, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 
@@ -7,14 +6,12 @@ import { IconButton, Tooltip } from '@mui/material';
 
 import { Edit } from '@mui/icons-material';
 
-import { I18n } from '@iobroker/gui-components';
-import type { AdminConnection, IobTheme, ThemeType } from '@iobroker/gui-components';
+import { I18n, type AdminConnection, type IobTheme, type ThemeType } from '@iobroker/gui-components';
 
 import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
-import CalendarDialog from './CalendarDialog';
+import CalendarDialog, { type CalendarObject } from './CalendarDialog';
 import { SidePanel, SidePanelItem } from './SidePanel';
-import type { CalendarObject } from './CalendarDialog';
 
 const styles: Record<string, CSSProperties> = {
     column: {
@@ -81,19 +78,23 @@ const CalendarManager = (props: CalendarManagerProps): JSX.Element => {
         });
 
     useEffect(() => {
-        updateCalendars().catch(e => console.error(e));
-
         const onAliveChanged = (_id: string, state: ioBroker.State | null | undefined): void => {
             const val = (state && state.val) || false;
             setAlive(!!val);
         };
+        const init = (): void => {
+            updateCalendars().catch(e => console.error(e));
 
-        void props.socket.subscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged);
+            props.socket
+                .subscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged)
+                .catch(e => console.error(e));
 
-        void props.socket
-            .getState(`system.adapter.fullcalendar.${props.instance}.alive`)
-            .then(state => setAlive(!!((state && state.val) || false)));
-
+            props.socket
+                .getState(`system.adapter.fullcalendar.${props.instance}.alive`)
+                .then(state => setAlive(!!((state && state.val) || false)))
+                .catch(e => console.error(e));
+        };
+        init();
         return () => {
             props.socket.unsubscribeState(`system.adapter.fullcalendar.${props.instance}.alive`, onAliveChanged);
         };

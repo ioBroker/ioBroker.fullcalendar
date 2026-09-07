@@ -4,24 +4,14 @@
     "compilerOptions": {
         "module": "esnext",
         "moduleResolution": "bundler",
-        // check JS files
-        "allowJs": true,
-        // This is necessary for the automatic typing of the adapter config
+        "allowJs": false,
         "resolveJsonModule": true,
-        // If you want to disable the stricter type checks (not recommended), uncomment the following line
-        // "strict": false,
-        // And enable some of those features for more fine-grained control
         "strictNullChecks": true,
-        // "strictPropertyInitialization": true,
-        // "strictBindCallApply": true,
-        // "noUnusedLocals": true,
-        // "noUnusedParameters": true,
         "useUnknownInCatchVariables": false,
         "target": "ES2022",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "checkJs": false,
-        // vite emits the bundle, tsc only type-checks
         "noEmit": true,
         "sourceMap": true,
         "sourceRoot": "./src",
@@ -31,12 +21,6 @@
         "lib": ["es2019", "DOM"],
         "jsx": "react-jsx",
         "types": ["@iobroker/types", "node"],
-        // Calendar/EventDialog/Utils are shared verbatim with src-widgets (see sync2files in tasks.js).
-        // vis-2 only supports @iobroker/adapter-react-v5, so the shared sources import that name;
-        // here it is served by its successor @iobroker/gui-components, which exports the same symbols.
-        "paths": {
-            "@iobroker/adapter-react-v5": ["./node_modules/@iobroker/gui-components/build/index.d.ts"]
-        }
     },
     "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./src/**/*.tsx", "./src/**/*.json", "./src/**/*.css"],
     "exclude": ["**/node_modules", "**/dist"]

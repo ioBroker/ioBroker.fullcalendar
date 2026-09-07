@@ -30,18 +30,8 @@ function sync2files(src, dst) {
         const srcs = fs.statSync(src);
         const dest = fs.statSync(dst);
         if (srcs.mtime > dest.mtime) {
-            if (dst.includes('widgets')) {
-                srcTxt = srcTxt.replace(/gui-components/g, 'adapter-react-v5');
-            } else {
-                srcTxt = srcTxt.replace(/adapter-react-v5/g, 'gui-components');
-            }
             fs.writeFileSync(dst, srcTxt);
         } else {
-            if (src.includes('widgets')) {
-                destTxt = destTxt.replace(/gui-components/g, 'adapter-react-v5');
-            } else {
-                destTxt = destTxt.replace(/adapter-react-v5/g, 'gui-components');
-            }
             fs.writeFileSync(src, destTxt);
         }
     }

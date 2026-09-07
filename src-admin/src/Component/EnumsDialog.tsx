@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { JSX } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 
 import {
     Accordion,
@@ -19,8 +18,7 @@ import {
 
 import { Cancel, Check, ExpandMore, Add, Remove } from '@mui/icons-material';
 
-import { I18n, TextWithIcon } from '@iobroker/gui-components';
-import type { AdminConnection } from '@iobroker/gui-components';
+import { I18n, TextWithIcon, type AdminConnection } from '@iobroker/gui-components';
 
 import { IGNORE_STATES, getIconAsync, getCachedObject, buildOverlap } from './Utils';
 

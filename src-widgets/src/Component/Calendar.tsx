@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import type { CSSProperties, JSX } from 'react';
+import { useEffect, useRef, useState, useMemo, type CSSProperties, type JSX } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
-import type { EventReceiveArg, EventResizeDoneArg } from '@fullcalendar/interaction';
+import interactionPlugin, { Draggable, type EventReceiveArg, type EventResizeDoneArg } from '@fullcalendar/interaction';
 import rrulePlugin from '@fullcalendar/rrule';
 import listPlugin from '@fullcalendar/list';
 import type {
@@ -31,16 +29,23 @@ import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { FormControl, Paper, Select, InputLabel, MenuItem } from '@mui/material';
 
-import { Utils, I18n } from '@iobroker/adapter-react-v5';
-import type { IobTheme } from '@iobroker/adapter-react-v5';
+import { Utils, I18n, type IobTheme, type Connection } from '@iobroker/gui-components';
 
 import { RRule } from 'rrule';
 import SunCalc from 'suncalc2';
 
 import './styles.css';
 
-import { clientDateToServer, cron2obj, obj2cron, serverDateToClient } from './Utils';
-import type { CalendarEvent, EventType, Simulation, SimulationStatus, SocketLike } from './Utils';
+import {
+    clientDateToServer,
+    cron2obj,
+    obj2cron,
+    serverDateToClient,
+    type CalendarEvent,
+    type EventType,
+    type Simulation,
+    type SimulationStatus,
+} from './Utils';
 import EventDialog from './EventDialog';
 
 interface EventTypeDescription {
@@ -184,7 +189,7 @@ export interface CalendarProps {
     serverTimeZone: number;
     systemConfig: ioBroker.SystemConfigCommon;
     theme: IobTheme;
-    socket: SocketLike;
+    socket: Connection;
     readOnly?: boolean;
     hideLeftBlock?: boolean;
     hideTopBlock?: boolean;
@@ -227,10 +232,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
         end: null,
     });
 
-    let initialDate =
-        !props.widget && window.localStorage.getItem(`${storageName}Start`) && false
-            ? new Date(parseInt(window.localStorage.getItem(`${storageName}Start`) as string, 10))
-            : new Date();
+    let initialDate = new Date();
 
     let initialView = props.viewMode || window.localStorage.getItem(`${storageName}View`) || 'dayGridMonth';
 
@@ -253,12 +255,11 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                 return;
             }
             // duration in ms
-            const initialDuration =
-                event.native?.intervals && event.native.intervals[0] && event.native.intervals[0].timeOffset
-                    ? event.native.intervals[0].timeOffset
-                    : 30;
+            const initialDuration = event.native?.intervals?.[0]?.timeOffset
+                ? event.native.intervals[0].timeOffset
+                : 30;
 
-            event.common.color = event.common.color || '#3a87b2';
+            event.common.color ||= '#3a87b2';
 
             const backgroundColor = event.common.enabled ? event.common.color : dimColor(event.common.color);
             let textColor: string | undefined = Utils.invertColor(event.common.color, true);
@@ -593,7 +594,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                                     }
                                                 }
                                                 window.localStorage.setItem('calendarStep', e.target.value.toString());
-                                                setStep(e.target.value as number);
+                                                setStep(e.target.value);
                                             }}
                                         >
                                             {MINUTES.map(minute => (
@@ -632,7 +633,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                                   : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                                       }
                             }
-                            eventTimeFormat={props.isSimulation ? (formatter) : undefined}
+                            eventTimeFormat={props.isSimulation ? formatter : undefined}
                             scrollTime={
                                 props.isSimulation && props.simulationState === 'record' ? scrollTime : undefined
                             }

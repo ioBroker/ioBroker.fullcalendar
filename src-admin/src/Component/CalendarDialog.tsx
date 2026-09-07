@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import type { CSSProperties, JSX } from 'react';
-import { Confirm, I18n } from '@iobroker/gui-components';
-import type { AdminConnection } from '@iobroker/gui-components';
+import { useState, type CSSProperties, type JSX } from 'react';
+import { Confirm, I18n, type AdminConnection } from '@iobroker/gui-components';
 import { Cancel, Delete, Save } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 
@@ -77,7 +75,7 @@ const CalendarDialog = (props: CalendarDialogProps): JSX.Element | null => {
                         calendar.common.name === props.calendar.common.name
                     }
                     onClick={async () => {
-                        await props.socket.setObject(calendar._id, calendar as unknown as ioBroker.Object);
+                        await props.socket.setObject(calendar._id, calendar);
                         await props.updateCalendars();
                         props.onClose();
                     }}

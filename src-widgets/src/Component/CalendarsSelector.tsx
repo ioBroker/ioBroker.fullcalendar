@@ -2,7 +2,7 @@ import React from 'react';
 
 import { MenuItem, Select } from '@mui/material';
 
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/gui-components';
 
 /** Anything that can list objects: the admin connection as well as the vis-2 socket */
 interface ObjectViewSocket {
@@ -56,7 +56,8 @@ export default class CalendarsSelector extends React.Component<CalendarsSelector
                     }));
                     list.unshift({ value: '_', label: this.props.t('default') });
                     this.setState({ list });
-                });
+                })
+                .catch(e => console.error(`Cannot read calendars: ${e.message}`));
         }
     }
 

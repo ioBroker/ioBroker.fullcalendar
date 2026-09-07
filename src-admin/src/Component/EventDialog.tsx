@@ -1,6 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
-import type { JSX } from 'react';
-import { type SxProps } from '@mui/material';
+import { useEffect, useState, useCallback, type JSX } from 'react';
 import moment from 'moment';
 import 'moment/locale/de';
 import 'moment/locale/ru';
@@ -31,17 +29,24 @@ import {
     Select,
     TextField,
 } from '@mui/material';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import { Cancel, Delete, Save } from '@mui/icons-material';
 
-import { ColorPicker, SelectID, Confirm, Icon, Utils } from '@iobroker/gui-components';
-import type { IobTheme } from '@iobroker/gui-components';
+import { ColorPicker, SelectID, Confirm, Icon, Utils, type IobTheme, type Connection } from '@iobroker/gui-components';
 
-import { clientDateToServer, cron2obj, obj2cron, serverDateToClient } from './Utils';
-import type { AstroName, CalendarEvent, CronObjectArrays, EventType, Simulation, SocketLike } from './Utils';
+import {
+    clientDateToServer,
+    cron2obj,
+    obj2cron,
+    serverDateToClient,
+    type AstroName,
+    type CalendarEvent,
+    type CronObjectArrays,
+    type EventType,
+    type Simulation,
+} from './Utils';
 
 const typeDescriptions: Record<EventType, string> = {
     single: 'single_description',
@@ -50,7 +55,7 @@ const typeDescriptions: Record<EventType, string> = {
 };
 
 // mixes plain inline styles with MUI `sx` entries (incl. theme callbacks), hence `any`
-const styles: Record<string, SxProps<IobTheme>> = {
+const styles: Record<string, any> = {
     field: {
         padding: '2px 0px',
     },
@@ -128,7 +133,7 @@ function getText(text: ioBroker.StringOrTranslated | undefined, lang: ioBroker.L
     return text;
 }
 
-async function getImage(id: string | ioBroker.Object, socket: SocketLike): Promise<string | null> {
+async function getImage(id: string | ioBroker.Object, socket: Connection): Promise<string | null> {
     let obj: ioBroker.Object | null | undefined;
     if (typeof id === 'string') {
         obj = await socket.getObject(id);
@@ -163,7 +168,7 @@ async function getImage(id: string | ioBroker.Object, socket: SocketLike): Promi
 
 export interface EventDialogProps {
     event: CalendarEvent;
-    socket: SocketLike;
+    socket: Connection;
     systemConfig: ioBroker.SystemConfigCommon;
     serverTimeZone: number;
     language: ioBroker.Languages;
@@ -195,7 +200,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
     const [event, setEvent] = useState<CalendarEvent>(props.event);
     const [object, setObject] = useState<ioBroker.StateObject | null>(null);
     const [deleteDialog, setDeleteDialog] = useState(false);
-    const [duration, setDuration] = useState<number>(initialDuration);
+    const [duration, setDuration] = useState<number | string>(initialDuration);
     const [endValue, setEndValue] = useState<ioBroker.StateValue>(initialEndValue);
     const [astroEventTimes, setAstroEventTimes] = useState<Partial<Record<AstroName, Date>>>({});
 
@@ -267,7 +272,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
         props.systemConfig.longitude,
     ]);
 
-    const cronObject = event.native?.cron ? cron2obj(event.native.cron!) : null;
+    const cronObject = event.native?.cron ? cron2obj(event.native.cron) : null;
     let period: 'once' | 'daily' | 'monthly' = 'once';
     let maxMonthDay = 29;
 
@@ -288,9 +293,9 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
 
     if (event) {
         if (period === 'once') {
-            date = serverDateToClient(event.native?.start!, 'date', props.serverTimeZone);
+            date = serverDateToClient(event.native?.start, 'date', props.serverTimeZone);
         } else if (period === 'monthly' || period === 'daily') {
-            date = serverDateToClient(event.native?.cron!, 'cron', props.serverTimeZone);
+            date = serverDateToClient(event.native?.cron, 'cron', props.serverTimeZone);
         }
     }
 
@@ -384,7 +389,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
         );
     };
 
-    const endValueField = () => {
+    const endValueField = (): null | JSX.Element => {
         if (!object) {
             return null;
         }
@@ -484,8 +489,13 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                         imagePrefix="../.."
                         theme={props.theme}
                         selected={event.native.oid}
-                        disabled={props.readOnly}
-                        onOk={id => {
+                        onOk={_id => {
+                            let id: string;
+                            if (_id && typeof _id !== 'string') {
+                                id = _id[0];
+                            } else {
+                                id = _id || '';
+                            }
                             changeEvent(newEvent => (newEvent.native.oid = id));
                             setIdDialog(false);
                         }}
@@ -591,7 +601,6 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                     '&.MuiFormControl-root': styles.timeSelector,
                                 })}
                                 label={props.t('Time')}
-                                variant="standard"
                                 value={date ? dayjs(date) : null}
                                 disabled={props.readOnly || !event?.common.enabled}
                                 onChange={_date => {
@@ -629,7 +638,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                         style={{
                                             ...styles.narrowText,
                                         }}
-                                        helperText={date.getSeconds() ? date.toLocaleTimeString() : ''}
+                                        helperText={date?.getSeconds() ? date.toLocaleTimeString() : ''}
                                     />
                                 )}
                                 ampm={false}
@@ -722,7 +731,10 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                 disabled={props.readOnly || !event?.common.enabled}
                                 onChange={e =>
                                     changeEvent(newEvent => {
-                                        if (newEvent.common.name === props.t(newEvent.native.type)) {
+                                        if (
+                                            newEvent.native.type &&
+                                            newEvent.common.name === props.t(newEvent.native.type)
+                                        ) {
                                             newEvent.common.name = props.t(e.target.value);
                                         }
                                         newEvent.native.type = e.target.value;
@@ -854,7 +866,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             </Select>
                         </FormControl>
                     )}
-                    {period === 'daily' && (!props.isSimulation || props.simulation.native.interval === 'week') && (
+                    {period === 'daily' && (!props.isSimulation || props.simulation?.native.interval === 'week') && (
                         <table
                             style={{
                                 ...styles.dayTable,
@@ -1112,7 +1124,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                             checked={cronObject?.dates?.length === maxMonthDay}
                                             indeterminate={
                                                 cronObject?.dates?.length !== maxMonthDay &&
-                                                !cronObject?.dates.includes(0)
+                                                !(cronObject?.dates as number[])?.includes(0)
                                             }
                                             disabled={props.readOnly || !event?.common.enabled}
                                             onChange={() =>
@@ -1177,29 +1189,30 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                         disabled={
                             !changed ||
                             (period === 'monthly' &&
-                                (!cronObject.dates?.length ||
-                                    (cronObject!.dates as number[]).includes(0) ||
+                                (!cronObject?.dates?.length ||
+                                    (cronObject.dates as number[]).includes(0) ||
                                     !cronObject.months?.length))
                         }
                         startIcon={<Save />}
                         onClick={async () => {
-                            if (event.native.type === 'single') {
-                                if (event.native.intervals) {
-                                    delete event.native.intervals;
+                            const newEvent = { ...event };
+                            if (newEvent.native.type === 'single') {
+                                if (newEvent.native.intervals) {
+                                    delete newEvent.native.intervals;
                                 }
-                            } else if (event.native.type === 'double') {
-                                event.native.intervals = event.native.intervals || [];
-                                event.native.intervals[0] = event.native.intervals[0] || {};
-                                event.native.intervals[0].timeOffset = (parseFloat(duration) || 1) * 60000;
-                                event.native.intervals[0].value = endValue;
-                            } else if (event.native.type === 'toggle') {
-                                event.native.intervals = event.native.intervals || [];
-                                event.native.intervals[0] = event.native.intervals[0] || {};
-                                event.native.intervals[0].timeOffset = (parseFloat(duration) || 1) * 60000;
+                            } else if (newEvent.native.type === 'double') {
+                                newEvent.native.intervals = newEvent.native.intervals || [];
+                                newEvent.native.intervals[0] = newEvent.native.intervals[0] || {};
+                                newEvent.native.intervals[0].timeOffset = (parseFloat(duration as string) || 1) * 60000;
+                                newEvent.native.intervals[0].value = endValue;
+                            } else if (newEvent.native.type === 'toggle') {
+                                newEvent.native.intervals = newEvent.native.intervals || [];
+                                newEvent.native.intervals[0] = newEvent.native.intervals[0] || {};
+                                newEvent.native.intervals[0].timeOffset = (parseFloat(duration as string) || 1) * 60000;
                             }
 
-                            await props.setEvent(event._id, event);
-                            props.updateEvents();
+                            await props.setEvent(newEvent._id, newEvent);
+                            await props.updateEvents();
                             props.onClose();
                         }}
                     >
@@ -1226,8 +1239,8 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                     onClose={async isYes => {
                         if (isYes) {
                             try {
-                                await props.deleteEvent(event._id);
-                                props.updateEvents();
+                                props.deleteEvent(event._id);
+                                await props.updateEvents();
                             } catch (e) {
                                 window.alert(`Cannot delete event: ${e}`);
                             }

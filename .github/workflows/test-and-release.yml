@@ -47,7 +47,7 @@ jobs:
       - uses: ioBroker/testing-action-adapter@v1
         with:
           build: true
-          install-command: 'npm ci && cd src-widgets && npm ci'
+          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm run build'
           os: 'ubuntu-latest'
           node-version: 24.x
 
@@ -73,5 +73,5 @@ jobs:
         with:
           node-version: '24.x'
           build: true
-          install-command: 'npm install'
+          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm run build'
           github-token: ${{ secrets.GITHUB_TOKEN }}

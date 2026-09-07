@@ -29,7 +29,7 @@ import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { FormControl, Paper, Select, InputLabel, MenuItem } from '@mui/material';
 
-import { Utils, I18n, type IobTheme } from '@iobroker/gui-components';
+import { Utils, I18n, type IobTheme, type Connection } from '@iobroker/gui-components';
 
 import { RRule } from 'rrule';
 import SunCalc from 'suncalc2';
@@ -45,7 +45,6 @@ import {
     type EventType,
     type Simulation,
     type SimulationStatus,
-    type SocketLike,
 } from './Utils';
 import EventDialog from './EventDialog';
 
@@ -190,7 +189,7 @@ export interface CalendarProps {
     serverTimeZone: number;
     systemConfig: ioBroker.SystemConfigCommon;
     theme: IobTheme;
-    socket: SocketLike;
+    socket: Connection;
     readOnly?: boolean;
     hideLeftBlock?: boolean;
     hideTopBlock?: boolean;

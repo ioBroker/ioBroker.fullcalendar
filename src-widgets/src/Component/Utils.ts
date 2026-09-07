@@ -1,4 +1,4 @@
-import { Utils } from '@iobroker/adapter-react-v5';
+import { type Connection, Utils } from '@iobroker/gui-components';
 
 /** A cron field: either the explicit list of values, or the `*` / `?` wildcards */
 export type CronField = number[] | '*' | '?' | '';
@@ -24,11 +24,6 @@ export interface CronObjectArrays {
     dates: number[];
     months: number[];
     dows: number[];
-}
-
-/** Anything that can read objects: the admin connection as well as the vis-2 socket */
-export interface SocketLike {
-    getObject: (id: string) => Promise<ioBroker.Object | null | undefined>;
 }
 
 /** Name of an astro time, as provided by suncalc2 */
@@ -180,56 +175,58 @@ function cron2obj(str: string, date?: string): CronObject {
     return cron;
 }
 
-function array2oneCron(obj: CronField | number | string): string {
+function array2oneCron(obj: CronField): string {
     if (obj === '*' || obj === '?') {
         return obj;
     }
+    let arrObj: number[];
     if (typeof obj === 'string') {
-        obj = parseInt(obj, 10);
-    }
-    if (typeof obj !== 'object') {
-        obj = [obj];
-    }
-
-    obj.sort((a, b) => a - b);
-
-    if (obj.length < 3) {
-        return obj.join(',');
+        arrObj = [parseInt(obj, 10)];
+    } else if (typeof obj !== 'object') {
+        arrObj = [obj];
+    } else {
+        arrObj = obj;
     }
 
-    const newObj: (number | string)[] = [];
-    let start = obj[0];
-    let end = obj[0];
+    arrObj.sort((a, b) => a - b);
 
-    for (let i = 1; i < obj.length; i++) {
-        if (obj[i] === end + 1) {
+    if (arrObj.length < 3) {
+        return arrObj.join(',');
+    }
+
+    const result: string[] = [];
+    let start = arrObj[0];
+    let end = arrObj[0];
+
+    for (let i = 1; i < arrObj.length; i++) {
+        if (arrObj[i] === end + 1) {
             end++;
         } else {
             if (start !== end) {
                 if (start + 1 === end) {
-                    newObj.push(`${start},${end}`);
+                    result.push(`${start},${end}`);
                 } else {
-                    newObj.push(`${start}-${end}`);
+                    result.push(`${start}-${end}`);
                 }
             } else {
-                newObj.push(start);
+                result.push(start.toString());
             }
-            start = obj[i];
-            end = obj[i];
+            start = arrObj[i];
+            end = arrObj[i];
         }
     }
 
     if (start !== end) {
         if (start + 1 === end) {
-            newObj.push(`${start},${end}`);
+            result.push(`${start},${end}`);
         } else {
-            newObj.push(`${start}-${end}`);
+            result.push(`${start}-${end}`);
         }
     } else {
-        newObj.push(start);
+        result.push(start.toString());
     }
 
-    return newObj.join(',');
+    return result.join(',');
 }
 
 function obj2cron(cron: Partial<CronObject>): string {
@@ -247,7 +244,7 @@ function obj2cron(cron: Partial<CronObject>): string {
 }
 
 function serverDateToClient(
-    dateString: string | Date,
+    dateString: string | Date | undefined,
     format: 'cron' | 'date',
     // kept for the (currently disabled) time zone correction below
     _serverTimeZone?: number,
@@ -256,6 +253,9 @@ function serverDateToClient(
         return format === 'date' ? new Date(dateString) : null;
     }
     if (format === 'cron') {
+        if (!dateString) {
+            return null;
+        }
         const cronObject = cron2obj(dateString);
         const date = new Date();
         date.setHours((cronObject.hours as number[])[0]);
@@ -269,6 +269,9 @@ function serverDateToClient(
     }
 
     if (format === 'date') {
+        if (!dateString) {
+            return null;
+        }
         return new Date(dateString);
         // dateString += 'Z';
         // return new Date(new Date(dateString).getTime() + serverTimeZone * 60000);
@@ -276,15 +279,22 @@ function serverDateToClient(
     return null;
 }
 
-function clientDateToServer(date: Date, format: 'cron', serverTimeZone?: number): Partial<CronObject>;
-function clientDateToServer(date: Date, format: 'date', serverTimeZone?: number): string;
 function clientDateToServer(
-    date: Date,
+    date: Date | null | undefined,
+    format: 'cron',
+    serverTimeZone?: number,
+): Partial<CronObject>;
+function clientDateToServer(date: Date | null | undefined, format: 'date', serverTimeZone?: number): string;
+function clientDateToServer(
+    date: Date | null | undefined,
     format: 'cron' | 'date',
     // kept for the (currently disabled) time zone correction below
     _serverTimeZone?: number,
 ): Partial<CronObject> | string | null {
     if (format === 'cron') {
+        if (!date) {
+            return null;
+        }
         date = new Date(date.getTime() /* + (date.getTimezoneOffset() - serverTimeZone) * 60000 */);
         return {
             minutes: [date.getMinutes()],
@@ -292,6 +302,9 @@ function clientDateToServer(
         };
     }
     if (format === 'date') {
+        if (!date) {
+            return null;
+        }
         date = new Date(date.getTime() - new Date().getTimezoneOffset() * 60000 /* - serverTimeZone * 60000 */);
         const dateStr = date.toISOString();
         return dateStr.substring(0, dateStr.length - 5);
@@ -380,7 +393,7 @@ function getIcon(id: string): string | undefined {
     return undefined;
 }
 
-async function getCachedObject(id: string, socket: SocketLike): Promise<ioBroker.Object | null> {
+async function getCachedObject(id: string, socket: Connection): Promise<ioBroker.Object | null> {
     if (objCache[id] === undefined) {
         try {
             objCache[id] = (await socket.getObject(id)) || null;
@@ -392,7 +405,7 @@ async function getCachedObject(id: string, socket: SocketLike): Promise<ioBroker
     return objCache[id];
 }
 
-async function getIconAsync(id: string, socket: SocketLike): Promise<string | null | undefined> {
+async function getIconAsync(id: string, socket: Connection): Promise<string | null | undefined> {
     let obj = await getCachedObject(id, socket);
     if (obj) {
         if (obj.common?.icon) {
