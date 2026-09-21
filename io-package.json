@@ -141,8 +141,7 @@
     "tier": 2,
     "adminTab": {
       "singleton": false,
-      "name": "Calendar",
-      "fa-icon": "calendar_today"
+      "name": "Calendar"
     },
     "dependencies": [
       {
