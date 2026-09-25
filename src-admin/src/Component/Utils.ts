@@ -446,7 +446,28 @@ async function getIconAsync(id: string, socket: Connection): Promise<string | nu
     return undefined;
 }
 
+/**
+ * Generate a random UUID v4 with the native web crypto API.
+ *
+ * `crypto.randomUUID` exists only in secure contexts, and the admin is often served over plain http,
+ * so fall back to `crypto.getRandomValues`, which is available everywhere.
+ */
+function uuidv4(): string {
+    if (crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    // set the version (4) and the variant (10xx) bits
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 export {
+    uuidv4,
     cron2obj,
     obj2cron,
     serverDateToClient,

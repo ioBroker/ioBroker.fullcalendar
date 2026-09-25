@@ -1,4 +1,3 @@
-// @ts-expect-error no types
 import react from '@vitejs/plugin-react';
 import commonjs from 'vite-plugin-commonjs';
 import { federation } from '@module-federation/vite';

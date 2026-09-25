@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useMemo, type CSSProperties, type JSX } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -41,6 +40,7 @@ import {
     cron2obj,
     obj2cron,
     serverDateToClient,
+    uuidv4,
     type CalendarEvent,
     type EventType,
     type Simulation,

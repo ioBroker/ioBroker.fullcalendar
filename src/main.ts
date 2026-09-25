@@ -1,8 +1,9 @@
+import { randomUUID } from 'node:crypto';
+
 // you have to require the utils module and call adapter function
 import { Adapter, type AdapterOptions } from '@iobroker/adapter-core'; // Get common adapter utils
 import * as later from 'later';
 import SunCalc from 'suncalc2';
-import { v4 as uuidv4 } from 'uuid';
 
 import * as timeUtils from './lib/utils';
 import type { AstroName } from './lib/utils';
@@ -846,7 +847,7 @@ export class Fullcalendar extends Adapter {
                     }
 
                     profile.native.events.push({
-                        _id: `${simulation._id}.event-${uuidv4()}`,
+                        _id: `${simulation._id}.event-${randomUUID()}`,
                         common: {
                             name,
                             enabled: true,

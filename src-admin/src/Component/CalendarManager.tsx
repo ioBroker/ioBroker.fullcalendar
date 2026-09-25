@@ -1,5 +1,4 @@
 import { useEffect, useState, type CSSProperties, type JSX } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import ReactSplit, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 
 import { IconButton, Tooltip } from '@mui/material';
@@ -12,6 +11,7 @@ import CalendarContainer from './CalendarContainer';
 import Simulations from './Simulations';
 import CalendarDialog, { type CalendarObject } from './CalendarDialog';
 import { SidePanel, SidePanelItem } from './SidePanel';
+import { uuidv4 } from './Utils';
 
 const styles: Record<string, CSSProperties> = {
     column: {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 
 import {
@@ -26,7 +25,7 @@ import SimulationDialog from './SimulationDialog';
 import PlaySimulationDialog from './PlaySimulationDialog';
 import { SidePanel, SidePanelItem } from './SidePanel';
 import type { PlaySettings } from './PlaySimulationDialog';
-import type { Simulation, SimulationStatus } from './Utils';
+import { uuidv4, type Simulation, type SimulationStatus } from './Utils';
 
 /** Width of the left panel. Unlike the calendars view, the simulations view has no splitter */
 const PANEL_WIDTH = 260;

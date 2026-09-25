@@ -62,7 +62,7 @@ function cleanWidget() {
 
 function copyAllFilesWidget() {
     copyFiles(
-        ['src-widgets/build/**/*', '!src-widgets/build/index.html', '!src-widgets/build/mf-manifest.json'],
+        ['src-widgets/build/**/*', '!src-widgets/build/index.html'],
         'widgets/fullcalendar/',
         {
             process: (fileData, fileName) => {
