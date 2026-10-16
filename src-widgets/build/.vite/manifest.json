@@ -1,198 +1,102 @@
 {
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_emotion_mf_1_react__loadShare__.js-B0fvS0ao.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_emotion_mf_1_react__loadShare__.js-B0fvS0ao.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_emotion_mf_1_react__loadShare__.js",
+  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared",
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "_vite-preload-helper-CRzLMJPS.js"
     ],
     "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_emotion_mf_1_react__prebuild__.js"
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js"
     ]
   },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_material__loadShare__.js-BJzCIbXV.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_material__loadShare__.js-BJzCIbXV.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_material__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_material__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_private_mf_2_theming__loadShare__.js-BMorIdcT.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_private_mf_2_theming__loadShare__.js-BMorIdcT.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_private_mf_2_theming__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js-Cy8lOCKp.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js-Cy8lOCKp.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_system__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__moment__loadShare__.js-DWkaVxAr.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__moment__loadShare__.js-DWkaVxAr.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__moment__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__moment__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_dev_mf_2_runtime__loadShare__.js-DADK1OLt.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_dev_mf_2_runtime__loadShare__.js-DADK1OLt.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_dev_mf_2_runtime__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js-CHgVxl22.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js-CHgVxl22.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom__prebuild__.js"
-    ]
-  },
-  "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-Cykx5mRi.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-Cykx5mRi.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js",
-    "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_vite-preload-helper-uBIymjUX.js"
-    ],
-    "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js"
-    ]
-  },
-  "_createGrid-Dh9Ze6Xh.js": {
-    "file": "assets/createGrid-Dh9Ze6Xh.js",
+  "_createGrid-B_cMcaaY.js": {
+    "file": "assets/createGrid-B_cMcaaY.js",
     "name": "createGrid",
     "imports": [
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-      "_useMediaQuery-iAz86eG4.js"
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
+      "_useMediaQuery-Cm2kB8Te.js"
     ]
   },
-  "_dist-BK97MX24.js": {
-    "file": "assets/dist-BK97MX24.js",
+  "_dist-BI-Ygd_Z.js": {
+    "file": "assets/dist-BI-Ygd_Z.js",
     "name": "dist",
     "imports": [
-      "_utils-jR9fY54i.js"
+      "_utils-BRGuweMc.js"
     ]
   },
   "_emotion-cache.browser.esm--RCZvsJA.js": {
     "file": "assets/emotion-cache.browser.esm--RCZvsJA.js",
     "name": "emotion-cache.browser.esm"
   },
-  "_emotion-use-insertion-effect-with-fallbacks.browser.esm-DYgqXpxG.js": {
-    "file": "assets/emotion-use-insertion-effect-with-fallbacks.browser.esm-DYgqXpxG.js",
+  "_emotion-use-insertion-effect-with-fallbacks.browser.esm-Dgo1zuEd.js": {
+    "file": "assets/emotion-use-insertion-effect-with-fallbacks.browser.esm-Dgo1zuEd.js",
     "name": "emotion-use-insertion-effect-with-fallbacks.browser.esm",
     "imports": [
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js"
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js"
     ]
   },
-  "_helpers-Bizl8Raj.js": {
-    "file": "assets/helpers-Bizl8Raj.js",
+  "_helpers-CsBAxMau.js": {
+    "file": "assets/helpers-CsBAxMau.js",
     "name": "helpers",
     "imports": [
-      "_utils-jR9fY54i.js"
+      "_utils-BRGuweMc.js"
     ]
   },
-  "_react-dom-BP5i0qKm.js": {
-    "file": "assets/react-dom-BP5i0qKm.js",
+  "_react-dom-Cp3cTVwc.js": {
+    "file": "assets/react-dom-Cp3cTVwc.js",
     "name": "react-dom",
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_react.production-DNV6vxBb.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "_react.production-BHZyVOnE.js"
     ]
   },
-  "_react.production-DNV6vxBb.js": {
-    "file": "assets/react.production-DNV6vxBb.js",
+  "_react.production-BHZyVOnE.js": {
+    "file": "assets/react.production-BHZyVOnE.js",
     "name": "react.production",
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js"
+      "_rolldown-runtime-COiEfhsA.js"
     ]
   },
-  "_rolldown-runtime-Dd_uD5pT.js": {
-    "file": "assets/rolldown-runtime-Dd_uD5pT.js",
+  "_rolldown-runtime-COiEfhsA.js": {
+    "file": "assets/rolldown-runtime-COiEfhsA.js",
     "name": "rolldown-runtime"
   },
-  "_useMediaQuery-CAJlQD9Y.js": {
-    "file": "assets/useMediaQuery-CAJlQD9Y.js",
+  "_useMediaQuery-CLh7sOs5.js": {
+    "file": "assets/useMediaQuery-CLh7sOs5.js",
     "name": "useMediaQuery",
     "imports": [
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js-Cy8lOCKp.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js-CHgVxl22.js",
-      "_useMediaQuery-iAz86eG4.js"
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
+      "_useMediaQuery-Cm2kB8Te.js"
     ]
   },
-  "_useMediaQuery-iAz86eG4.js": {
-    "file": "assets/useMediaQuery-iAz86eG4.js",
+  "_useMediaQuery-Cm2kB8Te.js": {
+    "file": "assets/useMediaQuery-Cm2kB8Te.js",
     "name": "useMediaQuery",
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_emotion_mf_1_react__loadShare__.js-B0fvS0ao.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-      "_emotion-use-insertion-effect-with-fallbacks.browser.esm-DYgqXpxG.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
+      "_emotion-use-insertion-effect-with-fallbacks.browser.esm-Dgo1zuEd.js"
     ]
   },
-  "_utils-jR9fY54i.js": {
-    "file": "assets/utils-jR9fY54i.js",
+  "_utils-BRGuweMc.js": {
+    "file": "assets/utils-BRGuweMc.js",
     "name": "utils",
     "imports": [
-      "_vite-preload-helper-uBIymjUX.js"
+      "_vite-preload-helper-CRzLMJPS.js"
     ]
   },
-  "_vite-preload-helper-uBIymjUX.js": {
-    "file": "assets/vite-preload-helper-uBIymjUX.js",
+  "_vite-preload-helper-CRzLMJPS.js": {
+    "file": "assets/vite-preload-helper-CRzLMJPS.js",
     "name": "vite-preload-helper"
   },
   "index.html": {
@@ -202,21 +106,16 @@
     "isEntry": true
   },
   "src/FullCalendar.tsx": {
-    "file": "assets/FullCalendar-BTnwbslg.js",
+    "file": "assets/FullCalendar-PaY1rhdw.js",
     "name": "FullCalendar",
     "src": "src/FullCalendar.tsx",
     "isEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_material__loadShare__.js-BJzCIbXV.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js-Cy8lOCKp.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__moment__loadShare__.js-DWkaVxAr.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js-CHgVxl22.js",
-      "_emotion-use-insertion-effect-with-fallbacks.browser.esm-DYgqXpxG.js",
-      "_useMediaQuery-CAJlQD9Y.js",
-      "_useMediaQuery-iAz86eG4.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
+      "_emotion-use-insertion-effect-with-fallbacks.browser.esm-Dgo1zuEd.js",
+      "_useMediaQuery-CLh7sOs5.js",
+      "_useMediaQuery-Cm2kB8Te.js"
     ],
     "css": [
       "assets/FullCalendar-DRKqq0fW.css"
@@ -233,9 +132,9 @@
     "name": "remoteEntry",
     "src": "virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__fullcalendar__customWidgets_js",
     "imports": [
-      "_vite-preload-helper-uBIymjUX.js",
-      "_dist-BK97MX24.js",
-      "_helpers-Bizl8Raj.js"
+      "_vite-preload-helper-CRzLMJPS.js",
+      "_dist-BI-Ygd_Z.js",
+      "_helpers-CsBAxMau.js"
     ],
     "dynamicImports": [
       "src/FullCalendar.tsx",
@@ -244,34 +143,34 @@
     ]
   },
   "virtual:mf-localSharedImportMap:__mfe_internal__fullcalendar__mf_owner__1": {
-    "file": "assets/_virtual_mf-localSharedImportMap___mfe_internal__fullcalendar__mf_owner__1-CoTGQqmW.js",
+    "file": "assets/_virtual_mf-localSharedImportMap___mfe_internal__fullcalendar__mf_owner__1-CccPXD-k.js",
     "name": "_virtual_mf-localSharedImportMap___mfe_internal__fullcalendar__mf_owner__1",
     "src": "virtual:mf-localSharedImportMap:__mfe_internal__fullcalendar__mf_owner__1",
     "isDynamicEntry": true,
     "imports": [
-      "_vite-preload-helper-uBIymjUX.js",
-      "_dist-BK97MX24.js"
+      "_vite-preload-helper-CRzLMJPS.js",
+      "_dist-BI-Ygd_Z.js"
     ],
     "dynamicImports": [
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_emotion_mf_1_react__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_system__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_material__prebuild__.js",
-      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__moment__prebuild__.js"
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__.js",
+      "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__.js"
     ]
   },
   "virtual:mf:__mfe_internal__fullcalendar__mf_owner__1__H_A_I__hostAutoInit__H_A_I__.js": {
-    "file": "assets/hostInit-DjUhCoSX.js",
+    "file": "assets/hostInit-kf5d7F18.js",
     "name": "hostInit",
     "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__1__H_A_I__hostAutoInit__H_A_I__.js",
     "imports": [
-      "_vite-preload-helper-uBIymjUX.js",
-      "_helpers-Bizl8Raj.js"
+      "_vite-preload-helper-CRzLMJPS.js",
+      "_helpers-CsBAxMau.js"
     ],
     "dynamicImports": [
       "virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__fullcalendar__customWidgets_js",
@@ -279,136 +178,120 @@
     ]
   },
   "virtual:mf:__mfe_internal__fullcalendar__mf_owner__1__P_S__pendingShares__P_S__.js": {
-    "file": "assets/pendingShares-BEyZL_Od.js",
+    "file": "assets/pendingShares-CUEcwctc.js",
     "name": "pendingShares",
     "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__1__P_S__pendingShares__P_S__.js",
     "imports": [
-      "_vite-preload-helper-uBIymjUX.js"
+      "_vite-preload-helper-CRzLMJPS.js"
     ],
     "dynamicImports": [
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_dev_mf_2_runtime__loadShare__.js-DADK1OLt.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js-CHgVxl22.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-Cykx5mRi.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_emotion_mf_1_react__loadShare__.js-B0fvS0ao.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_private_mf_2_theming__loadShare__.js-BMorIdcT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js-Cy8lOCKp.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_material__loadShare__.js-BJzCIbXV.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__moment__loadShare__.js-DWkaVxAr.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
       "virtual:mf-localSharedImportMap:__mfe_internal__fullcalendar__mf_owner__1"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_emotion_mf_1_react__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_emotion_mf_1_react__prebuild__-OQ0plrbS.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_emotion_mf_1_react__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_emotion_mf_1_react__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__-BbpInq7W.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
+      "_rolldown-runtime-COiEfhsA.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
       "_emotion-cache.browser.esm--RCZvsJA.js",
-      "_emotion-use-insertion-effect-with-fallbacks.browser.esm-DYgqXpxG.js"
+      "_emotion-use-insertion-effect-with-fallbacks.browser.esm-Dgo1zuEd.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_material__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_material__prebuild__-gHAZ786R.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_material__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_material__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__-BNACOqHg.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_system__loadShare__.js-Cy8lOCKp.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_2_dom__loadShare__.js-CHgVxl22.js",
-      "_useMediaQuery-CAJlQD9Y.js",
-      "_useMediaQuery-iAz86eG4.js",
-      "_createGrid-Dh9Ze6Xh.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
+      "_useMediaQuery-CLh7sOs5.js",
+      "_useMediaQuery-Cm2kB8Te.js",
+      "_createGrid-B_cMcaaY.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__-B3F0s2nz.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__-x2iF6PTF.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_system__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_system__prebuild__-CNdox1VZ.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_system__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild___mf_0_mui_mf_1_system__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__-BDFD_0by.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_emotion_mf_1_react__loadShare__.js-B0fvS0ao.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare___mf_0_mui_mf_1_private_mf_2_theming__loadShare__.js-BMorIdcT.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react__loadShare__.js-CvmZdlJR.js",
-      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-dKY8wLF8.js",
+      "_rolldown-runtime-COiEfhsA.js",
+      "__virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__loadShare__shared-CD90XqsH.js",
       "_emotion-cache.browser.esm--RCZvsJA.js",
-      "_useMediaQuery-iAz86eG4.js",
-      "_createGrid-Dh9Ze6Xh.js"
+      "_useMediaQuery-Cm2kB8Te.js",
+      "_createGrid-B_cMcaaY.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__moment__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__moment__prebuild__-Cp9x5vPa.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__moment__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__moment__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__-D4x1q4NQ.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js"
+      "_rolldown-runtime-COiEfhsA.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react__prebuild__-C-vNc16I.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__-1B29m3mz.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_react.production-DNV6vxBb.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "_react.production-BHZyVOnE.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__-BEQ_MXdj.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__-JH89NqeZ.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js"
+      "_rolldown-runtime-COiEfhsA.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-B_v57Qfr.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-M61rjtmp.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js"
+      "_rolldown-runtime-COiEfhsA.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom__prebuild__-aFzz7Ouu.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__-x6w-hndA.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_react-dom-BP5i0qKm.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "_react-dom-Cp3cTVwc.js"
     ]
   },
-  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js": {
-    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom_mf_1_client__prebuild__-BFeYclNy.js",
-    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom_mf_1_client__prebuild__",
-    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__219446345750563__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js",
+  "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js": {
+    "file": "assets/_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__-C2unmEaU.js",
+    "name": "_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__",
+    "src": "virtual:mf:__mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__.js",
     "isDynamicEntry": true,
     "imports": [
-      "_rolldown-runtime-Dd_uD5pT.js",
-      "_react-dom-BP5i0qKm.js"
+      "_rolldown-runtime-COiEfhsA.js",
+      "_react-dom-Cp3cTVwc.js"
     ]
   }
 }
