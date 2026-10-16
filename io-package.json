@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "news": {
+      "3.0.2": {
+        "en": "Updated packages",
+        "de": "Neue Pakete",
+        "ru": "Обновленные пакеты",
+        "pt": "Pacotes novos",
+        "nl": "Bijgewerkte pakketten",
+        "fr": "Packages mis à jour",
+        "it": "Pacchi nuovi",
+        "es": "Paquetes nuevos",
+        "pl": "Zaktualizowane pakiety",
+        "uk": "Оновлені пакети",
+        "zh-cn": "更新的软件包"
+      },
       "3.0.1": {
         "en": "Migrated GUI to React19",
         "de": "GUI auf React19 migriert",
@@ -80,19 +93,6 @@
         "pl": "Małe poprawki interfejsu użytkownika na widgecie",
         "uk": "Маленькі UI виправляє на віджет",
         "zh-cn": "部件上的小型 UI 修正"
-      },
-      "2.3.10": {
-        "en": "Small UI fixes",
-        "de": "Kleine UI Fixes",
-        "ru": "Маленькие UI исправления",
-        "pt": "Pequenas correções UI",
-        "nl": "Kleine UI-fixes",
-        "fr": "Petites corrections d'assurance-chômage",
-        "it": "Piccolo UI correzioni",
-        "es": "Pequeña UI",
-        "pl": "Małe poprawki interfejsu użytkownika",
-        "uk": "Маленькі UI кріплення",
-        "zh-cn": "小型 UI 修正"
       }
     },
     "titleLang": {
