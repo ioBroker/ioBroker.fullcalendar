@@ -812,7 +812,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                         if (e.target.value === 'once') {
                                             delete newEvent.native.cron;
                                             newEvent.native.start = clientDateToServer(
-                                                date!,
+                                                date,
                                                 'date',
                                                 props.serverTimeZone,
                                             );
@@ -822,7 +822,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                                 '0 0 ? * 0-6',
                                             ) as unknown as CronObjectArrays;
                                             const timeZoneCron = clientDateToServer(
-                                                date!,
+                                                date,
                                                 'cron',
                                                 props.serverTimeZone,
                                             );
@@ -841,7 +841,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                                 newCronObject = cron2obj('0 0 1-31 1-12 *');
                                             }
                                             const timeZoneCron = clientDateToServer(
-                                                date!,
+                                                date,
                                                 'cron',
                                                 props.serverTimeZone,
                                             );

@@ -737,7 +737,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                     }
                                     const newCron = cron2obj(newEvent.native.cron!);
                                     const timeZoneCron = clientDateToServer(
-                                        event.event.start!,
+                                        event.event.start,
                                         'cron',
                                         props.serverTimeZone,
                                     );
@@ -771,7 +771,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                         newEvent._id = `${props.calendarPrefix || props.simulationId}.event-${uuidv4()}`;
                                     }
                                     newEvent.native.start = clientDateToServer(
-                                        event.event.start!,
+                                        event.event.start,
                                         'date',
                                         props.serverTimeZone,
                                     );
@@ -789,7 +789,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                     },
                                     native: {
                                         id: Date.now(),
-                                        start: clientDateToServer(event.event.start!, 'date', props.serverTimeZone),
+                                        start: clientDateToServer(event.event.start, 'date', props.serverTimeZone),
                                         type: event.event.extendedProps.type as EventType,
                                         oid: '',
                                         startValue: '',
@@ -813,7 +813,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                     newEvent.common.color = props.simulation!.common.color || newEvent.common.color;
 
                                     delete newEvent.native.start;
-                                    const cron = clientDateToServer(event.event.start!, 'cron', props.serverTimeZone);
+                                    const cron = clientDateToServer(event.event.start, 'cron', props.serverTimeZone);
                                     cron.dows =
                                         props.simulation!.native.interval === 'day'
                                             ? [0, 1, 2, 3, 4, 5, 6]
