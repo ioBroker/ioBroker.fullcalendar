@@ -631,16 +631,11 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                         //
                                     }
                                 }}
-                                renderInput={(params: any) => (
-                                    <TextField
-                                        {...params}
-                                        variant="standard"
-                                        style={{
-                                            ...styles.narrowText,
-                                        }}
-                                        helperText={date?.getSeconds() ? date.toLocaleTimeString() : ''}
-                                    />
-                                )}
+                                slotProps={{
+                                    textField: {
+                                        helperText: date?.getSeconds() ? date.toLocaleTimeString() : '',
+                                    },
+                                }}
                                 ampm={false}
                             />
                         </LocalizationProvider>

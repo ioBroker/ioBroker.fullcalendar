@@ -46,7 +46,7 @@ let __tla = (async () => {
   var c = {
     "./FullCalendar": async () => {
       await s(`./FullCalendar`), await Promise.all([]);
-      let t2 = await o(`./FullCalendar`, () => e(() => import("./assets/FullCalendar-PaY1rhdw.js").then(async (m2) => {
+      let t2 = await o(`./FullCalendar`, () => e(() => import("./assets/FullCalendar-BGKZkhaK.js").then(async (m2) => {
         await m2.__tla;
         return m2;
       }), __vite__mapDeps([0]), import.meta.url)), n2 = t2 && t2.__mf_remote_dependency_pending;

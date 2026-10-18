@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { JSX } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import moment from 'moment';
 
 import {
@@ -17,14 +16,12 @@ import { alpha } from '@mui/material/styles';
 
 import { Edit, FiberManualRecord, Pause, PlayArrow, Delete, Check, Stop } from '@mui/icons-material';
 
-import { I18n, Confirm } from '@iobroker/gui-components';
-import type { AdminConnection, IobTheme } from '@iobroker/gui-components';
+import { I18n, Confirm, type AdminConnection, type IobTheme } from '@iobroker/gui-components';
 
 import CalendarContainer from './CalendarContainer';
 import SimulationDialog from './SimulationDialog';
-import PlaySimulationDialog from './PlaySimulationDialog';
+import PlaySimulationDialog, { type PlaySettings } from './PlaySimulationDialog';
 import { SidePanel, SidePanelItem } from './SidePanel';
-import type { PlaySettings } from './PlaySimulationDialog';
 import { uuidv4, type Simulation, type SimulationStatus } from './Utils';
 
 /** Width of the left panel. Unlike the calendars view, the simulations view has no splitter */
@@ -155,14 +152,14 @@ const Simulations = (props: SimulationsProps): JSX.Element => {
                 ? new Date(Date.now() + 24 * 60 * 60 * 1000)
                 : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        void props.socket.setObject(id, obj as unknown as ioBroker.Object);
+        void props.socket.setObject(id, obj);
         void props.socket.setState(id, 'record');
     };
 
     const playSimulation = async (id: string, options: PlaySettings): Promise<void> => {
         const obj = (await props.socket.getObject(id)) as unknown as Simulation;
         obj.native.play = options as unknown as Simulation['native']['play'];
-        await props.socket.setObject(id, obj as unknown as ioBroker.Object);
+        await props.socket.setObject(id, obj);
         void props.socket.setState(id, 'play');
     };
 
@@ -185,8 +182,8 @@ const Simulations = (props: SimulationsProps): JSX.Element => {
                         } as unknown as ioBroker.Object);
 
                         const events = simulations.find(s => s._id === selectedSimulation)!.native.events;
-                        for (const k in events) {
-                            const _event = JSON.parse(JSON.stringify(events[k]));
+                        for (const event of events) {
+                            const _event = JSON.parse(JSON.stringify(event));
                             _event.id = `${id}.event-${uuidv4()}`;
                             void props.socket.setObject(_event.id, _event);
                         }

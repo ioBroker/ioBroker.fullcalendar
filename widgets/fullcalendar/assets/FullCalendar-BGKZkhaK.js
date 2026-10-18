@@ -4576,15 +4576,16 @@ var lo = false, uo = [`0_userdata.`, `alias.`], fo = class e6 extends k {
     this.observeContainerWidth(), this.measureRenderedRows(), this.tableRef.current && this.selectFirst && this.scrollToItem(this.selectFirst), this.reconcileNavigation(e11);
   }
   scrollToItem(e11) {
-    this.selectFirst = ``;
+    this.selectFirst !== e11 && (this.selectFirst = ``);
     let t2 = window.document.getElementById(e11);
     if (t2) {
-      t2.scrollIntoView({behavior: `auto`, block: `center`, inline: `center`});
+      this.selectFirst = ``, t2.scrollIntoView({behavior: `auto`, block: `center`, inline: `center`});
       return;
     }
     let n2 = this.tableRef.current, r2 = this.flatRows.findIndex((t3) => t3.item.data.id === e11);
     if (!n2 || r2 === -1)
       return;
+    this.selectFirst = ``;
     let i2 = this.rowOffsets[r2] - Math.max(0, (this.viewportHeight - 32) / 2);
     n2.scrollTop = Math.max(0, i2);
   }
