@@ -821,11 +821,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                             const newCronObject = cron2obj(
                                                 '0 0 ? * 0-6',
                                             ) as unknown as CronObjectArrays;
-                                            const timeZoneCron = clientDateToServer(
-                                                date,
-                                                'cron',
-                                                props.serverTimeZone,
-                                            );
+                                            const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
                                             newCronObject.hours = timeZoneCron.hours as number[];
                                             newCronObject.minutes = timeZoneCron.minutes as number[];
                                             newEvent.native.cron = obj2cron(newCronObject);
@@ -840,11 +836,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                                             } else {
                                                 newCronObject = cron2obj('0 0 1-31 1-12 *');
                                             }
-                                            const timeZoneCron = clientDateToServer(
-                                                date,
-                                                'cron',
-                                                props.serverTimeZone,
-                                            );
+                                            const timeZoneCron = clientDateToServer(date, 'cron', props.serverTimeZone);
                                             newCronObject.hours = timeZoneCron.hours as number[];
                                             newCronObject.minutes = timeZoneCron.minutes as number[];
                                             newEvent.native.cron = obj2cron(newCronObject);
