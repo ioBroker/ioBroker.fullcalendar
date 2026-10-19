@@ -38,8 +38,6 @@ How to use:
 ### **WORK IN PROGRESS**
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (bluefox) Migrated GUI to vite
-
-### 3.0.4 (2026-10-19)
 * (bluefox) Updated packages
 
 ### 3.0.1 (2026-08-05)
