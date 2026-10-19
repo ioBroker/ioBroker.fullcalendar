@@ -13,17 +13,17 @@ You must not use any external resources, the scheduling is processed only in ioB
 
 ![Example](img/example.png)
 
-You can control your events with calendar and can plan to control them periodically.
+You can control your events with a calendar and can plan to control them periodically.
 
 ## Events simulation
-You can record your behavior and can play back it later.
+You can record your behavior and can play it back later.
 For example, you can create two recordings for workday and for weekend and play them back on according days.
 
-Or you can record the whole week and can play it back on the next weeks during you are away.
+Or you can record the whole week and can play it back in the next weeks while you are away.
 
 How to use:
-- Go to simulation tab
-- Create the new simulation by clicking on the "+" button and select type of simulation: day or week
+- Go to the simulation tab
+- Create the new simulation by clicking on the "+" button and selecting the type of simulation: day or week
 - Click the record button and wait 24 hours or 7 days till simulation stops to record events
 - Now you can replay the simulation by clicking on the play button. Additionally, you can define the time when the simulation should be started.
 
@@ -35,6 +35,12 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### 3.0.4 (2026-10-19)
+* (bluefox) Updated packages
+
+### 3.0.1 (2026-08-05)
+* (bluefox) Migrated GUI to React19
+
 ### 2.4.5 (2024-09-09)
 * (bluefox) Corrected SelectID Dialog
 
@@ -44,71 +50,12 @@ How to use:
 ### 2.3.17 (2024-05-26)
 * (bluefox) Corrected the simulation
 
-### 2.3.16 (2024-05-25)
-* (bluefox) Small UI fixes on widget
-
-### 2.3.10 (2024-05-22)
-* (bluefox) Small UI fixes
-
-### 2.3.9 (2024-05-20)
-* (bluefox) Corrected vis-2 widget
-
-### 2.3.4 (2023-11-28)
-* (bluefox) Corrected monthly events
-
-### 2.3.1 (2023-11-27)
-* (bluefox) Packages were updated
-* (bluefox) Corrected vis-2 widget
-
-### 2.2.6 (2023-07-27)
-* (bluefox) Compatibility with vis-2
-
-### 2.2.2 (2023-06-19)
-* (bluefox) Corrected stop of the recording
-
-### 2.2.0 (2023-04-24)
-* (bluefox) Added simulation of events
-
-### 2.0.8 (2023-03-24)
-* (bluefox) Corrected vis-2 widgets
-
-### 2.0.5 (2023-03-07)
-* (bluefox) New material design added
-* (bluefox) License changed to MIT
-* (bluefox) Allowed deletion of events
-
-### 1.2.0 (2021-12-14)
-* (bluefox) Updated to use with js-controller 3.3 and admin 5
-
-### 1.1.0 (2020-01-12)
-* (foxriver76) Updated to use with js-controller 2.x
-
-### 1.0.0 (2019-11-17)
-* (bluefox) Support for compact mode is added
-
-### 0.2.4 (2017-11-23)
-* Translations
-
-### 0.2.3 (2017-11-22)
-* (bluefox) Fixed interval settings
-* (bluefox) Update fullcalendar library
-
-### 0.2.1 (2017-09-25)
-* (bluefox) Fixed error
-
-### 0.2.0 (2017-08-06)
-* (bluefox) Support for new admin
-
-### 0.1.1 (2017-07-13)
-* (bluefox) Fixed double event by creation
-
-### 0.1.0 (2017-03-20)
-* (bluefox) initial commit
+[Older changelogs can be found there](CHANGELOG_OLD.md)
 
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2017-2024 Bluefox <dogafox@gmail.com>
+Copyright (c) 2017-2026 Bluefox <dogafox@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
