@@ -60,7 +60,7 @@ describe(`Test ${adapterShortName} adapter`, function () {
     it(`Test ${adapterShortName} instance object: it must exists`, function (done) {
         objects.getObject(`system.adapter.${adapterShortName}.0`, (err, obj) => {
             assert(!err);
-            assert(typeof obj !== 'object');
+            assert(typeof obj === 'object');
             assert(obj !== null);
             done();
         });

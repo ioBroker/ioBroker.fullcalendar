@@ -1,32 +1,42 @@
+# Dependabot will run on day 2 of each month at 01:13 (Europe/Berlin timezone)
 version: 2
 updates:
-  - package-ecosystem: github-actions
-    directory: "/"
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: monthly
-      time: "04:00"
-      timezone: Europe/Berlin
-  - package-ecosystem: npm
-    directory: "/"
+      interval: 'cron'
+      timezone: 'Europe/Berlin'
+      cronjob: '13 1 2 * *'
+    open-pull-requests-limit: 15
+
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: monthly
-      time: "04:00"
-      timezone: Europe/Berlin
+      interval: 'cron'
+      timezone: 'Europe/Berlin'
+      cronjob: '13 1 2 * *'
     open-pull-requests-limit: 20
-    versioning-strategy: increase
-  - package-ecosystem: npm
-    directory: "/src"
+    versioning-strategy: 'increase'
+    ignore:
+      - dependency-name: '@types/node'
+        update-types:
+          - 'version-update:semver-major'
+
+  - package-ecosystem: 'npm'
+    directory: '/src'
     schedule:
-      interval: monthly
-      time: "04:00"
-      timezone: Europe/Berlin
+      interval: 'cron'
+      timezone: 'Europe/Berlin'
+      cronjob: '13 1 2 * *'
     open-pull-requests-limit: 20
-    versioning-strategy: increase
-  - package-ecosystem: npm
-    directory: "/src-widget"
+    versioning-strategy: 'increase'
+
+  - package-ecosystem: 'npm'
+    directory: '/src-widget'
     schedule:
-      interval: monthly
-      time: "04:00"
-      timezone: Europe/Berlin
+      interval: 'cron'
+      timezone: 'Europe/Berlin'
+      cronjob: '13 1 2 * *'
     open-pull-requests-limit: 20
-    versioning-strategy: increase
+    versioning-strategy: 'increase'

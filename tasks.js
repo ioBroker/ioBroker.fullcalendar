@@ -5,11 +5,27 @@
 'use strict';
 
 const fs = require('node:fs');
+const { fork } = require('node:child_process');
 const { deleteFoldersRecursive, npmInstall, buildReact, copyFiles } = require('@iobroker/build-tools');
 
+/** Compile the adapter backend: src/*.ts => build/*.js */
+function buildBackend() {
+    return new Promise((resolve, reject) => {
+        const script = `${__dirname}/node_modules/typescript/bin/tsc`;
+        if (!fs.existsSync(script)) {
+            reject(new Error(`Cannot find execution file: ${script}`));
+            return;
+        }
+        const child = fork(script, ['-p', `${__dirname}/tsconfig.build.json`], { stdio: 'pipe', cwd: __dirname });
+        child.stdout?.on('data', data => console.log(data.toString()));
+        child.stderr?.on('data', data => console.log(data.toString()));
+        child.on('close', code => (code ? reject(new Error(`tsc exit code: ${code}`)) : resolve()));
+    });
+}
+
 function sync2files(src, dst) {
-    const srcTxt = fs.readFileSync(src).toString('utf8');
-    const destTxt = fs.readFileSync(dst).toString('utf8');
+    let srcTxt = fs.readFileSync(src).toString('utf8');
+    let destTxt = fs.readFileSync(dst).toString('utf8');
     if (srcTxt !== destTxt) {
         const srcs = fs.statSync(src);
         const dest = fs.statSync(dst);
@@ -22,16 +38,16 @@ function sync2files(src, dst) {
 }
 
 function buildWidgets() {
-    // sync src and src-widgets
-    sync2files(
-        `${__dirname}/src-widgets/src/Component/Calendar.jsx`,
-        `${__dirname}/src-admin/src/Component/Calendar.jsx`,
-    );
-    sync2files(
-        `${__dirname}/src-widgets/src/Component/EventDialog.jsx`,
-        `${__dirname}/src-admin/src/Component/EventDialog.jsx`,
-    );
-    sync2files(`${__dirname}/src-widgets/src/Component/Utils.js`, `${__dirname}/src-admin/src/Component/Utils.js`);
+    // sync src and src-widgets. Stop it till vis-2 is not updated to react 19
+    // sync2files(
+    //     `${__dirname}/src-widgets/src/Component/Calendar.tsx`,
+    //     `${__dirname}/src-admin/src/Component/Calendar.tsx`,
+    // );
+    // sync2files(
+    //     `${__dirname}/src-widgets/src/Component/EventDialog.tsx`,
+    //     `${__dirname}/src-admin/src/Component/EventDialog.tsx`,
+    // );
+    sync2files(`${__dirname}/src-widgets/src/Component/Utils.ts`, `${__dirname}/src-admin/src/Component/Utils.ts`);
     sync2files(`${__dirname}/src-widgets/src/Component/styles.css`, `${__dirname}/src-admin/src/Component/styles.css`);
     return buildReact(`${__dirname}/src-widgets`, { rootDir: __dirname, vite: true }).catch(() =>
         console.error('Error by build'),
@@ -46,7 +62,7 @@ function cleanWidget() {
 
 function copyAllFilesWidget() {
     copyFiles(
-        ['src-widgets/build/**/*', '!src-widgets/build/index.html', '!src-widgets/build/mf-manifest.json'],
+        ['src-widgets/build/**/*', '!src-widgets/build/index.html'],
         'widgets/fullcalendar/',
         {
             process: (fileData, fileName) => {
@@ -79,134 +95,7 @@ function copyAllFilesWidget() {
 }
 
 function copyAllFiles() {
-    copyFiles(
-        [
-            'src-admin/build/*',
-            `!src-admin/build/_socket/*.js`,
-            // replace it later with
-            // ...buildHelper.ignoreSvgFiles(`${__dirname}/src-admin/`),
-            `!src-admin/build/static/media/Alarm Systems.*.svg`,
-            `!src-admin/build/static/media/Amplifier.*.svg`,
-            `!src-admin/build/static/media/Anteroom.*.svg`,
-            `!src-admin/build/static/media/Attic.*.svg`,
-            `!src-admin/build/static/media/Awnings.*.svg`,
-            `!src-admin/build/static/media/Balcony.*.svg`,
-            `!src-admin/build/static/media/Barn.*.svg`,
-            `!src-admin/build/static/media/Basement.*.svg`,
-            `!src-admin/build/static/media/Bathroom.*.svg`,
-            `!src-admin/build/static/media/Battery Status.*.svg`,
-            `!src-admin/build/static/media/Bedroom.*.svg`,
-            `!src-admin/build/static/media/Boiler Room.*.svg`,
-            `!src-admin/build/static/media/Carport.*.svg`,
-            `!src-admin/build/static/media/Ceiling Spotlights.*.svg`,
-            `!src-admin/build/static/media/Cellar.*.svg`,
-            `!src-admin/build/static/media/Chamber.*.svg`,
-            `!src-admin/build/static/media/Chandelier.*.svg`,
-            `!src-admin/build/static/media/Climate.*.svg`,
-            `!src-admin/build/static/media/Coffee Makers.*.svg`,
-            `!src-admin/build/static/media/Cold Water.*.svg`,
-            `!src-admin/build/static/media/Computer.*.svg`,
-            `!src-admin/build/static/media/Consumption.*.svg`,
-            `!src-admin/build/static/media/Corridor.*.svg`,
-            `!src-admin/build/static/media/Curtains.*.svg`,
-            `!src-admin/build/static/media/Dining Area.*.svg`,
-            `!src-admin/build/static/media/Dining Room.*.svg`,
-            `!src-admin/build/static/media/Dining.*.svg`,
-            `!src-admin/build/static/media/Dishwashers.*.svg`,
-            `!src-admin/build/static/media/Doors.*.svg`,
-            `!src-admin/build/static/media/Doorstep.*.svg`,
-            `!src-admin/build/static/media/Dressing Room.*.svg`,
-            `!src-admin/build/static/media/Driveway.*.svg`,
-            `!src-admin/build/static/media/Dryer.*.svg`,
-            `!src-admin/build/static/media/Entrance.*.svg`,
-            `!src-admin/build/static/media/Equipment Room.*.svg`,
-            `!src-admin/build/static/media/Fan.*.svg`,
-            `!src-admin/build/static/media/Floor Lamps.*.svg`,
-            `!src-admin/build/static/media/Front Yard.*.svg`,
-            `!src-admin/build/static/media/Gallery.*.svg`,
-            `!src-admin/build/static/media/Garage Doors.*.svg`,
-            `!src-admin/build/static/media/Garage.*.svg`,
-            `!src-admin/build/static/media/Garden.*.svg`,
-            `!src-admin/build/static/media/Gates.*.svg`,
-            `!src-admin/build/static/media/Ground Floor.*.svg`,
-            `!src-admin/build/static/media/Guest Bathroom.*.svg`,
-            `!src-admin/build/static/media/Guest Room.*.svg`,
-            `!src-admin/build/static/media/Gym.*.svg`,
-            `!src-admin/build/static/media/Hairdryer.*.svg`,
-            `!src-admin/build/static/media/Hall.*.svg`,
-            `!src-admin/build/static/media/Handle.*.svg`,
-            `!src-admin/build/static/media/Hanging Lamps.*.svg`,
-            `!src-admin/build/static/media/Heater.*.svg`,
-            `!src-admin/build/static/media/Home Theater.*.svg`,
-            `!src-admin/build/static/media/Hoods.*.svg`,
-            `!src-admin/build/static/media/Hot Water.*.svg`,
-            `!src-admin/build/static/media/Humidity.*.svg`,
-            `!src-admin/build/static/media/Iron.*.svg`,
-            `!src-admin/build/static/media/Irrigation.*.svg`,
-            `!src-admin/build/static/media/Kitchen.*.svg`,
-            `!src-admin/build/static/media/Laundry Room.*.svg`,
-            `!src-admin/build/static/media/Led Strip.*.svg`,
-            `!src-admin/build/static/media/Light.*.svg`,
-            `!src-admin/build/static/media/Lightings.*.svg`,
-            `!src-admin/build/static/media/Living Area.*.svg`,
-            `!src-admin/build/static/media/Living Room.*.svg`,
-            `!src-admin/build/static/media/Lock.*.svg`,
-            `!src-admin/build/static/media/Locker Room.*.svg`,
-            `!src-admin/build/static/media/Louvre.*.svg`,
-            `!src-admin/build/static/media/Mowing Machine.*.svg`,
-            `!src-admin/build/static/media/Music.*.svg`,
-            `!src-admin/build/static/media/names.*.txt`,
-            `!src-admin/build/static/media/Nursery.*.svg`,
-            `!src-admin/build/static/media/Office.*.svg`,
-            `!src-admin/build/static/media/Outdoor Blinds.*.svg`,
-            `!src-admin/build/static/media/Outdoors.*.svg`,
-            `!src-admin/build/static/media/People.*.svg`,
-            `!src-admin/build/static/media/Playroom.*.svg`,
-            `!src-admin/build/static/media/Pool.*.svg`,
-            `!src-admin/build/static/media/Power Consumption.*.svg`,
-            `!src-admin/build/static/media/Printer.*.svg`,
-            `!src-admin/build/static/media/Pump.*.svg`,
-            `!src-admin/build/static/media/Rear Wall.*.svg`,
-            `!src-admin/build/static/media/Receiver.*.svg`,
-            `!src-admin/build/static/media/Sconces.*.svg`,
-            `!src-admin/build/static/media/Second Floor.*.svg`,
-            `!src-admin/build/static/media/Security.*.svg`,
-            `!src-admin/build/static/media/Shading.*.svg`,
-            `!src-admin/build/static/media/Shed.*.svg`,
-            `!src-admin/build/static/media/Shutters.*.svg`,
-            `!src-admin/build/static/media/Sleeping Area.*.svg`,
-            `!src-admin/build/static/media/SmokeDetector.*.svg`,
-            `!src-admin/build/static/media/Sockets.*.svg`,
-            `!src-admin/build/static/media/Speaker.*.svg`,
-            `!src-admin/build/static/media/Stairway.*.svg`,
-            `!src-admin/build/static/media/Stairwell.*.svg`,
-            `!src-admin/build/static/media/Storeroom.*.svg`,
-            `!src-admin/build/static/media/Stove.*.svg`,
-            `!src-admin/build/static/media/Summer House.*.svg`,
-            `!src-admin/build/static/media/Swimming Pool.*.svg`,
-            `!src-admin/build/static/media/Table Lamps.*.svg`,
-            `!src-admin/build/static/media/Temperature Sensors.*.svg`,
-            `!src-admin/build/static/media/Terrace.*.svg`,
-            `!src-admin/build/static/media/Toilet.*.svg`,
-            `!src-admin/build/static/media/Tv.*.svg`,
-            `!src-admin/build/static/media/Upstairs.*.svg`,
-            `!src-admin/build/static/media/Vacuum Cleaner.*.svg`,
-            `!src-admin/build/static/media/Ventilation.*.svg`,
-            `!src-admin/build/static/media/Wardrobe.*.svg`,
-            `!src-admin/build/static/media/Washing Machines.*.svg`,
-            `!src-admin/build/static/media/Washroom.*.svg`,
-            `!src-admin/build/static/media/Water Consumption.*.svg`,
-            `!src-admin/build/static/media/Water Heater.*.svg`,
-            `!src-admin/build/static/media/Water.*.svg`,
-            `!src-admin/build/static/media/Wc.*.svg`,
-            `!src-admin/build/static/media/Weather.*.svg`,
-            `!src-admin/build/static/media/Window.*.svg`,
-            `!src-admin/build/static/media/Windscreen.*.svg`,
-            `!src-admin/build/static/media/Workshop.*.svg`,
-            `!src-admin/build/static/media/Workspace.*.svg`,
-        ],
-        'admin',
-    );
+    copyFiles(['src-admin/build/**/*', '!src-admin/build/**/_socket/info.js'], 'admin');
 }
 
 function patch() {
@@ -231,7 +120,12 @@ function patch() {
     }
 }
 
-if (process.argv.includes('--0-widget-clean')) {
+if (process.argv.includes('--backend-build')) {
+    buildBackend().catch(e => {
+        console.error(`Cannot build backend: ${e}`);
+        process.exit(1);
+    });
+} else if (process.argv.includes('--0-widget-clean')) {
     cleanWidget();
 } else if (process.argv.includes('--1-widget-npm')) {
     npmInstall(`${__dirname}/src-widgets/`, { force: true }).catch(e =>
@@ -281,5 +175,6 @@ if (process.argv.includes('--0-widget-clean')) {
         .then(() => {
             copyAllFiles();
             patch();
-        });
+        })
+        .then(() => buildBackend());
 }

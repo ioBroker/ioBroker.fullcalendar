@@ -3,34 +3,24 @@
 {
     "compilerOptions": {
         "module": "esnext",
-        "moduleResolution": "node",
-        // check JS files
-        "allowJs": true,
-        // This is necessary for the automatic typing of the adapter config
+        "moduleResolution": "bundler",
+        "allowJs": false,
         "resolveJsonModule": true,
-        // If you want to disable the stricter type checks (not recommended), uncomment the following line
-        // "strict": false,
-        // And enable some of those features for more fine-grained control
         "strictNullChecks": true,
-        // "strictPropertyInitialization": true,
-        // "strictBindCallApply": true,
-        // "noUnusedLocals": true,
-        // "noUnusedParameters": true,
         "useUnknownInCatchVariables": false,
         "target": "ES2022",
-        "baseUrl": "./",
         "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
         "checkJs": false,
-        "noEmit": false,
-        "outDir": "./build",
+        "noEmit": true,
         "sourceMap": true,
         "sourceRoot": "./src",
         "noImplicitAny": true,
         "skipLibCheck": true,
         "verbatimModuleSyntax": true,
         "lib": ["es2019", "DOM"],
-        "jsx": "react",
-        "types": ["@iobroker/types", "node"]
+        "jsx": "react-jsx",
+        "types": ["@iobroker/types", "node"],
     },
     "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./src/**/*.tsx", "./src/**/*.json", "./src/**/*.css"],
     "exclude": ["**/node_modules", "**/dist"]

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "2.4.5",
+    "version": "3.0.4",
     "news": {
+      "3.0.4": {
+        "en": "Updated packages",
+        "de": "Neue Pakete",
+        "ru": "Обновленные пакеты",
+        "pt": "Pacotes novos",
+        "nl": "Bijgewerkte pakketten",
+        "fr": "Packages mis à jour",
+        "it": "Pacchi nuovi",
+        "es": "Paquetes nuevos",
+        "pl": "Zaktualizowane pakiety",
+        "uk": "Оновлені пакети",
+        "zh-cn": "更新的软件包"
+      },
       "2.4.5": {
         "en": "Corrected SelectID Dialog",
         "de": "Behobener Dialog zur Auswahl",
@@ -67,35 +80,8 @@
         "pl": "Małe poprawki interfejsu użytkownika na widgecie",
         "uk": "Маленькі UI виправляє на віджет",
         "zh-cn": "部件上的小型 UI 修正"
-      },
-      "2.3.10": {
-        "en": "Small UI fixes",
-        "de": "Kleine UI Fixes",
-        "ru": "Маленькие UI исправления",
-        "pt": "Pequenas correções UI",
-        "nl": "Kleine UI-fixes",
-        "fr": "Petites corrections d'assurance-chômage",
-        "it": "Piccolo UI correzioni",
-        "es": "Pequeña UI",
-        "pl": "Małe poprawki interfejsu użytkownika",
-        "uk": "Маленькі UI кріплення",
-        "zh-cn": "小型 UI 修正"
-      },
-      "2.3.9": {
-        "en": "Corrected vis-2 widget",
-        "de": "Korrigiert vis-2 Widget",
-        "ru": "Исправленный виджет vis-2",
-        "pt": "Corrigido vis-2 widget",
-        "nl": "Gecorrigeerd vis-2 widget",
-        "fr": "Widget vis-2 corrigé",
-        "it": "Corretto vis-2 widget",
-        "es": "Corregido vis-2 widget",
-        "pl": "Poprawiony widżet vis-2",
-        "uk": "Corrected vis-2 віджет",
-        "zh-cn": "已校正相对 2 部件"
       }
     },
-    "title": "Calendar schedule",
     "titleLang": {
       "en": "Calendar schedule",
       "de": "Kalender Zeitplan",
@@ -123,7 +109,10 @@
     "authors": [
       "bluefox <dogafox@gmail.com>"
     ],
-    "license": "MIT",
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
     "platform": "Javascript/Node.js",
     "icon": "fullcalendar.png",
     "mode": "daemon",
@@ -136,10 +125,10 @@
     "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.fullcalendar/master/admin/fullcalendar.png",
     "readme": "https://github.com/ioBroker/ioBroker.fullcalendar/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "adminTab": {
       "singleton": false,
-      "name": "Calendar",
-      "fa-icon": "calendar_today"
+      "name": "Calendar"
     },
     "dependencies": [
       {

@@ -15,9 +15,11 @@ export default [
     {
         ignores: [
             'src-admin/**/*',
+            'src-widgets/**/*',
             'packages/**/*',
             'src-www/**/*',
             'admin/**/*',
+            'widgets/**/*',
             'node_modules/**/*',
             'test/**/*',
             'build/**/*',

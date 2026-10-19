@@ -4,6 +4,8 @@ const { existsSync } = require('node:fs');
 const { deleteFoldersRecursive } = require('@iobroker/build-tools');
 let gPage;
 
+process.env.ADMIN_VERSION = '8.0.1';
+
 describe.skip('admin-gui', () => {
     before(async function () {
         this.timeout(240_000);
