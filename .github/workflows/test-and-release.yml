@@ -32,7 +32,7 @@ jobs:
       - uses: ioBroker/testing-action-check@v1
         with:
           node-version: '24.x'
-          install-command: 'npm ci && cd src-widgets && npm ci'
+          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm ci'
           lint: true
 
   # Runs adapter tests on all supported node versions and OSes
@@ -47,7 +47,7 @@ jobs:
       - uses: ioBroker/testing-action-adapter@v1
         with:
           build: true
-          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm run build'
+          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm ci && npm run build'
           os: 'ubuntu-latest'
           node-version: 24.x
 
@@ -73,5 +73,5 @@ jobs:
         with:
           node-version: '24.x'
           build: true
-          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm run build'
+          install-command: 'npm ci && cd src-widgets && npm ci && cd ../src-admin && npm ci && npm run build'
           github-token: ${{ secrets.GITHUB_TOKEN }}
