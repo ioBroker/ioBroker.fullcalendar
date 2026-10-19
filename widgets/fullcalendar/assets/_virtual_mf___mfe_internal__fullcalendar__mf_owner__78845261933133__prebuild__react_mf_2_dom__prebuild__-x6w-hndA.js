@@ -1,5 +1,5 @@
-import {i as e} from "./rolldown-runtime-COiEfhsA.js";
-import {t} from "./react-dom-Cp3cTVwc.js";
+import { i as e } from "./rolldown-runtime-COiEfhsA.js";
+import { t } from "./react-dom-Cp3cTVwc.js";
 var n = e(t()), r = n, i = r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, a = r.browser, o = r.createPortal, s = r.flushSync, c = r.preconnect, l = r.prefetchDNS, u = r.preinit, d = r.preinitModule, f = r.preload, p = r.preloadModule, m = r.requestFormReset, h = r.unstable_batchedUpdates, g = r.useFormState, _ = r.useFormStatus, v = r.version, y = Reflect.get(n, `default`) ?? n;
 export {
   i as __DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,

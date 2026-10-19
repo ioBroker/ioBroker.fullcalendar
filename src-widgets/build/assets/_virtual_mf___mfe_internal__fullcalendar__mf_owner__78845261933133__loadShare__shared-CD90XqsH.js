@@ -1,27 +1,24 @@
 const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./emotion-cache.browser.esm--RCZvsJA.js","./emotion-use-insertion-effect-with-fallbacks.browser.esm-Dgo1zuEd.js","./useMediaQuery-CLh7sOs5.js","./useMediaQuery-Cm2kB8Te.js","./createGrid-B_cMcaaY.js","./react.production-BHZyVOnE.js","./react-dom-Cp3cTVwc.js"])))=>i.map(i=>d[i]);
-import {n as e} from "./rolldown-runtime-COiEfhsA.js";
-import {t} from "./vite-preload-helper-CRzLMJPS.js";
+import { n as e } from "./rolldown-runtime-COiEfhsA.js";
+import { t } from "./vite-preload-helper-CRzLMJPS.js";
 let au, wm, Nt, P, S, mm, mt, ym, Tt, _m, xt, Nf, _, af, le, tf, w, El, v, df, xe, sf, ue, Yd, y, Pp, m, Op, h, bm, Ot, zf, g, tu, Xd, b, dm, pt, gm, bt, nf, T, ef, C, rf, Ce, Dl, _e, kf, me, Ol, re, Lp, qe, Um, hu, cm, dt, Im, vl, Yp, sl, ou, Xp, E, em, Ge, $p, Fn, qm, mu, Bp, Ft, xm, Mt, Em, ml, Qp, D, nh, kl, Wm, gu, Zp, He, lf, ye, rh, pu, Gm, Su, gh, uu, Ip, hl, nm, nt, hm, _t, Rp, ft, sm, ut, Zd, x;
 let __tla = (async () => {
   var _a2, _b, _c2, _d2, _e2, _f2, _g, _h2, _i2, _j, _k, _l2, _m2, _n2, _o2, _p2, _q, _r2, _s2, _t2;
   let n, r, i, a, ee, te, o, ne, s, c, ie;
   n = (e2, t2) => {
     let n2 = e2[t2.canonical];
-    if (n2 !== void 0)
-      return n2;
+    if (n2 !== void 0) return n2;
     let r2 = t2.aliases || [];
     for (let n3 of r2) {
-      if (!Object.prototype.hasOwnProperty.call(e2, n3))
-        continue;
+      if (!Object.prototype.hasOwnProperty.call(e2, n3)) continue;
       let r3 = e2[n3];
-      if (r3 !== void 0)
-        return e2[t2.canonical] = r3, r3;
+      if (r3 !== void 0) return e2[t2.canonical] = r3, r3;
     }
   };
-  r = Symbol.for(`module-federation.shared-cache-listeners`);
+  r = /* @__PURE__ */ Symbol.for(`module-federation.shared-cache-listeners`);
   i = (e2) => {
     let t2 = e2[r];
-    return t2 === void 0 && (t2 = Object.create(null), Object.defineProperty(e2, r, {
+    return t2 === void 0 && (t2 = /* @__PURE__ */ Object.create(null), Object.defineProperty(e2, r, {
       value: t2,
       enumerable: false,
       configurable: false,
@@ -31,12 +28,12 @@ let __tla = (async () => {
   a = (e2, t2, n2) => {
     var _a3;
     let r2 = i(e2);
-    (r2[_a3 = t2.canonical] || (r2[_a3] = new Set())).add(n2);
+    (r2[_a3 = t2.canonical] || (r2[_a3] = /* @__PURE__ */ new Set())).add(n2);
   };
-  ee = Symbol.for(`module-federation.shared-cache-owners`);
+  ee = /* @__PURE__ */ Symbol.for(`module-federation.shared-cache-owners`);
   te = (e2) => {
     let t2 = e2[ee];
-    return t2 === void 0 && (t2 = Object.create(null), Object.defineProperty(e2, ee, {
+    return t2 === void 0 && (t2 = /* @__PURE__ */ Object.create(null), Object.defineProperty(e2, ee, {
       value: t2,
       enumerable: false,
       configurable: false,
@@ -46,55 +43,47 @@ let __tla = (async () => {
   o = (e2) => {
     let t2 = [
       e2,
-      e2?.default
+      e2 == null ? void 0 : e2.default
     ];
-    for (let e3 of t2)
-      if (e3 && typeof e3 == `object`) {
-        for (let t3 of [
-          `__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE`,
-          `__TEST_INTERNALS`,
-          `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED`
-        ]) {
-          let n2 = e3[t3];
-          if (n2 && typeof n2 == `object`)
-            return {
-              internals: n2
-            };
-        }
-        if (typeof e3.useState == `function`)
-          return {
-            hook: e3.useState
-          };
+    for (let e3 of t2) if (e3 && typeof e3 == `object`) {
+      for (let t3 of [
+        `__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE`,
+        `__TEST_INTERNALS`,
+        `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED`
+      ]) {
+        let n2 = e3[t3];
+        if (n2 && typeof n2 == `object`) return {
+          internals: n2
+        };
       }
+      if (typeof e3.useState == `function`) return {
+        hook: e3.useState
+      };
+    }
   };
   ne = (e2, t2) => {
-    if (e2 === t2)
-      return true;
+    if (e2 === t2) return true;
     let n2 = o(e2), r2 = o(t2);
-    if (!n2 || !r2)
-      return false;
+    if (!n2 || !r2) return false;
     let i2 = n2.internals, a2 = r2.internals;
     return i2 !== void 0 || a2 !== void 0 ? i2 !== void 0 && i2 === a2 : typeof n2.hook == `function` && n2.hook === r2.hook;
   };
   s = (e2, t2, i2, a2) => {
+    var _a3;
     let o2 = n(e2, t2);
-    if (o2 !== void 0 && ne(o2, i2))
-      return i2;
+    if (o2 !== void 0 && ne(o2, i2)) return i2;
     e2[t2.canonical] = i2;
     let s2 = t2.aliases || [];
-    for (let t3 of s2)
-      Object.defineProperty(e2, t3, {
-        value: i2,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
+    for (let t3 of s2) Object.defineProperty(e2, t3, {
+      value: i2,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
     let re2 = e2[ee];
     a2 === void 0 ? re2 && delete re2[t2.canonical] : te(e2)[t2.canonical] = a2;
-    let c2 = e2[r]?.[t2.canonical];
-    if (c2)
-      for (let e3 of c2)
-        e3(i2);
+    let c2 = (_a3 = e2[r]) == null ? void 0 : _a3[t2.canonical];
+    if (c2) for (let e3 of c2) e3(i2);
     return i2;
   };
   re = e({
@@ -140,25 +129,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(u.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      u.share[t2] === void 0 && (u.share[t2] = u.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      u.share[t2] === void 0 && (u.share[t2] = u.share[e2]);
-    }
+  for (let e2 of Object.keys(u.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    u.share[t2] === void 0 && (u.share[t2] = u.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    u.share[t2] === void 0 && (u.share[t2] = u.share[e2]);
+  }
   let se, ce, de, fe, pe, he, ge, ve, be, Se;
   se = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -186,20 +172,18 @@ let __tla = (async () => {
       aliases: [
         `@emotion/react`
       ]
-    }), d !== void 0)
-      Se(d);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__-BbpInq7W.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        d = se(e2), s(u.share, {
-          canonical: `default:@emotion/react`,
-          aliases: [
-            `@emotion/react`
-          ]
-        }, d, `fullcalendar`);
-      }), __vite__mapDeps([0,1]), import.meta.url);
+    }), d !== void 0) Se(d);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_emotion_mf_1_react__prebuild__-BbpInq7W.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      d = se(e2), s(u.share, {
+        canonical: `default:@emotion/react`,
+        aliases: [
+          `@emotion/react`
+        ]
+      }, d, `fullcalendar`);
+    }), __vite__mapDeps([0,1]), import.meta.url);
   })) : Se(d);
   let we, Te;
   Ce = e({
@@ -706,25 +690,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(p.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      p.share[t2] === void 0 && (p.share[t2] = p.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      p.share[t2] === void 0 && (p.share[t2] = p.share[e2]);
-    }
+  for (let e2 of Object.keys(p.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    p.share[t2] === void 0 && (p.share[t2] = p.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    p.share[t2] === void 0 && (p.share[t2] = p.share[e2]);
+  }
   let Oe, ke, Ae, je, Me, Ne, Pe, Fe, Ie, Le, Re, ze, Be, Ve, Ue, We, Ke, Je, Ye, Xe, Ze, Qe, $e, et, tt, rt, it, at, ot, st, ct, lt, ht, gt, vt, yt, St, Ct, wt, Et, Dt, kt, At, jt, Pt, It, Lt, Rt, zt, Bt, Vt, Ht, Ut, Wt, Gt, Kt, qt, Jt, Yt, Xt, Zt, Qt, $t, en, tn, nn, rn, an, on, sn, cn, ln, un, dn, fn, pn, mn, hn, gn, _n, vn, yn, bn, xn, Sn, Cn, wn, Tn, En, Dn, On, kn, An, jn, Mn, Nn, Pn, In, Ln, Rn, zn, Bn, Vn, Hn, Un, Wn, Gn, Kn, qn, Jn, Yn, Xn, Zn, Qn, $n, er, tr, nr, rr, ir, ar, or, sr, cr, lr, ur, dr, fr, pr, mr, hr, gr, _r, vr, yr, br, xr, Sr, Cr, wr, Tr, Er, Dr, Or, kr, Ar, jr, Mr, Nr, Pr, Fr, Ir, Lr, Rr, zr, Br, Vr, Hr, Ur, Wr, Gr, Kr, qr, Jr, Yr, Xr, Zr, Qr, $r, ei, ti, ni, ri, ii, ai, oi, si, ci, li, ui, di, fi, pi, mi, hi, gi, _i, vi, yi, bi, xi, Si, Ci, wi, Ti, Ei, Di, Oi, ki, Ai, ji, Mi, Ni, Pi, Fi, Ii, Li, Ri, zi, Bi, Vi, Hi, Ui, Wi, Gi, Ki, qi, Ji, Yi, Xi, Zi, Qi, $i, ea, ta, na, ra, ia, aa, oa, sa, ca, la, ua, da, fa, pa, ma, ha, ga, _a, va, ya, ba, xa, Sa, Ca, wa, Ta, Ea, Da, Oa, ka, Aa, ja, Ma, Na, Pa, Fa, Ia, La, Ra, za, Ba, Va, Ha, Ua, Wa, Ga, Ka, qa, Ja, Ya, Xa, Za, Qa, $a, eo, to, no, ro, io, ao, oo, so, co, lo, uo, fo, po, mo, ho, go, _o, vo, yo, bo, xo, So, Co, wo, To, Eo, Do, Oo, ko, Ao, jo, Mo, No, Po, Fo, Io, Lo, Ro, zo, Bo, Vo, Ho, Uo, Wo, Go, Ko, qo, Jo, Yo, Xo, Zo, Qo, $o, es, ts, ns, rs, is, as, os, ss, cs, ls, us, ds, fs, ps, ms, hs, gs, _s, vs, ys, bs, xs, Ss, Cs, ws, Ts, Es, Ds, Os, ks, As, js, Ms, Ns, Ps, Fs, Is, Ls, Rs, zs, Bs, Vs, Hs, Us, Ws, Gs, Ks, qs, Js, Ys, Xs, Zs, Qs, $s, ec, tc, nc, rc, ic, ac, oc, sc, cc, lc, uc, dc, fc, pc, mc, hc, gc, _c, vc, yc, bc, xc, Sc, Cc, wc, Tc, Ec, Dc, Oc, kc, Ac, jc, Mc, Nc, Pc, Fc, Ic, Lc, Rc, zc, Bc, Vc, Hc, Uc, Wc, Gc, Kc, qc, Jc, Yc, Xc, Zc, Qc, $c, el, tl, nl, rl, il, al, ol;
   Oe = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -752,20 +733,18 @@ let __tla = (async () => {
       aliases: [
         `@mui/material`
       ]
-    }), O !== void 0)
-      ol(O);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__-BNACOqHg.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        O = Oe(e2), s(p.share, {
-          canonical: `default:@mui/material`,
-          aliases: [
-            `@mui/material`
-          ]
-        }, O, `fullcalendar`);
-      }), __vite__mapDeps([2,3,1,4]), import.meta.url);
+    }), O !== void 0) ol(O);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_material__prebuild__-BNACOqHg.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      O = Oe(e2), s(p.share, {
+        canonical: `default:@mui/material`,
+        aliases: [
+          `@mui/material`
+        ]
+      }, O, `fullcalendar`);
+    }), __vite__mapDeps([2,3,1,4]), import.meta.url);
   })) : ol(O);
   let cl, ll;
   sl = e({
@@ -801,25 +780,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(A.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      A.share[t2] === void 0 && (A.share[t2] = A.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      A.share[t2] === void 0 && (A.share[t2] = A.share[e2]);
-    }
+  for (let e2 of Object.keys(A.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    A.share[t2] === void 0 && (A.share[t2] = A.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    A.share[t2] === void 0 && (A.share[t2] = A.share[e2]);
+  }
   let fl, pl, gl, _l;
   fl = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -847,20 +823,18 @@ let __tla = (async () => {
       aliases: [
         `@mui/private-theming`
       ]
-    }), j !== void 0)
-      _l(j);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__-x2iF6PTF.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        j = fl(e2), s(A.share, {
-          canonical: `default:@mui/private-theming`,
-          aliases: [
-            `@mui/private-theming`
-          ]
-        }, j, `fullcalendar`);
-      }), [], import.meta.url);
+    }), j !== void 0) _l(j);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_private_mf_2_theming__prebuild__-x2iF6PTF.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      j = fl(e2), s(A.share, {
+        canonical: `default:@mui/private-theming`,
+        aliases: [
+          `@mui/private-theming`
+        ]
+      }, j, `fullcalendar`);
+    }), [], import.meta.url);
   })) : _l(j);
   let yl, bl;
   vl = e({
@@ -1062,25 +1036,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(N.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      N.share[t2] === void 0 && (N.share[t2] = N.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      N.share[t2] === void 0 && (N.share[t2] = N.share[e2]);
-    }
+  for (let e2 of Object.keys(N.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    N.share[t2] === void 0 && (N.share[t2] = N.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    N.share[t2] === void 0 && (N.share[t2] = N.share[e2]);
+  }
   let Cl, wl, Tl, Al, jl, Ml, Nl, Pl, Fl, Il, Ll, Rl, zl, Bl, Vl, Hl, Ul, Wl, Gl, Kl, ql, Jl, Yl, Xl, Zl, Ql, $l, eu, nu, ru, iu, su, cu, lu, du, fu, _u, vu, yu, bu, xu, Cu, wu, Tu, Eu, Du, Ou, ku, Au, ju, Mu, Nu, Pu, Fu, Iu, Lu, Ru, zu, Bu, Vu, Hu, Uu, Wu, Gu, Ku, qu, Ju, Yu, Xu, Zu, Qu, $u, ed, td, nd, rd, id, ad, od, sd, cd, ld, ud, dd, fd, pd, md, hd, gd, _d, vd, yd, bd, xd, Sd, Cd, wd, Td, Ed, Dd, Od, kd, Ad, jd, Md, Nd, Pd, Fd, Id, Ld, Rd, zd, Bd, Vd, Hd, Ud, Wd, Gd, Kd, qd, Jd, Qd, $d, of, cf, uf, ff, pf, mf, hf, gf, _f, vf, yf, bf, xf, Sf, Cf, wf, Tf, Ef, Df, Of, Af, jf, Mf;
   Cl = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1108,20 +1079,18 @@ let __tla = (async () => {
       aliases: [
         `@mui/system`
       ]
-    }), F !== void 0)
-      Mf(F);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__-BDFD_0by.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        F = Cl(e2), s(N.share, {
-          canonical: `default:@mui/system`,
-          aliases: [
-            `@mui/system`
-          ]
-        }, F, `fullcalendar`);
-      }), __vite__mapDeps([0,3,1,4]), import.meta.url);
+    }), F !== void 0) Mf(F);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild___mf_0_mui_mf_1_system__prebuild__-BDFD_0by.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      F = Cl(e2), s(N.share, {
+        canonical: `default:@mui/system`,
+        aliases: [
+          `@mui/system`
+        ]
+      }, F, `fullcalendar`);
+    }), __vite__mapDeps([0,3,1,4]), import.meta.url);
   })) : Mf(F);
   let Pf, Ff;
   Nf = e({
@@ -1195,25 +1164,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(L.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      L.share[t2] === void 0 && (L.share[t2] = L.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      L.share[t2] === void 0 && (L.share[t2] = L.share[e2]);
-    }
+  for (let e2 of Object.keys(L.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    L.share[t2] === void 0 && (L.share[t2] = L.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    L.share[t2] === void 0 && (L.share[t2] = L.share[e2]);
+  }
   let Rf, Bf, Vf, Hf, Uf, Wf, Gf, Kf, qf, Jf, Yf, Xf, Zf, Qf, $f, ep, tp, np, rp, ip, ap, op, sp, cp, lp, up, dp, fp, pp, mp, hp, gp, _p, vp, yp, bp, xp, Sp, Cp, wp, Tp, Ep, Dp;
   Rf = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1241,20 +1207,18 @@ let __tla = (async () => {
       aliases: [
         `moment`
       ]
-    }), R !== void 0)
-      Dp(R);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__-D4x1q4NQ.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        R = Rf(e2), s(L.share, {
-          canonical: `default:moment`,
-          aliases: [
-            `moment`
-          ]
-        }, R, `fullcalendar`);
-      }), [], import.meta.url);
+    }), R !== void 0) Dp(R);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__moment__prebuild__-D4x1q4NQ.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      R = Rf(e2), s(L.share, {
+        canonical: `default:moment`,
+        aliases: [
+          `moment`
+        ]
+      }, R, `fullcalendar`);
+    }), [], import.meta.url);
   })) : Dp(R);
   let kp, Ap;
   Op = e({
@@ -1331,25 +1295,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(B.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      B.share[t2] === void 0 && (B.share[t2] = B.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      B.share[t2] === void 0 && (B.share[t2] = B.share[e2]);
-    }
+  for (let e2 of Object.keys(B.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    B.share[t2] === void 0 && (B.share[t2] = B.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    B.share[t2] === void 0 && (B.share[t2] = B.share[e2]);
+  }
   let Np, Fp, zp, Vp, Hp, Up, Wp, Gp, Kp, qp, Jp, tm, rm, im, am, om, lm, um, fm, pm, vm, Sm, Cm, Tm;
   Np = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1377,20 +1338,18 @@ let __tla = (async () => {
       aliases: [
         `react`
       ]
-    }), V !== void 0)
-      Tm(V);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__-1B29m3mz.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        V = Np(e2), s(B.share, {
-          canonical: `default:react`,
-          aliases: [
-            `react`
-          ]
-        }, V, `fullcalendar`);
-      }), __vite__mapDeps([5]), import.meta.url);
+    }), V !== void 0) Tm(V);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__-1B29m3mz.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      V = Np(e2), s(B.share, {
+        canonical: `default:react`,
+        aliases: [
+          `react`
+        ]
+      }, V, `fullcalendar`);
+    }), __vite__mapDeps([5]), import.meta.url);
   })) : Tm(V);
   let Dm, Om;
   Em = e({
@@ -1425,24 +1384,21 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(U.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      U.share[t2] === void 0 && (U.share[t2] = U.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      U.share[t2] === void 0 && (U.share[t2] = U.share[e2]);
-    }
+  for (let e2 of Object.keys(U.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    U.share[t2] === void 0 && (U.share[t2] = U.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    U.share[t2] === void 0 && (U.share[t2] = U.share[e2]);
+  }
   var jm = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1469,20 +1425,18 @@ let __tla = (async () => {
       aliases: [
         `react/jsx-dev-runtime`
       ]
-    }), W !== void 0)
-      Fm(W);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__-JH89NqeZ.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        W = jm(e2), s(U.share, {
-          canonical: `default:react/jsx-dev-runtime`,
-          aliases: [
-            `react/jsx-dev-runtime`
-          ]
-        }, W, `fullcalendar`);
-      }), [], import.meta.url);
+    }), W !== void 0) Fm(W);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_dev_mf_2_runtime__prebuild__-JH89NqeZ.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      W = jm(e2), s(U.share, {
+        canonical: `default:react/jsx-dev-runtime`,
+        aliases: [
+          `react/jsx-dev-runtime`
+        ]
+      }, W, `fullcalendar`);
+    }), [], import.meta.url);
   })) : Fm(W);
   let Lm, Rm;
   Im = e({
@@ -1518,25 +1472,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(K.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      K.share[t2] === void 0 && (K.share[t2] = K.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      K.share[t2] === void 0 && (K.share[t2] = K.share[e2]);
-    }
+  for (let e2 of Object.keys(K.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    K.share[t2] === void 0 && (K.share[t2] = K.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    K.share[t2] === void 0 && (K.share[t2] = K.share[e2]);
+  }
   let Vm, Hm, Km;
   Vm = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1564,20 +1515,18 @@ let __tla = (async () => {
       aliases: [
         `react/jsx-runtime`
       ]
-    }), q !== void 0)
-      Km(q);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-M61rjtmp.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        q = Vm(e2), s(K.share, {
-          canonical: `default:react/jsx-runtime`,
-          aliases: [
-            `react/jsx-runtime`
-          ]
-        }, q, `fullcalendar`);
-      }), [], import.meta.url);
+    }), q !== void 0) Km(q);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-M61rjtmp.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      q = Vm(e2), s(K.share, {
+        canonical: `default:react/jsx-runtime`,
+        aliases: [
+          `react/jsx-runtime`
+        ]
+      }, q, `fullcalendar`);
+    }), [], import.meta.url);
   })) : Km(q);
   let Jm, Ym;
   qm = e({
@@ -1625,25 +1574,22 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(Y.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      Y.share[t2] === void 0 && (Y.share[t2] = Y.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      Y.share[t2] === void 0 && (Y.share[t2] = Y.share[e2]);
-    }
+  for (let e2 of Object.keys(Y.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    Y.share[t2] === void 0 && (Y.share[t2] = Y.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    Y.share[t2] === void 0 && (Y.share[t2] = Y.share[e2]);
+  }
   let Qm, $m, eh, th, ih, ah, oh, sh, ch, lh, uh, dh, fh, ph, mh, hh;
   Qm = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1671,20 +1617,18 @@ let __tla = (async () => {
       aliases: [
         `react-dom`
       ]
-    }), X !== void 0)
-      hh(X);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__-x6w-hndA.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        X = Qm(e2), s(Y.share, {
-          canonical: `default:react-dom`,
-          aliases: [
-            `react-dom`
-          ]
-        }, X, `fullcalendar`);
-      }), __vite__mapDeps([6,5]), import.meta.url);
+    }), X !== void 0) hh(X);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom__prebuild__-x6w-hndA.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      X = Qm(e2), s(Y.share, {
+        canonical: `default:react-dom`,
+        aliases: [
+          `react-dom`
+        ]
+      }, X, `fullcalendar`);
+    }), __vite__mapDeps([6,5]), import.meta.url);
   })) : hh(X);
   let _h, vh;
   gh = e({
@@ -1720,24 +1664,21 @@ let __tla = (async () => {
     };
     return e2.then(n2, n2), e2;
   };
-  for (let e2 of Object.keys(Q.share))
-    if (e2.startsWith(`default:`)) {
-      let t2 = e2.slice(8);
-      Q.share[t2] === void 0 && (Q.share[t2] = Q.share[e2]);
-    } else if (!e2.includes(`:`)) {
-      let t2 = `default:` + e2;
-      Q.share[t2] === void 0 && (Q.share[t2] = Q.share[e2]);
-    }
+  for (let e2 of Object.keys(Q.share)) if (e2.startsWith(`default:`)) {
+    let t2 = e2.slice(8);
+    Q.share[t2] === void 0 && (Q.share[t2] = Q.share[e2]);
+  } else if (!e2.includes(`:`)) {
+    let t2 = `default:` + e2;
+    Q.share[t2] === void 0 && (Q.share[t2] = Q.share[e2]);
+  }
   var xh = (e2) => {
     let t2 = (() => {
       let t3 = e2;
       for (let e3 = 0; e3 < 5; e3++) {
-        let e4 = t3?.default;
-        if (!e4 || typeof e4 != `object`)
-          break;
+        let e4 = t3 == null ? void 0 : t3.default;
+        if (!e4 || typeof e4 != `object`) break;
         let n2 = Object.keys(t3).filter((e5) => e5 !== "default").map((e5) => t3[e5]);
-        if (n2.length > 0 && n2.some((e5) => e5 !== void 0))
-          break;
+        if (n2.length > 0 && n2.some((e5) => e5 !== void 0)) break;
         t3 = e4;
       }
       return t3;
@@ -1764,20 +1705,18 @@ let __tla = (async () => {
       aliases: [
         `react-dom/client`
       ]
-    }), $ !== void 0)
-      Eh($);
-    else
-      return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__-C2unmEaU.js").then(async (m2) => {
-        await m2.__tla;
-        return m2;
-      }).then((e2) => {
-        $ = xh(e2), s(Q.share, {
-          canonical: `default:react-dom/client`,
-          aliases: [
-            `react-dom/client`
-          ]
-        }, $, `fullcalendar`);
-      }), __vite__mapDeps([6,5]), import.meta.url);
+    }), $ !== void 0) Eh($);
+    else return t(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react_mf_2_dom_mf_1_client__prebuild__-C2unmEaU.js").then(async (m2) => {
+      await m2.__tla;
+      return m2;
+    }).then((e2) => {
+      $ = xh(e2), s(Q.share, {
+        canonical: `default:react-dom/client`,
+        aliases: [
+          `react-dom/client`
+        ]
+      }, $, `fullcalendar`);
+    }), __vite__mapDeps([6,5]), import.meta.url);
   })) : Eh($);
 })();
 export {

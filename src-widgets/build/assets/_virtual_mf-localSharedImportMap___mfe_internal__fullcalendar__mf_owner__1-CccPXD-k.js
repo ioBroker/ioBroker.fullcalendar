@@ -1,23 +1,4 @@
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, {enumerable: true, configurable: true, writable: true, value}) : obj[key] = value;
-var __spreadValues = (a2, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a2, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a2, prop, b[prop]);
-    }
-  return a2;
-};
-var __spreadProps = (a2, b) => __defProps(a2, __getOwnPropDescs(b));
-import {t as e} from "./vite-preload-helper-CRzLMJPS.js";
+import { t as e } from "./vite-preload-helper-CRzLMJPS.js";
 import "./dist-BI-Ygd_Z.js";
 let a, i;
 let __tla = (async () => {
@@ -25,58 +6,51 @@ let __tla = (async () => {
   t = (e2) => {
     let t2 = e2;
     for (let e3 = 0; e3 < 5; e3++) {
-      let e4 = t2?.default;
-      if (!e4 || typeof e4 != `object` || Object.keys(e4).length === 0)
-        break;
+      let e4 = t2 == null ? void 0 : t2.default;
+      if (!e4 || typeof e4 != `object` || Object.keys(e4).length === 0) break;
       let n2 = Object.getPrototypeOf(e4);
-      if (n2 !== null && n2 !== Object.prototype)
-        break;
+      if (n2 !== null && n2 !== Object.prototype) break;
       let r2 = Object.keys(t2).filter((e5) => e5 !== "default").map((e5) => t2[e5]);
-      if (r2.length > 0 && r2.some((e5) => e5 !== void 0))
-        break;
+      if (r2.length > 0 && r2.some((e5) => e5 !== void 0)) break;
       t2 = e4;
     }
     return t2;
   };
   n = (e2, t2, n2, r2) => {
-    let i2 = globalThis.__mf_module_cache__?.share, a2 = t2.map((e3) => i2?.[e3]).find((e3) => e3 !== void 0), o = (e3) => {
+    var _a, _b, _c, _d;
+    let i2 = (_a = globalThis.__mf_module_cache__) == null ? void 0 : _a.share, a2 = t2.map((e3) => i2 == null ? void 0 : i2[e3]).find((e3) => e3 !== void 0), o = (e3) => {
       let t3 = String(e3 || ``).split(/[^0-9]+/).map(Number), r3 = String(n2 || ``).split(/[^0-9]+/).map(Number);
       for (let e4 = 0; e4 < Math.max(t3.length, r3.length); e4++) {
-        if ((t3[e4] || 0) < (r3[e4] || 0))
-          return true;
-        if ((t3[e4] || 0) > (r3[e4] || 0))
-          return false;
+        if ((t3[e4] || 0) < (r3[e4] || 0)) return true;
+        if ((t3[e4] || 0) > (r3[e4] || 0)) return false;
       }
       return false;
     };
-    if (!o(a2?.version ?? a2?.default?.version))
-      for (let t3 of e2) {
-        let e3 = i2?.[t3];
-        if (e3 === void 0)
-          continue;
-        let n3 = e3?.version ?? e3?.default?.version;
-        if (!(n3 !== void 0 && o(n3)) && (!r2 || typeof e3?.[r2] == `function` || typeof e3?.default?.[r2] == `function`)) {
-          let n4 = typeof e3?.[r2] == `function` ? e3 : e3?.default, i3 = n4?.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-          if (!r2 || t3.endsWith(`/client`) || !i3)
-            return e3;
-          let a3 = {};
-          for (let e4 of [
-            `createRoot`,
-            `hydrateRoot`
-          ])
-            a3[e4] = (...t4) => {
-              i3.usingClientEntryPoint = true;
-              try {
-                return n4[e4](...t4);
-              } finally {
-                i3.usingClientEntryPoint = false;
-              }
-            };
-          return __spreadProps(__spreadValues({}, a3), {
-            default: a3
-          });
-        }
+    if (!o((a2 == null ? void 0 : a2.version) ?? ((_b = a2 == null ? void 0 : a2.default) == null ? void 0 : _b.version))) for (let t3 of e2) {
+      let e3 = i2 == null ? void 0 : i2[t3];
+      if (e3 === void 0) continue;
+      let n3 = (e3 == null ? void 0 : e3.version) ?? ((_c = e3 == null ? void 0 : e3.default) == null ? void 0 : _c.version);
+      if (!(n3 !== void 0 && o(n3)) && (!r2 || typeof (e3 == null ? void 0 : e3[r2]) == `function` || typeof ((_d = e3 == null ? void 0 : e3.default) == null ? void 0 : _d[r2]) == `function`)) {
+        let n4 = typeof (e3 == null ? void 0 : e3[r2]) == `function` ? e3 : e3 == null ? void 0 : e3.default, i3 = n4 == null ? void 0 : n4.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        if (!r2 || t3.endsWith(`/client`) || !i3) return e3;
+        let a3 = {};
+        for (let e4 of [
+          `createRoot`,
+          `hydrateRoot`
+        ]) a3[e4] = (...t4) => {
+          i3.usingClientEntryPoint = true;
+          try {
+            return n4[e4](...t4);
+          } finally {
+            i3.usingClientEntryPoint = false;
+          }
+        };
+        return {
+          ...a3,
+          default: a3
+        };
       }
+    }
   };
   r = {
     react: async () => await e(() => import("./_virtual_mf___mfe_internal__fullcalendar__mf_owner__78845261933133__prebuild__react__prebuild__-1B29m3mz.js").then(async (m) => {
@@ -136,7 +110,9 @@ let __tla = (async () => {
         let e2 = i.react;
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {react: n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { react: n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -168,10 +144,8 @@ let __tla = (async () => {
       canLiveRebind: true,
       get() {
         let e2 = i[`react/jsx-dev-runtime`];
-        if (e2.lib)
-          return e2.lib;
-        if (e2.loading)
-          return e2.loading;
+        if (e2.lib) return e2.lib;
+        if (e2.loading) return e2.loading;
         let a2 = n([
           `default:react/jsx-dev-runtime`,
           `react/jsx-dev-runtime`
@@ -181,7 +155,9 @@ let __tla = (async () => {
         ], `19.3.1`, void 0);
         return a2 === void 0 ? (e2.loading = (async () => {
           try {
-            let {"react/jsx-dev-runtime": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "react/jsx-dev-runtime": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -215,10 +191,8 @@ let __tla = (async () => {
       canLiveRebind: true,
       get() {
         let e2 = i[`react/jsx-runtime`];
-        if (e2.lib)
-          return e2.lib;
-        if (e2.loading)
-          return e2.loading;
+        if (e2.lib) return e2.lib;
+        if (e2.loading) return e2.loading;
         let a2 = n([
           `default:react/jsx-runtime`,
           `react/jsx-runtime`
@@ -228,7 +202,9 @@ let __tla = (async () => {
         ], `19.3.1`, void 0);
         return a2 === void 0 ? (e2.loading = (async () => {
           try {
-            let {"react/jsx-runtime": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "react/jsx-runtime": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -264,7 +240,9 @@ let __tla = (async () => {
         let e2 = i[`react-dom`];
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {"react-dom": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "react-dom": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -296,10 +274,8 @@ let __tla = (async () => {
       canLiveRebind: true,
       get() {
         let e2 = i[`react-dom/client`];
-        if (e2.lib)
-          return e2.lib;
-        if (e2.loading)
-          return e2.loading;
+        if (e2.lib) return e2.lib;
+        if (e2.loading) return e2.loading;
         let a2 = n([
           `default:react-dom/client`,
           `react-dom/client`,
@@ -311,7 +287,9 @@ let __tla = (async () => {
         ], `19.3.1`, `createRoot`);
         return a2 === void 0 ? (e2.loading = (async () => {
           try {
-            let {"react-dom/client": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "react-dom/client": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -347,7 +325,9 @@ let __tla = (async () => {
         let e2 = i[`@emotion/react`];
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {"@emotion/react": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "@emotion/react": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -381,7 +361,9 @@ let __tla = (async () => {
         let e2 = i[`@mui/private-theming`];
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {"@mui/private-theming": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "@mui/private-theming": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -415,7 +397,9 @@ let __tla = (async () => {
         let e2 = i[`@mui/system`];
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {"@mui/system": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "@mui/system": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -449,7 +433,9 @@ let __tla = (async () => {
         let e2 = i[`@mui/material`];
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {"@mui/material": n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { "@mui/material": n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false
@@ -483,7 +469,9 @@ let __tla = (async () => {
         let e2 = i.moment;
         return e2.lib ? e2.lib : (e2.loading || (e2.loading = (async () => {
           try {
-            let {moment: n2} = r, i2 = t(__spreadValues({}, await n2()));
+            let { moment: n2 } = r, i2 = t({
+              ...await n2()
+            });
             return i2.__esModule !== true && Object.defineProperty(i2, "__esModule", {
               value: true,
               enumerable: false

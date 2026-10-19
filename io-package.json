@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.0.4",
+    "version": "3.0.5",
     "news": {
+      "3.0.5": {
+        "en": "Adapter requires js-controller >= 6.0.11 now.\nMigrated GUI to vite\nUpdated packages",
+        "de": "Adapter benötigt jetzt JS-Controller >= 6.0.11.\nGUI zu Vite migriert\nNeue Pakete",
+        "ru": "Теперь для адаптера требуется js-контроллер >= 6.0.11.\nГрафический интерфейс перенесен на vite\nОбновленные пакеты",
+        "pt": "O adaptador exige js-controller >= 6.0.11.\nGUI migrado para vite\nPacotes novos",
+        "nl": "Voor de adapter is nu een js-controller >= 6.0.11 nodig.\nGUI naar vite gemigreerd\nBijgewerkte pakketten",
+        "fr": "Adapter nécessite JS-Controller >= 6.0.11.\nGUI migré vers Vite\nPackages mis à jour",
+        "it": "Adapter richiede js-controller >= 6.0.11 ora.\nGUI migrata a vite\nPacchi nuovi",
+        "es": "El adaptador ahora requiere js-controller >= 6.0.11.\nMigró la GUI a Vite\nPaquetes nuevos",
+        "pl": "Adapter wymaga teraz kontrolera js->= 6.0.11.\nPrzemigrowany interfejs GUI do vite\nZaktualizowane pakiety",
+        "uk": "Для адаптера зараз потрібен js-контролер >= 6.0.11.\nПеренесений графічний інтерфейс до Vite\nОновлені пакети",
+        "zh-cn": "适配器现在需要 js-controller >= 6.0.11。\n将 GUI 迁移到 vite\n更新的软件包"
+      },
       "2.4.5": {
         "en": "Corrected SelectID Dialog",
         "de": "Behobener Dialog zur Auswahl",

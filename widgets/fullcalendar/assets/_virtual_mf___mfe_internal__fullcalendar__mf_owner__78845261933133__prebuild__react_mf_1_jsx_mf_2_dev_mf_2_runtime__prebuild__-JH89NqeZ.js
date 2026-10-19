@@ -1,9 +1,9 @@
-import {i as e, t} from "./rolldown-runtime-COiEfhsA.js";
-var n = t((e2) => {
-  e2.Fragment = Symbol.for(`react.fragment`), e2.jsxDEV = void 0;
-}), r = e(t((e2, t2) => {
+import { i as e, t } from "./rolldown-runtime-COiEfhsA.js";
+var n = t(((e2) => {
+  e2.Fragment = /* @__PURE__ */ Symbol.for(`react.fragment`), e2.jsxDEV = void 0;
+})), r = e(t(((e2, t2) => {
   t2.exports = n();
-})()), i = r.default ?? r, a = i.Fragment, o = i.jsxDEV;
+}))()), i = r.default ?? r, a = i.Fragment, o = i.jsxDEV;
 export {
   a as Fragment,
   i as default,
