@@ -38,6 +38,8 @@ import './styles.css';
 import {
     clientDateToServer,
     cron2obj,
+    floatingUtcToLocal,
+    localToFloatingUtc,
     obj2cron,
     serverDateToClient,
     uuidv4,
@@ -301,86 +303,83 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                 const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone)!;
                 const cronObject = cron2obj(event.native.cron);
                 start.setFullYear(new Date().getFullYear() - 1);
+                // RRule calculates in UTC, so use "floating time" to keep the local time over DST changes
+                const intervalStart = localToFloatingUtc(calendarInterval.start || new Date());
+                const intervalEnd = localToFloatingUtc(calendarInterval.end || new Date());
 
                 if (Array.isArray(cronObject.months)) {
                     const rule = new RRule({
-                        dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
-                        until: calendarInterval.end || new Date(),
+                        dtstart: localToFloatingUtc(start),
+                        until: intervalEnd,
                         freq: RRule.MONTHLY,
                         bymonth: cronObject.months,
                         bymonthday: Array.isArray(cronObject.dates) ? cronObject.dates : undefined,
                         // tzid: TIME_ZONE,
                     });
 
-                    rule.between(calendarInterval.start || new Date(), calendarInterval.end || new Date()).forEach(
-                        rruleTime => {
-                            const time = event.native.astro
-                                ? SunCalc.getTimes(
-                                      rruleTime,
-                                      props.systemConfig.latitude!,
-                                      props.systemConfig.longitude!,
-                                  )[event.native.astro]
-                                : rruleTime;
+                    rule.between(intervalStart, intervalEnd).forEach(floatingTime => {
+                        const rruleTime = floatingUtcToLocal(floatingTime);
+                        const time = event.native.astro
+                            ? SunCalc.getTimes(rruleTime, props.systemConfig.latitude!, props.systemConfig.longitude!)[
+                                  event.native.astro
+                              ]
+                            : rruleTime;
 
-                            if (event.native.astro && event.native.offset) {
-                                time.setMinutes(time.getMinutes() + event.native.offset);
-                            }
+                        if (event.native.astro && event.native.offset) {
+                            time.setMinutes(time.getMinutes() + event.native.offset);
+                        }
 
-                            _events.push({
-                                // id: `${event._id}_${rruleTime.getTime()}`,
-                                extendedProps: {
-                                    eventId: event._id,
-                                    icon: event.common.icon,
-                                    type: event.native.type,
-                                    seconds: time.getSeconds(),
-                                },
-                                title: name,
-                                backgroundColor,
-                                textColor,
-                                start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
-                                allDay: false,
-                                display: 'block',
-                            });
-                        },
-                    );
+                        _events.push({
+                            // id: `${event._id}_${rruleTime.getTime()}`,
+                            extendedProps: {
+                                eventId: event._id,
+                                icon: event.common.icon,
+                                type: event.native.type,
+                                seconds: time.getSeconds(),
+                            },
+                            title: name,
+                            backgroundColor,
+                            textColor,
+                            start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                            allDay: false,
+                            display: 'block',
+                        });
+                    });
                 } else if (Array.isArray(cronObject.dows)) {
                     const rule = new RRule({
-                        dtstart: start, // new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), start.getHours(), start.getMinutes(), start.getSeconds())),
-                        until: calendarInterval.end || new Date(),
+                        dtstart: localToFloatingUtc(start),
+                        until: intervalEnd,
                         freq: RRule.WEEKLY,
                         byweekday: cronObject.dows.map(dow => (dow === 0 ? 6 : dow - 1)),
                     });
 
-                    rule.between(calendarInterval.start || new Date(), calendarInterval.end || new Date()).forEach(
-                        rruleTime => {
-                            const time = event.native.astro
-                                ? SunCalc.getTimes(
-                                      rruleTime,
-                                      props.systemConfig.latitude!,
-                                      props.systemConfig.longitude!,
-                                  )[event.native.astro]
-                                : rruleTime;
+                    rule.between(intervalStart, intervalEnd).forEach(floatingTime => {
+                        const rruleTime = floatingUtcToLocal(floatingTime);
+                        const time = event.native.astro
+                            ? SunCalc.getTimes(rruleTime, props.systemConfig.latitude!, props.systemConfig.longitude!)[
+                                  event.native.astro
+                              ]
+                            : rruleTime;
 
-                            if (event.native.astro && event.native.offset) {
-                                time.setMinutes(time.getMinutes() + event.native.offset);
-                            }
+                        if (event.native.astro && event.native.offset) {
+                            time.setMinutes(time.getMinutes() + event.native.offset);
+                        }
 
-                            _events.push({
-                                extendedProps: {
-                                    eventId: event._id,
-                                    icon: event.common.icon,
-                                    type: event.native.type,
-                                    seconds: time.getSeconds(),
-                                },
-                                title: name,
-                                backgroundColor,
-                                textColor,
-                                start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
-                                allDay: false,
-                                display: 'block',
-                            });
-                        },
-                    );
+                        _events.push({
+                            extendedProps: {
+                                eventId: event._id,
+                                icon: event.common.icon,
+                                type: event.native.type,
+                                seconds: time.getSeconds(),
+                            },
+                            title: name,
+                            backgroundColor,
+                            textColor,
+                            start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                            allDay: false,
+                            display: 'block',
+                        });
+                    });
                 } else {
                     _events.push({
                         extendedProps: {

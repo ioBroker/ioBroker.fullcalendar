@@ -35,6 +35,9 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (GermanBluefox) Fixed display of recurring events after DST change (#448)
+
 ### 3.0.5 (2026-10-19)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (bluefox) Migrated GUI to vite
