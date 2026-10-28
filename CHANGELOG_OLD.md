@@ -1,4 +1,7 @@
 # Older changes
+## 2.3.17 (2024-05-26)
+* (bluefox) Corrected the simulation
+
 ## 2.3.16 (2024-05-25)
 * (bluefox) Small UI fixes on widget
 

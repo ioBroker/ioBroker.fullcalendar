@@ -75,7 +75,7 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.1.0 (2026-10-28)
 * (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
 * (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
 * (bluefox) A one-shot event in the past is no longer marked as disabled in memory
@@ -93,9 +93,6 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 
 ### 2.4.4 (2024-09-09)
 * (bluefox) Removed withStyles package
-
-### 2.3.17 (2024-05-26)
-* (bluefox) Corrected the simulation
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
