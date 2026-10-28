@@ -472,9 +472,7 @@ function uuidv4(): string {
  * and are shifted by one hour after a daylight saving time change.
  */
 function localToFloatingUtc(d: Date): Date {
-    return new Date(
-        Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()),
-    );
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
 }
 
 /** Convert a date in rrule "floating time" back into a local date */
