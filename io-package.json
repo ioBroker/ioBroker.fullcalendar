@@ -185,6 +185,92 @@
         "write": false
       },
       "native": {}
+    },
+    {
+      "_id": "events",
+      "type": "channel",
+      "common": {
+        "name": "Agenda of the calendars"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.list",
+      "type": "state",
+      "common": {
+        "name": "All events with their next execution (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.today",
+      "type": "state",
+      "common": {
+        "name": "Executions today (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.tomorrow",
+      "type": "state",
+      "common": {
+        "name": "Executions tomorrow (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.next",
+      "type": "state",
+      "common": {
+        "name": "Next execution (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "null"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.count",
+      "type": "state",
+      "common": {
+        "name": "Number of events",
+        "type": "number",
+        "role": "value",
+        "read": true,
+        "write": false,
+        "def": 0
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.lastChanged",
+      "type": "state",
+      "common": {
+        "name": "Last change of an event",
+        "type": "number",
+        "role": "value.time",
+        "read": true,
+        "write": false,
+        "def": 0
+      },
+      "native": {}
     }
   ],
   "objects": [
