@@ -466,8 +466,31 @@ function uuidv4(): string {
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+/**
+ * Convert a local date into rrule "floating time": the local fields are stored as UTC fields.
+ * RRule calculates in UTC, so without this all occurrences keep the UTC offset of `dtstart`
+ * and are shifted by one hour after a daylight saving time change.
+ */
+function localToFloatingUtc(d: Date): Date {
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
+}
+
+/** Convert a date in rrule "floating time" back into a local date */
+function floatingUtcToLocal(d: Date): Date {
+    return new Date(
+        d.getUTCFullYear(),
+        d.getUTCMonth(),
+        d.getUTCDate(),
+        d.getUTCHours(),
+        d.getUTCMinutes(),
+        d.getUTCSeconds(),
+    );
+}
+
 export {
     uuidv4,
+    localToFloatingUtc,
+    floatingUtcToLocal,
     cron2obj,
     obj2cron,
     serverDateToClient,
