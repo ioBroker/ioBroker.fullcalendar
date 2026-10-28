@@ -7,6 +7,19 @@ import SunCalc from 'suncalc2';
 
 import * as timeUtils from './lib/utils';
 import type { AstroName } from './lib/utils';
+import {
+    occurrencesOf,
+    parseCron,
+    parseDelaySeconds,
+    parseTime,
+    show,
+    startOfDay,
+    textOf,
+    toEventInfo,
+    toOccurrence,
+    type EventInfo,
+    type Occurrence,
+} from './lib/agenda';
 
 const adapterName = require('../package.json').name.split('.').pop();
 
@@ -38,6 +51,8 @@ export interface FullCalendarEvent extends ioBroker.ScheduleObject {
     parsed?: later.ScheduleData;
     timer?: NodeJS.Timeout | null;
     lastExec?: number;
+    /** a one-shot event whose time has passed: skipped by the scheduler, still part of today's agenda */
+    expired?: boolean;
     /** set while a simulation is played back */
     simulationStart?: Date | null;
     simulationEnd?: Date | null;
@@ -217,6 +232,15 @@ export class Fullcalendar extends Adapter {
 
     private readonly lastEvent: Record<string, { id: string; value: ioBroker.StateValue; ts: number }> = {};
 
+    /** debounce of the agenda states */
+    private agendaTimer: NodeJS.Timeout | null = null;
+
+    /** re-renders the agenda at midnight: "today" and "tomorrow" move on */
+    private midnightTimer: NodeJS.Timeout | null = null;
+
+    /** set at the end of `onReady`: before, the events are not read yet and the agenda would come out empty */
+    private agendaReady = false;
+
     public constructor(options: Partial<AdapterOptions> = {}) {
         super({
             ...options,
@@ -226,7 +250,344 @@ export class Fullcalendar extends Adapter {
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('objectChange', this.onObjectChange.bind(this));
+        this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
+    }
+
+    private resolveAstro = (astro: AstroName, offset: number | undefined, date: Date): Date | null =>
+        timeUtils.getAstroTime(astro, offset, date, SunCalc, this.sysConfig, this.instanceConfig);
+
+    /** The events of the calendars, without the events of simulations */
+    private calendarEvents(): FullCalendarEvent[] {
+        const simulations = `${this.namespace}.Simulations.`;
+        return Object.values(this.events).filter(
+            event => event.type === 'schedule' && !event._id.startsWith(simulations) && !!event.native,
+        );
+    }
+
+    /** Names of the calendars by object ID (the default calendar is not a folder and not listed) */
+    private async readCalendars(): Promise<Record<string, string>> {
+        const res = await this.getObjectViewAsync('system', 'folder', {
+            startkey: `${this.namespace}.Calendars.`,
+            endkey: `${this.namespace}.Calendars.${MAX_KEY}`,
+        });
+        const names: Record<string, string> = {};
+        for (const row of res?.rows || []) {
+            names[row.id] = textOf(row.value?.common?.name, this.lang) || row.id.split('.').pop()!;
+        }
+        return names;
+    }
+
+    /** Object ID of the calendar an event belongs to */
+    private calendarIdOf(eventId: string): string {
+        return eventId.substring(0, eventId.lastIndexOf('.'));
+    }
+
+    /** Name of the calendar of an event, '' = the default calendar */
+    private calendarNameOf(eventId: string, names: Record<string, string>): string {
+        const calendarId = this.calendarIdOf(eventId);
+        return calendarId === this.namespace ? '' : names[calendarId] || calendarId.split('.').pop()!;
+    }
+
+    /**
+     * A calendar given by ID or name. Empty, "default" or the instance = the default calendar.
+     *
+     * @param calendar ID or name
+     * @param names names of the calendars by ID
+     */
+    private findCalendar(calendar: unknown, names: Record<string, string>): string {
+        if (calendar === undefined || calendar === null || calendar === '') {
+            return this.namespace;
+        }
+        const text = show(calendar).trim();
+        if (text === this.namespace || text.toLowerCase() === 'default') {
+            return this.namespace;
+        }
+        if (names[text]) {
+            return text;
+        }
+        const byName = Object.keys(names).find(id => names[id].toLowerCase() === text.toLowerCase());
+        if (byName) {
+            return byName;
+        }
+        const known = Object.values(names);
+        throw new Error(`Unknown calendar "${text}"${known.length ? `, known: ${known.join(', ')}` : ''}`);
+    }
+
+    /**
+     * Definitions and occurrences of all calendar events around `now`.
+     *
+     * @param now the current time
+     * @param names names of the calendars by ID
+     */
+    private collectAgenda(
+        now: Date,
+        names: Record<string, string>,
+    ): { list: EventInfo[]; today: Occurrence[]; tomorrow: Occurrence[]; next: Occurrence | null } {
+        const today = startOfDay(now);
+        const tomorrow = startOfDay(now, 1);
+        const dayAfter = startOfDay(now, 2);
+        const yearAhead = new Date(now.getTime() + 366 * 24 * 3600_000);
+        const list: EventInfo[] = [];
+        const todayList: Occurrence[] = [];
+        const tomorrowList: Occurrence[] = [];
+        let next: Occurrence | null = null;
+        for (const event of this.calendarEvents()) {
+            const calendar = this.calendarNameOf(event._id, names);
+            let nextTime: Date | null = null;
+            if (event.common.enabled !== false) {
+                nextTime = occurrencesOf(event, now, yearAhead, this.resolveAstro, 1)[0] || null;
+                const end = (day: Date): Date => new Date(day.getTime() - 1);
+                for (const time of occurrencesOf(event, today, end(tomorrow), this.resolveAstro)) {
+                    todayList.push(toOccurrence(event, time, calendar, this.lang));
+                }
+                for (const time of occurrencesOf(event, tomorrow, end(dayAfter), this.resolveAstro)) {
+                    tomorrowList.push(toOccurrence(event, time, calendar, this.lang));
+                }
+                if (nextTime && (!next || nextTime.getTime() < next.ts)) {
+                    next = toOccurrence(event, nextTime, calendar, this.lang);
+                }
+            }
+            list.push(toEventInfo(event, calendar, nextTime, this.lang));
+        }
+        // upcoming first, then the ones without a next execution
+        list.sort((a, b) => (a.next || '￿').localeCompare(b.next || '￿') || a.name.localeCompare(b.name));
+        todayList.sort((a, b) => a.ts - b.ts);
+        tomorrowList.sort((a, b) => a.ts - b.ts);
+        return { list, today: todayList, tomorrow: tomorrowList, next };
+    }
+
+    /** Render the agenda states soon: many changes in a row (a calendar being edited) make one write */
+    private scheduleAgenda(): void {
+        if (!this.agendaReady) {
+            return;
+        }
+        if (this.agendaTimer) {
+            clearTimeout(this.agendaTimer);
+        }
+        this.agendaTimer = setTimeout(() => {
+            this.agendaTimer = null;
+            this.renderAgenda().catch(e => this.log.warn(`Cannot update the agenda: ${e}`));
+        }, 300);
+    }
+
+    /** Write `events.list/today/tomorrow/next/count`, and plan the update at midnight */
+    private async renderAgenda(): Promise<void> {
+        const now = new Date();
+        const agenda = this.collectAgenda(now, await this.readCalendars());
+        await this.setStateChangedAsync('events.list', JSON.stringify(agenda.list), true);
+        await this.setStateChangedAsync('events.today', JSON.stringify(agenda.today), true);
+        await this.setStateChangedAsync('events.tomorrow', JSON.stringify(agenda.tomorrow), true);
+        await this.setStateChangedAsync('events.next', JSON.stringify(agenda.next), true);
+        await this.setStateChangedAsync('events.count', agenda.list.length, true);
+
+        if (this.midnightTimer) {
+            clearTimeout(this.midnightTimer);
+        }
+        this.midnightTimer = setTimeout(
+            () => {
+                this.midnightTimer = null;
+                this.scheduleAgenda();
+            },
+            startOfDay(now, 1).getTime() - now.getTime() + 1000,
+        );
+    }
+
+    /**
+     * Create a one-shot event: write `value` to `oid` at `start` (a time) or after `in` (a delay); with `duration`
+     * the event writes `endValue` that much later (default for a boolean: the opposite of `value`).
+     *
+     * @param params the message
+     */
+    private async addEvent(
+        params: Record<string, unknown>,
+    ): Promise<{ id: string; name: string; start: string; ts: number }> {
+        const oid = typeof params.oid === 'string' ? params.oid.trim() : '';
+        if (!oid) {
+            throw new Error('"oid" is missing');
+        }
+        if (params.value === undefined) {
+            throw new Error('"value" is missing');
+        }
+        const obj = await this.getForeignObjectAsync(oid);
+        if (obj?.type !== 'state') {
+            throw new Error(`State "${oid}" does not exist`);
+        }
+        if (obj.common.write === false) {
+            throw new Error(`State "${oid}" is read-only`);
+        }
+
+        let time: Date | null;
+        if (params.start !== undefined && params.start !== null && params.start !== '') {
+            time = parseTime(params.start);
+            if (!time) {
+                throw new Error(`Cannot understand the time "${show(params.start)}"`);
+            }
+        } else if (params.in !== undefined && params.in !== null && params.in !== '') {
+            const seconds = parseDelaySeconds(params.in);
+            if (seconds === null) {
+                throw new Error(`Cannot understand the delay "${show(params.in)}"`);
+            }
+            time = new Date(Date.now() + seconds * 1000);
+        } else {
+            throw new Error('Give "start" (a time) or "in" (a delay)');
+        }
+        // the scheduler compares whole seconds
+        time = new Date(Math.round(time.getTime() / 1000) * 1000);
+        if (time.getTime() < Date.now() - 1000) {
+            throw new Error(`The time ${timeUtils.toLocalTime(time)} is in the past`);
+        }
+
+        let duration: number | null = null;
+        let endValue: ioBroker.StateValue | undefined;
+        if (params.duration !== undefined && params.duration !== null && params.duration !== '') {
+            duration = parseDelaySeconds(params.duration);
+            if (!duration) {
+                throw new Error(`Cannot understand the duration "${show(params.duration)}"`);
+            }
+            endValue = params.endValue as ioBroker.StateValue | undefined;
+            if (endValue === undefined) {
+                if (typeof params.value !== 'boolean') {
+                    throw new Error('"endValue" is missing (needed for "duration" unless the value is a boolean)');
+                }
+                endValue = !params.value;
+            }
+        }
+
+        const calendarId = this.findCalendar(params.calendar, await this.readCalendars());
+        const id = `${calendarId}.event-${randomUUID()}`;
+        const states = obj.common.states;
+        const native: EventNative = {
+            id: Date.now(),
+            start: timeUtils.toLocalTime(time),
+            type: duration ? 'double' : 'single',
+            oid,
+            startValue: params.value as ioBroker.StateValue,
+        };
+        if (states && typeof states === 'object' && !Array.isArray(states)) {
+            native.states = states;
+        }
+        if (duration) {
+            native.intervals = [{ value: endValue, timeOffset: Math.round(duration * 1000) }];
+        }
+        const name =
+            typeof params.name === 'string' && params.name.trim()
+                ? params.name.trim()
+                : (await this.getStateName(oid)).name;
+        await this.setForeignObjectAsync(id, {
+            type: 'schedule',
+            common: {
+                name,
+                enabled: true,
+                color: typeof params.color === 'string' && params.color ? params.color : '#3A87AD',
+                icon: (await this.getImage(obj)) || undefined,
+            },
+            native,
+        } as unknown as ioBroker.SettableObject);
+        this.log.info(`Event "${name}" created: ${oid} = ${show(params.value)} at ${native.start}`);
+        return { id, name, start: native.start!, ts: time.getTime() };
+    }
+
+    /** Delete a calendar event (not the events of simulations, they live inside the simulation object) */
+    private async deleteEvent(params: Record<string, unknown>): Promise<{ result: 'ok' }> {
+        const id = typeof params.id === 'string' ? params.id.trim() : '';
+        if (!id.startsWith(`${this.namespace}.`) || id.startsWith(`${this.namespace}.Simulations.`)) {
+            throw new Error(`"${id}" is no event of ${this.namespace}`);
+        }
+        const obj = await this.getForeignObjectAsync(id);
+        if (obj?.type !== 'schedule') {
+            throw new Error(`Event "${id}" does not exist`);
+        }
+        await this.delForeignObjectAsync(id);
+        this.log.info(`Event "${this.getText(obj)}" deleted`);
+        return { result: 'ok' };
+    }
+
+    /**
+     * Occurrences between `from` (default now) and `to` (default `days` later, default 7), optionally of one calendar
+     *
+     * @param params the message
+     */
+    private async listEvents(params: Record<string, unknown>): Promise<{ events: Occurrence[] }> {
+        const names = await this.readCalendars();
+        const from = (params.from !== undefined && parseTime(params.from)) || new Date();
+        const days = typeof params.days === 'number' && params.days > 0 ? params.days : 7;
+        const to = (params.to !== undefined && parseTime(params.to)) || new Date(from.getTime() + days * 24 * 3600_000);
+        const calendarId =
+            params.calendar !== undefined && params.calendar !== '' ? this.findCalendar(params.calendar, names) : null;
+        const max = typeof params.max === 'number' && params.max > 0 ? params.max : 100;
+        const events: Occurrence[] = [];
+        for (const event of this.calendarEvents()) {
+            if (event.common.enabled === false || (calendarId && this.calendarIdOf(event._id) !== calendarId)) {
+                continue;
+            }
+            const calendar = this.calendarNameOf(event._id, names);
+            for (const time of occurrencesOf(event, from, to, this.resolveAstro, max)) {
+                events.push(toOccurrence(event, time, calendar, this.lang));
+            }
+        }
+        events.sort((a, b) => a.ts - b.ts);
+        return { events: events.slice(0, max) };
+    }
+
+    /**
+     * Messages:
+     * - `addEvent` {oid, value, start | in, duration?, endValue?, name?, calendar?, color?} → {id, name, start, ts}
+     * - `deleteEvent` {id} → {result: 'ok'}
+     * - `listEvents` {from?, to?, days?, calendar?, max?} → {events}
+     * - `getEvents` {calendar?} → {events} (the definitions, with their next execution)
+     * - `getCalendars` → {calendars: [{id, name}]}
+     *
+     * Errors come back as {error}.
+     */
+    private async onMessage(msg: ioBroker.Message): Promise<void> {
+        if (!msg?.command) {
+            return;
+        }
+        const params = (msg.message && typeof msg.message === 'object' ? msg.message : {}) as Record<string, unknown>;
+        let result: unknown;
+        try {
+            switch (msg.command) {
+                case 'addEvent':
+                    result = await this.addEvent(params);
+                    break;
+                case 'deleteEvent':
+                    result = await this.deleteEvent(params);
+                    break;
+                case 'listEvents':
+                    result = await this.listEvents(params);
+                    break;
+                case 'getEvents': {
+                    const names = await this.readCalendars();
+                    const calendarId =
+                        params.calendar !== undefined && params.calendar !== ''
+                            ? this.findCalendar(params.calendar, names)
+                            : null;
+                    const { list } = this.collectAgenda(new Date(), names);
+                    result = {
+                        events: calendarId ? list.filter(event => this.calendarIdOf(event.id) === calendarId) : list,
+                    };
+                    break;
+                }
+                case 'getCalendars': {
+                    const names = await this.readCalendars();
+                    result = {
+                        calendars: [
+                            { id: this.namespace, name: 'Default' },
+                            ...Object.keys(names).map(id => ({ id, name: names[id] })),
+                        ],
+                    };
+                    break;
+                }
+                default:
+                    result = { error: `Unknown command "${msg.command}"` };
+            }
+        } catch (e) {
+            result = { error: (e as Error).message };
+        }
+        if (msg.callback) {
+            this.sendTo(msg.from, msg.command, result as ioBroker.MessagePayload, msg.callback);
+        }
     }
 
     private t(word: 'ON' | 'OFF'): string {
@@ -596,26 +957,20 @@ export class Fullcalendar extends Adapter {
         let diff: number;
 
         for (const id in this.events) {
-            if (!Object.prototype.hasOwnProperty.call(this.events, id) || !this.events[id].common.enabled) {
+            if (
+                !Object.prototype.hasOwnProperty.call(this.events, id) ||
+                !this.events[id].common.enabled ||
+                this.events[id].expired
+            ) {
                 continue;
             }
             const event = this.events[id];
 
             // if daily
             if (event.native.cron) {
-                let cron = event.native.cron;
-                if (cron.split(' ').length === 6) {
-                    const parts = cron.split(' ');
-                    parts.shift();
-                    cron = parts.join(' ');
-                }
                 if (!event.parsed) {
-                    if (event.native.astro) {
-                        // take the last second of this day
-                        event.parsed = later.parse.cron(cron.replace(/^\d\d? \d\d? /, '59 59 23 '), true);
-                    } else {
-                        event.parsed = later.parse.cron(cron);
-                    }
+                    // an astro event takes the last second of each day, the astro time is calculated from there
+                    event.parsed = parseCron(event.native);
                 }
                 let date: Date | null = later.schedule(event.parsed).next();
 
@@ -705,7 +1060,7 @@ export class Fullcalendar extends Adapter {
                     if (diff > 0 && (timeout === null || diff < timeout)) {
                         timeout = diff;
                     } else if (diff < 0) {
-                        event.common.enabled = false;
+                        event.expired = true;
                     }
                 }
             }
@@ -719,6 +1074,7 @@ export class Fullcalendar extends Adapter {
         }
         this.log.debug(`Next check in ${Math.round(timeout / 1000)} seconds`);
         this.nextTimer = setTimeout(() => this.calculateNext(), timeout);
+        this.scheduleAgenda();
     }
 
     private getRoomFunc(id: string): { func: string; room: string } {
@@ -903,8 +1259,8 @@ export class Fullcalendar extends Adapter {
             return;
         }
 
-        // ignore info states
-        if (id.startsWith(`${this.namespace}.info.`)) {
+        // ignore info and agenda states
+        if (id.startsWith(`${this.namespace}.info.`) || id.startsWith(`${this.namespace}.events.`)) {
             return;
         }
 
@@ -955,6 +1311,7 @@ export class Fullcalendar extends Adapter {
             return;
         }
 
+        const wasEvent = !!this.events[id];
         if (this.events[id]) {
             stopEvent(this.events[id]);
             delete this.events[id];
@@ -968,9 +1325,14 @@ export class Fullcalendar extends Adapter {
             }
         }
 
-        if (obj) {
+        // only schedule objects are events — not the calendar folders
+        if (obj?.type === 'schedule') {
             this.events[id] = checkEvent(obj as unknown as FullCalendarEvent);
         }
+        if (wasEvent || this.events[id]) {
+            await this.setStateAsync('events.lastChanged', Date.now(), true);
+        }
+        // a renamed calendar changes the agenda, too (calculateNext renders it)
         this.calculateNext();
     }
 
@@ -988,6 +1350,15 @@ export class Fullcalendar extends Adapter {
             clearTimeout(this.nextTimer);
             this.nextTimer = null;
         }
+        if (this.agendaTimer) {
+            clearTimeout(this.agendaTimer);
+            this.agendaTimer = null;
+        }
+        if (this.midnightTimer) {
+            clearTimeout(this.midnightTimer);
+            this.midnightTimer = null;
+        }
+        this.agendaReady = false;
 
         Object.keys(this.events).forEach(id => stopEvent(this.events[id]));
 
@@ -1115,6 +1486,7 @@ export class Fullcalendar extends Adapter {
         this.readEnums();
         await this.subscribeObjectsAsync('*'); // subscribe on own events and simulations
 
+        this.agendaReady = true;
         this.calculateNext();
     }
 }

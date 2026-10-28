@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.0.5",
+    "version": "3.1.0",
     "news": {
+      "3.1.0": {
+        "en": "Added agenda states `events.list/today/tomorrow/next/count/lastChanged`\nAdded the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants\nA one-shot event in the past is no longer marked as disabled in memory",
+        "de": "Agenda mit Angabe `Events.List/Today/Morrow/Next/Count/LastChanged`\nNachrichten „AddEvent“, „DeleteEvent“, „ListEvents“, „GetEvents“ und „GetCalendars“ hinzugefügt, z. B. für Sprachassistenten\nEin einmaliges Event ist nicht mehr im Speicher deaktiviert",
+        "ru": "Добавлены следующие пункты повестки дня: «События.список/сегодня/завтра/следующие/счет/последнее изменение»\nДобавлены сообщения «AddEvent», «DeleteEvent», «ListEvents», «GetEvents» и «GetCalendars», например, для голосовых помощников\nОднократное событие в прошлом больше не помечается в памяти как отключенное",
+        "pt": "Agenda adicionada: `events.list/today/tomorrow/next/count/lastChanged`\nAdicionadas as mensagens `addEvent`, `deleteEvent`, `listEvents`, `getEvents` e `getCalendars` para assistentes de voz\nUm evento único no passado não está mais desativado na memória",
+        "nl": "Op de agenda staat `Events.list/Today/Tomorrow/Next/Count/LastChanged`\nDe berichten `addEvent`, `DeleteEvent`, `ListEvents`, `GetEvents` en `GetCalendars` toegevoegd, bijvoorbeeld voor stemassistenten\nEen eenmalige gebeurtenis in het verleden wordt in het geheugen niet langer als uitgeschakeld gemarkeerd",
+        "fr": "L'agenda a ajouté « Events.List/Today/Tomorrow/Next/Count/LastChanged »\nAjout des messages « AddEvent », « DeleteEvent », « ListEvents », « GetEvents » et « GetCalendars », par exemple pour les assistants vocaux\nUn événement ponctuel n'est plus marqué comme désactivé de mémoire",
+        "it": "Aggiunto l'agenda `events.list/oggi/domani/next/count/lastChanged`\nAggiunti i messaggi addEvent`, deleteEvent`, listEvents`, getEvents` e `getCalendars`, ad es. per assistenti vocali\nUn evento one-shot del passato non è più segnato come disattivato",
+        "es": "El orden del día ha añadido `Events.List/Today/Tomorrow/Next/Count/LastChanged`\nAñadió los mensajes `addEvent`, `DeleteEvents`, `GetEvents` y `getCalendars`, p. ej. para los asistentes de voz\nUn hecho único del pasado ya no se marca como desactivado en la memoria",
+        "pl": "Dodano stany agendy `events.list/Today/Tomorrow/NEXT/Count/LastChanged`\nDodano komunikaty `AddEvent`, `DeleteEvents`, `ListEvents`, `GetEvents` i `GetCalendars`, np. dla asystentów głosowych\nZdarzenie jednorazowe w przeszłości nie jest już oznaczane jako wyłączone w pamięci",
+        "uk": "Додано порядок денний «події.списк/сьогодні/завтра/далі/рахунок/останнє змінення`\nДодано повідомлення `addEvent`, `deleteEvent`, `ListEvents`, `getEvents` і `getCalendars`, наприклад для голосових помічників\nОдноразова подія в минулому більше не позначається як вимкнена в пам'яті",
+        "zh-cn": "添加了议程内容 “events.list/今天/明天/下一次/计数/上次更改”\n添加了 `addEvent`、`DeleteEvents`、`listEvents`、`getEvents` 和 `getCalendars`消息，例如语音助手消息\n过去的单发事件在内存中不再标记为禁用"
+      },
       "3.0.5": {
         "en": "Adapter requires js-controller >= 6.0.11 now.\nMigrated GUI to vite\nUpdated packages",
         "de": "Adapter benötigt jetzt JS-Controller >= 6.0.11.\nGUI zu Vite migriert\nNeue Pakete",
@@ -183,6 +196,92 @@
         "unit": "minutes",
         "read": true,
         "write": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "events",
+      "type": "channel",
+      "common": {
+        "name": "Agenda of the calendars"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.list",
+      "type": "state",
+      "common": {
+        "name": "All events with their next execution (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.today",
+      "type": "state",
+      "common": {
+        "name": "Executions today (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.tomorrow",
+      "type": "state",
+      "common": {
+        "name": "Executions tomorrow (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.next",
+      "type": "state",
+      "common": {
+        "name": "Next execution (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "null"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.count",
+      "type": "state",
+      "common": {
+        "name": "Number of events",
+        "type": "number",
+        "role": "value",
+        "read": true,
+        "write": false,
+        "def": 0
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.lastChanged",
+      "type": "state",
+      "common": {
+        "name": "Last change of an event",
+        "type": "number",
+        "role": "value.time",
+        "read": true,
+        "write": false,
+        "def": 0
       },
       "native": {}
     }

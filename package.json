@@ -1,7 +1,7 @@
 {
   "name": "iobroker.fullcalendar",
   "description": "This adapter allows planning with calendar.",
-  "version": "3.0.5",
+  "version": "3.1.0",
   "author": {
     "name": "bluefox",
     "email": "dogafox@gmail.com"
@@ -23,6 +23,9 @@
     "calendar",
     "schedule"
   ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.3",
     "later": "^1.2.0",
@@ -39,7 +42,7 @@
     "@types/node": "^22.20.5",
     "@iobroker/vis-2-widgets-testing": "^2.0.0",
     "colorette": "^2.0.20",
-    "puppeteer": "^25.14.0",
+    "puppeteer": "^25.16.0",
     "typescript": "~6.0.3"
   },
   "bugs": {

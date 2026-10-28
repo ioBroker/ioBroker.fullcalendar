@@ -27,6 +27,46 @@ How to use:
 - Click the record button and wait 24 hours or 7 days till simulation stops to record events
 - Now you can replay the simulation by clicking on the play button. Additionally, you can define the time when the simulation should be started.
 
+## Agenda states
+The adapter writes what is planned into states, e.g. to ask a chat or voice assistant about it or to show it in a visualization:
+
+| State                          | Content                                                                         |
+|--------------------------------|---------------------------------------------------------------------------------|
+| `fullcalendar.0.events.list`        | all events (JSON): name, calendar, state, value, time or cron, next execution |
+| `fullcalendar.0.events.today`       | executions today (JSON), also the ones already done                            |
+| `fullcalendar.0.events.tomorrow`    | executions tomorrow (JSON)                                                     |
+| `fullcalendar.0.events.next`        | the next execution (JSON, `null` = none)                                      |
+| `fullcalendar.0.events.count`       | number of events                                                               |
+| `fullcalendar.0.events.lastChanged` | time of the last change of an event                                            |
+
+One execution looks like this (times are local times of the ioBroker host):
+```json
+{"id": "fullcalendar.0.event-…", "name": "Light living room", "calendar": "", "time": "2026-10-28T22:30:00", "ts": 1793223000000,
+ "oid": "hm-rpc.0.ABC.1.STATE", "value": false, "recurring": false}
+```
+A "double" event has `endTime` and `endValue` too, `calendar` is `""` for the default calendar. Events of simulations are not part of the agenda.
+
+## Script and adapter API (sendTo)
+Other adapters and scripts can plan events, e.g. a voice assistant for "turn off the light in 2 hours":
+```js
+// in 2 hours (`in`: seconds, or "90s", "30m", "2h", "1h30m", "1d")
+sendTo('fullcalendar.0', 'addEvent', { oid: 'hm-rpc.0.ABC.1.STATE', value: false, in: '2h' }, res => log(JSON.stringify(res)));
+// at a time (local time, or a timestamp in ms), for 10 minutes, in the calendar "Garden"
+sendTo('fullcalendar.0', 'addEvent', {
+    oid: 'hm-rpc.0.PUMP.1.STATE', value: true, start: '2026-10-29T07:30', duration: '10m', calendar: 'Garden', name: 'Pump',
+}, res => log(JSON.stringify(res))); // {id, name, start, ts} or {error}
+```
+
+| Command        | Message                                                                                                   | Answer                          |
+|----------------|-----------------------------------------------------------------------------------------------------------|---------------------------------|
+| `addEvent`     | `oid`, `value`, `start` or `in`; optional `duration` + `endValue` (a boolean switches back by itself), `name`, `calendar` (name or ID), `color` | `{id, name, start, ts}`     |
+| `deleteEvent`  | `id`                                                                                                      | `{result: "ok"}`               |
+| `listEvents`   | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                                  | `{events: [execution, …]}`     |
+| `getEvents`    | optional `calendar`                                                                                       | `{events: [definition, …]}`    |
+| `getCalendars` | –                                                                                                         | `{calendars: [{id, name}, …]}` |
+
+Errors come back as `{error}`. A new event is a one-shot event and appears in the calendar like one created by hand.
+
 ## Todo
 - Week and day must scroll to the current time
 
@@ -37,6 +77,11 @@ How to use:
 ## Changelog
 ### **WORK IN PROGRESS**
 * (GermanBluefox) Fixed display of recurring events after DST change (#448)
+
+### 3.1.0 (2026-10-28)
+* (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
+* (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
+* (bluefox) A one-shot event in the past is no longer marked as disabled in memory
 
 ### 3.0.5 (2026-10-19)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
@@ -51,9 +96,6 @@ How to use:
 
 ### 2.4.4 (2024-09-09)
 * (bluefox) Removed withStyles package
-
-### 2.3.17 (2024-05-26)
-* (bluefox) Corrected the simulation
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
