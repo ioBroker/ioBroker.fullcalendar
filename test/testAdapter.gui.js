@@ -1,10 +1,10 @@
 const engineHelper = require('@iobroker/legacy-testing/engineHelper');
 const guiHelper = require('@iobroker/legacy-testing/guiHelper');
 const { existsSync } = require('node:fs');
-const {
-    deleteFoldersRecursive,
-} = require('@iobroker/build-tools');
+const { deleteFoldersRecursive } = require('@iobroker/build-tools');
 let gPage;
+
+process.env.ADMIN_VERSION = '8.0.1';
 
 describe.skip('admin-gui', () => {
     before(async function () {

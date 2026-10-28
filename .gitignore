@@ -1,8 +1,13 @@
 .idea
 node_modules
 nbproject
-package-lock.json
 src/node_modules
 src/build
 tmp
 *.tgz
+
+#ignore .commitinfo created by ioBroker release script
+.commitinfo
+/src-widgets/.__mf__temp/
+# compiled adapter backend (src/*.ts => build/), rebuilt by `npm run build-backend`
+/build/
