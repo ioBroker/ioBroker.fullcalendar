@@ -29,7 +29,7 @@ updates:
           - 'version-update:semver-major'
 
   - package-ecosystem: 'npm'
-    directory: '/src'
+    directory: '/src-admin'
     schedule:
       interval: 'cron'
       timezone: 'Europe/Berlin'
@@ -40,7 +40,7 @@ updates:
       default-days: 7
 
   - package-ecosystem: 'npm'
-    directory: '/src-widget'
+    directory: '/src-widgets'
     schedule:
       interval: 'cron'
       timezone: 'Europe/Berlin'
