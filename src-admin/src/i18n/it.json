@@ -124,5 +124,17 @@
   "Object ID": "Identificativo dell'oggetto",
   "All": "Tutto",
   "Description": "Descrizione",
-  "First value": "Primo valore"
+  "First value": "Primo valore",
+  "seconds": "secondi",
+  "hours": "ore",
+  "Only if": "Solo se",
+  "condition_description": "L'evento viene eseguito solo se questo stato ha il valore indicato in quel momento",
+  "Condition object ID": "ID oggetto della condizione",
+  "Operator": "Operatore",
+  "Value": "Valore",
+  "ON (true)": "ACCESO (true)",
+  "OFF (false)": "SPENTO (false)",
+  "Inactive calendars do not execute their events": "I calendari inattivi non eseguono i loro eventi",
+  "Calendar is inactive. Click to activate": "Il calendario è inattivo. Fare clic per attivarlo",
+  "Deactivate calendar": "Disattiva calendario"
 }

@@ -124,5 +124,17 @@
   "Object ID": "ID об'єкта",
   "All": "все",
   "Description": "опис",
-  "First value": "Перше значення"
+  "First value": "Перше значення",
+  "seconds": "секунд",
+  "hours": "годин",
+  "Only if": "Лише якщо",
+  "condition_description": "Подія виконується, лише якщо цей стан у цей момент має вказане значення",
+  "Condition object ID": "ID об'єкта умови",
+  "Operator": "Оператор",
+  "Value": "Значення",
+  "ON (true)": "УВІМКНЕНО (true)",
+  "OFF (false)": "ВИМКНЕНО (false)",
+  "Inactive calendars do not execute their events": "Неактивні календарі не виконують свої події",
+  "Calendar is inactive. Click to activate": "Календар неактивний. Натисніть, щоб активувати",
+  "Deactivate calendar": "Деактивувати календар"
 }

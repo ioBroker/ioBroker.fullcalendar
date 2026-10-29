@@ -252,6 +252,8 @@ interface SidePanelItemProps {
     actions?: ReactNode;
     /** Buttons that are always visible, e.g. the stop button of a running simulation */
     status?: ReactNode;
+    /** Shown dimmed, e.g. a calendar switched off */
+    inactive?: boolean;
 }
 
 export function SidePanelItem(props: SidePanelItemProps): JSX.Element {
@@ -280,7 +282,11 @@ export function SidePanelItem(props: SidePanelItemProps): JSX.Element {
                 slotProps={{
                     primary: {
                         noWrap: true,
-                        sx: { fontSize: 13, fontWeight: props.selected ? 600 : 400 },
+                        sx: {
+                            fontSize: 13,
+                            fontWeight: props.selected ? 600 : 400,
+                            opacity: props.inactive ? 0.5 : 1,
+                        },
                     },
                 }}
             />

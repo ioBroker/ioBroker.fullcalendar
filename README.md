@@ -15,6 +15,10 @@ You must not use any external resources, the scheduling is processed only in ioB
 
 You can control your events with a calendar and can plan to control them periodically.
 
+- **Duration** of "On/Off" and "Toggle" events can be given in seconds, minutes or hours. With a duration of 1 second, an event works like a push button.
+- **Condition** ("Only if"): an event writes its value only if another state has the given value at that time (`==`, `!=`, `>`, `>=`, `<`, `<=`), e.g. the shutter goes down only if the terrace door is closed. If the condition is not met, the whole event is skipped (an "On/Off" event does not write the end value either), and a line is written to the log.
+- **Calendars** can be switched off (button in the calendar list or "Active" in the calendar dialog): their events stay, but are not executed until the calendar is switched on again. This way you can prepare scenarios like "Vacation" and switch them by a script (`enableCalendar`, see below).
+
 ## Events simulation
 You can record your behavior and can play it back later.
 For example, you can create two recordings for workday and for weekend and play them back on according days.
@@ -63,7 +67,8 @@ sendTo('fullcalendar.0', 'addEvent', {
 | `deleteEvent`  | `id`                                                                                                      | `{result: "ok"}`               |
 | `listEvents`   | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                                  | `{events: [execution, …]}`     |
 | `getEvents`    | optional `calendar`                                                                                       | `{events: [definition, …]}`    |
-| `getCalendars` | –                                                                                                         | `{calendars: [{id, name}, …]}` |
+| `getCalendars` | –                                                                                                         | `{calendars: [{id, name, enabled}, …]}` |
+| `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                                     | `{id, enabled}`                |
 
 Errors come back as `{error}`. A new event is a one-shot event and appears in the calendar like one created by hand.
 
@@ -75,6 +80,15 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
+* (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)
+* (bluefox) Fixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)
+* (bluefox) Fixed: the subscriptions of a stopped recording were not removed
+* (bluefox) Added: the duration of "On/Off" and "Toggle" events can be given in seconds, minutes or hours, e.g. for a push button (#354)
+* (bluefox) Added: conditions for events, e.g. do not close the shutter if the door is open (#257)
+* (bluefox) Added: calendars can be switched off and on, also with the message `enableCalendar` (#236)
+
 ### 3.1.1 (2026-10-29)
 * (GermanBluefox) Fixed display of recurring events after DST change (#448)
 

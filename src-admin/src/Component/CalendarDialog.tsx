@@ -1,7 +1,16 @@
 import { useState, type CSSProperties, type JSX } from 'react';
 import { Confirm, I18n, type AdminConnection } from '@iobroker/gui-components';
 import { Cancel, Delete, Save } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import {
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    TextField,
+} from '@mui/material';
 
 const styles: Record<string, CSSProperties> = {
     field: {
@@ -9,14 +18,21 @@ const styles: Record<string, CSSProperties> = {
         alignItems: 'end',
         gap: 20,
     },
+    hint: {
+        fontSize: 12,
+        fontStyle: 'italic',
+    },
 };
 
 /** A calendar is a folder-like object that groups events */
 export interface CalendarObject {
     _id: string;
     type: 'folder';
-    /** `color` and `icon` are not edited here, but can be set on the object, e.g. in the object browser */
-    common: { name: string; color?: string; icon?: string };
+    /**
+     * `color` and `icon` are not edited here, but can be set on the object, e.g. in the object browser.
+     * `enabled: false` switches all events of the calendar off.
+     */
+    common: { name: string; color?: string; icon?: string; enabled?: boolean };
     native: Record<string, unknown>;
 }
 
@@ -43,7 +59,7 @@ const CalendarDialog = (props: CalendarDialogProps): JSX.Element | null => {
             open={!0}
             onClose={props.onClose}
         >
-            <DialogTitle>{I18n.t('Edit calendar name')}</DialogTitle>
+            <DialogTitle>{I18n.t('Edit calendar')}</DialogTitle>
             <DialogContent>
                 <div style={styles.field}>
                     <TextField
@@ -55,6 +71,28 @@ const CalendarDialog = (props: CalendarDialogProps): JSX.Element | null => {
                             setCalendar(_calendar);
                         }}
                         variant="standard"
+                    />
+                </div>
+                <div style={styles.field}>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={calendar.common.enabled !== false}
+                                onChange={e => {
+                                    const _calendar: CalendarObject = JSON.parse(JSON.stringify(calendar));
+                                    _calendar.common.enabled = e.target.checked;
+                                    setCalendar(_calendar);
+                                }}
+                            />
+                        }
+                        label={
+                            <div>
+                                <div>{I18n.t('Active')}</div>
+                                <div style={styles.hint}>
+                                    {I18n.t('Inactive calendars do not execute their events')}
+                                </div>
+                            </div>
+                        }
                     />
                 </div>
             </DialogContent>
@@ -72,7 +110,8 @@ const CalendarDialog = (props: CalendarDialogProps): JSX.Element | null => {
                         !calendar ||
                         !props.calendar ||
                         !calendar.common.name ||
-                        calendar.common.name === props.calendar.common.name
+                        (calendar.common.name === props.calendar.common.name &&
+                            (calendar.common.enabled !== false) === (props.calendar.common.enabled !== false))
                     }
                     onClick={async () => {
                         await props.socket.setObject(calendar._id, calendar);

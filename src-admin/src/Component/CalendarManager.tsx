@@ -3,7 +3,7 @@ import ReactSplit, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 
 import { IconButton, Tooltip } from '@mui/material';
 
-import { Edit } from '@mui/icons-material';
+import { Edit, EventAvailable, EventBusy } from '@mui/icons-material';
 
 import { I18n, type AdminConnection, type IobTheme, type ThemeType } from '@iobroker/gui-components';
 
@@ -69,6 +69,14 @@ const CalendarManager = (props: CalendarManagerProps): JSX.Element => {
             window.localStorage.removeItem('fullcalendar.calendar');
             setCalendarPrefix(`fullcalendar.${props.instance}`);
         }
+    };
+
+    /** Switch all events of a calendar on or off */
+    const toggleCalendar = async (calendar: CalendarObject): Promise<void> => {
+        const _calendar: CalendarObject = JSON.parse(JSON.stringify(calendar));
+        _calendar.common.enabled = calendar.common.enabled === false;
+        await props.socket.setObject(_calendar._id, _calendar);
+        await updateCalendars();
     };
 
     const changeCalendarType = (): void =>
@@ -165,25 +173,62 @@ const CalendarManager = (props: CalendarManagerProps): JSX.Element => {
                                         color={calendar.common.color}
                                         icon={calendar.common.icon}
                                         selected={calendar._id === calendarPrefix}
+                                        inactive={calendar.common.enabled === false}
                                         onClick={() => {
                                             window.localStorage.setItem('fullcalendar.calendar', calendar._id);
                                             setCalendarPrefix(calendar._id);
                                         }}
-                                        actions={
-                                            <Tooltip
-                                                title={I18n.t('Edit name or delete calendar')}
-                                                slotProps={{ popper: { sx: styles.tooltip } }}
-                                            >
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={e => {
-                                                        setCalendarDialog(calendar._id);
-                                                        e.stopPropagation();
-                                                    }}
+                                        status={
+                                            calendar.common.enabled === false ? (
+                                                <Tooltip
+                                                    title={I18n.t('Calendar is inactive. Click to activate')}
+                                                    slotProps={{ popper: { sx: styles.tooltip } }}
                                                 >
-                                                    <Edit />
-                                                </IconButton>
-                                            </Tooltip>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            void toggleCalendar(calendar);
+                                                        }}
+                                                    >
+                                                        <EventBusy />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            ) : null
+                                        }
+                                        actions={
+                                            <>
+                                                {calendar.common.enabled !== false ? (
+                                                    <Tooltip
+                                                        title={I18n.t('Deactivate calendar')}
+                                                        slotProps={{ popper: { sx: styles.tooltip } }}
+                                                    >
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={e => {
+                                                                e.stopPropagation();
+                                                                void toggleCalendar(calendar);
+                                                            }}
+                                                        >
+                                                            <EventAvailable />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : null}
+                                                <Tooltip
+                                                    title={I18n.t('Edit name or delete calendar')}
+                                                    slotProps={{ popper: { sx: styles.tooltip } }}
+                                                >
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={e => {
+                                                            setCalendarDialog(calendar._id);
+                                                            e.stopPropagation();
+                                                        }}
+                                                    >
+                                                        <Edit />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </>
                                         }
                                     />
                                 ))}

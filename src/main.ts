@@ -7,6 +7,7 @@ import SunCalc from 'suncalc2';
 
 import * as timeUtils from './lib/utils';
 import type { AstroName } from './lib/utils';
+import { conditionText, hasCondition, isConditionMet, type EventCondition } from './lib/condition';
 import {
     occurrencesOf,
     parseCron,
@@ -42,6 +43,8 @@ export interface EventNative {
     /** random jitter in ms, applied symmetrically around the calculated time */
     timeRandomOffset?: number;
     states?: Record<string, string>;
+    /** the event writes only, if this condition is met at that time */
+    condition?: EventCondition;
 }
 
 /** A calendar event object, plus the bookkeeping the runtime attaches to it */
@@ -232,6 +235,9 @@ export class Fullcalendar extends Adapter {
 
     private readonly lastEvent: Record<string, { id: string; value: ioBroker.StateValue; ts: number }> = {};
 
+    /** object IDs of the calendars switched off (`common.enabled === false` of the calendar folder) */
+    private readonly disabledCalendars = new Set<string>();
+
     /** debounce of the agenda states */
     private agendaTimer: NodeJS.Timeout | null = null;
 
@@ -281,6 +287,36 @@ export class Fullcalendar extends Adapter {
     /** Object ID of the calendar an event belongs to */
     private calendarIdOf(eventId: string): string {
         return eventId.substring(0, eventId.lastIndexOf('.'));
+    }
+
+    /** An event is executed, if it and its calendar are enabled */
+    private isActive(event: FullCalendarEvent): boolean {
+        return !!event.common.enabled && !this.disabledCalendars.has(this.calendarIdOf(event._id));
+    }
+
+    /** Remember whether a calendar folder is switched off */
+    private updateCalendarState(id: string, obj: ioBroker.Object | null | undefined): void {
+        if (obj?.type === 'folder' && (obj.common as { enabled?: boolean }).enabled === false) {
+            this.disabledCalendars.add(id);
+        } else {
+            this.disabledCalendars.delete(id);
+        }
+    }
+
+    /**
+     * Switch a calendar on or off: its events stay, but are not executed
+     *
+     * @param params the message
+     */
+    private async enableCalendar(params: Record<string, unknown>): Promise<{ id: string; enabled: boolean }> {
+        const id = this.findCalendar(params.calendar, await this.readCalendars());
+        if (id === this.namespace) {
+            throw new Error('The default calendar cannot be switched off');
+        }
+        const enabled = params.enabled !== false && params.enabled !== 'false' && params.enabled !== 0;
+        await this.extendForeignObjectAsync(id, { common: { enabled } });
+        this.log.info(`Calendar "${id}" ${enabled ? 'enabled' : 'disabled'}`);
+        return { id, enabled };
     }
 
     /** Name of the calendar of an event, '' = the default calendar */
@@ -335,7 +371,8 @@ export class Fullcalendar extends Adapter {
         for (const event of this.calendarEvents()) {
             const calendar = this.calendarNameOf(event._id, names);
             let nextTime: Date | null = null;
-            if (event.common.enabled !== false) {
+            const active = event.common.enabled !== false && !this.disabledCalendars.has(this.calendarIdOf(event._id));
+            if (active) {
                 nextTime = occurrencesOf(event, now, yearAhead, this.resolveAstro, 1)[0] || null;
                 const end = (day: Date): Date => new Date(day.getTime() - 1);
                 for (const time of occurrencesOf(event, today, end(tomorrow), this.resolveAstro)) {
@@ -348,7 +385,10 @@ export class Fullcalendar extends Adapter {
                     next = toOccurrence(event, nextTime, calendar, this.lang);
                 }
             }
-            list.push(toEventInfo(event, calendar, nextTime, this.lang));
+            const info = toEventInfo(event, calendar, nextTime, this.lang);
+            // an event of a calendar switched off is listed as disabled
+            info.enabled = active;
+            list.push(info);
         }
         // upcoming first, then the ones without a next execution
         list.sort((a, b) => (a.next || '￿').localeCompare(b.next || '￿') || a.name.localeCompare(b.name));
@@ -518,7 +558,11 @@ export class Fullcalendar extends Adapter {
         const max = typeof params.max === 'number' && params.max > 0 ? params.max : 100;
         const events: Occurrence[] = [];
         for (const event of this.calendarEvents()) {
-            if (event.common.enabled === false || (calendarId && this.calendarIdOf(event._id) !== calendarId)) {
+            if (
+                event.common.enabled === false ||
+                this.disabledCalendars.has(this.calendarIdOf(event._id)) ||
+                (calendarId && this.calendarIdOf(event._id) !== calendarId)
+            ) {
                 continue;
             }
             const calendar = this.calendarNameOf(event._id, names);
@@ -536,7 +580,8 @@ export class Fullcalendar extends Adapter {
      * - `deleteEvent` {id} → {result: 'ok'}
      * - `listEvents` {from?, to?, days?, calendar?, max?} → {events}
      * - `getEvents` {calendar?} → {events} (the definitions, with their next execution)
-     * - `getCalendars` → {calendars: [{id, name}]}
+     * - `getCalendars` → {calendars: [{id, name, enabled}]}
+     * - `enableCalendar` {calendar, enabled} → {id, enabled}
      *
      * Errors come back as {error}.
      */
@@ -573,12 +618,19 @@ export class Fullcalendar extends Adapter {
                     const names = await this.readCalendars();
                     result = {
                         calendars: [
-                            { id: this.namespace, name: 'Default' },
-                            ...Object.keys(names).map(id => ({ id, name: names[id] })),
+                            { id: this.namespace, name: 'Default', enabled: true },
+                            ...Object.keys(names).map(id => ({
+                                id,
+                                name: names[id],
+                                enabled: !this.disabledCalendars.has(id),
+                            })),
                         ],
                     };
                     break;
                 }
+                case 'enableCalendar':
+                    result = await this.enableCalendar(params);
+                    break;
                 default:
                     result = { error: `Unknown command "${msg.command}"` };
             }
@@ -661,10 +713,9 @@ export class Fullcalendar extends Adapter {
         });
 
         // unsubscribe old
-        this.subscribed.forEach(state => {
-            const pos = this.subscribed.indexOf(state);
-            if (pos === -1) {
-                this.subscribed.splice(pos, 1);
+        [...this.subscribed].forEach(state => {
+            if (!toSubscribe.includes(state)) {
+                this.subscribed.splice(this.subscribed.indexOf(state), 1);
                 const obj = this.stateObjs[state];
                 if (obj && (obj.type === 'channel' || obj.type === 'device')) {
                     this.log.debug(`- Unsubscribed from ${state}.*`);
@@ -769,18 +820,25 @@ export class Fullcalendar extends Adapter {
     }
 
     private async startRecordSimulation(id: string): Promise<void> {
-        if (!this.recordingSimulations[id]) {
-            this.recordingSimulations[id] = (await this.getForeignObjectAsync(id)) as unknown as SimulationObject;
-            const state = await this.getForeignStateAsync(id);
-            this.recordingSimulations[id].value = (state?.val as SimulationStatus) || 'stop';
+        // Read the object again: the GUI writes the new recording period just before it sets the state to "record",
+        // and the object change can arrive after the state change. With the cached object, the period of the last
+        // recording would be checked and the recording stopped at once (#234).
+        const obj = (await this.getForeignObjectAsync(id)) as unknown as SimulationObject | null;
+        if (!obj) {
+            return;
         }
+        const value: SimulationStatus =
+            this.recordingSimulations[id]?.value ||
+            ((await this.getForeignStateAsync(id))?.val as SimulationStatus) ||
+            'stop';
+        this.recordingSimulations[id] = obj;
+        this.recordingSimulations[id].value = value;
 
         this.collectAllStates(id);
 
-        if (
-            new Date(this.recordingSimulations[id].native.record.start).getTime() >= Date.now() ||
-            new Date(this.recordingSimulations[id].native.record.end).getTime() < Date.now()
-        ) {
+        // `record.start` is not checked: it comes from the clock of the browser, which can be ahead of this host
+        if (!obj.native.record?.end || new Date(obj.native.record.end).getTime() < Date.now()) {
+            this.log.warn(`Recording of "${this.getText(obj)}" stopped: the recording period is over`);
             await this.setForeignStateAsync(id, 'stop');
             this.recordingSimulations[id].value = 'stop';
             return;
@@ -867,6 +925,22 @@ export class Fullcalendar extends Adapter {
         if (!obj) {
             this.log.warn(`Object "${event.native.oid}" does not exist!`);
             return;
+        }
+        if (hasCondition(event.native.condition)) {
+            const condition = event.native.condition;
+            let actual: ioBroker.StateValue | undefined;
+            try {
+                actual = (await this.getForeignStateAsync(condition.oid))?.val;
+            } catch (e) {
+                this.log.warn(`Cannot read the condition state "${condition.oid}": ${e}`);
+            }
+            if (!isConditionMet(condition, actual)) {
+                // a "double" or "toggle" event is skipped completely, it does not write the second value either
+                this.log.info(
+                    `Event "${this.getText(event)}" skipped: condition ${conditionText(condition)} is not met (value: ${JSON.stringify(actual ?? null)})`,
+                );
+                return;
+            }
         }
         if (event.native.type !== 'single' && event.native.intervals && event.native.intervals.length) {
             event.timer = setTimeout(
@@ -959,7 +1033,7 @@ export class Fullcalendar extends Adapter {
         for (const id in this.events) {
             if (
                 !Object.prototype.hasOwnProperty.call(this.events, id) ||
-                !this.events[id].common.enabled ||
+                !this.isActive(this.events[id]) ||
                 this.events[id].expired
             ) {
                 continue;
@@ -1131,6 +1205,13 @@ export class Fullcalendar extends Adapter {
                 return;
             }
 
+            // A device that reports its status periodically (Tasmota, Sonoff, Homematic) sends the same value again
+            // and again: only a change of the value is a switching action worth recording (#285).
+            // `lc` (last change) keeps the time of the last different value.
+            if (state.lc && state.ts !== state.lc) {
+                return;
+            }
+
             // we can record only commands, as we must play back them later
             const ids = Object.keys(this.recordingSimulations);
             for (let i = 0; i < ids.length; i++) {
@@ -1178,7 +1259,7 @@ export class Fullcalendar extends Adapter {
                         (stateObj.common.role.endsWith('.lock') || stateObj.common.role === 'lock')
                     ) {
                         this.log.warn(`Cannot record state "${name}/${stateId}" because it has role "lock"`);
-                        return;
+                        continue;
                     }
 
                     if (stateObj.common.write === false) {
@@ -1309,6 +1390,10 @@ export class Fullcalendar extends Adapter {
 
         if (!id.startsWith(`${this.namespace}.`)) {
             return;
+        }
+
+        if (id.startsWith(`${this.namespace}.Calendars.`) && (!obj || obj.type === 'folder')) {
+            this.updateCalendarState(id, obj);
         }
 
         const wasEvent = !!this.events[id];
@@ -1444,6 +1529,19 @@ export class Fullcalendar extends Adapter {
             this.lang = this.sysConfig.common.language;
         } catch (e) {
             this.log.error(`Cannot read system.config: ${e}`);
+        }
+
+        // read the calendars switched off
+        try {
+            const calendars = await this.getObjectViewAsync('system', 'folder', {
+                startkey: `${this.namespace}.Calendars.`,
+                endkey: `${this.namespace}.Calendars.${MAX_KEY}`,
+            });
+            for (const row of calendars?.rows || []) {
+                this.updateCalendarState(row.id, row.value);
+            }
+        } catch (e) {
+            this.log.error(`Cannot read calendars: ${e}`);
         }
 
         // read possible simulations

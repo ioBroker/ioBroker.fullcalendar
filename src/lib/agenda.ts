@@ -7,6 +7,7 @@
 import * as later from 'later';
 
 import { parseISOLocal, toLocalTime, type AstroName } from './utils';
+import { hasCondition, type EventCondition } from './condition';
 
 /** The part of a calendar event the agenda reads */
 export interface AgendaEvent {
@@ -22,6 +23,7 @@ export interface AgendaEvent {
         startValue: ioBroker.StateValue;
         intervals?: { value?: ioBroker.StateValue; timeOffset?: number | string }[];
         states?: Record<string, string>;
+        condition?: EventCondition;
     };
 }
 
@@ -70,6 +72,8 @@ export interface EventInfo {
     /** "double" and "toggle": time until the second write, in seconds */
     durationSec?: number;
     endValue?: ioBroker.StateValue;
+    /** the event writes only, if this condition is met at that time */
+    condition?: EventCondition;
     /** next execution (local time), null = none ahead */
     next: string | null;
 }
@@ -240,6 +244,13 @@ export function toEventInfo(
         if (native.type === 'double') {
             info.endValue = native.intervals?.[0]?.value ?? null;
         }
+    }
+    if (hasCondition(native.condition)) {
+        info.condition = {
+            oid: native.condition.oid,
+            operator: native.condition.operator || '==',
+            value: native.condition.value,
+        };
     }
     return info;
 }

@@ -95,5 +95,14 @@
   "Desired value": "Желаемое значение",
   "Description": "Описание",
   "min": "мин.",
-  "default": "по умолчанию"
+  "default": "по умолчанию",
+  "seconds": "секунд",
+  "hours": "часов",
+  "Only if": "Только если",
+  "condition_description": "Событие выполняется, только если это состояние в этот момент имеет указанное значение",
+  "Condition object ID": "ID объекта условия",
+  "Operator": "Оператор",
+  "Value": "Значение",
+  "ON (true)": "ВКЛ (true)",
+  "OFF (false)": "ВЫКЛ (false)"
 }

@@ -346,7 +346,8 @@ export default class FullCalendar extends (window.visRxWidget as typeof VisRxWid
                         key={`${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`}
                         events={this.state.events || []}
                         socket={this.props.context.socket}
-                        calendarPrefix={`fullcalendar.${this.state.rxData.instance}`}
+                        // new events go into the calendar shown by the widget, else they would not be shown (#444)
+                        calendarPrefix={this.state.rxData.calendar || `fullcalendar.${this.state.rxData.instance}`}
                         changeEvents={this.changeEvents}
                         updateEvents={this.updateEvents}
                         setEvent={this.setEvent}

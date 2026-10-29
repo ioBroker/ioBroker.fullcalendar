@@ -95,5 +95,14 @@
   "Desired value": "Gewenste waarde",
   "Description": "Beschrijving",
   "min": "min.",
-  "default": "standaard"
+  "default": "standaard",
+  "seconds": "seconden",
+  "hours": "uren",
+  "Only if": "Alleen als",
+  "condition_description": "De gebeurtenis wordt alleen uitgevoerd als deze status op dat moment de opgegeven waarde heeft",
+  "Condition object ID": "Object-ID van de voorwaarde",
+  "Operator": "Operator",
+  "Value": "Waarde",
+  "ON (true)": "AAN (true)",
+  "OFF (false)": "UIT (false)"
 }

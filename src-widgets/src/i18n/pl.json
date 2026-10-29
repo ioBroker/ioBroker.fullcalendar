@@ -95,5 +95,14 @@
   "Desired value": "Pożądana wartość",
   "Description": "Opis",
   "min": "min.",
-  "default": "domyślny"
+  "default": "domyślny",
+  "seconds": "sekund",
+  "hours": "godzin",
+  "Only if": "Tylko jeśli",
+  "condition_description": "Zdarzenie zostanie wykonane tylko wtedy, gdy ten stan ma w tym momencie podaną wartość",
+  "Condition object ID": "ID obiektu warunku",
+  "Operator": "Operator",
+  "Value": "Wartość",
+  "ON (true)": "WŁĄCZONY (true)",
+  "OFF (false)": "WYŁĄCZONY (false)"
 }

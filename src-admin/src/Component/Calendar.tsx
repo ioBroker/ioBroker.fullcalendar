@@ -219,6 +219,13 @@ export interface CalendarProps {
 
 function Calendar(props: CalendarProps): JSX.Element | null {
     const [eventDialog, setEventDialog] = useState<string | null>(null);
+    // A new event is shown in the dialog at once: it comes back in `props.events` only after it was saved and the
+    // events were read again, which can take longer than the dialog waits (#444)
+    const [createdEvent, setCreatedEvent] = useState<CalendarEvent | null>(null);
+    const dialogEvent = eventDialog
+        ? props.events.find(event => event?._id === eventDialog) ||
+          (createdEvent?._id === eventDialog ? createdEvent : null)
+        : null;
     const [step, setStep] = useState<number>(
         props.dayStep || parseInt(window.localStorage.getItem('calendarStep') as string, 10) || 30,
     );
@@ -518,11 +525,11 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 }
 `}
             </style>
-            {eventDialog ? (
+            {dialogEvent ? (
                 <EventDialog
                     systemConfig={props.systemConfig}
                     widget={props.widget}
-                    event={props.events.find(event => event?._id === eventDialog)!}
+                    event={dialogEvent}
                     onClose={() => {
                         setEventDialog(null);
                         const _now = lastEventTime.current ? new Date(lastEventTime.current) : new Date();
@@ -836,6 +843,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                 lastEventTime.current = new Date(event.event.start!).getTime();
                                 await props.setEvent(newEvent._id, newEvent);
                                 void props.updateEvents();
+                                setCreatedEvent(newEvent);
                                 setTimeout(() => setEventDialog(newEvent._id), 100);
                             }}
                             eventDidMount={(info: EventMountArg) => {
@@ -914,6 +922,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 
                                 await props.setEvent(newEvent._id, newEvent);
                                 await props.updateEvents();
+                                setCreatedEvent(newEvent);
                                 setTimeout(() => setEventDialog(newEvent._id), 100);
                             }}
                         />

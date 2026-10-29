@@ -40,6 +40,7 @@ import {
     cron2obj,
     obj2cron,
     serverDateToClient,
+    CONDITION_OPERATORS,
     type AstroName,
     type CalendarEvent,
     type CronObjectArrays,
@@ -107,6 +108,29 @@ const styles: Record<string, any> = {
         backgroundColor: theme.palette.mode === 'dark' ? '#656565' : '#dadada',
     }),
 };
+
+type DurationUnit = 'seconds' | 'minutes' | 'hours';
+
+const DURATION_UNITS: Record<DurationUnit, number> = {
+    seconds: 1000,
+    minutes: 60000,
+    hours: 3600000,
+};
+
+/** Duration in ms → value and the largest unit that shows it without fraction */
+function splitDuration(ms: number | string | undefined): { value: number; unit: DurationUnit } {
+    const _ms = parseInt(String(ms || 0), 10) || 0;
+    if (!_ms) {
+        return { value: 0, unit: 'minutes' };
+    }
+    if (_ms % DURATION_UNITS.hours === 0) {
+        return { value: _ms / DURATION_UNITS.hours, unit: 'hours' };
+    }
+    if (_ms % DURATION_UNITS.minutes === 0) {
+        return { value: _ms / DURATION_UNITS.minutes, unit: 'minutes' };
+    }
+    return { value: Math.round(_ms / 100) / 10, unit: 'seconds' };
+}
 
 const astroTypes: AstroName[] = [
     'sunrise',
@@ -185,10 +209,8 @@ export interface EventDialogProps {
 }
 
 const EventDialog = (props: EventDialogProps): JSX.Element | null => {
-    const initialDuration =
-        props.event?.native?.intervals && props.event.native.intervals[0] && props.event.native.intervals[0].timeOffset
-            ? props.event.native.intervals[0].timeOffset / 60000
-            : 0;
+    const initialDurationUnit = splitDuration(props.event?.native?.intervals?.[0]?.timeOffset);
+    const initialDuration = initialDurationUnit.value;
     const initialEndValue =
         props.event?.native?.intervals &&
         props.event.native.intervals[0] &&
@@ -200,6 +222,9 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
     const [object, setObject] = useState<ioBroker.StateObject | null>(null);
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [duration, setDuration] = useState<number | string>(initialDuration);
+    const [durationUnit, setDurationUnit] = useState<DurationUnit>(initialDurationUnit.unit);
+    const [conditionIdDialog, setConditionIdDialog] = useState(false);
+    const [conditionObject, setConditionObject] = useState<ioBroker.StateObject | null>(null);
     const [endValue, setEndValue] = useState<ioBroker.StateValue>(initialEndValue);
     const [astroEventTimes, setAstroEventTimes] = useState<Partial<Record<AstroName, Date>>>({});
 
@@ -271,6 +296,18 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
         props.systemConfig.longitude,
     ]);
 
+    const conditionOid = event.native?.condition?.oid;
+    useEffect(() => {
+        if (!conditionOid) {
+            setConditionObject(null);
+            return;
+        }
+        props.socket
+            .getObject(conditionOid)
+            .then(obj => setConditionObject(obj?.type === 'state' ? obj : null))
+            .catch(() => setConditionObject(null));
+    }, [conditionOid, props.socket]);
+
     const cronObject = event.native?.cron ? cron2obj(event.native.cron) : null;
     let period: 'once' | 'daily' | 'monthly' = 'once';
     let maxMonthDay = 29;
@@ -301,6 +338,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
     const changed =
         JSON.stringify(props.event) !== JSON.stringify(event) ||
         duration !== initialDuration ||
+        durationUnit !== initialDurationUnit.unit ||
         endValue !== initialEndValue;
 
     const valueField = (field: 'startValue' | 'endValue', name: string): JSX.Element | null => {
@@ -456,6 +494,154 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
         );
     };
 
+    const conditionValueField = (): JSX.Element => {
+        const condition = event.native.condition!;
+        const disabled = !!props.readOnly || !event?.common.enabled;
+        if (conditionObject?.common.type === 'boolean') {
+            return (
+                <FormControl
+                    style={styles.narrowText2}
+                    variant="standard"
+                >
+                    <InputLabel>{props.t('Value')}</InputLabel>
+                    <Select
+                        value={condition.value === true || condition.value === 'true' ? 'true' : 'false'}
+                        disabled={disabled}
+                        onChange={e =>
+                            changeEvent(newEvent => (newEvent.native.condition!.value = e.target.value === 'true'))
+                        }
+                    >
+                        <MenuItem value="true">{props.t('ON (true)')}</MenuItem>
+                        <MenuItem value="false">{props.t('OFF (false)')}</MenuItem>
+                    </Select>
+                </FormControl>
+            );
+        }
+        if (conditionObject?.common.states && typeof conditionObject.common.states === 'object') {
+            const states = conditionObject.common.states as Record<string, string>;
+            return (
+                <FormControl
+                    style={styles.narrowText2}
+                    variant="standard"
+                >
+                    <InputLabel>{props.t('Value')}</InputLabel>
+                    <Select
+                        value={condition.value === null || condition.value === undefined ? '' : String(condition.value)}
+                        disabled={disabled}
+                        onChange={e => changeEvent(newEvent => (newEvent.native.condition!.value = e.target.value))}
+                    >
+                        {Object.keys(states).map(option => (
+                            <MenuItem
+                                key={option}
+                                value={option}
+                            >
+                                {states[option]}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            );
+        }
+        return (
+            <TextField
+                style={styles.narrowText2}
+                label={props.t('Value')}
+                value={condition.value === null || condition.value === undefined ? '' : String(condition.value)}
+                disabled={disabled}
+                onChange={e => changeEvent(newEvent => (newEvent.native.condition!.value = e.target.value))}
+                variant="standard"
+                slotProps={{
+                    input: {
+                        endAdornment: conditionObject?.common.unit ? (
+                            <InputAdornment position="end">{conditionObject.common.unit}</InputAdornment>
+                        ) : null,
+                    },
+                }}
+            />
+        );
+    };
+
+    const conditionField = (): JSX.Element => {
+        const condition = event.native.condition;
+        const disabled = !!props.readOnly || !event?.common.enabled;
+        return (
+            <div style={styles.field}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={!!condition}
+                            disabled={disabled}
+                            onChange={e =>
+                                changeEvent(newEvent => {
+                                    if (e.target.checked) {
+                                        newEvent.native.condition = { oid: '', operator: '==', value: '' };
+                                    } else {
+                                        delete newEvent.native.condition;
+                                    }
+                                })
+                            }
+                        />
+                    }
+                    label={
+                        <div>
+                            <div>{props.t('Only if')}</div>
+                            <div style={styles.typeDescription}>{props.t('condition_description')}</div>
+                        </div>
+                    }
+                />
+                {condition ? (
+                    <>
+                        <div style={styles.selectId}>
+                            <TextField
+                                label={props.t('Condition object ID')}
+                                value={condition.oid || ''}
+                                disabled={disabled}
+                                onChange={e =>
+                                    changeEvent(newEvent => (newEvent.native.condition!.oid = e.target.value))
+                                }
+                                variant="standard"
+                                helperText={getText(conditionObject?.common.name || '', props.language)}
+                                error={!condition.oid}
+                                fullWidth
+                            />
+                            <Button
+                                disabled={disabled}
+                                onClick={() => setConditionIdDialog(true)}
+                            >
+                                ...
+                            </Button>
+                        </div>
+                        <div style={styles.selectId}>
+                            <FormControl
+                                style={{ width: 80 }}
+                                variant="standard"
+                            >
+                                <InputLabel>{props.t('Operator')}</InputLabel>
+                                <Select
+                                    value={condition.operator || '=='}
+                                    disabled={disabled}
+                                    onChange={e =>
+                                        changeEvent(newEvent => (newEvent.native.condition!.operator = e.target.value))
+                                    }
+                                >
+                                    {CONDITION_OPERATORS.map(operator => (
+                                        <MenuItem
+                                            key={operator}
+                                            value={operator}
+                                        >
+                                            {operator}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {conditionValueField()}
+                        </div>
+                    </>
+                ) : null}
+            </div>
+        );
+    };
+
     const daysOfWeek = props.systemConfig?.firstDayOfWeek === 'monday' ? [1, 2, 3, 4, 5, 6, 0] : [0, 1, 2, 3, 4, 5, 6];
 
     const astroTime = event.native?.astro && astroEventTimes ? astroEventTimes[event.native.astro] : '';
@@ -499,6 +685,27 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             setIdDialog(false);
                         }}
                         onClose={() => setIdDialog(false)}
+                        socket={props.socket}
+                    />
+                ) : null}
+                {conditionIdDialog && !props.readOnly ? (
+                    <SelectID
+                        imagePrefix="../.."
+                        theme={props.theme}
+                        selected={event.native.condition?.oid}
+                        onOk={_id => {
+                            const id = (Array.isArray(_id) ? _id[0] : _id) || '';
+                            changeEvent(newEvent => {
+                                newEvent.native.condition = newEvent.native.condition || {
+                                    oid: '',
+                                    operator: '==',
+                                    value: '',
+                                };
+                                newEvent.native.condition.oid = id;
+                            });
+                            setConditionIdDialog(false);
+                        }}
+                        onClose={() => setConditionIdDialog(false)}
                         socket={props.socket}
                     />
                 ) : null}
@@ -757,7 +964,27 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             style={styles.narrowText}
                             slotProps={{
                                 input: {
-                                    endAdornment: <InputAdornment position="end">{props.t('minutes')}</InputAdornment>,
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Select
+                                                variant="standard"
+                                                disableUnderline
+                                                value={durationUnit}
+                                                disabled={!!props.readOnly || !event?.common.enabled}
+                                                onChange={e => setDurationUnit(e.target.value)}
+                                                sx={{ fontSize: 'inherit' }}
+                                            >
+                                                {(Object.keys(DURATION_UNITS) as DurationUnit[]).map(unit => (
+                                                    <MenuItem
+                                                        key={unit}
+                                                        value={unit}
+                                                    >
+                                                        {props.t(unit)}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </InputAdornment>
+                                    ),
                                 },
                             }}
                         />
@@ -797,6 +1024,7 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                     )}
                     {event.native.type === 'double' && endValueField()}
                 </div>
+                {!props.isSimulation ? conditionField() : null}
                 <div style={styles.field}>
                     {!props.isSimulation && (
                         <FormControl variant="standard">
@@ -1184,7 +1412,15 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                         }
                         startIcon={<Save />}
                         onClick={async () => {
-                            const newEvent = { ...event };
+                            const newEvent: CalendarEvent = JSON.parse(JSON.stringify(event));
+                            const durationMs = Math.round(
+                                (parseFloat(String(duration).replace(',', '.')) || 1) * DURATION_UNITS[durationUnit],
+                            );
+                            if (newEvent.native.condition && !newEvent.native.condition.oid.trim()) {
+                                delete newEvent.native.condition;
+                            } else if (newEvent.native.condition) {
+                                newEvent.native.condition.oid = newEvent.native.condition.oid.trim();
+                            }
                             if (newEvent.native.type === 'single') {
                                 if (newEvent.native.intervals) {
                                     delete newEvent.native.intervals;
@@ -1192,12 +1428,12 @@ const EventDialog = (props: EventDialogProps): JSX.Element | null => {
                             } else if (newEvent.native.type === 'double') {
                                 newEvent.native.intervals = newEvent.native.intervals || [];
                                 newEvent.native.intervals[0] = newEvent.native.intervals[0] || {};
-                                newEvent.native.intervals[0].timeOffset = (parseFloat(duration as string) || 1) * 60000;
+                                newEvent.native.intervals[0].timeOffset = durationMs;
                                 newEvent.native.intervals[0].value = endValue;
                             } else if (newEvent.native.type === 'toggle') {
                                 newEvent.native.intervals = newEvent.native.intervals || [];
                                 newEvent.native.intervals[0] = newEvent.native.intervals[0] || {};
-                                newEvent.native.intervals[0].timeOffset = (parseFloat(duration as string) || 1) * 60000;
+                                newEvent.native.intervals[0].timeOffset = durationMs;
                             }
 
                             await props.setEvent(newEvent._id, newEvent);

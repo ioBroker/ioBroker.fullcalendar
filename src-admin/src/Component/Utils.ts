@@ -51,6 +51,18 @@ export interface EventInterval {
     timeOffset?: number;
 }
 
+export type ConditionOperator = '==' | '!=' | '>' | '>=' | '<' | '<=';
+
+export const CONDITION_OPERATORS: ConditionOperator[] = ['==', '!=', '>', '>=', '<', '<='];
+
+/** The event writes only, if `oid` has a matching value at that time */
+export interface EventCondition {
+    oid: string;
+    /** default `==` */
+    operator?: ConditionOperator;
+    value: ioBroker.StateValue;
+}
+
 export interface CalendarEventNative {
     id?: number;
     /** cron expression; mutually exclusive with `start` */
@@ -67,6 +79,8 @@ export interface CalendarEventNative {
     states?: Record<string, string>;
     /** random jitter in ms */
     timeRandomOffset?: number;
+    /** the event writes only, if this condition is met at that time */
+    condition?: EventCondition;
     /** @deprecated events created by older versions stored the color here instead of in `common` */
     color?: string;
     durationEditable?: boolean;

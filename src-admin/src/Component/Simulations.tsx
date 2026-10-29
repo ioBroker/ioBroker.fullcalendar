@@ -152,7 +152,8 @@ const Simulations = (props: SimulationsProps): JSX.Element => {
                 ? new Date(Date.now() + 24 * 60 * 60 * 1000)
                 : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        void props.socket.setObject(id, obj);
+        // the new recording period must be stored before the adapter starts the recording (#234)
+        await props.socket.setObject(id, obj);
         void props.socket.setState(id, 'record');
     };
 

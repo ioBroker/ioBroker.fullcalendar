@@ -124,5 +124,17 @@
   "Object ID": "对象ID",
   "All": "全部",
   "Description": "描述",
-  "First value": "第一个值"
+  "First value": "第一个值",
+  "seconds": "秒",
+  "hours": "小时",
+  "Only if": "仅当",
+  "condition_description": "仅当此状态在该时刻具有指定值时才执行事件",
+  "Condition object ID": "条件对象 ID",
+  "Operator": "运算符",
+  "Value": "值",
+  "ON (true)": "开 (true)",
+  "OFF (false)": "关 (false)",
+  "Inactive calendars do not execute their events": "未激活的日历不会执行其事件",
+  "Calendar is inactive. Click to activate": "日历未激活。点击激活",
+  "Deactivate calendar": "停用日历"
 }

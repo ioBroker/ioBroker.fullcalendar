@@ -95,5 +95,14 @@
   "Object ID": "Object ID",
   "Desired value": "Desired value",
   "Description": "Description",
-  "default": "default"
+  "default": "default",
+  "seconds": "seconds",
+  "hours": "hours",
+  "Only if": "Only if",
+  "condition_description": "The event is executed only if this state has the given value at that time",
+  "Condition object ID": "Condition object ID",
+  "Operator": "Operator",
+  "Value": "Value",
+  "ON (true)": "ON (true)",
+  "OFF (false)": "OFF (false)"
 }
