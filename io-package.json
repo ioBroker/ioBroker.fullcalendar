@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.3.0",
+    "version": "3.3.1",
     "news": {
+      "3.3.1": {
+        "en": "Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)\nThe adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)\nAdded the message `updateEvent`: move or change an event without deleting and creating it again",
+        "de": "Admin >= 7.6.17, übersetzter Name des Admin-Tabs und UK-Übersetzungen hinzugefügt (#557)\nDie Adapter-Timer (`this.setTimeout`/`this.setInterval`) werden benutzt (#557)\nNachricht `updateEvent` hinzugefügt: Event verschieben oder ändern, ohne es neu zu erstellen",
+        "ru": "Добавлена зависимость admin >= 7.6.17, переведенное имя вкладки admin и переводы для Великобритании (#557)\nТаймеры адаптера (`this.setTimeout`/`this.setInterval`) используются вместо обычных (#557)\nДобавлено сообщение `updateEvent`: перемещайте или изменяйте событие, не удаляя и не создавая его снова",
+        "pt": "Adicionou a dependência admin >= 7.6.17, o nome traduzido da aba admin e as traduções do Reino Unido (#557)\nOs timers do adaptador (`this.setTimeout`/`this.setInterval`) são usados em vez dos simples (#557)\nAdicionada a mensagem `updateEvent`: mova ou altere um evento sem excluí-lo e criá-lo",
+        "nl": "De afhankelijkheid admin >= 7.6.17, de vertaalde naam van het tabblad admin en de Engelse vertalingen (#557) toegevoegd\nDe timers van de adapter (`This.setTimeout`/`This.setInterval`) worden gebruikt in plaats van de gewone timers (#557)\nDe boodschap `UpdateEvent` toegevoegd: een gebeurtenis verplaatsen of wijzigen zonder deze te verwijderen en opnieuw aan te maken",
+        "fr": "Ajout de la dépendance admin >= 7.6.17, du nom traduit de l'onglet admin et des traductions britanniques (#557)\nLes temporisateurs (`this.setTimeout`/`this.setInterval`) sont utilisés au lieu des simples (#557)\nAjout du message « UpdateEvent » : déplacer ou modifier un événement sans le supprimer ni le créer",
+        "it": "Aggiunti la dipendenza admin >= 7.6.17, il nome tradotto e le traduzioni in UK (#557)\nI timer adattatori (`this.setTimeout`/`this.setInterval`) sono usati al posto di quelli semplici (#557)\nAggiunto il messaggio `UpdateEvent`: sposta o modifica un evento senza eliminarlo e crearlo",
+        "es": "Se ha añadido la dependencia admin >= 7.6.17, el nombre traducido de la pestaña admin y UK Translations (#557)\nLos temporizadores adaptadores (`this.setTimeout`/`this.setInterval`) se usan en lugar de los normales (#557)\nAñadió el mensaje `UpdateEvent`: mover o cambiar un evento sin eliminarlo y volver a crearlo",
+        "pl": "Dodano zależność admin >= 7.6.17, przetłumaczoną nazwę zakładki admin i tłumaczenia brytyjskie (#557)\nCzasomierze adaptera (`this.setTimeout`/`this.setInterval`) są używane zamiast zwykłych (#557)\nDodano komunikat `UpdateEvent`: przenieś lub zmień zdarzenie bez usuwania i ponownego tworzenia",
+        "uk": "Додано залежність admin >= 7.6.17, перекладена назва вкладки адміністратора та переклади Великобританії (#557)\nЗамість простих (#557) використовуються таймери адаптера (`this.setTimeout`/`this.setInterval`)\nДодано повідомлення `updateEvent`: перемістіть або змініть подію, не видаляючи та створюючи її знову",
+        "zh-cn": "添加了管理员 >= 7.6.17 依赖项、管理选项卡的翻译名称和英国翻译 (#557)\n使用适配器计时器 (`this.setTimeout`/`this.setInterval`) 而不是普通计时器 (#557)\n添加了消息 `updateEvent`：在不删除和重新创建的情况下移动或更改事件"
+      },
       "3.3.0": {
         "en": "Fixed: `addEvent` ignored `type` and `durationSec`, a \"double\" event was saved as \"single\"\nAdded recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`\n`deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)\nAdded the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands\nDocumented all messages and parameters in the README",
         "de": "Behoben: `addEvent` ignorierte `Type` und `DurationSec`, ein Doppelevent wurde als „Single“ gespeichert\n„AddEvent“: „wiederkehrend“ (täglich, wöchentlich, monatlich, jährlich) oder eine iCal-Regel hinzugefügt\n`DeleteEvent` löscht eine Eventliste (`ids`) oder alle Events mit Namen (`Name`)\nDie Meldungen `getEvent` und `getCommands` hinzugefügt, ein unbekannter Befehl gibt eine Liste\nDokumentiert alle Meldungen und Parameter im README",
@@ -80,19 +93,6 @@
         "pl": "Poprawione okno dialogowe SelectID",
         "uk": "Корекція ВиберітьД Діалог",
         "zh-cn": "已更正的选定ID对话框"
-      },
-      "2.4.4": {
-        "en": "Removed withStyles package",
-        "de": "MitStyles-Paket entfernt",
-        "ru": "Удаленный пакет со Стайлз",
-        "pt": "Removido com pacote Estilos",
-        "nl": "Verwijderd metStyles pakket",
-        "fr": "Enlever avec le paquetStyles",
-        "it": "Rimosso con pacchettoStyles",
-        "es": "Retire el paquete de estilos",
-        "pl": "Usunięty z pakietem Styles",
-        "uk": "Видаліть пакет \"Стиль\"",
-        "zh-cn": "用 Styles 软件包删除"
       }
     },
     "titleLang": {

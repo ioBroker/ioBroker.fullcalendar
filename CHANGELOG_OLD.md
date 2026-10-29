@@ -1,4 +1,9 @@
 # Older changes
+## 3.0.5 (2026-10-19)
+* (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
+* (bluefox) Migrated GUI to vite
+* (bluefox) Updated packages
+
 ## 3.0.1 (2026-08-05)
 * (bluefox) Migrated GUI to React19
 

@@ -120,7 +120,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.3.1 (2026-10-29)
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
 * (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)
 * (@GermanBluefox) Added the message `updateEvent`: move or change an event without deleting and creating it again
@@ -148,11 +148,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
 * (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
 * (bluefox) A one-shot event in the past is no longer marked as disabled in memory
-
-### 3.0.5 (2026-10-19)
-* (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
-* (bluefox) Migrated GUI to vite
-* (bluefox) Updated packages
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
