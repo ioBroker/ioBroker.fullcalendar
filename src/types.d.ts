@@ -8,10 +8,6 @@ declare module 'later' {
         error: number;
     }
 
-    export interface Timer {
-        clear: () => void;
-    }
-
     export interface ScheduleInstance {
         isValid: (date: Date) => boolean;
         next: (count?: number, startDate?: Date, endDate?: Date) => Date;
@@ -33,8 +29,6 @@ declare module 'later' {
     };
 
     export function schedule(sched: ScheduleData): ScheduleInstance;
-    export function setTimeout(fn: () => void, sched: ScheduleData): Timer;
-    export function setInterval(fn: () => void, sched: ScheduleData): Timer;
 }
 
 declare module 'suncalc2' {
