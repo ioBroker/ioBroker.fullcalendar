@@ -8,6 +8,7 @@ import SunCalc from 'suncalc2';
 import * as timeUtils from './lib/utils';
 import type { AstroName } from './lib/utils';
 import { conditionText, hasCondition, isConditionMet, type EventCondition } from './lib/condition';
+import { parseRecurrence, recurrenceToCron } from './lib/recurrence';
 import {
     occurrencesOf,
     parseCron,
@@ -112,6 +113,40 @@ const YYYY_MM_DDTHH_mm_ss = 'YYYY_MM_DDTHH_mm_ss'.length;
 
 /** Upper bound for `getObjectView` range queries */
 const MAX_KEY = '\u9999';
+
+/** The messages of the adapter, the answer of `getCommands` and the reference in the README */
+const COMMANDS: { command: string; params: string; answer: string }[] = [
+    {
+        command: 'addEvent',
+        params:
+            'oid, value, start (local time "2026-10-29T07:30" or ms) or in (delay: seconds, "90s", "30m", "2h"); ' +
+            'optional: duration or durationSec (then type "double", endValue default: opposite of a boolean value), ' +
+            'type ("single", "double", "toggle"), endValue, recurring ("daily", "weekly", "monthly", "yearly") ' +
+            'with weekdays (0 = Sunday or "MO"\u2026), monthDays, months, or rrule ("FREQ=YEARLY", "FREQ=WEEKLY;BYDAY=MO,FR"), ' +
+            'name, calendar (name or ID), color',
+        answer: '{id, name, type, start, ts, cron?}: start/ts = first execution',
+    },
+    {
+        command: 'deleteEvent',
+        params: 'id, ids (a list) and/or name (all events with this name), optional calendar for name',
+        answer: '{result: "ok", deleted: [id\u2026], notFound?: [id\u2026]}',
+    },
+    { command: 'getEvent', params: 'id', answer: '{event: definition}' },
+    { command: 'getEvents', params: 'optional calendar', answer: '{events: [definition\u2026]}' },
+    {
+        command: 'listEvents',
+        params: 'optional from, to (default now \u2026 7 days, or days), calendar, max',
+        answer: '{events: [execution\u2026]}',
+    },
+    { command: 'getCalendars', params: '-', answer: '{calendars: [{id, name, enabled}\u2026]}' },
+    { command: 'enableCalendar', params: 'calendar (name or ID), enabled', answer: '{id, enabled}' },
+    { command: 'getCommands', params: '-', answer: '{commands: [{command, params, answer}\u2026]}' },
+];
+
+/** A message parameter is given (not undefined, null or '') */
+function isGiven(value: unknown): boolean {
+    return value !== undefined && value !== null && value !== '';
+}
 
 function stopEvent(adapter: Fullcalendar, event: FullCalendarEvent): void {
     if (event.timer) {
@@ -434,14 +469,20 @@ export class Fullcalendar extends Adapter {
     }
 
     /**
-     * Create a one-shot event: write `value` to `oid` at `start` (a time) or after `in` (a delay); with `duration`
-     * the event writes `endValue` that much later (default for a boolean: the opposite of `value`).
+     * Create an event: write `value` to `oid` at `start` (a time) or after `in` (a delay); with `duration`
+     * (or `durationSec`) the event writes `endValue` that much later (default for a boolean: the opposite of `value`),
+     * with `type: 'toggle'` it switches back. With `recurring` or `rrule` it repeats at the time of day of `start`.
      *
      * @param params the message
      */
-    private async addEvent(
-        params: Record<string, unknown>,
-    ): Promise<{ id: string; name: string; start: string; ts: number }> {
+    private async addEvent(params: Record<string, unknown>): Promise<{
+        id: string;
+        name: string;
+        type: 'single' | 'double' | 'toggle';
+        start: string;
+        ts: number;
+        cron?: string;
+    }> {
         const oid = typeof params.oid === 'string' ? params.oid.trim() : '';
         if (!oid) {
             throw new Error('"oid" is missing');
@@ -457,11 +498,29 @@ export class Fullcalendar extends Adapter {
             throw new Error(`State "${oid}" is read-only`);
         }
 
+        const recurrence = parseRecurrence(params);
+
         let time: Date | null;
         if (params.start !== undefined && params.start !== null && params.start !== '') {
             time = parseTime(params.start);
             if (!time) {
                 throw new Error(`Cannot understand the time "${show(params.start)}"`);
+            }
+            // "07:30" for a one-shot event means the next 07:30: tomorrow, if it is over today
+            if (
+                !recurrence &&
+                typeof params.start === 'string' &&
+                /^\d{1,2}:\d{2}(:\d{2})?$/.test(params.start.trim()) &&
+                time.getTime() < Date.now() - 1000
+            ) {
+                time = new Date(
+                    time.getFullYear(),
+                    time.getMonth(),
+                    time.getDate() + 1,
+                    time.getHours(),
+                    time.getMinutes(),
+                    time.getSeconds(),
+                );
             }
         } else if (params.in !== undefined && params.in !== null && params.in !== '') {
             const seconds = parseDelaySeconds(params.in);
@@ -474,17 +533,32 @@ export class Fullcalendar extends Adapter {
         }
         // the scheduler compares whole seconds
         time = new Date(Math.round(time.getTime() / 1000) * 1000);
-        if (time.getTime() < Date.now() - 1000) {
+        // a series may start in the past (a birthday): it runs at its next date
+        if (!recurrence && time.getTime() < Date.now() - 1000) {
             throw new Error(`The time ${timeUtils.toLocalTime(time)} is in the past`);
         }
 
+        // `durationSec` is the name in `events.list` and `getEvents`, so it is accepted here too
+        const durationParam = isGiven(params.duration) ? params.duration : params.durationSec;
         let duration: number | null = null;
-        let endValue: ioBroker.StateValue | undefined;
-        if (params.duration !== undefined && params.duration !== null && params.duration !== '') {
-            duration = parseDelaySeconds(params.duration);
+        if (isGiven(durationParam)) {
+            duration = parseDelaySeconds(durationParam);
             if (!duration) {
-                throw new Error(`Cannot understand the duration "${show(params.duration)}"`);
+                throw new Error(`Cannot understand the duration "${show(durationParam)}"`);
             }
+        }
+        const type = isGiven(params.type) ? params.type : duration ? 'double' : 'single';
+        if (type !== 'single' && type !== 'double' && type !== 'toggle') {
+            throw new Error(`Unknown type "${show(type)}" (single, double or toggle)`);
+        }
+        if (type !== 'single' && !duration) {
+            throw new Error(`Type "${type}" needs "duration" (seconds, or "90s", "5m", "1h")`);
+        }
+        if (type === 'single' && duration) {
+            throw new Error('"duration" needs the type "double" or "toggle"');
+        }
+        let endValue: ioBroker.StateValue | undefined;
+        if (type === 'double') {
             endValue = params.endValue as ioBroker.StateValue | undefined;
             if (endValue === undefined) {
                 if (typeof params.value !== 'boolean') {
@@ -499,16 +573,34 @@ export class Fullcalendar extends Adapter {
         const states = obj.common.states;
         const native: EventNative = {
             id: Date.now(),
-            start: timeUtils.toLocalTime(time),
-            type: duration ? 'double' : 'single',
+            type,
             oid,
             startValue: params.value as ioBroker.StateValue,
         };
+        if (recurrence) {
+            native.cron = recurrenceToCron(recurrence, time);
+        } else {
+            native.start = timeUtils.toLocalTime(time);
+        }
         if (states && typeof states === 'object' && !Array.isArray(states)) {
             native.states = states;
         }
-        if (duration) {
-            native.intervals = [{ value: endValue, timeOffset: Math.round(duration * 1000) }];
+        if (type === 'double') {
+            native.intervals = [{ value: endValue, timeOffset: Math.round(duration! * 1000) }];
+        } else if (type === 'toggle') {
+            native.intervals = [{ timeOffset: Math.round(duration! * 1000) }];
+        }
+
+        // first execution: of a series the next one (a yearly event on February 29 can be 4 years ahead)
+        let first = time;
+        if (recurrence) {
+            const probe = { _id: id, common: { enabled: true }, native };
+            const fiveYears = new Date(Date.now() + 5 * 366 * 24 * 3600_000);
+            const next = occurrencesOf(probe, new Date(), fiveYears, this.resolveAstro, 1)[0];
+            if (!next) {
+                throw new Error(`The recurrence never happens (cron "${native.cron}")`);
+            }
+            first = next;
         }
         const name =
             typeof params.name === 'string' && params.name.trim()
@@ -524,23 +616,101 @@ export class Fullcalendar extends Adapter {
             },
             native,
         } as unknown as ioBroker.SettableObject);
-        this.log.info(`Event "${name}" created: ${oid} = ${show(params.value)} at ${native.start}`);
-        return { id, name, start: native.start!, ts: time.getTime() };
+        const start = timeUtils.toLocalTime(first);
+        this.log.info(
+            `Event "${name}" created: ${oid} = ${show(params.value)} ${native.cron ? `with cron "${native.cron}", next at` : 'at'} ${start}`,
+        );
+        const result: { id: string; name: string; type: typeof type; start: string; ts: number; cron?: string } = {
+            id,
+            name,
+            type,
+            start,
+            ts: first.getTime(),
+        };
+        if (native.cron) {
+            result.cron = native.cron;
+        }
+        return result;
     }
 
-    /** Delete a calendar event (not the events of simulations, they live inside the simulation object) */
-    private async deleteEvent(params: Record<string, unknown>): Promise<{ result: 'ok' }> {
-        const id = typeof params.id === 'string' ? params.id.trim() : '';
-        if (!id.startsWith(`${this.namespace}.`) || id.startsWith(`${this.namespace}.Simulations.`)) {
-            throw new Error(`"${id}" is no event of ${this.namespace}`);
+    /**
+     * Delete calendar events by `id`, a list `ids` (or `id` as a list) and/or by `name` (all events with exactly this
+     * name, optionally only in `calendar`). Events of simulations live inside the simulation object and are not deleted.
+     *
+     * @param params the message
+     */
+    private async deleteEvent(
+        params: Record<string, unknown>,
+    ): Promise<{ result: 'ok'; deleted: string[]; notFound?: string[] }> {
+        const ids: string[] = [];
+        const add = (id: unknown): void => {
+            const text = typeof id === 'string' ? id.trim() : '';
+            if (text && !ids.includes(text)) {
+                ids.push(text);
+            }
+        };
+        for (const param of [params.id, params.ids]) {
+            if (Array.isArray(param)) {
+                param.forEach(add);
+            } else {
+                add(param);
+            }
         }
-        const obj = await this.getForeignObjectAsync(id);
-        if (obj?.type !== 'schedule') {
+        if (isGiven(params.name)) {
+            const names = await this.readCalendars();
+            const calendarId = isGiven(params.calendar) ? this.findCalendar(params.calendar, names) : null;
+            const wanted = show(params.name).trim().toLowerCase();
+            const matches = this.calendarEvents().filter(
+                event =>
+                    textOf(event.common.name, this.lang).trim().toLowerCase() === wanted &&
+                    (!calendarId || this.calendarIdOf(event._id) === calendarId),
+            );
+            if (!matches.length) {
+                throw new Error(`No event with the name "${show(params.name)}"`);
+            }
+            matches.forEach(event => add(event._id));
+        }
+        if (!ids.length) {
+            throw new Error('Give "id", "ids" (a list) or "name"');
+        }
+
+        const deleted: string[] = [];
+        const notFound: string[] = [];
+        for (const id of ids) {
+            if (!id.startsWith(`${this.namespace}.`) || id.startsWith(`${this.namespace}.Simulations.`)) {
+                notFound.push(id);
+                continue;
+            }
+            const obj = await this.getForeignObjectAsync(id);
+            if (obj?.type !== 'schedule') {
+                notFound.push(id);
+                continue;
+            }
+            await this.delForeignObjectAsync(id);
+            this.log.info(`Event "${this.getText(obj)}" deleted`);
+            deleted.push(id);
+        }
+        if (!deleted.length) {
+            throw new Error(`No event of ${this.namespace}: ${notFound.join(', ')}`);
+        }
+        return notFound.length ? { result: 'ok', deleted, notFound } : { result: 'ok', deleted };
+    }
+
+    /**
+     * The definition of one event, with its next execution
+     *
+     * @param params the message
+     */
+    private async getEvent(params: Record<string, unknown>): Promise<{ event: EventInfo }> {
+        const id = typeof params.id === 'string' ? params.id.trim() : '';
+        if (!id) {
+            throw new Error('"id" is missing');
+        }
+        const event = this.collectAgenda(new Date(), await this.readCalendars()).list.find(info => info.id === id);
+        if (!event) {
             throw new Error(`Event "${id}" does not exist`);
         }
-        await this.delForeignObjectAsync(id);
-        this.log.info(`Event "${this.getText(obj)}" deleted`);
-        return { result: 'ok' };
+        return { event };
     }
 
     /**
@@ -574,17 +744,7 @@ export class Fullcalendar extends Adapter {
         return { events: events.slice(0, max) };
     }
 
-    /**
-     * Messages:
-     * - `addEvent` {oid, value, start | in, duration?, endValue?, name?, calendar?, color?} → {id, name, start, ts}
-     * - `deleteEvent` {id} → {result: 'ok'}
-     * - `listEvents` {from?, to?, days?, calendar?, max?} → {events}
-     * - `getEvents` {calendar?} → {events} (the definitions, with their next execution)
-     * - `getCalendars` → {calendars: [{id, name, enabled}]}
-     * - `enableCalendar` {calendar, enabled} → {id, enabled}
-     *
-     * Errors come back as {error}.
-     */
+    /** Messages: see `COMMANDS` (also the answer of `getCommands`). Errors come back as {error}. */
     private async onMessage(msg: ioBroker.Message): Promise<void> {
         if (!msg?.command) {
             return;
@@ -598,6 +758,9 @@ export class Fullcalendar extends Adapter {
                     break;
                 case 'deleteEvent':
                     result = await this.deleteEvent(params);
+                    break;
+                case 'getEvent':
+                    result = await this.getEvent(params);
                     break;
                 case 'listEvents':
                     result = await this.listEvents(params);
@@ -631,8 +794,13 @@ export class Fullcalendar extends Adapter {
                 case 'enableCalendar':
                     result = await this.enableCalendar(params);
                     break;
+                case 'getCommands':
+                    result = { commands: COMMANDS };
+                    break;
                 default:
-                    result = { error: `Unknown command "${msg.command}"` };
+                    result = {
+                        error: `Unknown command "${msg.command}". Commands: ${COMMANDS.map(c => c.command).join(', ')}`,
+                    };
             }
         } catch (e) {
             result = { error: (e as Error).message };

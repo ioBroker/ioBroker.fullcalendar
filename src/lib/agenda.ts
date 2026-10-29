@@ -279,6 +279,16 @@ export function parseTime(value: unknown): Date | null {
         const [, y, M, d, h, m, s] = local;
         return new Date(+y, +M - 1, +d, +h, +m, s ? +s : 0, 0);
     }
+    // a time of day: today
+    const timeOfDay = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(text);
+    if (timeOfDay) {
+        const [, h, m, s] = timeOfDay;
+        if (+h > 23 || +m > 59 || (s && +s > 59)) {
+            return null;
+        }
+        const today = new Date();
+        return new Date(today.getFullYear(), today.getMonth(), today.getDate(), +h, +m, s ? +s : 0, 0);
+    }
     const date = new Date(text);
     return Number.isNaN(date.getTime()) ? null : date;
 }
