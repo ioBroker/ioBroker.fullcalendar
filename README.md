@@ -13,6 +13,10 @@ You must not use any external resources, the scheduling is processed only in ioB
 
 ![Example](img/example.png)
 
+The vis-2 widget in the month view with a dark theme: watering, heating mode and balcony light as events.
+
+![vis-2 widget, month view](img/vis2-widget-month.png)
+
 You can control your events with a calendar and can plan to control them periodically.
 
 - **Duration** of "On/Off" and "Toggle" events can be given in seconds, minutes or hours. With a duration of 1 second, an event works like a push button.
