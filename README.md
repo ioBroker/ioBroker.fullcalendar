@@ -75,7 +75,7 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.1.1 (2026-10-29)
 * (GermanBluefox) Fixed display of recurring events after DST change (#448)
 
 ### 3.1.0 (2026-10-28)
@@ -93,9 +93,6 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 
 ### 2.4.5 (2024-09-09)
 * (bluefox) Corrected SelectID Dialog
-
-### 2.4.4 (2024-09-09)
-* (bluefox) Removed withStyles package
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

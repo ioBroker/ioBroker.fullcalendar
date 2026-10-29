@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.1.0",
+    "version": "3.1.1",
     "news": {
+      "3.1.1": {
+        "en": "Fixed display of recurring events after DST change (#448)",
+        "de": "Anzeige von Terminen nach Sommerzeit behoben (#448)",
+        "ru": "Исправлено отображение повторяющихся событий после смены летнего времени (#448)",
+        "pt": "Exibição fixa de eventos recorrentes após o horário de verão (#448)",
+        "nl": "Vaste weergave van terugkerende gebeurtenissen na wijziging van de zomertijd (#448)",
+        "fr": "Affichage fixe des événements récurrents après l'heure d'été (#448)",
+        "it": "Risolto il problema con eventi ricorrenti dopo l'ora legale (#448)",
+        "es": "Pantalla fija de eventos recurrentes tras el cambio de horario (#448)",
+        "pl": "Naprawiono wyświetlanie powtarzających się zdarzeń po zmianie czasu letniego (#448)",
+        "uk": "Виправлено відображення повторюваних подій після зміни літнього часу (#448)",
+        "zh-cn": "修复了 DST 更改后反复出现的事件的显示问题 (#448)"
+      },
       "3.1.0": {
         "en": "Added agenda states `events.list/today/tomorrow/next/count/lastChanged`\nAdded the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants\nA one-shot event in the past is no longer marked as disabled in memory",
         "de": "Agenda mit Angabe `Events.List/Today/Morrow/Next/Count/LastChanged`\nNachrichten „AddEvent“, „DeleteEvent“, „ListEvents“, „GetEvents“ und „GetCalendars“ hinzugefügt, z. B. für Sprachassistenten\nEin einmaliges Event ist nicht mehr im Speicher deaktiviert",
@@ -80,19 +93,6 @@
         "pl": "Korekta symulacji",
         "uk": "Виправлено моделювання",
         "zh-cn": "纠正了模拟"
-      },
-      "2.3.16": {
-        "en": "Small UI fixes on widget",
-        "de": "Kleine UI fixiert auf Widget",
-        "ru": "Малые UI фиксации на виджете",
-        "pt": "Pequenas correções UI no widget",
-        "nl": "Kleine UI fixes op widget",
-        "fr": "Petite UI corrige sur widget",
-        "it": "Piccolo UI correzioni su widget",
-        "es": "Pequeña UI se fija en widget",
-        "pl": "Małe poprawki interfejsu użytkownika na widgecie",
-        "uk": "Маленькі UI виправляє на віджет",
-        "zh-cn": "部件上的小型 UI 修正"
       }
     },
     "titleLang": {
