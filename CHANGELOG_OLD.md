@@ -1,4 +1,7 @@
 # Older changes
+## 3.0.1 (2026-08-05)
+* (bluefox) Migrated GUI to React19
+
 ## 2.4.5 (2024-09-09)
 * (bluefox) Corrected SelectID Dialog
 

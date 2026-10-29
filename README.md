@@ -108,7 +108,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.3.0 (2026-10-29)
 * (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
 * (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`
 * (bluefox) `deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)
@@ -136,9 +136,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (bluefox) Migrated GUI to vite
 * (bluefox) Updated packages
-
-### 3.0.1 (2026-08-05)
-* (bluefox) Migrated GUI to React19
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

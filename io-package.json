@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "news": {
+      "3.3.0": {
+        "en": "Fixed: `addEvent` ignored `type` and `durationSec`, a \"double\" event was saved as \"single\"\nAdded recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`\n`deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)\nAdded the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands\nDocumented all messages and parameters in the README",
+        "de": "Behoben: `addEvent` ignorierte `Type` und `DurationSec`, ein Doppelevent wurde als „Single“ gespeichert\n„AddEvent“: „wiederkehrend“ (täglich, wöchentlich, monatlich, jährlich) oder eine iCal-Regel hinzugefügt\n`DeleteEvent` löscht eine Eventliste (`ids`) oder alle Events mit Namen (`Name`)\nDie Meldungen `getEvent` und `getCommands` hinzugefügt, ein unbekannter Befehl gibt eine Liste\nDokumentiert alle Meldungen und Parameter im README",
+        "ru": "Исправлено: `AddEvent` игнорировали `type` и `durationSec`, «двойное» событие сохранялось как «одиночное»\nВ «AddEvent» добавлены повторяющиеся события: «повторяющиеся» (ежедневно, еженедельно, ежемесячно, ежегодно) или «правило iCal»\n`DeleteEvent` удаляет список событий (`ids`) или все события с именем (`name`)\nДобавлены сообщения `getEvent` и `getCommands`, неизвестная команда отвечает списком команд\nЗадокументировал все сообщения и параметры в README",
+        "pt": "Corrigido: `addEvent` ignorou `type` e `durationSec`, um evento “duplo” foi salvo\nEventos recorrentes adicionados a `addEvent`: `diário, semanal, mensal ou anual) ou a uma `rrule` do iCal\n`deleteEvent` exclui uma lista de eventos (`ids`) ou com um nome (`name`)\nAdicionadas as mensagens `getEvent` e `getCommands`, um comando desconhecido responde\nDocumentou todas as mensagens e parâmetros no README",
+        "nl": "Opgelost: `addEvent` negeerde `type` en `DurationSec`, een „dubbele” gebeurtenis werd opgeslagen als „single”\nTerugkerende gebeurtenissen toegevoegd aan `addEvent`: `terugkerend` (dagelijks, wekelijks, maandelijks, jaarlijks) of een iCal-regel\nMet `DeleteEvent` wordt een lijst met gebeurtenissen (`ids`) of alle gebeurtenissen met een naam (`naam`) verwijderd\nDe berichten `getEvent` en `GetCommands` toegevoegd, een onbekend commando antwoordt met de lijst van de opdrachten\nAlle berichten en parameters in de README gedocumenteerd",
+        "fr": "Corrigé : « AddEvent » ignorait « type » et « DurationSec », un événement « double » était « simple »\nAjout d'événements récurrents à « AddEvent » : « récurrents » (quotidiens, hebdomadaires, mensuels) ou « règle » iCal\n`DeleteEvent` supprime une liste d'événements (`ids`) ou tous ceux qui ont un nom (`name`)\nAjout des messages « GetEvent » et « GetCommands », une commande inconnue répond par la liste des commandes\nA documenté tous les messages et paramètres dans le README",
+        "it": "Risolto: addEvent ignorava «type» e «DurationSec», un evento «double» salvato come «singolo»\nAggiunti eventi ricorrenti a `addEvent`: `recurring` (giornalieri, mensili, annuali) o iCal\n`DeleteEvent` elimina un elenco di eventi (`ids`) o tutti gli eventi con un nome\nAggiunti i messaggi `getEvent` e `getCommands`, un comando sconosciuto risponde con l'elenco\nDocumenta tutti i messaggi e i parametri nel README",
+        "es": "Corregido: `addEvent` ignoró `Type` y `DurationSec`, un evento «doble» se guardó como «único»\nSe han añadido eventos recurrentes a «AddEvent»: «periódicos» (diarios, semanales, mensuales, anuales) o una «regla» de iCal\n`DeleteEvent` borra una lista de eventos (`ids`) o todos los eventos con un nombre (`nombre`)\nAñadió los mensajes `getEvent` y `getCommands`, un comando desconocido responde con la lista de comandos\nDocumentó todos los mensajes y parámetros del README",
+        "pl": "Naprawiono: `AddEvent` zignorował `type` i `DurationSec`, zdarzenie „double” zostało zapisane jako „pojedyncze”\nDodano powtarzające się zdarzenia do `AddEvent`: `recurring` (codziennie, tygodniowo, miesięcznie, rocznie) lub `rrule` iCal\n`DeleteEvent` usuwa listę zdarzeń (`ids`) lub wszystkie zdarzenia o nazwie (`name`)\nDodano komunikaty `getEvent` i `GetCommands`, nieznane polecenie odpowiada z listą poleceń\nUdokumentowano wszystkie komunikaty i parametry w README",
+        "uk": "Виправлено: `addEvent` ігнорував `type` і `durationSec`, подія «подвійна» була збережена як «одинарна»\nДодано повторювані події до `addEvent`: `recurring` (щодня, щотижня, щомісяця, щорічно) або iCal `rrule`\n`DeleteEvent` видаляє список подій (`ids`) або всі події з назвою (`name`)\nДодані повідомлення `getEvent` і `getCommands`, невідома команда відповідає зі списком команд\nЗадокументовані всі повідомлення та параметри в README",
+        "zh-cn": "修复：`addEvent`忽略了 `type` 和 `durationSec`，一个 “双精度” 事件被保存为 “单一事件”\n在 `addEvent` 中添加了循环事件：“循环”（每天、每周、每月、每年）或 iCal 的 “rrule”\n`deleteEvent` 删除事件列表 (`ids`) 或所有带有名称（`名称`）的事件\n添加了消息 `getEvent`和`getCommands`，一个未知命令的答案包含命令列表\n在 README 中记录了所有消息和参数"
+      },
       "3.2.0": {
         "en": "Fixed white screen when adding an event in the vis-2 widget (#444)\nFixed: the recording of a simulation stopped immediately after the start (#234)\nFixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)\nFixed: the subscriptions of a stopped recording were not removed\nAdded: the duration of \"On/Off\" and \"Toggle\" events can be given in seconds, minutes or hours, e.g. for a push button (#354)\nAdded: conditions for events, e.g. do not close the shutter if the door is open (#257)\nAdded: calendars can be switched off and on, also with the message `enableCalendar` (#236)",
         "de": "Weißbild beim Hinzufügen von Events im Vis-2-Widget behoben (#444)\nBehoben: Die Simulationsaufnahme stoppte sofort nach dem Start (#234)\nBehoben: Die Simulation zeigte mehrere Statusmeldungen ohne Änderung des Werts, z. B. von Tasmota oder Sonoff (#285, #235)\nBehoben: Die Abos einer gestoppten Aufnahme wurden nicht gelöscht\nHinzugefügt: Die Dauer von On/Off und Toggle kann in Sekunden, Minuten oder Stunden angegeben werden, z. B. per Tastendruck (#354)\nHinzugefügt: Eventbedingungen, z. B. bei offener Tür nicht schließen (#257)\nHinzugefügt: Kalender ein- und ausschalten, auch mit `enableCalendar` (#236)",
@@ -69,19 +82,6 @@
         "zh-cn": "已更正的选定ID对话框"
       },
       "2.4.4": {
-        "en": "Removed withStyles package",
-        "de": "MitStyles-Paket entfernt",
-        "ru": "Удаленный пакет со Стайлз",
-        "pt": "Removido com pacote Estilos",
-        "nl": "Verwijderd metStyles pakket",
-        "fr": "Enlever avec le paquetStyles",
-        "it": "Rimosso con pacchettoStyles",
-        "es": "Retire el paquete de estilos",
-        "pl": "Usunięty z pakietem Styles",
-        "uk": "Видаліть пакет \"Стиль\"",
-        "zh-cn": "用 Styles 软件包删除"
-      },
-      "2.4.2": {
         "en": "Removed withStyles package",
         "de": "MitStyles-Paket entfernt",
         "ru": "Удаленный пакет со Стайлз",
