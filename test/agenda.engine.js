@@ -89,6 +89,13 @@ describe('agenda', () => {
         assert.equal(parseTime('2026-10-28T20:30:00Z').getTime(), Date.UTC(2026, 9, 28, 20, 30));
         assert.equal(parseTime(1793209171835).getTime(), 1793209171835);
         assert.equal(parseTime('morgen'), null);
+        // a time of day is today
+        const now = new Date();
+        assert.equal(
+            parseTime('7:05').getTime(),
+            local(now.getFullYear(), now.getMonth() + 1, now.getDate(), 7, 5).getTime(),
+        );
+        assert.equal(parseTime('25:00'), null);
         assert.equal(parseDelaySeconds(90), 90);
         assert.equal(parseDelaySeconds('30m'), 1800);
         assert.equal(parseDelaySeconds('1h30m'), 5400);

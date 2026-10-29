@@ -62,19 +62,43 @@ sendTo('fullcalendar.0', 'addEvent', { oid: 'hm-rpc.0.ABC.1.STATE', value: false
 // at a time (local time, or a timestamp in ms), for 10 minutes, in the calendar "Garden"
 sendTo('fullcalendar.0', 'addEvent', {
     oid: 'hm-rpc.0.PUMP.1.STATE', value: true, start: '2026-10-29T07:30', duration: '10m', calendar: 'Garden', name: 'Pump',
-}, res => log(JSON.stringify(res))); // {id, name, start, ts} or {error}
+}, res => log(JSON.stringify(res))); // {id, name, type, start, ts} or {error}
+// every year on June 15 at 08:00 (a birthday), the start may be in the past
+sendTo('fullcalendar.0', 'addEvent', {
+    oid: '0_userdata.0.birthday', value: 'Anna', start: '2020-06-15T08:00', recurring: 'yearly', name: 'Birthday Anna',
+}, res => log(JSON.stringify(res))); // {id, name, type, start: next execution, ts, cron: "0 0 8 15 6 *"}
+// delete all events with this name
+sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JSON.stringify(res)));
 ```
 
-| Command        | Message                                                                                                   | Answer                          |
-|----------------|-----------------------------------------------------------------------------------------------------------|---------------------------------|
-| `addEvent`     | `oid`, `value`, `start` or `in`; optional `duration` + `endValue` (a boolean switches back by itself), `name`, `calendar` (name or ID), `color` | `{id, name, start, ts}`     |
-| `deleteEvent`  | `id`                                                                                                      | `{result: "ok"}`               |
-| `listEvents`   | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                                  | `{events: [execution, …]}`     |
-| `getEvents`    | optional `calendar`                                                                                       | `{events: [definition, …]}`    |
-| `getCalendars` | –                                                                                                         | `{calendars: [{id, name, enabled}, …]}` |
-| `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                                     | `{id, enabled}`                |
+| Command          | Message                                                                                    | Answer                                            |
+|------------------|--------------------------------------------------------------------------------------------|---------------------------------------------------|
+| `addEvent`       | see below                                                                                  | `{id, name, type, start, ts, cron?}` (`start`/`ts` = first execution) |
+| `deleteEvent`    | `id`, `ids` (a list) and/or `name` (all events with exactly this name; optional `calendar`) | `{result: "ok", deleted: [id, …], notFound?: [id, …]}` |
+| `getEvent`       | `id`                                                                                       | `{event: definition}`                             |
+| `getEvents`      | optional `calendar`                                                                        | `{events: [definition, …]}`                       |
+| `listEvents`     | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                   | `{events: [execution, …]}`                        |
+| `getCalendars`   | –                                                                                          | `{calendars: [{id, name, enabled}, …]}`           |
+| `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                        | `{id, enabled}`                                   |
+| `getCommands`    | –                                                                                          | `{commands: [{command, params, answer}, …]}`      |
 
-Errors come back as `{error}`. A new event is a one-shot event and appears in the calendar like one created by hand.
+Parameters of `addEvent`:
+
+| Parameter                  | Meaning                                                                                                    |
+|----------------------------|------------------------------------------------------------------------------------------------------------|
+| `oid`                      | state to write (must exist and be writable)                                                                |
+| `value`                    | value to write                                                                                             |
+| `start` or `in`            | `start`: local time (`"2026-10-29T07:30"`, `"07:30"` = today) or a timestamp in ms; `in`: delay (seconds, or `"90s"`, `"30m"`, `"2h"`, `"1h30m"`, `"1d"`) |
+| `duration` / `durationSec` | after this time (same formats as `in`) the second value is written; then `type` is `"double"` by default |
+| `type`                     | `"single"` (default), `"double"` (writes `endValue` after `duration`), `"toggle"` (switches back after `duration`) |
+| `endValue`                 | value of `"double"`; for a boolean `value` the default is the opposite                                    |
+| `recurring`                | `"daily"`, `"weekly"`, `"monthly"` or `"yearly"`: repeats at the time of day of `start` (also of a `start` in the past). The day comes from `start`, or from `weekdays` (list, `0` = Sunday or `"MO"`, `"TU"`…), `monthDays` (list, 1…31), `months` (list, 1…12) |
+| `rrule`                    | instead of `recurring`: iCal rule, e.g. `"FREQ=YEARLY"`, `"FREQ=WEEKLY;BYDAY=MO,FR"`, `"FREQ=MONTHLY;BYMONTHDAY=1,15"`. Supported: `FREQ` (DAILY, WEEKLY, MONTHLY, YEARLY), `BYDAY` (plain weekdays), `BYMONTHDAY`, `BYMONTH`. Not supported: `INTERVAL` > 1, `COUNT`, `UNTIL`, `BYDAY=2MO` |
+| `name`                     | name of the event, default: name of the state                                                              |
+| `calendar`                 | name or ID of the calendar, default: the default calendar                                                  |
+| `color`                    | color in the calendar                                                                                      |
+
+Errors come back as `{error}`, an unknown command answers with the list of the commands. A new event appears in the calendar like one created by hand and can be edited there. Recurring events run at whole minutes.
 
 ## Todo
 - Week and day must scroll to the current time
@@ -84,6 +108,13 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
+* (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`
+* (bluefox) `deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)
+* (bluefox) Added the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands
+* (bluefox) Documented all messages and parameters in the README
+
 ### 3.2.0 (2026-10-29)
 * (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
 * (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)
