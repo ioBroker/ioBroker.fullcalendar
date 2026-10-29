@@ -127,6 +127,14 @@ const COMMANDS: { command: string; params: string; answer: string }[] = [
         answer: '{id, name, type, start, ts, cron?}: start/ts = first execution',
     },
     {
+        command: 'updateEvent',
+        params:
+            'id, and every parameter of addEvent to change (the others stay): start or in moves a one-shot event, ' +
+            'of a series it changes the time of day; recurring/rrule make it a series, recurring: false (with start ' +
+            'or in) a one-shot event; enabled; calendar moves it (new id)',
+        answer: '{id, name, type, enabled, start, ts, cron?}: start/ts = next execution, null if none',
+    },
+    {
         command: 'deleteEvent',
         params: 'id, ids (a list) and/or name (all events with this name), optional calendar for name',
         answer: '{result: "ok", deleted: [id\u2026], notFound?: [id\u2026]}',
@@ -490,83 +498,15 @@ export class Fullcalendar extends Adapter {
         if (params.value === undefined) {
             throw new Error('"value" is missing');
         }
-        const obj = await this.getForeignObjectAsync(oid);
-        if (obj?.type !== 'state') {
-            throw new Error(`State "${oid}" does not exist`);
-        }
-        if (obj.common.write === false) {
-            throw new Error(`State "${oid}" is read-only`);
-        }
+        const obj = await this.writableState(oid);
 
         const recurrence = parseRecurrence(params);
-
-        let time: Date | null;
-        if (params.start !== undefined && params.start !== null && params.start !== '') {
-            time = parseTime(params.start);
-            if (!time) {
-                throw new Error(`Cannot understand the time "${show(params.start)}"`);
-            }
-            // "07:30" for a one-shot event means the next 07:30: tomorrow, if it is over today
-            if (
-                !recurrence &&
-                typeof params.start === 'string' &&
-                /^\d{1,2}:\d{2}(:\d{2})?$/.test(params.start.trim()) &&
-                time.getTime() < Date.now() - 1000
-            ) {
-                time = new Date(
-                    time.getFullYear(),
-                    time.getMonth(),
-                    time.getDate() + 1,
-                    time.getHours(),
-                    time.getMinutes(),
-                    time.getSeconds(),
-                );
-            }
-        } else if (params.in !== undefined && params.in !== null && params.in !== '') {
-            const seconds = parseDelaySeconds(params.in);
-            if (seconds === null) {
-                throw new Error(`Cannot understand the delay "${show(params.in)}"`);
-            }
-            time = new Date(Date.now() + seconds * 1000);
-        } else {
+        const time = this.resolveTime(params, !!recurrence);
+        if (!time) {
             throw new Error('Give "start" (a time) or "in" (a delay)');
         }
-        // the scheduler compares whole seconds
-        time = new Date(Math.round(time.getTime() / 1000) * 1000);
-        // a series may start in the past (a birthday): it runs at its next date
-        if (!recurrence && time.getTime() < Date.now() - 1000) {
-            throw new Error(`The time ${timeUtils.toLocalTime(time)} is in the past`);
-        }
-
-        // `durationSec` is the name in `events.list` and `getEvents`, so it is accepted here too
-        const durationParam = isGiven(params.duration) ? params.duration : params.durationSec;
-        let duration: number | null = null;
-        if (isGiven(durationParam)) {
-            duration = parseDelaySeconds(durationParam);
-            if (!duration) {
-                throw new Error(`Cannot understand the duration "${show(durationParam)}"`);
-            }
-        }
-        const type = isGiven(params.type) ? params.type : duration ? 'double' : 'single';
-        if (type !== 'single' && type !== 'double' && type !== 'toggle') {
-            throw new Error(`Unknown type "${show(type)}" (single, double or toggle)`);
-        }
-        if (type !== 'single' && !duration) {
-            throw new Error(`Type "${type}" needs "duration" (seconds, or "90s", "5m", "1h")`);
-        }
-        if (type === 'single' && duration) {
-            throw new Error('"duration" needs the type "double" or "toggle"');
-        }
-        let endValue: ioBroker.StateValue | undefined;
-        if (type === 'double') {
-            endValue = params.endValue as ioBroker.StateValue | undefined;
-            if (endValue === undefined) {
-                if (typeof params.value !== 'boolean') {
-                    throw new Error('"endValue" is missing (needed for "duration" unless the value is a boolean)');
-                }
-                endValue = !params.value;
-            }
-        }
+        const action = this.resolveAction(params, params.value as ioBroker.StateValue);
+        const type = action.type;
 
         const calendarId = this.findCalendar(params.calendar, await this.readCalendars());
         const id = `${calendarId}.event-${randomUUID()}`;
@@ -585,23 +525,11 @@ export class Fullcalendar extends Adapter {
         if (states && typeof states === 'object' && !Array.isArray(states)) {
             native.states = states;
         }
-        if (type === 'double') {
-            native.intervals = [{ value: endValue, timeOffset: Math.round(duration! * 1000) }];
-        } else if (type === 'toggle') {
-            native.intervals = [{ timeOffset: Math.round(duration! * 1000) }];
+        if (action.intervals) {
+            native.intervals = action.intervals;
         }
 
-        // first execution: of a series the next one (a yearly event on February 29 can be 4 years ahead)
-        let first = time;
-        if (recurrence) {
-            const probe = { _id: id, common: { enabled: true }, native };
-            const fiveYears = new Date(Date.now() + 5 * 366 * 24 * 3600_000);
-            const next = occurrencesOf(probe, new Date(), fiveYears, this.resolveAstro, 1)[0];
-            if (!next) {
-                throw new Error(`The recurrence never happens (cron "${native.cron}")`);
-            }
-            first = next;
-        }
+        const first = this.firstExecution(id, native);
         const name =
             typeof params.name === 'string' && params.name.trim()
                 ? params.name.trim()
@@ -631,6 +559,341 @@ export class Fullcalendar extends Adapter {
             result.cron = native.cron;
         }
         return result;
+    }
+
+    /** The state an event writes: it must exist and be writable */
+    private async writableState(oid: string): Promise<ioBroker.StateObject> {
+        const obj = await this.getForeignObjectAsync(oid);
+        if (obj?.type !== 'state') {
+            throw new Error(`State "${oid}" does not exist`);
+        }
+        if (obj.common.write === false) {
+            throw new Error(`State "${oid}" is read-only`);
+        }
+        return obj;
+    }
+
+    /**
+     * The time of `start` or `in`, null if neither is given. A one-shot time must not be in the past, "07:30" means
+     * the next 07:30 then. A series may start in the past (a birthday): it runs at its next date.
+     *
+     * @param params the message
+     * @param recurring the event is a series
+     */
+    private resolveTime(params: Record<string, unknown>, recurring: boolean): Date | null {
+        let time: Date | null;
+        if (isGiven(params.start)) {
+            time = parseTime(params.start);
+            if (!time) {
+                throw new Error(`Cannot understand the time "${show(params.start)}"`);
+            }
+            if (
+                !recurring &&
+                typeof params.start === 'string' &&
+                /^\d{1,2}:\d{2}(:\d{2})?$/.test(params.start.trim()) &&
+                time.getTime() < Date.now() - 1000
+            ) {
+                time = new Date(
+                    time.getFullYear(),
+                    time.getMonth(),
+                    time.getDate() + 1,
+                    time.getHours(),
+                    time.getMinutes(),
+                    time.getSeconds(),
+                );
+            }
+        } else if (isGiven(params.in)) {
+            const seconds = parseDelaySeconds(params.in);
+            if (seconds === null) {
+                throw new Error(`Cannot understand the delay "${show(params.in)}"`);
+            }
+            time = new Date(Date.now() + seconds * 1000);
+        } else {
+            return null;
+        }
+        // the scheduler compares whole seconds
+        time = new Date(Math.round(time.getTime() / 1000) * 1000);
+        if (!recurring && time.getTime() < Date.now() - 1000) {
+            throw new Error(`The time ${timeUtils.toLocalTime(time)} is in the past`);
+        }
+        return time;
+    }
+
+    /**
+     * What an event does: `type` and the second write (`intervals`) from `type`, `duration` (or `durationSec`, the name
+     * in `events.list`) and `endValue`. Missing parameters are taken from `current` (an existing event).
+     *
+     * @param params the message
+     * @param value the value the event writes first
+     * @param current the event before the change
+     * @param current.native the settings of the event before the change
+     */
+    private resolveAction(
+        params: Record<string, unknown>,
+        value: ioBroker.StateValue,
+        current?: { native: EventNative },
+    ): { type: 'single' | 'double' | 'toggle'; intervals?: EventNative['intervals'] } {
+        const old = current?.native;
+        const oldType = old?.type || 'single';
+        const oldOffset = parseInt(String(old?.intervals?.[0]?.timeOffset || 0), 10);
+        const durationParam = isGiven(params.duration) ? params.duration : params.durationSec;
+        const durationGiven = isGiven(durationParam);
+        // the scheduler takes 1 second, if an old event has no duration stored
+        let duration: number | null = old && oldType !== 'single' ? (oldOffset || 1000) / 1000 : null;
+        if (durationGiven) {
+            duration = parseDelaySeconds(durationParam);
+            if (!duration) {
+                throw new Error(`Cannot understand the duration "${show(durationParam)}"`);
+            }
+        }
+        let type: unknown;
+        if (isGiven(params.type)) {
+            type = params.type;
+        } else if (durationGiven) {
+            type = oldType === 'toggle' ? 'toggle' : 'double';
+        } else {
+            type = old ? oldType : duration ? 'double' : 'single';
+        }
+        if (type !== 'single' && type !== 'double' && type !== 'toggle') {
+            throw new Error(`Unknown type "${show(type)}" (single, double or toggle)`);
+        }
+        if (type === 'single' && !durationGiven) {
+            // switched to "single": the old duration is dropped
+            duration = null;
+        }
+        if (type !== 'single' && !duration) {
+            throw new Error(`Type "${type}" needs "duration" (seconds, or "90s", "5m", "1h")`);
+        }
+        if (type === 'single' && duration) {
+            throw new Error('"duration" needs the type "double" or "toggle"');
+        }
+        if (type === 'single') {
+            return { type };
+        }
+        const timeOffset = Math.round(duration! * 1000);
+        if (type === 'toggle') {
+            return { type, intervals: [{ timeOffset }] };
+        }
+        let endValue = params.endValue as ioBroker.StateValue | undefined;
+        if (endValue === undefined && oldType === 'double' && old?.intervals?.[0]?.value !== undefined) {
+            endValue = old.intervals[0].value;
+            // a boolean event that now switches the other way: its end value follows
+            if (
+                typeof value === 'boolean' &&
+                typeof old.startValue === 'boolean' &&
+                value !== old.startValue &&
+                endValue === !old.startValue
+            ) {
+                endValue = !value;
+            }
+        }
+        if (endValue === undefined) {
+            if (typeof value !== 'boolean') {
+                throw new Error('"endValue" is missing (needed for "duration" unless the value is a boolean)');
+            }
+            endValue = !value;
+        }
+        return { type, intervals: [{ value: endValue, timeOffset }] };
+    }
+
+    /**
+     * The next execution of a series, or the time of a one-shot event
+     *
+     * @param id ID of the event
+     * @param native the event
+     */
+    private firstExecution(id: string, native: EventNative): Date {
+        if (native.cron) {
+            // a yearly event on February 29 can be 4 years ahead
+            const fiveYears = new Date(Date.now() + 5 * 366 * 24 * 3600_000);
+            const next = occurrencesOf(
+                { _id: id, common: { enabled: true }, native },
+                new Date(),
+                fiveYears,
+                this.resolveAstro,
+                1,
+            )[0];
+            if (!next) {
+                throw new Error(`The recurrence never happens (cron "${native.cron}")`);
+            }
+            return next;
+        }
+        const time = native.astro
+            ? this.resolveAstro(native.astro, native.offset, timeUtils.parseISOLocal(native.start!))
+            : timeUtils.parseISOLocal(native.start!);
+        if (!time) {
+            throw new Error(`Cannot calculate the time of the event`);
+        }
+        return time;
+    }
+
+    /**
+     * Change an event in place: every parameter of `addEvent` can be given, the missing ones stay as they are.
+     *
+     * - `start` or `in` alone moves a one-shot event; of a series it changes the time of day, the days stay.
+     * - `recurring`/`rrule` make it a series (at the time of `start`, or at its current time of day),
+     *   `recurring: false` with `start` or `in` makes it a one-shot event again.
+     * - `calendar` moves it to another calendar: then it gets a new ID (the answer has it).
+     * - `enabled` switches it on or off.
+     *
+     * @param params the message
+     */
+    private async updateEvent(params: Record<string, unknown>): Promise<{
+        id: string;
+        name: string;
+        type: 'single' | 'double' | 'toggle';
+        enabled: boolean;
+        start: string | null;
+        ts: number | null;
+        cron?: string;
+    }> {
+        const id = typeof params.id === 'string' ? params.id.trim() : '';
+        if (!id) {
+            throw new Error('"id" is missing');
+        }
+        if (!id.startsWith(`${this.namespace}.`) || id.startsWith(`${this.namespace}.Simulations.`)) {
+            throw new Error(`"${id}" is no event of ${this.namespace}`);
+        }
+        const obj = (await this.getForeignObjectAsync(id)) as unknown as FullCalendarEvent | null;
+        if (obj?.type !== 'schedule' || !obj.native) {
+            throw new Error(`Event "${id}" does not exist`);
+        }
+        const old = { native: JSON.parse(JSON.stringify(obj.native)) as EventNative };
+        const native: EventNative = JSON.parse(JSON.stringify(obj.native));
+        const common = { ...obj.common };
+
+        // what it writes
+        let stateObj: ioBroker.StateObject | null = null;
+        if (isGiven(params.oid)) {
+            native.oid = show(params.oid).trim();
+            stateObj = await this.writableState(native.oid);
+            const states = stateObj.common.states;
+            if (states && typeof states === 'object' && !Array.isArray(states)) {
+                native.states = states;
+            } else {
+                delete native.states;
+            }
+        }
+        if (params.value !== undefined) {
+            native.startValue = params.value as ioBroker.StateValue;
+        }
+        if (
+            [params.type, params.duration, params.durationSec].some(isGiven) ||
+            params.endValue !== undefined ||
+            params.value !== undefined
+        ) {
+            const action = this.resolveAction(params, native.startValue, old);
+            native.type = action.type;
+            if (action.intervals) {
+                native.intervals = action.intervals;
+            } else {
+                delete native.intervals;
+            }
+        }
+
+        // when
+        const recurrenceGiven = params.recurring !== undefined || isGiven(params.rrule);
+        if (recurrenceGiven || isGiven(params.start) || isGiven(params.in)) {
+            const recurrence = recurrenceGiven ? parseRecurrence(params) : null;
+            const keepSeries = !recurrenceGiven && !!native.cron;
+            const time = this.resolveTime(params, !!recurrence || keepSeries);
+            if (keepSeries) {
+                // a series moved to another time of day: the days stay
+                const parts = native.cron!.trim().split(/\s+/);
+                const offset = parts.length === 6 ? 1 : 0;
+                if (parts.length === 6) {
+                    parts[0] = '0';
+                }
+                parts[offset] = String(time!.getMinutes());
+                parts[offset + 1] = String(time!.getHours());
+                native.cron = parts.join(' ');
+            } else if (recurrence) {
+                native.cron = recurrenceToCron(recurrence, time || this.timeOfDay(native));
+                delete native.start;
+            } else {
+                if (!time) {
+                    throw new Error('Give "start" (a time) or "in" (a delay) for the one-shot event');
+                }
+                native.start = timeUtils.toLocalTime(time);
+                delete native.cron;
+            }
+            // a new time replaces an astro time
+            delete native.astro;
+            delete native.offset;
+        }
+
+        if (typeof params.name === 'string' && params.name.trim()) {
+            common.name = params.name.trim();
+        }
+        if (typeof params.color === 'string' && params.color) {
+            common.color = params.color;
+        }
+        if (params.enabled !== undefined) {
+            common.enabled = params.enabled !== false && params.enabled !== 'false' && params.enabled !== 0;
+        }
+        if (stateObj) {
+            common.icon = (await this.getImage(stateObj)) || undefined;
+        }
+
+        let newId = id;
+        if (isGiven(params.calendar)) {
+            const calendarId = this.findCalendar(params.calendar, await this.readCalendars());
+            if (calendarId !== this.calendarIdOf(id)) {
+                newId = `${calendarId}.event-${randomUUID()}`;
+            }
+        }
+
+        const next = common.enabled ? this.firstExecution(newId, native) : null;
+        const event = {
+            type: 'schedule',
+            common,
+            native,
+        } as unknown as ioBroker.SettableObject;
+        await this.setForeignObjectAsync(newId, event);
+        if (newId !== id) {
+            await this.delForeignObjectAsync(id);
+        }
+        const name = textOf(common.name, this.lang);
+        this.log.info(`Event "${name}" changed${newId !== id ? ` and moved to ${this.calendarIdOf(newId)}` : ''}`);
+
+        const result: {
+            id: string;
+            name: string;
+            type: 'single' | 'double' | 'toggle';
+            enabled: boolean;
+            start: string | null;
+            ts: number | null;
+            cron?: string;
+        } = {
+            id: newId,
+            name,
+            type: native.type || 'single',
+            enabled: !!common.enabled,
+            // a one-shot event in the past has no next execution
+            start: next && next.getTime() >= Date.now() - 1000 ? timeUtils.toLocalTime(next) : null,
+            ts: next && next.getTime() >= Date.now() - 1000 ? next.getTime() : null,
+        };
+        if (native.cron) {
+            result.cron = native.cron;
+        }
+        return result;
+    }
+
+    /**
+     * Time of day of an event today, from its cron or its start
+     *
+     * @param native the event
+     */
+    private timeOfDay(native: EventNative): Date {
+        const now = new Date();
+        if (native.cron) {
+            const parts = native.cron.trim().split(/\s+/);
+            const offset = parts.length === 6 ? 1 : 0;
+            const minutes = parseInt(parts[offset], 10) || 0;
+            const hours = parseInt(parts[offset + 1], 10) || 0;
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
+        }
+        return native.start ? timeUtils.parseISOLocal(native.start) : now;
     }
 
     /**
@@ -761,6 +1024,9 @@ export class Fullcalendar extends Adapter {
                     break;
                 case 'getEvent':
                     result = await this.getEvent(params);
+                    break;
+                case 'updateEvent':
+                    result = await this.updateEvent(params);
                     break;
                 case 'listEvents':
                     result = await this.listEvents(params);

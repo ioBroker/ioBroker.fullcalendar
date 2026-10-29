@@ -69,6 +69,8 @@ sendTo('fullcalendar.0', 'addEvent', {
 sendTo('fullcalendar.0', 'addEvent', {
     oid: '0_userdata.0.birthday', value: 'Anna', start: '2020-06-15T08:00', recurring: 'yearly', name: 'Birthday Anna',
 }, res => log(JSON.stringify(res))); // {id, name, type, start: next execution, ts, cron: "0 0 8 15 6 *"}
+// move an event to 09:30 (a series keeps its days) and let it switch for 2 minutes
+sendTo('fullcalendar.0', 'updateEvent', { id: 'fullcalendar.0.event-…', start: '09:30', duration: '2m' }, res => log(JSON.stringify(res)));
 // delete all events with this name
 sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JSON.stringify(res)));
 ```
@@ -76,6 +78,7 @@ sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JS
 | Command          | Message                                                                                    | Answer                                            |
 |------------------|--------------------------------------------------------------------------------------------|---------------------------------------------------|
 | `addEvent`       | see below                                                                                  | `{id, name, type, start, ts, cron?}` (`start`/`ts` = first execution) |
+| `updateEvent`    | `id` and the parameters of `addEvent` to change, see below                                 | `{id, name, type, enabled, start, ts, cron?}` (`start`/`ts` = next execution, `null` if none) |
 | `deleteEvent`    | `id`, `ids` (a list) and/or `name` (all events with exactly this name; optional `calendar`) | `{result: "ok", deleted: [id, …], notFound?: [id, …]}` |
 | `getEvent`       | `id`                                                                                       | `{event: definition}`                             |
 | `getEvents`      | optional `calendar`                                                                        | `{events: [definition, …]}`                       |
@@ -100,6 +103,13 @@ Parameters of `addEvent`:
 | `calendar`                 | name or ID of the calendar, default: the default calendar                                                  |
 | `color`                    | color in the calendar                                                                                      |
 
+`updateEvent` changes an event in place, the parameters not given stay as they are:
+- `start` or `in` moves a one-shot event; of a series it changes the time of day, the days stay.
+- `recurring` or `rrule` make it a series (at the time of `start`, or at its current time of day), `recurring: false` together with `start` or `in` makes it a one-shot event again.
+- `value`, `oid`, `type`, `duration`/`durationSec`, `endValue`, `name`, `color` like in `addEvent`. If a boolean event switches the other way (`value`), its end value follows.
+- `enabled: false` / `true` switches it off or on.
+- `calendar` moves it to another calendar. The event gets a new ID then, the answer has it.
+
 Errors come back as `{error}`, an unknown command answers with the list of the commands. A new event appears in the calendar like one created by hand and can be edited there. Recurring events run at whole minutes.
 
 ## Todo
@@ -113,6 +123,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 ### **WORK IN PROGRESS**
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
 * (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)
+* (@GermanBluefox) Added the message `updateEvent`: move or change an event without deleting and creating it again
 
 ### 3.3.0 (2026-10-29)
 * (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
