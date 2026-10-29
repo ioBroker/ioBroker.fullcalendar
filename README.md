@@ -6,6 +6,8 @@
 
 [![NPM](https://nodei.co/npm/iobroker.fullcalendar.png?downloads=true)](https://nodei.co/npm/iobroker.fullcalendar/)
 
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
+
 Schedules with [fullcalendar](https://fullcalendar.io).
 
 ## Plan the events (control your devices)
@@ -108,6 +110,10 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
+* (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)
+
 ### 3.3.0 (2026-10-29)
 * (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
 * (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`

@@ -105,6 +105,7 @@
       "it": "Calendario",
       "es": "Calendario calendario",
       "pl": "Harmonogram kalendarza",
+      "uk": "Розклад календаря",
       "zh-cn": "日历时间表"
     },
     "desc": {
@@ -117,6 +118,7 @@
       "it": "Questo adattatore consente la piallatura con calendario",
       "es": "Este adaptador permite planear con calendario",
       "pl": "Ten adapter umożliwia struganie za pomocą kalendarza",
+      "uk": "Цей адаптер дозволяє планувати за допомогою календаря",
       "zh-cn": "该适配器允许日历计划"
     },
     "authors": [
@@ -141,13 +143,31 @@
     "tier": 2,
     "adminTab": {
       "singleton": false,
-      "name": "Calendar"
+      "name": {
+        "en": "Calendar",
+        "de": "Kalender",
+        "ru": "Календарь",
+        "pt": "Calendário",
+        "nl": "Kalender",
+        "fr": "Calendrier",
+        "it": "Calendario",
+        "es": "Calendario",
+        "pl": "Kalendarz",
+        "uk": "Календар",
+        "zh-cn": "日历"
+      }
     },
     "dependencies": [
       {
         "js-controller": ">=6.0.11"
       }
     ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
+    ],
+    "nogit": true,
     "enabled": true,
     "type": "date-and-time",
     "connectionType": "local",

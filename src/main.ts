@@ -53,7 +53,7 @@ export interface FullCalendarEvent extends ioBroker.ScheduleObject {
     native: EventNative;
     /** cached result of `later.parse.cron()` */
     parsed?: later.ScheduleData;
-    timer?: NodeJS.Timeout | null;
+    timer?: ioBroker.Timeout;
     lastExec?: number;
     /** a one-shot event whose time has passed: skipped by the scheduler, still part of today's agenda */
     expired?: boolean;
@@ -148,10 +148,10 @@ function isGiven(value: unknown): boolean {
     return value !== undefined && value !== null && value !== '';
 }
 
-function stopEvent(event: FullCalendarEvent): void {
+function stopEvent(adapter: Fullcalendar, event: FullCalendarEvent): void {
     if (event.timer) {
-        clearTimeout(event.timer);
-        event.timer = null;
+        adapter.clearTimeout(event.timer);
+        event.timer = undefined;
     }
 }
 
@@ -236,7 +236,7 @@ function buildOverlap(
 export class Fullcalendar extends Adapter {
     private events: Record<string, FullCalendarEvent> = {};
 
-    private nextTimer: NodeJS.Timeout | null = null;
+    private nextTimer: ioBroker.Timeout | undefined;
 
     /** cached `system.config` object (`systemConfig` is taken by the base class) */
     private sysConfig!: ioBroker.SystemConfigObject;
@@ -244,9 +244,9 @@ export class Fullcalendar extends Adapter {
     /** cached own `system.adapter.*` object (`adapterConfig` is taken by the base class) */
     private instanceConfig!: ioBroker.InstanceObject;
 
-    private timeZoneInterval: NodeJS.Timeout | null = null;
+    private timeZoneInterval: ioBroker.Interval | undefined;
 
-    private updateInterval: NodeJS.Timeout | null = null;
+    private updateInterval: ioBroker.Interval | undefined;
 
     /** system language (`language` is taken by the base class) */
     private lang: ioBroker.Languages = 'en';
@@ -274,10 +274,10 @@ export class Fullcalendar extends Adapter {
     private readonly disabledCalendars = new Set<string>();
 
     /** debounce of the agenda states */
-    private agendaTimer: NodeJS.Timeout | null = null;
+    private agendaTimer: ioBroker.Timeout | undefined;
 
     /** re-renders the agenda at midnight: "today" and "tomorrow" move on */
-    private midnightTimer: NodeJS.Timeout | null = null;
+    private midnightTimer: ioBroker.Timeout | undefined;
 
     /** set at the end of `onReady`: before, the events are not read yet and the agenda would come out empty */
     private agendaReady = false;
@@ -438,10 +438,10 @@ export class Fullcalendar extends Adapter {
             return;
         }
         if (this.agendaTimer) {
-            clearTimeout(this.agendaTimer);
+            this.clearTimeout(this.agendaTimer);
         }
-        this.agendaTimer = setTimeout(() => {
-            this.agendaTimer = null;
+        this.agendaTimer = this.setTimeout(() => {
+            this.agendaTimer = undefined;
             this.renderAgenda().catch(e => this.log.warn(`Cannot update the agenda: ${e}`));
         }, 300);
     }
@@ -457,11 +457,11 @@ export class Fullcalendar extends Adapter {
         await this.setStateChangedAsync('events.count', agenda.list.length, true);
 
         if (this.midnightTimer) {
-            clearTimeout(this.midnightTimer);
+            this.clearTimeout(this.midnightTimer);
         }
-        this.midnightTimer = setTimeout(
+        this.midnightTimer = this.setTimeout(
             () => {
-                this.midnightTimer = null;
+                this.midnightTimer = undefined;
                 this.scheduleAgenda();
             },
             startOfDay(now, 1).getTime() - now.getTime() + 1000,
@@ -909,7 +909,7 @@ export class Fullcalendar extends Adapter {
         // stop playing
         this.recordingSimulations[id].native.events.forEach(event => {
             if (this.events[event._id]) {
-                stopEvent(this.events[event._id]);
+                stopEvent(this, this.events[event._id]);
                 delete this.events[event._id];
             }
         });
@@ -1111,7 +1111,7 @@ export class Fullcalendar extends Adapter {
             }
         }
         if (event.native.type !== 'single' && event.native.intervals && event.native.intervals.length) {
-            event.timer = setTimeout(
+            event.timer = this.setTimeout(
                 (_event: FullCalendarEvent, _obj: ioBroker.StateObject) => {
                     if (_event.native.type === 'toggle') {
                         let value = _event.native.startValue;
@@ -1190,7 +1190,7 @@ export class Fullcalendar extends Adapter {
 
     private calculateNext(): void {
         if (this.nextTimer) {
-            clearTimeout(this.nextTimer);
+            this.clearTimeout(this.nextTimer);
         }
 
         let timeout: number | null = null;
@@ -1315,7 +1315,7 @@ export class Fullcalendar extends Adapter {
             timeout = 3600000;
         }
         this.log.debug(`Next check in ${Math.round(timeout / 1000)} seconds`);
-        this.nextTimer = setTimeout(() => this.calculateNext(), timeout);
+        this.nextTimer = this.setTimeout(() => this.calculateNext(), timeout);
         this.scheduleAgenda();
     }
 
@@ -1352,7 +1352,7 @@ export class Fullcalendar extends Adapter {
     private setTimeZone(): void {
         void this.setState('info.timeZone', new Date().getTimezoneOffset(), true);
         // because of winter time, update timezone every 30 minutes
-        this.timeZoneInterval = this.timeZoneInterval || setInterval(() => this.setTimeZone(), 30000);
+        this.timeZoneInterval = this.timeZoneInterval || this.setInterval(() => this.setTimeZone(), 30000);
     }
 
     private async onStateChange(stateId: string, state: ioBroker.State | null | undefined): Promise<void> {
@@ -1566,7 +1566,7 @@ export class Fullcalendar extends Adapter {
 
         const wasEvent = !!this.events[id];
         if (this.events[id]) {
-            stopEvent(this.events[id]);
+            stopEvent(this, this.events[id]);
             delete this.events[id];
         }
 
@@ -1591,29 +1591,29 @@ export class Fullcalendar extends Adapter {
 
     private onUnload(callback: () => void): void {
         if (this.timeZoneInterval) {
-            clearInterval(this.timeZoneInterval);
-            this.timeZoneInterval = null;
+            this.clearInterval(this.timeZoneInterval);
+            this.timeZoneInterval = undefined;
         }
 
         if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-            this.updateInterval = null;
+            this.clearInterval(this.updateInterval);
+            this.updateInterval = undefined;
         }
         if (this.nextTimer) {
-            clearTimeout(this.nextTimer);
-            this.nextTimer = null;
+            this.clearTimeout(this.nextTimer);
+            this.nextTimer = undefined;
         }
         if (this.agendaTimer) {
-            clearTimeout(this.agendaTimer);
-            this.agendaTimer = null;
+            this.clearTimeout(this.agendaTimer);
+            this.agendaTimer = undefined;
         }
         if (this.midnightTimer) {
-            clearTimeout(this.midnightTimer);
-            this.midnightTimer = null;
+            this.clearTimeout(this.midnightTimer);
+            this.midnightTimer = undefined;
         }
         this.agendaReady = false;
 
-        Object.keys(this.events).forEach(id => stopEvent(this.events[id]));
+        Object.keys(this.events).forEach(id => stopEvent(this, this.events[id]));
 
         callback && callback();
     }
@@ -1729,7 +1729,7 @@ export class Fullcalendar extends Adapter {
         }
         await this.subscribeForeignStatesAsync(`${this.namespace}.Simulations.*`); // subscribe on own events and simulations
 
-        this.updateInterval = setInterval(() => {
+        this.updateInterval = this.setInterval(() => {
             Object.keys(this.recordingSimulations).forEach(id => {
                 if (
                     (this.recordingSimulations[id].value === 'record' ||
