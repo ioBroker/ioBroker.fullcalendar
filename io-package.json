@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.1.1",
+    "version": "3.2.0",
     "news": {
+      "3.2.0": {
+        "en": "Fixed white screen when adding an event in the vis-2 widget (#444)\nFixed: the recording of a simulation stopped immediately after the start (#234)\nFixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)\nFixed: the subscriptions of a stopped recording were not removed\nAdded: the duration of \"On/Off\" and \"Toggle\" events can be given in seconds, minutes or hours, e.g. for a push button (#354)\nAdded: conditions for events, e.g. do not close the shutter if the door is open (#257)\nAdded: calendars can be switched off and on, also with the message `enableCalendar` (#236)",
+        "de": "Weißbild beim Hinzufügen von Events im Vis-2-Widget behoben (#444)\nBehoben: Die Simulationsaufnahme stoppte sofort nach dem Start (#234)\nBehoben: Die Simulation zeigte mehrere Statusmeldungen ohne Änderung des Werts, z. B. von Tasmota oder Sonoff (#285, #235)\nBehoben: Die Abos einer gestoppten Aufnahme wurden nicht gelöscht\nHinzugefügt: Die Dauer von On/Off und Toggle kann in Sekunden, Minuten oder Stunden angegeben werden, z. B. per Tastendruck (#354)\nHinzugefügt: Eventbedingungen, z. B. bei offener Tür nicht schließen (#257)\nHinzugefügt: Kalender ein- und ausschalten, auch mit `enableCalendar` (#236)",
+        "ru": "Исправлен белый экран при добавлении события в виджет vis-2 (#444)\nИсправлено: запись симуляции останавливалась сразу после запуска (#234)\nИсправлено: моделирование регистрировало повторяющиеся обновления статуса без изменения значения, например, устройств Tasmota или Sonoff (#285, #235)\nИсправлено: подписки на остановленную запись не удалялись\nДобавлено: продолжительность событий «On/Off» и «Toggle» может быть указана в секундах, минутах или часах, например, при нажатии кнопки (#354)\nДобавлено: условия проведения мероприятий, например, не закрывайте жалюзи, если дверь открыта (#257)\nДобавлено: календари можно включать и выключать, а также сообщением `EnableCalendar` (#236)",
+        "pt": "Tela branca fixa ao adicionar um evento no widget vis-2 (#444)\nCorrigido: a gravação de uma simulação parou logo após o início (#234)\nCorrigido: a simulação atualizou o status sem alterar o valor, por exemplo, de dispositivos Tasmota ou Sonoff (#285, #235)\nCorrigido: a assinatura de uma gravação parada não foi removida\nAdicionado: a duração dos eventos “On/Off” e “Toggle” pode ser em segundos, minutos ou horas (#354)\nAdicionado: condições para eventos, p. ex., não feche a porta (#257)\nAdicionado: pode ativar e desativar calendários com a mensagem `enableCalendar` (#236)",
+        "nl": "Wit scherm opgelost bij het toevoegen van een gebeurtenis in de vis-2-widget (#444)\nOpgelost: de opname van een simulatie stopte onmiddellijk na de start (#234)\nOpgelost: in de simulatie werden herhaalde statusupdates geregistreerd zonder dat de waarde werd gewijzigd, bijvoorbeeld van Tasmota- of Sonoff-apparaten (#285, #235)\nOpgelost: de abonnementen op een stopgezette opname zijn niet verwijderd\nToegevoegd: de duur van de gebeurtenissen „On/Off” en „Toggle” kan worden gegeven in seconden, minuten of uren, bijvoorbeeld voor een drukknop (#354)\nToegevoegd: voorwaarden voor evenementen, bijvoorbeeld het rolluik niet sluiten als de deur open is (#257)\nToegevoegd: agenda's kunnen in- en uitgeschakeld worden, ook met de boodschap `EnableCalendar` (#236)",
+        "fr": "Écran blanc fixe lors de l'ajout d'un événement au widget Vis-2 (#444)\nCorrigé : l'enregistrement d'une simulation s'arrêtait juste après le départ (#234)\nCorrigé : la simulation enregistrait des mises à jour de statut répétées sans modifier la valeur, par exemple pour Tasmota ou Sonoff (#285, #235)\nCorrigé : les abonnements à un enregistrement arrêté n'ont pas été supprimés\nAjouté : la durée des événements « On/Off » et « Toggle » peut être donnée en secondes, minutes ou heures, par exemple (#354)\nAjouté : conditions pour les événements, par exemple ne pas fermer la porte ouverte (#257)\nAjouté : les calendriers peuvent être allumés ou éteints, avec le message « EnableCalendar » (#236)",
+        "it": "Schermo bianco fisso con un evento nel widget vis-2 (#444)\nRisolto: la registrazione di una simulazione si interrompe subito (#234)\nRisolto: la simulazione registrava ripetuti aggiornamenti di stato, ad esempio Tasmota o Sonoff (#285, #235)\nRisolto: le iscrizioni a una registrazione interrotta non sono rimosse\nAggiunto: la durata degli eventi «On/Off» e «Toggle» può essere espressa in secondi, minuti o ore (#354)\nAggiunto: condizioni per eventi, ad es. non chiuda se la porta è aperta (#257)\nAggiunto: i calendari si accendono e si spengono, anche con `EnableCalendar` (#236)",
+        "es": "Pantalla blanca fija al añadir un evento en el widget vis-2 (#444)\nCorregido: la grabación de una simulación se detuvo justo después del inicio (#234)\nCorregido: la simulación grabó varias actualizaciones de estado sin cambiar el valor, por ejemplo, de los dispositivos Tasmota o Sonoff (#285, #235)\nCorregido: no se eliminaron los abonos de una grabación detenida\nAñadido: la duración de los eventos «On/Off» y «Toggle» puede ser en segundos, minutos u horas, por ejemplo, con un botón (#354)\nAñadido: condiciones para eventos, p. ej., no cierre la persiana (#257)\nAñadido: los calendarios se pueden encender y apagar, también con el mensaje `EnableCalendar` (#236)",
+        "pl": "Naprawiono biały ekran podczas dodawania zdarzenia w widżecie vis-2 (#444)\nNaprawiono: nagrywanie symulacji zatrzymało się natychmiast po rozpoczęciu (#234)\nNaprawiono: symulacja rejestrowała powtarzające się aktualizacje statusu bez zmiany wartości, np. urządzeń Tasmota lub Sonoff (#285, #235)\nNaprawiono: subskrypcje zatrzymanego nagrania nie zostały usunięte\nDodano: czas trwania zdarzeń „On/Off” i „Toggle” można podać w sekundach, minutach lub godzinach, np. za naciśnięcie przycisku (#354)\nDodano: warunki zdarzeń, np. nie zamykaj migawki, jeśli drzwi są otwarte (#257)\nDodano: kalendarze można wyłączać i włączać, również z komunikatem `EnableCalendar` (#236)",
+        "uk": "Виправлено білий екран при додаванні події в віджет vis-2 (#444)\nВиправлено: запис моделювання зупинився відразу після запуску (#234)\nВиправлено: моделювання записувало повторні оновлення статусу без зміни значення, наприклад, пристроїв Tasmota або Sonoff (#285, #235)\nВиправлено: підписки зупиненого запису не були видалені\nДодано: тривалість подій «On/Off» та «Toggle» може бути вказана в секундах, хвилині або годині, наприклад, для натискання кнопки (#354)\nДодано: умови для подій, наприклад, не закривати затвор, якщо двері відкриті (#257)\nДодано: календарі можна вимикати та вмикати, також із повідомленням `enableCalendar` (#236)",
+        "zh-cn": "修复了在 vis-2 控件中添加事件时出现白屏的问题 (#444)\n修复：模拟录制在开始后立即停止 (#234)\n修复：模拟在不更改值的情况下记录了重复的状态更新，例如 Tasmota 或 Sonoff 设备的状态更新 (#285, #235)\n修复：已停止录制的订阅未被删除\n新增：“开/关” 和 “切换” 事件的持续时间可以以秒、分钟或小时为单位给出，例如按下按钮 (#354)\n新增：活动条件，例如门开着时不要关闭快门 (#257)\n新增：可以关闭和打开日历，还可以显示消息 `enableCalendar` (#236)"
+      },
       "3.1.1": {
         "en": "Fixed display of recurring events after DST change (#448)",
         "de": "Anzeige von Terminen nach Sommerzeit behoben (#448)",
@@ -80,19 +93,6 @@
         "pl": "Usunięty z pakietem Styles",
         "uk": "Видаліть пакет \"Стиль\"",
         "zh-cn": "用 Styles 软件包删除"
-      },
-      "2.3.17": {
-        "en": "Corrected the simulation",
-        "de": "Die Simulation wurde korrigiert",
-        "ru": "Исправлено моделирование",
-        "pt": "Corrigido a simulação",
-        "nl": "Correctie van de simulatie",
-        "fr": "Correction de la simulation",
-        "it": "Corretto la simulazione",
-        "es": "Corregido la simulación",
-        "pl": "Korekta symulacji",
-        "uk": "Виправлено моделювання",
-        "zh-cn": "纠正了模拟"
       }
     },
     "titleLang": {

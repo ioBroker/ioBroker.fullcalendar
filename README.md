@@ -80,7 +80,7 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.2.0 (2026-10-29)
 * (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
 * (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)
 * (bluefox) Fixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)
@@ -104,9 +104,6 @@ Errors come back as `{error}`. A new event is a one-shot event and appears in th
 
 ### 3.0.1 (2026-08-05)
 * (bluefox) Migrated GUI to React19
-
-### 2.4.5 (2024-09-09)
-* (bluefox) Corrected SelectID Dialog
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

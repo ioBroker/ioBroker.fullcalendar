@@ -28,7 +28,7 @@ let __tla = (async () => {
   var c = {
     "./FullCalendar": async () => {
       await s(`./FullCalendar`), await Promise.all([]);
-      let t2 = await o(`./FullCalendar`, () => e(() => import("./assets/FullCalendar-unCnA4AJ.js").then(async (m2) => {
+      let t2 = await o(`./FullCalendar`, () => e(() => import("./assets/FullCalendar-_1zNh2T3.js").then(async (m2) => {
         await m2.__tla;
         return m2;
       }), __vite__mapDeps([0]), import.meta.url)), n2 = t2 && t2.__mf_remote_dependency_pending;
@@ -41,7 +41,7 @@ let __tla = (async () => {
     },
     "./translations": async () => {
       await s(`./translations`), await Promise.all([]);
-      let t2 = await o(`./translations`, () => e(() => import("./assets/translations-e8MhG2Cb.js").then(async (m2) => {
+      let t2 = await o(`./translations`, () => e(() => import("./assets/translations-Bp3A__c7.js").then(async (m2) => {
         await m2.__tla;
         return m2;
       }), [], import.meta.url)), n2 = t2 && t2.__mf_remote_dependency_pending;

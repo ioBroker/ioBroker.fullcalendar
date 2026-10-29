@@ -1,4 +1,7 @@
 # Older changes
+## 2.4.5 (2024-09-09)
+* (bluefox) Corrected SelectID Dialog
+
 ## 2.4.4 (2024-09-09)
 * (bluefox) Removed withStyles package
 
