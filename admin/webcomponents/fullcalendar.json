@@ -1,0 +1,347 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ioBroker/web-components/main/schemas/manifest.json",
+    "manifestVersion": 1,
+    "tag": "iob-fullcalendar",
+    "name": {
+        "en": "Calendar",
+        "de": "Kalender",
+        "ru": "Календарь",
+        "pt": "Calendário",
+        "nl": "Kalender",
+        "fr": "Calendrier",
+        "it": "Calendario",
+        "es": "Calendario",
+        "pl": "Kalendarz",
+        "uk": "Календар",
+        "zh-cn": "日历"
+    },
+    "description": {
+        "en": "The planned events of an instance of fullcalendar as a month, week, day or list; events can be created, moved and edited",
+        "de": "Die geplanten Ereignisse einer Instanz von fullcalendar als Monat, Woche, Tag oder Liste; Ereignisse lassen sich anlegen, verschieben und bearbeiten",
+        "ru": "Запланированные события экземпляра fullcalendar в виде месяца, недели, дня или списка; события можно создавать, перемещать и редактировать",
+        "pt": "Os eventos planeados de uma instância do fullcalendar como mês, semana, dia ou lista; os eventos podem ser criados, movidos e editados",
+        "nl": "De geplande gebeurtenissen van een instantie van fullcalendar als maand, week, dag of lijst; gebeurtenissen kunnen worden aangemaakt, verplaatst en bewerkt",
+        "fr": "Les événements planifiés d'une instance de fullcalendar sous forme de mois, semaine, jour ou liste ; les événements peuvent être créés, déplacés et modifiés",
+        "it": "Gli eventi pianificati di un'istanza di fullcalendar come mese, settimana, giorno o elenco; gli eventi possono essere creati, spostati e modificati",
+        "es": "Los eventos planificados de una instancia de fullcalendar como mes, semana, día o lista; los eventos se pueden crear, mover y editar",
+        "pl": "Zaplanowane zdarzenia instancji fullcalendar jako miesiąc, tydzień, dzień lub lista; zdarzenia można tworzyć, przesuwać i edytować",
+        "uk": "Заплановані події екземпляра fullcalendar у вигляді місяця, тижня, дня або списку; події можна створювати, переміщувати та редагувати",
+        "zh-cn": "fullcalendar 实例的计划事件，以月、周、日或列表显示；可以创建、移动和编辑事件"
+    },
+    "icon": "../fullcalendar.png",
+    "module": "fullcalendar.js",
+    "size": {
+        "width": 520,
+        "height": 420
+    },
+    "settings": {
+        "type": "panel",
+        "items": {
+            "instance": {
+                "type": "instance",
+                "adapter": "fullcalendar",
+                "label": {
+                    "en": "Instance",
+                    "de": "Instanz",
+                    "ru": "Экземпляр",
+                    "pt": "Instância",
+                    "nl": "Voorbeeld",
+                    "fr": "Exemple",
+                    "it": "Esempio",
+                    "es": "Instancia",
+                    "pl": "Instancja",
+                    "uk": "Екземпляр",
+                    "zh-cn": "实例"
+                }
+            },
+            "calendar": {
+                "type": "objectId",
+                "types": "folder",
+                "root": "fullcalendar",
+                "label": {
+                    "en": "Specific calendar",
+                    "de": "Spezifischer Kalender",
+                    "ru": "Конкретный календарь",
+                    "pt": "calendário específico",
+                    "nl": "Specifieke kalender",
+                    "fr": "Calendrier spécifique",
+                    "it": "Calendario specifico",
+                    "es": "Calendario específico",
+                    "pl": "Konkretny kalendarz",
+                    "uk": "Конкретний календар",
+                    "zh-cn": "具体日历"
+                },
+                "help": {
+                    "en": "A calendar of the instance (fullcalendar.0.Calendars.<id>); empty: the default calendar of the instance",
+                    "de": "Ein Kalender der Instanz (fullcalendar.0.Calendars.<ID>); leer: der Standardkalender der Instanz",
+                    "ru": "Календарь экземпляра (fullcalendar.0.Calendars.<id>); пусто: календарь экземпляра по умолчанию",
+                    "pt": "Um calendário da instância (fullcalendar.0.Calendars.<id>); vazio: o calendário predefinido da instância",
+                    "nl": "Een kalender van de instantie (fullcalendar.0.Calendars.<id>); leeg: de standaardkalender van de instantie",
+                    "fr": "Un calendrier de l'instance (fullcalendar.0.Calendars.<id>) ; vide : le calendrier par défaut de l'instance",
+                    "it": "Un calendario dell'istanza (fullcalendar.0.Calendars.<id>); vuoto: il calendario predefinito dell'istanza",
+                    "es": "Un calendario de la instancia (fullcalendar.0.Calendars.<id>); vacío: el calendario predeterminado de la instancia",
+                    "pl": "Kalendarz instancji (fullcalendar.0.Calendars.<id>); puste: domyślny kalendarz instancji",
+                    "uk": "Календар екземпляра (fullcalendar.0.Calendars.<id>); порожньо: типовий календар екземпляра",
+                    "zh-cn": "实例的日历（fullcalendar.0.Calendars.<id>）；为空时使用实例的默认日历"
+                }
+            },
+            "readOnly": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Read only",
+                    "de": "Nicht veränderbar",
+                    "ru": "Только чтение",
+                    "pt": "Somente leitura",
+                    "nl": "Alleen lezen",
+                    "fr": "Lecture seulement",
+                    "it": "Sola lettura",
+                    "es": "Solo lectura",
+                    "pl": "Tylko czytać",
+                    "uk": "Лише для читання",
+                    "zh-cn": "只读"
+                }
+            },
+            "hideLeftBlock": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Hide left block",
+                    "de": "Linken Block ausblenden",
+                    "ru": "Скрыть левый блок",
+                    "pt": "Ocultar bloco esquerdo",
+                    "nl": "Verberg linker blok",
+                    "fr": "Masquer le bloc de gauche",
+                    "it": "Nascondi blocco sinistro",
+                    "es": "Ocultar bloque izquierdo",
+                    "pl": "Ukryj lewy blok",
+                    "uk": "Приховати лівий блок",
+                    "zh-cn": "隐藏左方块"
+                },
+                "hidden": "!!data.readOnly"
+            },
+            "hideLeftBlockHint": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Hide hint in left block",
+                    "de": "Hinweis im linken Block ausblenden",
+                    "ru": "Скрыть подсказку в левом блоке",
+                    "pt": "Ocultar dica no bloco esquerdo",
+                    "nl": "Verberg hint in linkerblok",
+                    "fr": "Masquer l'indice dans le bloc de gauche",
+                    "it": "Nascondi suggerimento nel blocco di sinistra",
+                    "es": "Ocultar pista en el bloque izquierdo",
+                    "pl": "Ukryj podpowiedź w lewym bloku",
+                    "uk": "Сховати підказку в лівому блоці",
+                    "zh-cn": "在左侧块中隐藏提示"
+                },
+                "hidden": "!!data.readOnly || !!data.hideLeftBlock"
+            },
+            "hideTopBlock": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Hide top block",
+                    "de": "Oberen Block ausblenden",
+                    "ru": "Скрыть верхний блок",
+                    "pt": "Ocultar bloco superior",
+                    "nl": "Verberg het bovenste blok",
+                    "fr": "Masquer le bloc supérieur",
+                    "it": "Nascondi blocco superiore",
+                    "es": "Ocultar bloque superior",
+                    "pl": "Ukryj górny blok",
+                    "uk": "Приховати верхній блок",
+                    "zh-cn": "隐藏顶部块"
+                }
+            },
+            "hideTopBlockButtons": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Hide buttons in top block",
+                    "de": "Schaltflächen im oberen Block ausblenden",
+                    "ru": "Скрыть кнопки в верхнем блоке",
+                    "pt": "Ocultar botões no bloco superior",
+                    "nl": "Verberg knoppen in het bovenste blok",
+                    "fr": "Masquer les boutons dans le bloc supérieur",
+                    "it": "Nascondi i pulsanti nel blocco superiore",
+                    "es": "Ocultar botones en el bloque superior",
+                    "pl": "Ukryj przyciski w górnym bloku",
+                    "uk": "Сховати кнопки у верхньому блоці",
+                    "zh-cn": "隐藏顶部块中的按钮"
+                },
+                "hidden": "!!data.hideTopBlock"
+            },
+            "hideWeekends": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Hide weekends",
+                    "de": "Wochenenden ausblenden",
+                    "ru": "Скрыть выходные",
+                    "pt": "Ocultar fins de semana",
+                    "nl": "Weekends verbergen",
+                    "fr": "Masquer les week-ends",
+                    "it": "Nascondi i fine settimana",
+                    "es": "Ocultar fines de semana",
+                    "pl": "Ukryj weekendy",
+                    "uk": "Приховати вихідні",
+                    "zh-cn": "隐藏周末"
+                }
+            },
+            "viewMode": {
+                "type": "select",
+                "default": "dayGridMonth",
+                "label": {
+                    "en": "View mode",
+                    "de": "Ansichtsmodus",
+                    "ru": "Режим просмотра",
+                    "pt": "Modo de visualização",
+                    "nl": "Bekijk modus",
+                    "fr": "Mode d'affichage",
+                    "it": "Modalità di visualizzazione",
+                    "es": "Modo de vista",
+                    "pl": "Tryb podglądu",
+                    "uk": "Режим перегляду",
+                    "zh-cn": "查看模式"
+                },
+                "options": [
+                    {
+                        "value": "dayGridMonth",
+                        "label": {
+                            "en": "Month",
+                            "de": "Monat",
+                            "ru": "Месяц",
+                            "pt": "Mês",
+                            "nl": "Maand",
+                            "fr": "Mois",
+                            "it": "Mese",
+                            "es": "Mes",
+                            "pl": "Miesiąc",
+                            "uk": "місяць",
+                            "zh-cn": "月"
+                        }
+                    },
+                    {
+                        "value": "timeGridWeek",
+                        "label": {
+                            "en": "Week",
+                            "de": "Woche",
+                            "ru": "Неделя",
+                            "pt": "Semana",
+                            "nl": "Week",
+                            "fr": "Semaine",
+                            "it": "Settimana",
+                            "es": "Semana",
+                            "pl": "Tydzień",
+                            "uk": "тиждень",
+                            "zh-cn": "星期"
+                        }
+                    },
+                    {
+                        "value": "timeGridDay",
+                        "label": {
+                            "en": "Day",
+                            "de": "Tag",
+                            "ru": "День",
+                            "pt": "Dia",
+                            "nl": "Dag",
+                            "fr": "Jour",
+                            "it": "Giorno",
+                            "es": "Día",
+                            "pl": "Dzień",
+                            "uk": "День",
+                            "zh-cn": "天"
+                        }
+                    },
+                    {
+                        "value": "listMonth",
+                        "label": {
+                            "en": "List",
+                            "de": "Liste",
+                            "ru": "Список",
+                            "pt": "Lista",
+                            "nl": "Lijst",
+                            "fr": "Liste",
+                            "it": "Elenco",
+                            "es": "Lista",
+                            "pl": "Lista",
+                            "uk": "Список",
+                            "zh-cn": "列表"
+                        }
+                    }
+                ]
+            },
+            "dayStep": {
+                "type": "select",
+                "default": "30",
+                "label": {
+                    "en": "Day time scale",
+                    "de": "Tageszeitskala",
+                    "ru": "Дневная шкала",
+                    "pt": "escala de tempo do dia",
+                    "nl": "Dag tijd schaal",
+                    "fr": "Echelle horaire du jour",
+                    "it": "Scala diurna",
+                    "es": "Escala de tiempo del día",
+                    "pl": "Skala czasu dziennego",
+                    "uk": "Шкала денного часу",
+                    "zh-cn": "日时间尺度"
+                },
+                "help": {
+                    "en": "In minutes",
+                    "de": "In Minuten",
+                    "ru": "В минутах",
+                    "pt": "Em minutos",
+                    "nl": "In minuten",
+                    "fr": "En minutes",
+                    "it": "In pochi minuti",
+                    "es": "En minutos",
+                    "pl": "W minutach",
+                    "uk": "За хвилини",
+                    "zh-cn": "几分钟内"
+                },
+                "options": [
+                    {
+                        "value": "1",
+                        "label": "1"
+                    },
+                    {
+                        "value": "2",
+                        "label": "2"
+                    },
+                    {
+                        "value": "3",
+                        "label": "3"
+                    },
+                    {
+                        "value": "5",
+                        "label": "5"
+                    },
+                    {
+                        "value": "10",
+                        "label": "10"
+                    },
+                    {
+                        "value": "15",
+                        "label": "15"
+                    },
+                    {
+                        "value": "20",
+                        "label": "20"
+                    },
+                    {
+                        "value": "30",
+                        "label": "30"
+                    },
+                    {
+                        "value": "60",
+                        "label": "60"
+                    }
+                ],
+                "hidden": "data.viewMode !== 'timeGridDay' && data.viewMode !== 'timeGridWeek'"
+            }
+        }
+    }
+}

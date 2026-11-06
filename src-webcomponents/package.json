@@ -1,0 +1,22 @@
+{
+    "name": "iobroker-web-components-fullcalendar",
+    "private": true,
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "check-ts": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit",
+        "lint": "eslint -c eslint.config.mjs src"
+    },
+    "devDependencies": {
+        "@fullcalendar/core": "^6.1.22",
+        "@fullcalendar/daygrid": "^6.1.22",
+        "@fullcalendar/interaction": "^6.1.22",
+        "@fullcalendar/list": "^6.1.22",
+        "@fullcalendar/timegrid": "^6.1.22",
+        "@iobroker/types": "^7.2.5",
+        "@iobroker/web-components": "^0.6.0",
+        "@types/node": "^22.20.5",
+        "vite": "^8.3.5"
+    }
+}

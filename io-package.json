@@ -172,6 +172,9 @@
         ]
       }
     },
+    "webComponents": [
+      "webcomponents/fullcalendar.json"
+    ],
     "restartAdapters": [
       "vis-2"
     ]

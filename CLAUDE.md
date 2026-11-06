@@ -8,13 +8,15 @@ ioBroker.fullcalendar is an ioBroker adapter that schedules state changes on dev
 
 ## Architecture
 
-Three cooperating pieces in this repo:
+Four cooperating pieces in this repo:
 
 1. **Adapter runtime** (`main.js` + `lib/utils.js`) — the Node.js ioBroker adapter. Reads event objects from ioBroker's object DB, schedules them via `later` + `rrule` + `suncalc2`, subscribes/unsubscribes to foreign states when simulations are recording, and writes state values at trigger time. Translations for `ON`/`OFF` strings are inlined in `main.js` (`t()`).
 
 2. **Admin UI** (`src-admin/`) — React app (Vite, MUI v6, `@iobroker/adapter-react-v5`) shown as the adapter's config tab. Entry: `src-admin/src/App.jsx` extending `GenericApp`. `Component/CalendarManager.jsx` is the top-level screen; calendars are stored as ioBroker objects and rendered via FullCalendar React plus custom event/simulation dialogs.
 
 3. **vis-2 widget** (`src-widgets/`) — React widget federated into vis-2 using `@originjs/vite-plugin-federation`. Published into `widgets/fullcalendar/` at build time. Entry: `src-widgets/src/FullCalendar.jsx`.
+
+4. **Web component** (`src-webcomponents/`) — `<iob-fullcalendar>` for hosts of `@iobroker/web-components` (Aura, devices, ...): one ES module without React that bundles FullCalendar, plus its manifest, built by `npm run build-wc` (`tasks.js --wc`) into `admin/webcomponents/` (committed, named in `common.webComponents`). It may use only the socket methods of the web-components contract, so it reads and writes events through the instance: `sendTo` `getEvents` / `setEvent` / `deleteEvent` (`onMessage` in `src/main.ts`). Its texts are picked at build time from `src-widgets/src/i18n/`; FullCalendar's CSS is moved into the shadow root by a Vite transform (`vite.config.ts`) that fails the build when FullCalendar changes. Lint/typecheck: `npm run lint-wc`, `npm run check-wc`.
 
 ### Shared component files (important!)
 

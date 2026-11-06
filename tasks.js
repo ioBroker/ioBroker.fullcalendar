@@ -94,6 +94,27 @@ function copyAllFilesWidget() {
     );
 }
 
+/**
+ * The web component `<iob-fullcalendar>`: src-webcomponents => admin/webcomponents/fullcalendar.js and its manifest
+ * fullcalendar.json (`common.webComponents` in io-package.json). The Vite build checks the manifest and fails if it
+ * is wrong.
+ */
+async function buildWebComponents() {
+    const src = `${__dirname}/src-webcomponents`;
+    deleteFoldersRecursive(`${__dirname}/admin/webcomponents`);
+    deleteFoldersRecursive(`${src}/build`);
+    if (!fs.existsSync(`${src}/node_modules`)) {
+        await npmInstall(src);
+    }
+    await buildReact(src, { rootDir: src, vite: true });
+    for (const file of ['fullcalendar.js', 'fullcalendar.json']) {
+        if (!fs.existsSync(`${src}/build/${file}`)) {
+            throw new Error(`src-webcomponents/build/${file} was not built`);
+        }
+    }
+    copyFiles(['src-webcomponents/build/*.js', 'src-webcomponents/build/*.json'], 'admin/webcomponents');
+}
+
 function copyAllFiles() {
     copyFiles(['src-admin/build/**/*', '!src-admin/build/**/_socket/info.js'], 'admin');
 }
@@ -140,8 +161,13 @@ if (process.argv.includes('--backend-build')) {
     npmInstall(`${__dirname}/src-widgets/`, { force: true })
         .then(() => buildWidgets())
         .then(() => copyAllFilesWidget());
+} else if (process.argv.includes('--wc')) {
+    buildWebComponents().catch(e => {
+        console.error(`Cannot build the web components: ${e}`);
+        process.exit(1);
+    });
 } else if (process.argv.includes('--0-clean')) {
-    deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png']);
+    deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png', 'webcomponents']);
 } else if (process.argv.includes('--1-npm')) {
     if (!fs.existsSync(`${__dirname}/src-admin/node_modules`)) {
         npmInstall(`${__dirname}/src-admin/`).catch(e => console.error(`Cannot execute npm install: ${e}`));
@@ -155,7 +181,7 @@ if (process.argv.includes('--backend-build')) {
 } else if (process.argv.includes('--4-patch')) {
     patch();
 } else if (process.argv.includes('--build')) {
-    deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png']);
+    deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png', 'webcomponents']);
     npmInstall(`${__dirname}/src-admin/`)
         .then(() => buildReact(`${__dirname}/src-admin/`, { rootDir: __dirname, vite: true }))
         .then(() => {
@@ -168,7 +194,7 @@ if (process.argv.includes('--backend-build')) {
         .then(() => buildWidgets())
         .then(() => copyAllFilesWidget())
         .then(() => {
-            deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png']);
+            deleteFoldersRecursive(`${__dirname}/admin`, ['fullcalendar.png', 'webcomponents']);
             return npmInstall(`${__dirname}/src-admin/`);
         })
         .then(() => buildReact(`${__dirname}/src-admin/`, { rootDir: __dirname, vite: true }))
@@ -176,5 +202,6 @@ if (process.argv.includes('--backend-build')) {
             copyAllFiles();
             patch();
         })
+        .then(() => buildWebComponents())
         .then(() => buildBackend());
 }

@@ -226,7 +226,102 @@ export class Fullcalendar extends Adapter {
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('objectChange', this.onObjectChange.bind(this));
+        this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
+    }
+
+    /**
+     * The events of the web component `<iob-fullcalendar>` (`admin/webcomponents/`): a web component may not read
+     * a custom object view or write objects through the socket, so it asks the instance with `sendTo`.
+     *
+     * - `getEvents` `{ calendar? }`: the events of a calendar (`<namespace>.Calendars.<id>`), else of the default
+     *   calendar of the instance -> `{ events }`
+     * - `setEvent` `{ event }`: saves an event of this instance -> `{ result: 'ok' }`
+     * - `deleteEvent` `{ id }`: deletes an event of this instance -> `{ result: 'ok' }`
+     *
+     * On an error the answer is `{ error }`. A message that names a user (web and admin do so from js-controller
+     * 7.2.5 on) is executed with the rights of that user, like the object commands of the socket.
+     *
+     * @param msg the message
+     */
+    private async onMessage(msg: ioBroker.Message): Promise<void> {
+        if (!msg?.command || !['getEvents', 'setEvent', 'deleteEvent'].includes(msg.command)) {
+            return;
+        }
+        const options = msg.user ? { user: msg.user } : undefined;
+        const data = (msg.message && typeof msg.message === 'object' ? msg.message : {}) as Record<string, unknown>;
+        let answer: { events?: ioBroker.Object[]; result?: 'ok'; error?: string };
+        try {
+            if (msg.command === 'getEvents') {
+                answer = { events: await this.readEvents(data.calendar, options) };
+            } else if (msg.command === 'setEvent') {
+                const event = data.event as ioBroker.ScheduleObject | undefined;
+                await this.checkEvent(event?._id, !!event?.common && !!event.native && event.type === 'schedule');
+                await this.setForeignObjectAsync(event!._id, event!, options);
+                answer = { result: 'ok' };
+            } else {
+                const id = typeof data.id === 'string' ? data.id : '';
+                if (!(await this.checkEvent(id, true))) {
+                    throw new Error(`Event "${id}" does not exist`);
+                }
+                await this.delForeignObjectAsync(id, options);
+                answer = { result: 'ok' };
+            }
+        } catch (e) {
+            answer = { error: e instanceof Error ? e.message : String(e) };
+        }
+        if (msg.callback) {
+            this.sendTo(msg.from, msg.command, answer, msg.callback);
+        }
+    }
+
+    /**
+     * The events of a calendar of this instance, as the widgets read them
+     *
+     * @param calendar `<namespace>.Calendars.<id>`, or empty for the default calendar
+     * @param options what the socket named
+     * @param options.user the user to read as
+     */
+    private async readEvents(calendar: unknown, options?: { user: string }): Promise<ioBroker.Object[]> {
+        if (calendar && (typeof calendar !== 'string' || !calendar.startsWith(`${this.namespace}.Calendars.`))) {
+            throw new Error(`${JSON.stringify(calendar)} is no calendar of ${this.namespace}`);
+        }
+        const prefix = (calendar as string) || this.namespace;
+        const res = await this.getObjectViewAsync(
+            'schedule',
+            'schedule',
+            { startkey: `${prefix}.`, endkey: `${prefix}.${MAX_KEY}` },
+            options,
+        );
+        const events = (res?.rows || []).map(row => row.value as ioBroker.Object).filter(obj => obj?._id);
+        // the default calendar has the events directly below the instance only: fullcalendar.0.event-<uuid>
+        return calendar ? events : events.filter(obj => obj._id.split('.').length <= 3);
+    }
+
+    /**
+     * Throws if `id` may not be written as an event: not below this instance, an object of another type, or a new ID
+     * that is no event ID of a calendar
+     *
+     * @param id ID of the event
+     * @param valid whether the rest of the event is valid
+     * @returns whether the event exists
+     */
+    private async checkEvent(id: string | undefined, valid: boolean): Promise<boolean> {
+        if (!valid || !id || typeof id !== 'string' || !id.startsWith(`${this.namespace}.`)) {
+            throw new Error(`Invalid event "${String(id)}"`);
+        }
+        const existing = await this.getForeignObjectAsync(id);
+        if (existing) {
+            if (existing.type !== 'schedule') {
+                throw new Error(`"${id}" is no event`);
+            }
+            return true;
+        }
+        const ns = this.namespace.replace(/\./g, '\\.');
+        if (!new RegExp(`^${ns}\\.(Calendars\\.[^.]+\\.)?event-[^.]+$`).test(id)) {
+            throw new Error(`Invalid event "${id}"`);
+        }
+        return false;
     }
 
     private t(word: 'ON' | 'OFF'): string {

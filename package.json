@@ -68,8 +68,8 @@
     "release-patch": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
     "release-major": "release-script major --yes",
-    "update-packages": "npx -y npm-check-updates --upgrade && cd src-widgets && npx -y npm-check-updates --upgrade && cd ../src-admin && npx -y npm-check-updates --upgrade",
-    "npm": "npm i && cd src-admin && npm i -f && cd ../src-widgets && npm i -f",
+    "update-packages": "npx -y npm-check-updates --upgrade && cd src-widgets && npx -y npm-check-updates --upgrade && cd ../src-admin && npx -y npm-check-updates --upgrade && cd ../src-webcomponents && npx -y npm-check-updates --upgrade",
+    "npm": "npm i && cd src-admin && npm i -f && cd ../src-widgets && npm i -f && cd ../src-webcomponents && npm i",
     "0-widget-clean": "node tasks --0-widget-clean",
     "1-widget-npm": "node tasks --1-widget-npm",
     "2-widget-compile": "node tasks --2-widget-compile",
@@ -81,6 +81,9 @@
     "3-copy": "node tasks --3-copy",
     "4-patch": "node tasks --4-patch",
     "build-gui": "node tasks --build",
+    "build-wc": "node tasks --wc",
+    "lint-wc": "cd src-webcomponents && npm run lint",
+    "check-wc": "cd src-webcomponents && npm run check-ts",
     "build": "node tasks"
   },
   "license": "MIT"

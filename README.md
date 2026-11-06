@@ -27,6 +27,17 @@ How to use:
 - Click the record button and wait 24 hours or 7 days till simulation stops to record events
 - Now you can replay the simulation by clicking on the play button. Additionally, you can define the time when the simulation should be started.
 
+## Web components
+Besides the vis-2 widget, the adapter brings the calendar as a web component for every host of
+[ioBroker web components](https://github.com/ioBroker/web-components), e.g. Aura or devices: `<iob-fullcalendar>`
+(`admin/webcomponents/fullcalendar.js`, described by `fullcalendar.json` in `common.webComponents`).
+
+It shows the events of an instance - or of one of its calendars - as month, week, day or list and, unless it is read only,
+creates, moves, resizes, edits and deletes them like the widget, in the dialog of the host. It reads and writes the
+events through the instance (`sendTo` with `getEvents`, `setEvent`, `deleteEvent`), so the instance must be running.
+
+Build it with `npm run build-wc` (part of `npm run build`).
+
 ## Todo
 - Week and day must scroll to the current time
 
@@ -35,6 +46,10 @@ How to use:
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
+* (bluefox) The instance answers the commands `getEvents`, `setEvent` and `deleteEvent` (`sendTo`) of the web component
+
 ### 3.0.2 (2026-10-16)
 * (bluefox) Updated packages
 
