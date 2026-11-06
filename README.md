@@ -49,6 +49,7 @@ Build it with `npm run build-wc` (part of `npm run build`).
 ### **WORK IN PROGRESS**
 * (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
 * (bluefox) The instance answers the commands `getEvents`, `setEvent` and `deleteEvent` (`sendTo`) of the web component
+* (bluefox) The vis-2 widget creates new events in the calendar selected in its settings instead of the default calendar
 
 ### 3.0.2 (2026-10-16)
 * (bluefox) Updated packages
