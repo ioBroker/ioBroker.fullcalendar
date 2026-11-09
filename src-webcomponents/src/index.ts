@@ -468,6 +468,8 @@ class FullCalendarElement extends IobWebComponent<Settings> {
             this.#currentView = view;
             this.#calendar = new Calendar(el, {
                 plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+                // always with minutes: a full hour is "09 Uhr" otherwise, next to "19:45"
+                eventTimeFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false },
                 locales: LOCALES,
                 initialView: view,
                 height: '100%',

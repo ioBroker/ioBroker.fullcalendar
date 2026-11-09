@@ -134,6 +134,9 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Web component: the time of an event always has minutes, so a full hour no longer looks different from "19:45", and a long title ends with "..." instead of being cut off
+
 ### 3.4.0 (2026-11-09)
 * (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
 * (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
