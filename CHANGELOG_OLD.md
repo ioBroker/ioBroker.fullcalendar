@@ -1,4 +1,9 @@
 # Older changes
+## 3.1.0 (2026-10-28)
+* (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
+* (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
+* (bluefox) A one-shot event in the past is no longer marked as disabled in memory
+
 ## 3.0.5 (2026-10-19)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (bluefox) Migrated GUI to vite

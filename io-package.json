@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.3.1",
+    "version": "3.4.0",
     "news": {
+      "3.4.0": {
+        "en": "Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)\nAdded the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component",
+        "de": "Webkomponente `<iob-fullcalendar>` für Aura, Geräte und andere Webkomponenten hinzugefügt (`common.WebComponents`)\nNachrichten `getEventObjects`, `setEventObject` und `deleteEventObject` für die Web-Komponente hinzugefügt",
+        "ru": "Добавлен веб-компонент `<iob-fullcalendar>` для Aura, устройств и других хостов веб-компонентов (`Common.webcomponents`)\nДобавлены сообщения `getEventObjects`, `setEventObject` и `DeleteEventObject` для веб-компонента",
+        "pt": "Adicionado o componente web `<iob-fullcalendar>` para Aura, dispositivos e outros hosts (`common.webComponents`)\nForam adicionadas as mensagens `getEventObjects`, `setEventObject` e `deleteEventObject` para o componente web",
+        "nl": "De webcomponent `<iob-fullcalendar>` toegevoegd voor Aura, apparaten en andere hosts van webcomponenten (`Common.WebComponents`)\nDe berichten `getEventObjects`, `setEventObject` en `DeleteEventObject` toegevoegd voor de webcomponent",
+        "fr": "Ajout du composant Web `<iob-fullcalendar>` pour Aura, appareils et autres hébergeurs de composants Web (`common.WebComponents`)\nAjout des messages « GetEventObjects », « SetEventObject » et « DeleteEventObject » pour le composant Web",
+        "it": "Aggiunto il componente web <iob-fullcalendar>``per Aura, dispositivi e altri host di componenti web (`Common.WebComponents`)\nAggiunti i messaggi getEventObjects, setEventObject e deleteEventObject per il componente web",
+        "es": "Se ha añadido el componente web `<iob-fullcalendar>` para Aura, dispositivos y otros servidores de componentes web (`Common.WebComponents`)\nAñadió los mensajes `getEventObjects`, `setEventObject` y `deleteEventObject` para el componente web",
+        "pl": "Dodano komponent sieciowy `<iob-fullcalendar>` dla Aura, urządzeń i innych hostów komponentów internetowych (`common.webcomponents`)\nDodano komunikaty `getEventObjects`, `setEventObject` i `DeleteEventObject` dla komponentu internetowego",
+        "uk": "Додано веб-компонент `<iob-fullcalendar>` для Aura, пристроїв та інших хостів веб-компонентів (`Common.WebComponents`)\nДодано повідомлення `getEventObject`, `setEventObject` і `deleteEventObject` для веб-компонента",
+        "zh-cn": "为 <iob-fullcalendar>Aura、设备和其他 Web 组件主机添加了 Web 组件 ``（`common.webComponents`）\n为 Web 组件添加了消息 getEventObjects、setEventObjects 和 deleteEventObject"
+      },
       "3.3.1": {
         "en": "Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)\nThe adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)\nAdded the message `updateEvent`: move or change an event without deleting and creating it again",
         "de": "Admin >= 7.6.17, übersetzter Name des Admin-Tabs und UK-Übersetzungen hinzugefügt (#557)\nDie Adapter-Timer (`this.setTimeout`/`this.setInterval`) werden benutzt (#557)\nNachricht `updateEvent` hinzugefügt: Event verschieben oder ändern, ohne es neu zu erstellen",
@@ -80,19 +93,6 @@
         "pl": "Adapter wymaga teraz kontrolera js->= 6.0.11.\nPrzemigrowany interfejs GUI do vite\nZaktualizowane pakiety",
         "uk": "Для адаптера зараз потрібен js-контролер >= 6.0.11.\nПеренесений графічний інтерфейс до Vite\nОновлені пакети",
         "zh-cn": "适配器现在需要 js-controller >= 6.0.11。\n将 GUI 迁移到 vite\n更新的软件包"
-      },
-      "2.4.5": {
-        "en": "Corrected SelectID Dialog",
-        "de": "Behobener Dialog zur Auswahl",
-        "ru": "Исправленный диалог SelectID",
-        "pt": "Diálogo selecionado corrigido",
-        "nl": "Gecorrigeerd SelectID-dialoogvenster",
-        "fr": "Boîte de dialogue SelectID corrigée",
-        "it": "Dialogo SelectID corretto",
-        "es": "Dialogo SelectID corregido",
-        "pl": "Poprawione okno dialogowe SelectID",
-        "uk": "Корекція ВиберітьД Діалог",
-        "zh-cn": "已更正的选定ID对话框"
       }
     },
     "titleLang": {

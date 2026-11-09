@@ -134,7 +134,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.4.0 (2026-11-09)
 * (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
 * (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
 
@@ -161,11 +161,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 
 ### 3.1.1 (2026-10-29)
 * (GermanBluefox) Fixed display of recurring events after DST change (#448)
-
-### 3.1.0 (2026-10-28)
-* (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
-* (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
-* (bluefox) A one-shot event in the past is no longer marked as disabled in memory
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
