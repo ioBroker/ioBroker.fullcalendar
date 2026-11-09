@@ -134,7 +134,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.4.1 (2026-11-09)
 * (bluefox) Web component: the time of an event always has minutes, so a full hour no longer looks different from "19:45", and a long title ends with "..." instead of being cut off
 
 ### 3.4.0 (2026-11-09)
@@ -161,9 +161,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (bluefox) Added: the duration of "On/Off" and "Toggle" events can be given in seconds, minutes or hours, e.g. for a push button (#354)
 * (bluefox) Added: conditions for events, e.g. do not close the shutter if the door is open (#257)
 * (bluefox) Added: calendars can be switched off and on, also with the message `enableCalendar` (#236)
-
-### 3.1.1 (2026-10-29)
-* (GermanBluefox) Fixed display of recurring events after DST change (#448)
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

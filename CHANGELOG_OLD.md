@@ -1,4 +1,7 @@
 # Older changes
+## 3.1.1 (2026-10-29)
+* (GermanBluefox) Fixed display of recurring events after DST change (#448)
+
 ## 3.1.0 (2026-10-28)
 * (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
 * (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
