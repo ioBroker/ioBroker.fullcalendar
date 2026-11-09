@@ -11,3 +11,5 @@ tmp
 /src-widgets/.__mf__temp/
 # compiled adapter backend (src/*.ts => build/), rebuilt by `npm run build-backend`
 /build/
+# the web component, built into admin/webcomponents/ by `npm run build-wc`
+/src-webcomponents/build/

@@ -37,6 +37,17 @@ How to use:
 - Click the record button and wait 24 hours or 7 days till simulation stops to record events
 - Now you can replay the simulation by clicking on the play button. Additionally, you can define the time when the simulation should be started.
 
+## Web components
+Besides the vis-2 widget, the adapter brings the calendar as a web component for every host of
+[ioBroker web components](https://github.com/ioBroker/web-components), e.g. Aura or devices: `<iob-fullcalendar>`
+(`admin/webcomponents/fullcalendar.js`, described by `fullcalendar.json` in `common.webComponents`).
+
+It shows the events of an instance - or of one of its calendars - as month, week, day or list and, unless it is read only,
+creates, moves, resizes, edits and deletes them like the widget, in the dialog of the host. It reads and writes the
+events through the instance (`sendTo` with `getEventObjects`, `setEventObject`, `deleteEventObject`), so the instance must be running.
+
+Build it with `npm run build-wc` (part of `npm run build`).
+
 ## Agenda states
 The adapter writes what is planned into states, e.g. to ask a chat or voice assistant about it or to show it in a visualization:
 
@@ -85,6 +96,9 @@ sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JS
 | `listEvents`     | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                   | `{events: [execution, …]}`                        |
 | `getCalendars`   | –                                                                                          | `{calendars: [{id, name, enabled}, …]}`           |
 | `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                        | `{id, enabled}`                                   |
+| `getEventObjects` | optional `calendar` (`<namespace>.Calendars.<id>`) | `{events: [object, …]}`: the schedule objects, for the web component |
+| `setEventObject` | `event` (a schedule object of this instance) | `{result: "ok"}` |
+| `deleteEventObject` | `id` | `{result: "ok"}` |
 | `getCommands`    | –                                                                                          | `{commands: [{command, params, answer}, …]}`      |
 
 Parameters of `addEvent`:
@@ -120,6 +134,10 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
+* (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
+
 ### 3.3.1 (2026-10-29)
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
 * (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)

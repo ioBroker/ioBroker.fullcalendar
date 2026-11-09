@@ -243,4 +243,36 @@ describe('messages', () => {
         assert.ok(commands.commands.find(cmd => cmd.command === 'updateEvent'));
         assert.match((await send('changeEvent', {})).error, /Commands: addEvent, updateEvent/);
     });
+
+    it('getEventObjects, setEventObject and deleteEventObject of the web component', async () => {
+        const event = (id) => ({ _id: id, type: 'schedule', common: { name: 'Lamp' }, native: { start: '2026-11-09T10:00:00' } });
+        const main = 'fullcalendar.0.event-wc';
+        const other = 'fullcalendar.0.Calendars.garden.event-wc';
+
+        assert.deepEqual(await send('setEventObject', { event: event(main) }), { result: 'ok' });
+        assert.deepEqual(await send('setEventObject', { event: event(other) }), { result: 'ok' });
+        assert.equal(db[main].common.name, 'Lamp');
+
+        // the default calendar has only the events directly below the instance
+        let res = await send('getEventObjects', {});
+        assert.deepEqual(res.events.map(obj => obj._id), [main]);
+        res = await send('getEventObjects', { calendar: 'fullcalendar.0.Calendars.garden' });
+        assert.deepEqual(res.events.map(obj => obj._id), [other]);
+        assert.match((await send('getEventObjects', { calendar: 'fullcalendar.1.Calendars.x' })).error, /is no calendar/);
+
+        // only events of this instance
+        assert.match((await send('setEventObject', { event: event('fullcalendar.1.event-x') })).error, /Invalid event/);
+        assert.match((await send('setEventObject', { event: event('fullcalendar.0.lamp') })).error, /Invalid event/);
+        assert.match((await send('setEventObject', { event: { ...event(main), type: 'state' } })).error, /Invalid event/);
+        db['fullcalendar.0.lamp'] = { _id: 'fullcalendar.0.lamp', type: 'state', common: {}, native: {} };
+        assert.match((await send('deleteEventObject', { id: 'fullcalendar.0.lamp' })).error, /is no event/);
+        assert.ok(db['fullcalendar.0.lamp']);
+
+        assert.deepEqual(await send('deleteEventObject', { id: main }), { result: 'ok' });
+        assert.equal(db[main], undefined);
+        assert.match((await send('deleteEventObject', { id: main })).error, /does not exist/);
+
+        // the public messages stay what they were
+        assert.ok((await send('getCommands', {})).commands.find(cmd => cmd.command === 'getEventObjects'));
+    });
 });

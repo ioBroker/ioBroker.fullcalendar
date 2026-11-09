@@ -16,6 +16,7 @@ export default [
         ignores: [
             'src-admin/**/*',
             'src-widgets/**/*',
+            'src-webcomponents/**/*',
             'packages/**/*',
             'src-www/**/*',
             'admin/**/*',
