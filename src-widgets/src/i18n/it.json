@@ -95,5 +95,14 @@
   "Desired value": "Valore desiderato",
   "Description": "Descrizione",
   "min": "min.",
-  "default": "predefinito"
+  "default": "predefinito",
+  "seconds": "secondi",
+  "hours": "ore",
+  "Only if": "Solo se",
+  "condition_description": "L'evento viene eseguito solo se questo stato ha il valore indicato in quel momento",
+  "Condition object ID": "ID oggetto della condizione",
+  "Operator": "Operatore",
+  "Value": "Valore",
+  "ON (true)": "ACCESO (true)",
+  "OFF (false)": "SPENTO (false)"
 }

@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { JSX, ReactNode } from 'react';
+import { useEffect, useState, type JSX, type ReactNode } from 'react';
 
 import {
     Button,
@@ -20,11 +19,25 @@ import {
 
 import { Cancel, Delete, Save, Add } from '@mui/icons-material';
 
-import { Confirm, I18n, ColorPicker, SelectID, TextWithIcon } from '@iobroker/gui-components';
-import type { AdminConnection, IobTheme } from '@iobroker/gui-components';
+import {
+    Confirm,
+    I18n,
+    ColorPicker,
+    SelectID,
+    TextWithIcon,
+    type AdminConnection,
+    type IobTheme,
+} from '@iobroker/gui-components';
 
-import { IGNORE_STATES, getIconAsync, getCachedObject, cron2obj, obj2cron, buildOverlap } from './Utils';
-import type { Simulation } from './Utils';
+import {
+    IGNORE_STATES,
+    getIconAsync,
+    getCachedObject,
+    cron2obj,
+    obj2cron,
+    buildOverlap,
+    type Simulation,
+} from './Utils';
 import EnumsDialog from './EnumsDialog';
 
 const styles: Record<string, any> = {
@@ -225,7 +238,7 @@ const SimulationDialog = (props: SimulationDialogProps): JSX.Element | null => {
                 <div style={styles.field}>
                     <TextField
                         label={I18n.t('Name')}
-                        value={(simulation.common.name as string) || ''}
+                        value={simulation.common.name || ''}
                         onChange={e => {
                             const _simulation: Simulation = JSON.parse(JSON.stringify(simulation));
                             _simulation.common.name = e.target.value;
@@ -239,7 +252,7 @@ const SimulationDialog = (props: SimulationDialogProps): JSX.Element | null => {
                             value={simulation.native.interval || ''}
                             onChange={e => {
                                 const _simulation: Simulation = JSON.parse(JSON.stringify(simulation));
-                                _simulation.native.interval = e.target.value as 'day' | 'week';
+                                _simulation.native.interval = e.target.value;
                                 setSimulation(_simulation);
                             }}
                             variant="standard"
@@ -378,7 +391,7 @@ const SimulationDialog = (props: SimulationDialogProps): JSX.Element | null => {
                                 });
                             }
                         }
-                        await props.socket.setObject(simulation._id, _simulation as unknown as ioBroker.Object);
+                        await props.socket.setObject(simulation._id, _simulation);
                         props.onClose();
                     }}
                     variant="contained"

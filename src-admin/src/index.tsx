@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import type { JSX } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
 import './index.css';
-import { Utils } from '@iobroker/gui-components';
-import type { ThemeName } from '@iobroker/gui-components';
+import { Utils, type ThemeName } from '@iobroker/gui-components';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import packageJson from '../package.json';
@@ -38,34 +36,20 @@ const ThemeContainer = (): JSX.Element => {
 
     const getTheme = (): typeof newTheme => newTheme;
 
-    if (newTheme.palette.mode === 'dark') {
-        window.document.body.className = modifyClasses(window.document.body.className, 'body-dark', 'body-light');
-    } else {
-        window.document.body.className = modifyClasses(window.document.body.className, 'body-light', 'body-dark');
-    }
+    const mode = newTheme.palette.mode;
+
+    useEffect(() => {
+        if (mode === 'dark') {
+            window.document.body.className = modifyClasses(window.document.body.className, 'body-dark', 'body-light');
+        } else {
+            window.document.body.className = modifyClasses(window.document.body.className, 'body-light', 'body-dark');
+        }
+    }, [mode]);
 
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={getTheme()}>
-                <App
-                    onThemeChange={_theme => {
-                        if (newTheme.palette.mode === 'dark') {
-                            window.document.body.className = modifyClasses(
-                                window.document.body.className,
-                                'body-dark',
-                                'body-light',
-                            );
-                        } else {
-                            window.document.body.className = modifyClasses(
-                                window.document.body.className,
-                                'body-light',
-                                'body-dark',
-                            );
-                        }
-
-                        setCurrentTheme(_theme);
-                    }}
-                />
+                <App onThemeChange={_theme => setCurrentTheme(_theme)} />
             </ThemeProvider>
         </StyledEngineProvider>
     );

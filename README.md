@@ -6,6 +6,8 @@
 
 [![NPM](https://nodei.co/npm/iobroker.fullcalendar.png?downloads=true)](https://nodei.co/npm/iobroker.fullcalendar/)
 
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
+
 Schedules with [fullcalendar](https://fullcalendar.io).
 
 ## Plan the events (control your devices)
@@ -13,7 +15,15 @@ You must not use any external resources, the scheduling is processed only in ioB
 
 ![Example](img/example.png)
 
+The vis-2 widget in the month view with a dark theme: watering, heating mode and balcony light as events.
+
+![vis-2 widget, month view](img/vis2-widget-month.png)
+
 You can control your events with a calendar and can plan to control them periodically.
+
+- **Duration** of "On/Off" and "Toggle" events can be given in seconds, minutes or hours. With a duration of 1 second, an event works like a push button.
+- **Condition** ("Only if"): an event writes its value only if another state has the given value at that time (`==`, `!=`, `>`, `>=`, `<`, `<=`), e.g. the shutter goes down only if the terrace door is closed. If the condition is not met, the whole event is skipped (an "On/Off" event does not write the end value either), and a line is written to the log.
+- **Calendars** can be switched off (button in the calendar list or "Active" in the calendar dialog): their events stay, but are not executed until the calendar is switched on again. This way you can prepare scenarios like "Vacation" and switch them by a script (`enableCalendar`, see below).
 
 ## Events simulation
 You can record your behavior and can play it back later.
@@ -34,9 +44,87 @@ Besides the vis-2 widget, the adapter brings the calendar as a web component for
 
 It shows the events of an instance - or of one of its calendars - as month, week, day or list and, unless it is read only,
 creates, moves, resizes, edits and deletes them like the widget, in the dialog of the host. It reads and writes the
-events through the instance (`sendTo` with `getEvents`, `setEvent`, `deleteEvent`), so the instance must be running.
+events through the instance (`sendTo` with `getEventObjects`, `setEventObject`, `deleteEventObject`), so the instance must be running.
 
 Build it with `npm run build-wc` (part of `npm run build`).
+
+## Agenda states
+The adapter writes what is planned into states, e.g. to ask a chat or voice assistant about it or to show it in a visualization:
+
+| State                          | Content                                                                         |
+|--------------------------------|---------------------------------------------------------------------------------|
+| `fullcalendar.0.events.list`        | all events (JSON): name, calendar, state, value, time or cron, next execution |
+| `fullcalendar.0.events.today`       | executions today (JSON), also the ones already done                            |
+| `fullcalendar.0.events.tomorrow`    | executions tomorrow (JSON)                                                     |
+| `fullcalendar.0.events.next`        | the next execution (JSON, `null` = none)                                      |
+| `fullcalendar.0.events.count`       | number of events                                                               |
+| `fullcalendar.0.events.lastChanged` | time of the last change of an event                                            |
+
+One execution looks like this (times are local times of the ioBroker host):
+```json
+{"id": "fullcalendar.0.event-…", "name": "Light living room", "calendar": "", "time": "2026-10-28T22:30:00", "ts": 1793223000000,
+ "oid": "hm-rpc.0.ABC.1.STATE", "value": false, "recurring": false}
+```
+A "double" event has `endTime` and `endValue` too, `calendar` is `""` for the default calendar. Events of simulations are not part of the agenda.
+
+## Script and adapter API (sendTo)
+Other adapters and scripts can plan events, e.g. a voice assistant for "turn off the light in 2 hours":
+```js
+// in 2 hours (`in`: seconds, or "90s", "30m", "2h", "1h30m", "1d")
+sendTo('fullcalendar.0', 'addEvent', { oid: 'hm-rpc.0.ABC.1.STATE', value: false, in: '2h' }, res => log(JSON.stringify(res)));
+// at a time (local time, or a timestamp in ms), for 10 minutes, in the calendar "Garden"
+sendTo('fullcalendar.0', 'addEvent', {
+    oid: 'hm-rpc.0.PUMP.1.STATE', value: true, start: '2026-10-29T07:30', duration: '10m', calendar: 'Garden', name: 'Pump',
+}, res => log(JSON.stringify(res))); // {id, name, type, start, ts} or {error}
+// every year on June 15 at 08:00 (a birthday), the start may be in the past
+sendTo('fullcalendar.0', 'addEvent', {
+    oid: '0_userdata.0.birthday', value: 'Anna', start: '2020-06-15T08:00', recurring: 'yearly', name: 'Birthday Anna',
+}, res => log(JSON.stringify(res))); // {id, name, type, start: next execution, ts, cron: "0 0 8 15 6 *"}
+// move an event to 09:30 (a series keeps its days) and let it switch for 2 minutes
+sendTo('fullcalendar.0', 'updateEvent', { id: 'fullcalendar.0.event-…', start: '09:30', duration: '2m' }, res => log(JSON.stringify(res)));
+// delete all events with this name
+sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JSON.stringify(res)));
+```
+
+| Command          | Message                                                                                    | Answer                                            |
+|------------------|--------------------------------------------------------------------------------------------|---------------------------------------------------|
+| `addEvent`       | see below                                                                                  | `{id, name, type, start, ts, cron?}` (`start`/`ts` = first execution) |
+| `updateEvent`    | `id` and the parameters of `addEvent` to change, see below                                 | `{id, name, type, enabled, start, ts, cron?}` (`start`/`ts` = next execution, `null` if none) |
+| `deleteEvent`    | `id`, `ids` (a list) and/or `name` (all events with exactly this name; optional `calendar`) | `{result: "ok", deleted: [id, …], notFound?: [id, …]}` |
+| `getEvent`       | `id`                                                                                       | `{event: definition}`                             |
+| `getEvents`      | optional `calendar`                                                                        | `{events: [definition, …]}`                       |
+| `listEvents`     | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                   | `{events: [execution, …]}`                        |
+| `getCalendars`   | –                                                                                          | `{calendars: [{id, name, enabled}, …]}`           |
+| `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                        | `{id, enabled}`                                   |
+| `getEventObjects` | optional `calendar` (`<namespace>.Calendars.<id>`) | `{events: [object, …]}`: the schedule objects, for the web component |
+| `setEventObject` | `event` (a schedule object of this instance) | `{result: "ok"}` |
+| `deleteEventObject` | `id` | `{result: "ok"}` |
+| `getCommands`    | –                                                                                          | `{commands: [{command, params, answer}, …]}`      |
+
+Parameters of `addEvent`:
+
+| Parameter                  | Meaning                                                                                                    |
+|----------------------------|------------------------------------------------------------------------------------------------------------|
+| `oid`                      | state to write (must exist and be writable)                                                                |
+| `value`                    | value to write                                                                                             |
+| `start` or `in`            | `start`: local time (`"2026-10-29T07:30"`, `"07:30"` = today) or a timestamp in ms; `in`: delay (seconds, or `"90s"`, `"30m"`, `"2h"`, `"1h30m"`, `"1d"`) |
+| `duration` / `durationSec` | after this time (same formats as `in`) the second value is written; then `type` is `"double"` by default |
+| `type`                     | `"single"` (default), `"double"` (writes `endValue` after `duration`), `"toggle"` (switches back after `duration`) |
+| `endValue`                 | value of `"double"`; for a boolean `value` the default is the opposite                                    |
+| `recurring`                | `"daily"`, `"weekly"`, `"monthly"` or `"yearly"`: repeats at the time of day of `start` (also of a `start` in the past). The day comes from `start`, or from `weekdays` (list, `0` = Sunday or `"MO"`, `"TU"`…), `monthDays` (list, 1…31), `months` (list, 1…12) |
+| `rrule`                    | instead of `recurring`: iCal rule, e.g. `"FREQ=YEARLY"`, `"FREQ=WEEKLY;BYDAY=MO,FR"`, `"FREQ=MONTHLY;BYMONTHDAY=1,15"`. Supported: `FREQ` (DAILY, WEEKLY, MONTHLY, YEARLY), `BYDAY` (plain weekdays), `BYMONTHDAY`, `BYMONTH`. Not supported: `INTERVAL` > 1, `COUNT`, `UNTIL`, `BYDAY=2MO` |
+| `name`                     | name of the event, default: name of the state                                                              |
+| `calendar`                 | name or ID of the calendar, default: the default calendar                                                  |
+| `color`                    | color in the calendar                                                                                      |
+
+`updateEvent` changes an event in place, the parameters not given stay as they are:
+- `start` or `in` moves a one-shot event; of a series it changes the time of day, the days stay.
+- `recurring` or `rrule` make it a series (at the time of `start`, or at its current time of day), `recurring: false` together with `start` or `in` makes it a one-shot event again.
+- `value`, `oid`, `type`, `duration`/`durationSec`, `endValue`, `name`, `color` like in `addEvent`. If a boolean event switches the other way (`value`), its end value follows.
+- `enabled: false` / `true` switches it off or on.
+- `calendar` moves it to another calendar. The event gets a new ID then, the answer has it.
+
+Errors come back as `{error}`, an unknown command answers with the list of the commands. A new event appears in the calendar like one created by hand and can be edited there. Recurring events run at whole minutes.
 
 ## Todo
 - Week and day must scroll to the current time
@@ -48,23 +136,36 @@ Build it with `npm run build-wc` (part of `npm run build`).
 ## Changelog
 ### **WORK IN PROGRESS**
 * (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
-* (bluefox) The instance answers the commands `getEvents`, `setEvent` and `deleteEvent` (`sendTo`) of the web component
-* (bluefox) The vis-2 widget creates new events in the calendar selected in its settings instead of the default calendar
+* (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
 
-### 3.0.2 (2026-10-16)
-* (bluefox) Updated packages
+### 3.3.1 (2026-10-29)
+* (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
+* (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)
+* (@GermanBluefox) Added the message `updateEvent`: move or change an event without deleting and creating it again
 
-### 3.0.1 (2026-08-05)
-* (bluefox) Migrated GUI to React19
+### 3.3.0 (2026-10-29)
+* (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
+* (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`
+* (bluefox) `deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)
+* (bluefox) Added the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands
+* (bluefox) Documented all messages and parameters in the README
 
-### 2.4.5 (2024-09-09)
-* (bluefox) Corrected SelectID Dialog
+### 3.2.0 (2026-10-29)
+* (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
+* (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)
+* (bluefox) Fixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)
+* (bluefox) Fixed: the subscriptions of a stopped recording were not removed
+* (bluefox) Added: the duration of "On/Off" and "Toggle" events can be given in seconds, minutes or hours, e.g. for a push button (#354)
+* (bluefox) Added: conditions for events, e.g. do not close the shutter if the door is open (#257)
+* (bluefox) Added: calendars can be switched off and on, also with the message `enableCalendar` (#236)
 
-### 2.4.4 (2024-09-09)
-* (bluefox) Removed withStyles package
+### 3.1.1 (2026-10-29)
+* (GermanBluefox) Fixed display of recurring events after DST change (#448)
 
-### 2.3.17 (2024-05-26)
-* (bluefox) Corrected the simulation
+### 3.1.0 (2026-10-28)
+* (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
+* (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
+* (bluefox) A one-shot event in the past is no longer marked as disabled in memory
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

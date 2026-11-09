@@ -95,5 +95,14 @@
   "Desired value": "Бажане значення",
   "Description": "опис",
   "min": "хви.",
-  "default": "за замовчуванням"
+  "default": "за замовчуванням",
+  "seconds": "секунд",
+  "hours": "годин",
+  "Only if": "Лише якщо",
+  "condition_description": "Подія виконується, лише якщо цей стан у цей момент має вказане значення",
+  "Condition object ID": "ID об'єкта умови",
+  "Operator": "Оператор",
+  "Value": "Значення",
+  "ON (true)": "УВІМКНЕНО (true)",
+  "OFF (false)": "ВИМКНЕНО (false)"
 }

@@ -95,5 +95,14 @@
   "Desired value": "Gewünschter Wert",
   "Description": "Beschreibung",
   "min": "Min.",
-  "default": "Standard"
+  "default": "Standard",
+  "seconds": "Sekunden",
+  "hours": "Stunden",
+  "Only if": "Nur wenn",
+  "condition_description": "Das Ereignis wird nur ausgeführt, wenn dieser Zustand zu diesem Zeitpunkt den angegebenen Wert hat",
+  "Condition object ID": "Objekt-ID der Bedingung",
+  "Operator": "Operator",
+  "Value": "Wert",
+  "ON (true)": "EIN (true)",
+  "OFF (false)": "AUS (false)"
 }

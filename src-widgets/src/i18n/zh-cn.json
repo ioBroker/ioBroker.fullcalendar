@@ -95,5 +95,14 @@
   "Desired value": "期望值",
   "Description": "描述",
   "min": "分钟",
-  "default": "默认"
+  "default": "默认",
+  "seconds": "秒",
+  "hours": "小时",
+  "Only if": "仅当",
+  "condition_description": "仅当此状态在该时刻具有指定值时才执行事件",
+  "Condition object ID": "条件对象 ID",
+  "Operator": "运算符",
+  "Value": "值",
+  "ON (true)": "开 (true)",
+  "OFF (false)": "关 (false)"
 }

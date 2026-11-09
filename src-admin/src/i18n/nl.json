@@ -124,5 +124,17 @@
   "Object ID": "Object-ID",
   "All": "Alle",
   "Description": "Beschrijving",
-  "First value": "Eerste waarde"
+  "First value": "Eerste waarde",
+  "seconds": "seconden",
+  "hours": "uren",
+  "Only if": "Alleen als",
+  "condition_description": "De gebeurtenis wordt alleen uitgevoerd als deze status op dat moment de opgegeven waarde heeft",
+  "Condition object ID": "Object-ID van de voorwaarde",
+  "Operator": "Operator",
+  "Value": "Waarde",
+  "ON (true)": "AAN (true)",
+  "OFF (false)": "UIT (false)",
+  "Inactive calendars do not execute their events": "Inactieve kalenders voeren hun gebeurtenissen niet uit",
+  "Calendar is inactive. Click to activate": "Kalender is inactief. Klik om te activeren",
+  "Deactivate calendar": "Kalender deactiveren"
 }

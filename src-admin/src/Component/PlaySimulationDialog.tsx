@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import type { CSSProperties, JSX } from 'react';
-import moment from 'moment';
-import type { Moment } from 'moment';
+import { useState, type CSSProperties, type JSX } from 'react';
+import moment, { type Moment } from 'moment';
 import 'moment/locale/de';
 import 'moment/locale/ru';
 import 'moment/locale/zh-cn';

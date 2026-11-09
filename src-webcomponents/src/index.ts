@@ -4,9 +4,9 @@
  *
  * - The events are objects of the instance (`type: 'schedule'`): `fullcalendar.N.event-<uuid>` for the default
  *   calendar, `fullcalendar.N.Calendars.<id>.event-<uuid>` for another one. A web component may not read a custom
- *   object view or write objects through the socket, so it asks the instance (`sendTo`: `getEvents`, `setEvent`,
- *   `deleteEvent`, see `src/main.ts`). It follows changes with a subscription of the objects below the calendar,
- *   and reads all of them again every few minutes for a host whose socket does not deliver them.
+ *   object view or write objects through the socket, so it asks the instance (`sendTo`: `getEventObjects`,
+ *   `setEventObject`, `deleteEventObject`, see `src/main.ts`). It follows changes with a subscription of the objects
+ *   below the calendar, and reads all of them again every few minutes for a host whose socket does not deliver them.
  * - Like the widget, it creates events by dragging a type from the left into the calendar or by a double click,
  *   moves them by dragging (with ALT: copies them), changes the duration by resizing and edits them in a dialog -
  *   the form dialog of the host (`openDialog`). Read only: the dialog shows the event without changing it.
@@ -899,7 +899,7 @@ class FullCalendarElement extends IobWebComponent<Settings> {
         let events: CalendarEvent[] | null = null;
         try {
             const answer = await withTimeout(
-                socket.sendTo<{ events?: unknown[]; error?: string }>(target.instance, 'getEvents', {
+                socket.sendTo<{ events?: unknown[]; error?: string }>(target.instance, 'getEventObjects', {
                     calendar: target.calendar || undefined,
                 }),
                 TIMEOUT,
@@ -936,14 +936,14 @@ class FullCalendarElement extends IobWebComponent<Settings> {
      * @returns whether it was saved
      */
     async #save(event: CalendarEvent): Promise<boolean> {
-        return this.#send('setEvent', { event }, () => this.#putEvent(event._id, event));
+        return this.#send('setEventObject', { event }, () => this.#putEvent(event._id, event));
     }
 
     async #delete(id: string): Promise<boolean> {
-        return this.#send('deleteEvent', { id }, () => this.#putEvent(id, null));
+        return this.#send('deleteEventObject', { id }, () => this.#putEvent(id, null));
     }
 
-    async #send(command: 'setEvent' | 'deleteEvent', data: unknown, done: () => void): Promise<boolean> {
+    async #send(command: 'setEventObject' | 'deleteEventObject', data: unknown, done: () => void): Promise<boolean> {
         const target = this.#target;
         const socket = this.socket;
         // never in edit mode

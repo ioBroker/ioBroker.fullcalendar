@@ -1,33 +1,85 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.0.2",
+    "version": "3.3.1",
     "news": {
-      "3.0.2": {
-        "en": "Updated packages",
-        "de": "Neue Pakete",
-        "ru": "Обновленные пакеты",
-        "pt": "Pacotes novos",
-        "nl": "Bijgewerkte pakketten",
-        "fr": "Packages mis à jour",
-        "it": "Pacchi nuovi",
-        "es": "Paquetes nuevos",
-        "pl": "Zaktualizowane pakiety",
-        "uk": "Оновлені пакети",
-        "zh-cn": "更新的软件包"
+      "3.3.1": {
+        "en": "Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)\nThe adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)\nAdded the message `updateEvent`: move or change an event without deleting and creating it again",
+        "de": "Admin >= 7.6.17, übersetzter Name des Admin-Tabs und UK-Übersetzungen hinzugefügt (#557)\nDie Adapter-Timer (`this.setTimeout`/`this.setInterval`) werden benutzt (#557)\nNachricht `updateEvent` hinzugefügt: Event verschieben oder ändern, ohne es neu zu erstellen",
+        "ru": "Добавлена зависимость admin >= 7.6.17, переведенное имя вкладки admin и переводы для Великобритании (#557)\nТаймеры адаптера (`this.setTimeout`/`this.setInterval`) используются вместо обычных (#557)\nДобавлено сообщение `updateEvent`: перемещайте или изменяйте событие, не удаляя и не создавая его снова",
+        "pt": "Adicionou a dependência admin >= 7.6.17, o nome traduzido da aba admin e as traduções do Reino Unido (#557)\nOs timers do adaptador (`this.setTimeout`/`this.setInterval`) são usados em vez dos simples (#557)\nAdicionada a mensagem `updateEvent`: mova ou altere um evento sem excluí-lo e criá-lo",
+        "nl": "De afhankelijkheid admin >= 7.6.17, de vertaalde naam van het tabblad admin en de Engelse vertalingen (#557) toegevoegd\nDe timers van de adapter (`This.setTimeout`/`This.setInterval`) worden gebruikt in plaats van de gewone timers (#557)\nDe boodschap `UpdateEvent` toegevoegd: een gebeurtenis verplaatsen of wijzigen zonder deze te verwijderen en opnieuw aan te maken",
+        "fr": "Ajout de la dépendance admin >= 7.6.17, du nom traduit de l'onglet admin et des traductions britanniques (#557)\nLes temporisateurs (`this.setTimeout`/`this.setInterval`) sont utilisés au lieu des simples (#557)\nAjout du message « UpdateEvent » : déplacer ou modifier un événement sans le supprimer ni le créer",
+        "it": "Aggiunti la dipendenza admin >= 7.6.17, il nome tradotto e le traduzioni in UK (#557)\nI timer adattatori (`this.setTimeout`/`this.setInterval`) sono usati al posto di quelli semplici (#557)\nAggiunto il messaggio `UpdateEvent`: sposta o modifica un evento senza eliminarlo e crearlo",
+        "es": "Se ha añadido la dependencia admin >= 7.6.17, el nombre traducido de la pestaña admin y UK Translations (#557)\nLos temporizadores adaptadores (`this.setTimeout`/`this.setInterval`) se usan en lugar de los normales (#557)\nAñadió el mensaje `UpdateEvent`: mover o cambiar un evento sin eliminarlo y volver a crearlo",
+        "pl": "Dodano zależność admin >= 7.6.17, przetłumaczoną nazwę zakładki admin i tłumaczenia brytyjskie (#557)\nCzasomierze adaptera (`this.setTimeout`/`this.setInterval`) są używane zamiast zwykłych (#557)\nDodano komunikat `UpdateEvent`: przenieś lub zmień zdarzenie bez usuwania i ponownego tworzenia",
+        "uk": "Додано залежність admin >= 7.6.17, перекладена назва вкладки адміністратора та переклади Великобританії (#557)\nЗамість простих (#557) використовуються таймери адаптера (`this.setTimeout`/`this.setInterval`)\nДодано повідомлення `updateEvent`: перемістіть або змініть подію, не видаляючи та створюючи її знову",
+        "zh-cn": "添加了管理员 >= 7.6.17 依赖项、管理选项卡的翻译名称和英国翻译 (#557)\n使用适配器计时器 (`this.setTimeout`/`this.setInterval`) 而不是普通计时器 (#557)\n添加了消息 `updateEvent`：在不删除和重新创建的情况下移动或更改事件"
       },
-      "3.0.1": {
-        "en": "Migrated GUI to React19",
-        "de": "GUI auf React19 migriert",
-        "ru": "Перенесен графический интерфейс на React19.",
-        "pt": "Interface gráfica migrada para React19",
-        "nl": "GUI gemigreerd naar React19",
-        "fr": "Interface graphique migrée vers React19",
-        "it": "Interfaccia grafica migrata a React19",
-        "es": "Se migró la interfaz gráfica de usuario a React19.",
-        "pl": "Migracja GUI do React19",
-        "uk": "Перенесено графічний інтерфейс на React19",
-        "zh-cn": "将 GUI 迁移到 React19"
+      "3.3.0": {
+        "en": "Fixed: `addEvent` ignored `type` and `durationSec`, a \"double\" event was saved as \"single\"\nAdded recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`\n`deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)\nAdded the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands\nDocumented all messages and parameters in the README",
+        "de": "Behoben: `addEvent` ignorierte `Type` und `DurationSec`, ein Doppelevent wurde als „Single“ gespeichert\n„AddEvent“: „wiederkehrend“ (täglich, wöchentlich, monatlich, jährlich) oder eine iCal-Regel hinzugefügt\n`DeleteEvent` löscht eine Eventliste (`ids`) oder alle Events mit Namen (`Name`)\nDie Meldungen `getEvent` und `getCommands` hinzugefügt, ein unbekannter Befehl gibt eine Liste\nDokumentiert alle Meldungen und Parameter im README",
+        "ru": "Исправлено: `AddEvent` игнорировали `type` и `durationSec`, «двойное» событие сохранялось как «одиночное»\nВ «AddEvent» добавлены повторяющиеся события: «повторяющиеся» (ежедневно, еженедельно, ежемесячно, ежегодно) или «правило iCal»\n`DeleteEvent` удаляет список событий (`ids`) или все события с именем (`name`)\nДобавлены сообщения `getEvent` и `getCommands`, неизвестная команда отвечает списком команд\nЗадокументировал все сообщения и параметры в README",
+        "pt": "Corrigido: `addEvent` ignorou `type` e `durationSec`, um evento “duplo” foi salvo\nEventos recorrentes adicionados a `addEvent`: `diário, semanal, mensal ou anual) ou a uma `rrule` do iCal\n`deleteEvent` exclui uma lista de eventos (`ids`) ou com um nome (`name`)\nAdicionadas as mensagens `getEvent` e `getCommands`, um comando desconhecido responde\nDocumentou todas as mensagens e parâmetros no README",
+        "nl": "Opgelost: `addEvent` negeerde `type` en `DurationSec`, een „dubbele” gebeurtenis werd opgeslagen als „single”\nTerugkerende gebeurtenissen toegevoegd aan `addEvent`: `terugkerend` (dagelijks, wekelijks, maandelijks, jaarlijks) of een iCal-regel\nMet `DeleteEvent` wordt een lijst met gebeurtenissen (`ids`) of alle gebeurtenissen met een naam (`naam`) verwijderd\nDe berichten `getEvent` en `GetCommands` toegevoegd, een onbekend commando antwoordt met de lijst van de opdrachten\nAlle berichten en parameters in de README gedocumenteerd",
+        "fr": "Corrigé : « AddEvent » ignorait « type » et « DurationSec », un événement « double » était « simple »\nAjout d'événements récurrents à « AddEvent » : « récurrents » (quotidiens, hebdomadaires, mensuels) ou « règle » iCal\n`DeleteEvent` supprime une liste d'événements (`ids`) ou tous ceux qui ont un nom (`name`)\nAjout des messages « GetEvent » et « GetCommands », une commande inconnue répond par la liste des commandes\nA documenté tous les messages et paramètres dans le README",
+        "it": "Risolto: addEvent ignorava «type» e «DurationSec», un evento «double» salvato come «singolo»\nAggiunti eventi ricorrenti a `addEvent`: `recurring` (giornalieri, mensili, annuali) o iCal\n`DeleteEvent` elimina un elenco di eventi (`ids`) o tutti gli eventi con un nome\nAggiunti i messaggi `getEvent` e `getCommands`, un comando sconosciuto risponde con l'elenco\nDocumenta tutti i messaggi e i parametri nel README",
+        "es": "Corregido: `addEvent` ignoró `Type` y `DurationSec`, un evento «doble» se guardó como «único»\nSe han añadido eventos recurrentes a «AddEvent»: «periódicos» (diarios, semanales, mensuales, anuales) o una «regla» de iCal\n`DeleteEvent` borra una lista de eventos (`ids`) o todos los eventos con un nombre (`nombre`)\nAñadió los mensajes `getEvent` y `getCommands`, un comando desconocido responde con la lista de comandos\nDocumentó todos los mensajes y parámetros del README",
+        "pl": "Naprawiono: `AddEvent` zignorował `type` i `DurationSec`, zdarzenie „double” zostało zapisane jako „pojedyncze”\nDodano powtarzające się zdarzenia do `AddEvent`: `recurring` (codziennie, tygodniowo, miesięcznie, rocznie) lub `rrule` iCal\n`DeleteEvent` usuwa listę zdarzeń (`ids`) lub wszystkie zdarzenia o nazwie (`name`)\nDodano komunikaty `getEvent` i `GetCommands`, nieznane polecenie odpowiada z listą poleceń\nUdokumentowano wszystkie komunikaty i parametry w README",
+        "uk": "Виправлено: `addEvent` ігнорував `type` і `durationSec`, подія «подвійна» була збережена як «одинарна»\nДодано повторювані події до `addEvent`: `recurring` (щодня, щотижня, щомісяця, щорічно) або iCal `rrule`\n`DeleteEvent` видаляє список подій (`ids`) або всі події з назвою (`name`)\nДодані повідомлення `getEvent` і `getCommands`, невідома команда відповідає зі списком команд\nЗадокументовані всі повідомлення та параметри в README",
+        "zh-cn": "修复：`addEvent`忽略了 `type` 和 `durationSec`，一个 “双精度” 事件被保存为 “单一事件”\n在 `addEvent` 中添加了循环事件：“循环”（每天、每周、每月、每年）或 iCal 的 “rrule”\n`deleteEvent` 删除事件列表 (`ids`) 或所有带有名称（`名称`）的事件\n添加了消息 `getEvent`和`getCommands`，一个未知命令的答案包含命令列表\n在 README 中记录了所有消息和参数"
+      },
+      "3.2.0": {
+        "en": "Fixed white screen when adding an event in the vis-2 widget (#444)\nFixed: the recording of a simulation stopped immediately after the start (#234)\nFixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)\nFixed: the subscriptions of a stopped recording were not removed\nAdded: the duration of \"On/Off\" and \"Toggle\" events can be given in seconds, minutes or hours, e.g. for a push button (#354)\nAdded: conditions for events, e.g. do not close the shutter if the door is open (#257)\nAdded: calendars can be switched off and on, also with the message `enableCalendar` (#236)",
+        "de": "Weißbild beim Hinzufügen von Events im Vis-2-Widget behoben (#444)\nBehoben: Die Simulationsaufnahme stoppte sofort nach dem Start (#234)\nBehoben: Die Simulation zeigte mehrere Statusmeldungen ohne Änderung des Werts, z. B. von Tasmota oder Sonoff (#285, #235)\nBehoben: Die Abos einer gestoppten Aufnahme wurden nicht gelöscht\nHinzugefügt: Die Dauer von On/Off und Toggle kann in Sekunden, Minuten oder Stunden angegeben werden, z. B. per Tastendruck (#354)\nHinzugefügt: Eventbedingungen, z. B. bei offener Tür nicht schließen (#257)\nHinzugefügt: Kalender ein- und ausschalten, auch mit `enableCalendar` (#236)",
+        "ru": "Исправлен белый экран при добавлении события в виджет vis-2 (#444)\nИсправлено: запись симуляции останавливалась сразу после запуска (#234)\nИсправлено: моделирование регистрировало повторяющиеся обновления статуса без изменения значения, например, устройств Tasmota или Sonoff (#285, #235)\nИсправлено: подписки на остановленную запись не удалялись\nДобавлено: продолжительность событий «On/Off» и «Toggle» может быть указана в секундах, минутах или часах, например, при нажатии кнопки (#354)\nДобавлено: условия проведения мероприятий, например, не закрывайте жалюзи, если дверь открыта (#257)\nДобавлено: календари можно включать и выключать, а также сообщением `EnableCalendar` (#236)",
+        "pt": "Tela branca fixa ao adicionar um evento no widget vis-2 (#444)\nCorrigido: a gravação de uma simulação parou logo após o início (#234)\nCorrigido: a simulação atualizou o status sem alterar o valor, por exemplo, de dispositivos Tasmota ou Sonoff (#285, #235)\nCorrigido: a assinatura de uma gravação parada não foi removida\nAdicionado: a duração dos eventos “On/Off” e “Toggle” pode ser em segundos, minutos ou horas (#354)\nAdicionado: condições para eventos, p. ex., não feche a porta (#257)\nAdicionado: pode ativar e desativar calendários com a mensagem `enableCalendar` (#236)",
+        "nl": "Wit scherm opgelost bij het toevoegen van een gebeurtenis in de vis-2-widget (#444)\nOpgelost: de opname van een simulatie stopte onmiddellijk na de start (#234)\nOpgelost: in de simulatie werden herhaalde statusupdates geregistreerd zonder dat de waarde werd gewijzigd, bijvoorbeeld van Tasmota- of Sonoff-apparaten (#285, #235)\nOpgelost: de abonnementen op een stopgezette opname zijn niet verwijderd\nToegevoegd: de duur van de gebeurtenissen „On/Off” en „Toggle” kan worden gegeven in seconden, minuten of uren, bijvoorbeeld voor een drukknop (#354)\nToegevoegd: voorwaarden voor evenementen, bijvoorbeeld het rolluik niet sluiten als de deur open is (#257)\nToegevoegd: agenda's kunnen in- en uitgeschakeld worden, ook met de boodschap `EnableCalendar` (#236)",
+        "fr": "Écran blanc fixe lors de l'ajout d'un événement au widget Vis-2 (#444)\nCorrigé : l'enregistrement d'une simulation s'arrêtait juste après le départ (#234)\nCorrigé : la simulation enregistrait des mises à jour de statut répétées sans modifier la valeur, par exemple pour Tasmota ou Sonoff (#285, #235)\nCorrigé : les abonnements à un enregistrement arrêté n'ont pas été supprimés\nAjouté : la durée des événements « On/Off » et « Toggle » peut être donnée en secondes, minutes ou heures, par exemple (#354)\nAjouté : conditions pour les événements, par exemple ne pas fermer la porte ouverte (#257)\nAjouté : les calendriers peuvent être allumés ou éteints, avec le message « EnableCalendar » (#236)",
+        "it": "Schermo bianco fisso con un evento nel widget vis-2 (#444)\nRisolto: la registrazione di una simulazione si interrompe subito (#234)\nRisolto: la simulazione registrava ripetuti aggiornamenti di stato, ad esempio Tasmota o Sonoff (#285, #235)\nRisolto: le iscrizioni a una registrazione interrotta non sono rimosse\nAggiunto: la durata degli eventi «On/Off» e «Toggle» può essere espressa in secondi, minuti o ore (#354)\nAggiunto: condizioni per eventi, ad es. non chiuda se la porta è aperta (#257)\nAggiunto: i calendari si accendono e si spengono, anche con `EnableCalendar` (#236)",
+        "es": "Pantalla blanca fija al añadir un evento en el widget vis-2 (#444)\nCorregido: la grabación de una simulación se detuvo justo después del inicio (#234)\nCorregido: la simulación grabó varias actualizaciones de estado sin cambiar el valor, por ejemplo, de los dispositivos Tasmota o Sonoff (#285, #235)\nCorregido: no se eliminaron los abonos de una grabación detenida\nAñadido: la duración de los eventos «On/Off» y «Toggle» puede ser en segundos, minutos u horas, por ejemplo, con un botón (#354)\nAñadido: condiciones para eventos, p. ej., no cierre la persiana (#257)\nAñadido: los calendarios se pueden encender y apagar, también con el mensaje `EnableCalendar` (#236)",
+        "pl": "Naprawiono biały ekran podczas dodawania zdarzenia w widżecie vis-2 (#444)\nNaprawiono: nagrywanie symulacji zatrzymało się natychmiast po rozpoczęciu (#234)\nNaprawiono: symulacja rejestrowała powtarzające się aktualizacje statusu bez zmiany wartości, np. urządzeń Tasmota lub Sonoff (#285, #235)\nNaprawiono: subskrypcje zatrzymanego nagrania nie zostały usunięte\nDodano: czas trwania zdarzeń „On/Off” i „Toggle” można podać w sekundach, minutach lub godzinach, np. za naciśnięcie przycisku (#354)\nDodano: warunki zdarzeń, np. nie zamykaj migawki, jeśli drzwi są otwarte (#257)\nDodano: kalendarze można wyłączać i włączać, również z komunikatem `EnableCalendar` (#236)",
+        "uk": "Виправлено білий екран при додаванні події в віджет vis-2 (#444)\nВиправлено: запис моделювання зупинився відразу після запуску (#234)\nВиправлено: моделювання записувало повторні оновлення статусу без зміни значення, наприклад, пристроїв Tasmota або Sonoff (#285, #235)\nВиправлено: підписки зупиненого запису не були видалені\nДодано: тривалість подій «On/Off» та «Toggle» може бути вказана в секундах, хвилині або годині, наприклад, для натискання кнопки (#354)\nДодано: умови для подій, наприклад, не закривати затвор, якщо двері відкриті (#257)\nДодано: календарі можна вимикати та вмикати, також із повідомленням `enableCalendar` (#236)",
+        "zh-cn": "修复了在 vis-2 控件中添加事件时出现白屏的问题 (#444)\n修复：模拟录制在开始后立即停止 (#234)\n修复：模拟在不更改值的情况下记录了重复的状态更新，例如 Tasmota 或 Sonoff 设备的状态更新 (#285, #235)\n修复：已停止录制的订阅未被删除\n新增：“开/关” 和 “切换” 事件的持续时间可以以秒、分钟或小时为单位给出，例如按下按钮 (#354)\n新增：活动条件，例如门开着时不要关闭快门 (#257)\n新增：可以关闭和打开日历，还可以显示消息 `enableCalendar` (#236)"
+      },
+      "3.1.1": {
+        "en": "Fixed display of recurring events after DST change (#448)",
+        "de": "Anzeige von Terminen nach Sommerzeit behoben (#448)",
+        "ru": "Исправлено отображение повторяющихся событий после смены летнего времени (#448)",
+        "pt": "Exibição fixa de eventos recorrentes após o horário de verão (#448)",
+        "nl": "Vaste weergave van terugkerende gebeurtenissen na wijziging van de zomertijd (#448)",
+        "fr": "Affichage fixe des événements récurrents après l'heure d'été (#448)",
+        "it": "Risolto il problema con eventi ricorrenti dopo l'ora legale (#448)",
+        "es": "Pantalla fija de eventos recurrentes tras el cambio de horario (#448)",
+        "pl": "Naprawiono wyświetlanie powtarzających się zdarzeń po zmianie czasu letniego (#448)",
+        "uk": "Виправлено відображення повторюваних подій після зміни літнього часу (#448)",
+        "zh-cn": "修复了 DST 更改后反复出现的事件的显示问题 (#448)"
+      },
+      "3.1.0": {
+        "en": "Added agenda states `events.list/today/tomorrow/next/count/lastChanged`\nAdded the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants\nA one-shot event in the past is no longer marked as disabled in memory",
+        "de": "Agenda mit Angabe `Events.List/Today/Morrow/Next/Count/LastChanged`\nNachrichten „AddEvent“, „DeleteEvent“, „ListEvents“, „GetEvents“ und „GetCalendars“ hinzugefügt, z. B. für Sprachassistenten\nEin einmaliges Event ist nicht mehr im Speicher deaktiviert",
+        "ru": "Добавлены следующие пункты повестки дня: «События.список/сегодня/завтра/следующие/счет/последнее изменение»\nДобавлены сообщения «AddEvent», «DeleteEvent», «ListEvents», «GetEvents» и «GetCalendars», например, для голосовых помощников\nОднократное событие в прошлом больше не помечается в памяти как отключенное",
+        "pt": "Agenda adicionada: `events.list/today/tomorrow/next/count/lastChanged`\nAdicionadas as mensagens `addEvent`, `deleteEvent`, `listEvents`, `getEvents` e `getCalendars` para assistentes de voz\nUm evento único no passado não está mais desativado na memória",
+        "nl": "Op de agenda staat `Events.list/Today/Tomorrow/Next/Count/LastChanged`\nDe berichten `addEvent`, `DeleteEvent`, `ListEvents`, `GetEvents` en `GetCalendars` toegevoegd, bijvoorbeeld voor stemassistenten\nEen eenmalige gebeurtenis in het verleden wordt in het geheugen niet langer als uitgeschakeld gemarkeerd",
+        "fr": "L'agenda a ajouté « Events.List/Today/Tomorrow/Next/Count/LastChanged »\nAjout des messages « AddEvent », « DeleteEvent », « ListEvents », « GetEvents » et « GetCalendars », par exemple pour les assistants vocaux\nUn événement ponctuel n'est plus marqué comme désactivé de mémoire",
+        "it": "Aggiunto l'agenda `events.list/oggi/domani/next/count/lastChanged`\nAggiunti i messaggi addEvent`, deleteEvent`, listEvents`, getEvents` e `getCalendars`, ad es. per assistenti vocali\nUn evento one-shot del passato non è più segnato come disattivato",
+        "es": "El orden del día ha añadido `Events.List/Today/Tomorrow/Next/Count/LastChanged`\nAñadió los mensajes `addEvent`, `DeleteEvents`, `GetEvents` y `getCalendars`, p. ej. para los asistentes de voz\nUn hecho único del pasado ya no se marca como desactivado en la memoria",
+        "pl": "Dodano stany agendy `events.list/Today/Tomorrow/NEXT/Count/LastChanged`\nDodano komunikaty `AddEvent`, `DeleteEvents`, `ListEvents`, `GetEvents` i `GetCalendars`, np. dla asystentów głosowych\nZdarzenie jednorazowe w przeszłości nie jest już oznaczane jako wyłączone w pamięci",
+        "uk": "Додано порядок денний «події.списк/сьогодні/завтра/далі/рахунок/останнє змінення`\nДодано повідомлення `addEvent`, `deleteEvent`, `ListEvents`, `getEvents` і `getCalendars`, наприклад для голосових помічників\nОдноразова подія в минулому більше не позначається як вимкнена в пам'яті",
+        "zh-cn": "添加了议程内容 “events.list/今天/明天/下一次/计数/上次更改”\n添加了 `addEvent`、`DeleteEvents`、`listEvents`、`getEvents` 和 `getCalendars`消息，例如语音助手消息\n过去的单发事件在内存中不再标记为禁用"
+      },
+      "3.0.5": {
+        "en": "Adapter requires js-controller >= 6.0.11 now.\nMigrated GUI to vite\nUpdated packages",
+        "de": "Adapter benötigt jetzt JS-Controller >= 6.0.11.\nGUI zu Vite migriert\nNeue Pakete",
+        "ru": "Теперь для адаптера требуется js-контроллер >= 6.0.11.\nГрафический интерфейс перенесен на vite\nОбновленные пакеты",
+        "pt": "O adaptador exige js-controller >= 6.0.11.\nGUI migrado para vite\nPacotes novos",
+        "nl": "Voor de adapter is nu een js-controller >= 6.0.11 nodig.\nGUI naar vite gemigreerd\nBijgewerkte pakketten",
+        "fr": "Adapter nécessite JS-Controller >= 6.0.11.\nGUI migré vers Vite\nPackages mis à jour",
+        "it": "Adapter richiede js-controller >= 6.0.11 ora.\nGUI migrata a vite\nPacchi nuovi",
+        "es": "El adaptador ahora requiere js-controller >= 6.0.11.\nMigró la GUI a Vite\nPaquetes nuevos",
+        "pl": "Adapter wymaga teraz kontrolera js->= 6.0.11.\nPrzemigrowany interfejs GUI do vite\nZaktualizowane pakiety",
+        "uk": "Для адаптера зараз потрібен js-контролер >= 6.0.11.\nПеренесений графічний інтерфейс до Vite\nОновлені пакети",
+        "zh-cn": "适配器现在需要 js-controller >= 6.0.11。\n将 GUI 迁移到 vite\n更新的软件包"
       },
       "2.4.5": {
         "en": "Corrected SelectID Dialog",
@@ -41,58 +93,6 @@
         "pl": "Poprawione okno dialogowe SelectID",
         "uk": "Корекція ВиберітьД Діалог",
         "zh-cn": "已更正的选定ID对话框"
-      },
-      "2.4.4": {
-        "en": "Removed withStyles package",
-        "de": "MitStyles-Paket entfernt",
-        "ru": "Удаленный пакет со Стайлз",
-        "pt": "Removido com pacote Estilos",
-        "nl": "Verwijderd metStyles pakket",
-        "fr": "Enlever avec le paquetStyles",
-        "it": "Rimosso con pacchettoStyles",
-        "es": "Retire el paquete de estilos",
-        "pl": "Usunięty z pakietem Styles",
-        "uk": "Видаліть пакет \"Стиль\"",
-        "zh-cn": "用 Styles 软件包删除"
-      },
-      "2.4.2": {
-        "en": "Removed withStyles package",
-        "de": "MitStyles-Paket entfernt",
-        "ru": "Удаленный пакет со Стайлз",
-        "pt": "Removido com pacote Estilos",
-        "nl": "Verwijderd metStyles pakket",
-        "fr": "Enlever avec le paquetStyles",
-        "it": "Rimosso con pacchettoStyles",
-        "es": "Retire el paquete de estilos",
-        "pl": "Usunięty z pakietem Styles",
-        "uk": "Видаліть пакет \"Стиль\"",
-        "zh-cn": "用 Styles 软件包删除"
-      },
-      "2.3.17": {
-        "en": "Corrected the simulation",
-        "de": "Die Simulation wurde korrigiert",
-        "ru": "Исправлено моделирование",
-        "pt": "Corrigido a simulação",
-        "nl": "Correctie van de simulatie",
-        "fr": "Correction de la simulation",
-        "it": "Corretto la simulazione",
-        "es": "Corregido la simulación",
-        "pl": "Korekta symulacji",
-        "uk": "Виправлено моделювання",
-        "zh-cn": "纠正了模拟"
-      },
-      "2.3.16": {
-        "en": "Small UI fixes on widget",
-        "de": "Kleine UI fixiert auf Widget",
-        "ru": "Малые UI фиксации на виджете",
-        "pt": "Pequenas correções UI no widget",
-        "nl": "Kleine UI fixes op widget",
-        "fr": "Petite UI corrige sur widget",
-        "it": "Piccolo UI correzioni su widget",
-        "es": "Pequeña UI se fija en widget",
-        "pl": "Małe poprawki interfejsu użytkownika na widgecie",
-        "uk": "Маленькі UI виправляє на віджет",
-        "zh-cn": "部件上的小型 UI 修正"
       }
     },
     "titleLang": {
@@ -105,6 +105,7 @@
       "it": "Calendario",
       "es": "Calendario calendario",
       "pl": "Harmonogram kalendarza",
+      "uk": "Розклад календаря",
       "zh-cn": "日历时间表"
     },
     "desc": {
@@ -117,6 +118,7 @@
       "it": "Questo adattatore consente la piallatura con calendario",
       "es": "Este adaptador permite planear con calendario",
       "pl": "Ten adapter umożliwia struganie za pomocą kalendarza",
+      "uk": "Цей адаптер дозволяє планувати за допомогою календаря",
       "zh-cn": "该适配器允许日历计划"
     },
     "authors": [
@@ -141,13 +143,31 @@
     "tier": 2,
     "adminTab": {
       "singleton": false,
-      "name": "Calendar"
+      "name": {
+        "en": "Calendar",
+        "de": "Kalender",
+        "ru": "Календарь",
+        "pt": "Calendário",
+        "nl": "Kalender",
+        "fr": "Calendrier",
+        "it": "Calendario",
+        "es": "Calendario",
+        "pl": "Kalendarz",
+        "uk": "Календар",
+        "zh-cn": "日历"
+      }
     },
     "dependencies": [
       {
         "js-controller": ">=6.0.11"
       }
     ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
+    ],
+    "nogit": true,
     "enabled": true,
     "type": "date-and-time",
     "connectionType": "local",
@@ -199,6 +219,92 @@
         "unit": "minutes",
         "read": true,
         "write": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "events",
+      "type": "channel",
+      "common": {
+        "name": "Agenda of the calendars"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.list",
+      "type": "state",
+      "common": {
+        "name": "All events with their next execution (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.today",
+      "type": "state",
+      "common": {
+        "name": "Executions today (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.tomorrow",
+      "type": "state",
+      "common": {
+        "name": "Executions tomorrow (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.next",
+      "type": "state",
+      "common": {
+        "name": "Next execution (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": "null"
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.count",
+      "type": "state",
+      "common": {
+        "name": "Number of events",
+        "type": "number",
+        "role": "value",
+        "read": true,
+        "write": false,
+        "def": 0
+      },
+      "native": {}
+    },
+    {
+      "_id": "events.lastChanged",
+      "type": "state",
+      "common": {
+        "name": "Last change of an event",
+        "type": "number",
+        "role": "value.time",
+        "read": true,
+        "write": false,
+        "def": 0
       },
       "native": {}
     }

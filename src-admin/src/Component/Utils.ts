@@ -51,6 +51,18 @@ export interface EventInterval {
     timeOffset?: number;
 }
 
+export type ConditionOperator = '==' | '!=' | '>' | '>=' | '<' | '<=';
+
+export const CONDITION_OPERATORS: ConditionOperator[] = ['==', '!=', '>', '>=', '<', '<='];
+
+/** The event writes only, if `oid` has a matching value at that time */
+export interface EventCondition {
+    oid: string;
+    /** default `==` */
+    operator?: ConditionOperator;
+    value: ioBroker.StateValue;
+}
+
 export interface CalendarEventNative {
     id?: number;
     /** cron expression; mutually exclusive with `start` */
@@ -67,6 +79,8 @@ export interface CalendarEventNative {
     states?: Record<string, string>;
     /** random jitter in ms */
     timeRandomOffset?: number;
+    /** the event writes only, if this condition is met at that time */
+    condition?: EventCondition;
     /** @deprecated events created by older versions stored the color here instead of in `common` */
     color?: string;
     durationEditable?: boolean;
@@ -466,8 +480,31 @@ function uuidv4(): string {
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+/**
+ * Convert a local date into rrule "floating time": the local fields are stored as UTC fields.
+ * RRule calculates in UTC, so without this all occurrences keep the UTC offset of `dtstart`
+ * and are shifted by one hour after a daylight saving time change.
+ */
+function localToFloatingUtc(d: Date): Date {
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
+}
+
+/** Convert a date in rrule "floating time" back into a local date */
+function floatingUtcToLocal(d: Date): Date {
+    return new Date(
+        d.getUTCFullYear(),
+        d.getUTCMonth(),
+        d.getUTCDate(),
+        d.getUTCHours(),
+        d.getUTCMinutes(),
+        d.getUTCSeconds(),
+    );
+}
+
 export {
     uuidv4,
+    localToFloatingUtc,
+    floatingUtcToLocal,
     cron2obj,
     obj2cron,
     serverDateToClient,
