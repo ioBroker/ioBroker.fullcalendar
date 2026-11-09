@@ -1164,8 +1164,7 @@ export class Fullcalendar extends Adapter {
             }
             return true;
         }
-        const ns = this.namespace.replace(/\./g, '\\.');
-        if (!new RegExp(`^${ns}\\.(Calendars\\.[^.]+\\.)?event-[^.]+$`).test(id)) {
+        if (!/^(Calendars\.[^.]+\.)?event-[^.]+$/.test(id.substring(this.namespace.length + 1))) {
             throw new Error(`Invalid event "${id}"`);
         }
         return false;
