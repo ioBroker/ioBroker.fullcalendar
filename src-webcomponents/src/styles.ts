@@ -205,6 +205,14 @@ export const STYLES = `
     min-height: 21px;
     overflow: hidden;
 }
+.fc-daygrid-event .fc-event-title-container {
+    min-width: 0;
+}
+.fc-daygrid-event .fc-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .fc-v-event .fc-event-title-container {
     display: flex;
     align-items: flex-start;

@@ -137,11 +137,16 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 -->
 ## Changelog
 ### **WORK IN PROGRESS**
-* (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
-* (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
 * (bluefox) Added the messages `addCalendar` and `deleteCalendar`: calendars can be created and deleted by scripts
 * (bluefox) Fixed: the duration of an event is shown in seconds if it is shorter than a minute (not "0.0166 min.")
 * (bluefox) The calendar in the admin tab uses the full height
+
+### 3.4.1 (2026-11-09)
+* (bluefox) Web component: the time of an event always has minutes, so a full hour no longer looks different from "19:45", and a long title ends with "..." instead of being cut off
+
+### 3.4.0 (2026-11-09)
+* (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
+* (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
 
 ### 3.3.1 (2026-10-29)
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
@@ -163,14 +168,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (bluefox) Added: the duration of "On/Off" and "Toggle" events can be given in seconds, minutes or hours, e.g. for a push button (#354)
 * (bluefox) Added: conditions for events, e.g. do not close the shutter if the door is open (#257)
 * (bluefox) Added: calendars can be switched off and on, also with the message `enableCalendar` (#236)
-
-### 3.1.1 (2026-10-29)
-* (GermanBluefox) Fixed display of recurring events after DST change (#448)
-
-### 3.1.0 (2026-10-28)
-* (bluefox) Added agenda states `events.list/today/tomorrow/next/count/lastChanged`
-* (bluefox) Added the messages `addEvent`, `deleteEvent`, `listEvents`, `getEvents` and `getCalendars`, e.g. for voice assistants
-* (bluefox) A one-shot event in the past is no longer marked as disabled in memory
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

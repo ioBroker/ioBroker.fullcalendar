@@ -1,8 +1,34 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.3.1",
+    "version": "3.4.1",
     "news": {
+      "3.4.1": {
+        "en": "Web component: the time of an event always has minutes, so a full hour no longer looks different from \"19:45\", and a long title ends with \"...\" instead of being cut off",
+        "de": "Web-Komponente: Ein Event hat immer Minuten, also sieht eine Stunde nicht mehr anders aus als \"19:45 „, und ein langer Titel endet mit „...“ statt abgeschnitten",
+        "ru": "Веб-компонент: время события всегда указано в минутах, поэтому целый час больше не выглядит иначе, чем «19:45», а длинный заголовок заканчивается буквой «...» вместо того, чтобы быть прерванным",
+        "pt": "Componente Web: a hora de um evento sempre tem minutos, então uma hora inteira não difere de \"19:45 “e um título longo termina com “...” em vez de cortado",
+        "nl": "Webcomponent: de tijd van een evenement bestaat altijd uit minuten, dus een heel uur ziet er niet meer anders uit dan \"19:45 „, en een lange titel eindigt met „...” in plaats van te worden afgekapt",
+        "fr": "Composant Web : l'heure d'un événement est toujours comptée en minutes, donc une heure complète ne diffère plus de « 19 h 45 », et un titre long se termine par «... » au lieu d'être interrompu",
+        "it": "Componente web: la durata di un evento è sempre in minuti, quindi un'ora intera non è più diversa da \"19:45 «, e un titolo lungo termina con «...»",
+        "es": "Componente web: la hora de un evento siempre tiene minutos, por lo que una hora completa ya no es diferente de «19:45 «, y un título largo termina con «...» en lugar de interrumpirse",
+        "pl": "Komponent internetowy: czas wydarzenia zawsze ma minuty, więc pełna godzina nie wygląda już inaczej niż \"19:45 „, a długi tytuł kończy się na „...” zamiast być odcięty",
+        "uk": "Веб-компонент: час події завжди має хвилини, тому ціла година більше не відрізняється від \"19:45 «, а довгий заголовок закінчується на «...» замість того, щоб бути відрізаним",
+        "zh-cn": "Web 组件：活动时间总是以分钟为单位，因此整整一小时看起来与 “19:45” 没有区别，而且长标题以 “...” 结尾而不是被切断"
+      },
+      "3.4.0": {
+        "en": "Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)\nAdded the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component",
+        "de": "Webkomponente `<iob-fullcalendar>` für Aura, Geräte und andere Webkomponenten hinzugefügt (`common.WebComponents`)\nNachrichten `getEventObjects`, `setEventObject` und `deleteEventObject` für die Web-Komponente hinzugefügt",
+        "ru": "Добавлен веб-компонент `<iob-fullcalendar>` для Aura, устройств и других хостов веб-компонентов (`Common.webcomponents`)\nДобавлены сообщения `getEventObjects`, `setEventObject` и `DeleteEventObject` для веб-компонента",
+        "pt": "Adicionado o componente web `<iob-fullcalendar>` para Aura, dispositivos e outros hosts (`common.webComponents`)\nForam adicionadas as mensagens `getEventObjects`, `setEventObject` e `deleteEventObject` para o componente web",
+        "nl": "De webcomponent `<iob-fullcalendar>` toegevoegd voor Aura, apparaten en andere hosts van webcomponenten (`Common.WebComponents`)\nDe berichten `getEventObjects`, `setEventObject` en `DeleteEventObject` toegevoegd voor de webcomponent",
+        "fr": "Ajout du composant Web `<iob-fullcalendar>` pour Aura, appareils et autres hébergeurs de composants Web (`common.WebComponents`)\nAjout des messages « GetEventObjects », « SetEventObject » et « DeleteEventObject » pour le composant Web",
+        "it": "Aggiunto il componente web <iob-fullcalendar>``per Aura, dispositivi e altri host di componenti web (`Common.WebComponents`)\nAggiunti i messaggi getEventObjects, setEventObject e deleteEventObject per il componente web",
+        "es": "Se ha añadido el componente web `<iob-fullcalendar>` para Aura, dispositivos y otros servidores de componentes web (`Common.WebComponents`)\nAñadió los mensajes `getEventObjects`, `setEventObject` y `deleteEventObject` para el componente web",
+        "pl": "Dodano komponent sieciowy `<iob-fullcalendar>` dla Aura, urządzeń i innych hostów komponentów internetowych (`common.webcomponents`)\nDodano komunikaty `getEventObjects`, `setEventObject` i `DeleteEventObject` dla komponentu internetowego",
+        "uk": "Додано веб-компонент `<iob-fullcalendar>` для Aura, пристроїв та інших хостів веб-компонентів (`Common.WebComponents`)\nДодано повідомлення `getEventObject`, `setEventObject` і `deleteEventObject` для веб-компонента",
+        "zh-cn": "为 <iob-fullcalendar>Aura、设备和其他 Web 组件主机添加了 Web 组件 ``（`common.webComponents`）\n为 Web 组件添加了消息 getEventObjects、setEventObjects 和 deleteEventObject"
+      },
       "3.3.1": {
         "en": "Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)\nThe adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)\nAdded the message `updateEvent`: move or change an event without deleting and creating it again",
         "de": "Admin >= 7.6.17, übersetzter Name des Admin-Tabs und UK-Übersetzungen hinzugefügt (#557)\nDie Adapter-Timer (`this.setTimeout`/`this.setInterval`) werden benutzt (#557)\nNachricht `updateEvent` hinzugefügt: Event verschieben oder ändern, ohne es neu zu erstellen",
@@ -67,32 +93,6 @@
         "pl": "Dodano stany agendy `events.list/Today/Tomorrow/NEXT/Count/LastChanged`\nDodano komunikaty `AddEvent`, `DeleteEvents`, `ListEvents`, `GetEvents` i `GetCalendars`, np. dla asystentów głosowych\nZdarzenie jednorazowe w przeszłości nie jest już oznaczane jako wyłączone w pamięci",
         "uk": "Додано порядок денний «події.списк/сьогодні/завтра/далі/рахунок/останнє змінення`\nДодано повідомлення `addEvent`, `deleteEvent`, `ListEvents`, `getEvents` і `getCalendars`, наприклад для голосових помічників\nОдноразова подія в минулому більше не позначається як вимкнена в пам'яті",
         "zh-cn": "添加了议程内容 “events.list/今天/明天/下一次/计数/上次更改”\n添加了 `addEvent`、`DeleteEvents`、`listEvents`、`getEvents` 和 `getCalendars`消息，例如语音助手消息\n过去的单发事件在内存中不再标记为禁用"
-      },
-      "3.0.5": {
-        "en": "Adapter requires js-controller >= 6.0.11 now.\nMigrated GUI to vite\nUpdated packages",
-        "de": "Adapter benötigt jetzt JS-Controller >= 6.0.11.\nGUI zu Vite migriert\nNeue Pakete",
-        "ru": "Теперь для адаптера требуется js-контроллер >= 6.0.11.\nГрафический интерфейс перенесен на vite\nОбновленные пакеты",
-        "pt": "O adaptador exige js-controller >= 6.0.11.\nGUI migrado para vite\nPacotes novos",
-        "nl": "Voor de adapter is nu een js-controller >= 6.0.11 nodig.\nGUI naar vite gemigreerd\nBijgewerkte pakketten",
-        "fr": "Adapter nécessite JS-Controller >= 6.0.11.\nGUI migré vers Vite\nPackages mis à jour",
-        "it": "Adapter richiede js-controller >= 6.0.11 ora.\nGUI migrata a vite\nPacchi nuovi",
-        "es": "El adaptador ahora requiere js-controller >= 6.0.11.\nMigró la GUI a Vite\nPaquetes nuevos",
-        "pl": "Adapter wymaga teraz kontrolera js->= 6.0.11.\nPrzemigrowany interfejs GUI do vite\nZaktualizowane pakiety",
-        "uk": "Для адаптера зараз потрібен js-контролер >= 6.0.11.\nПеренесений графічний інтерфейс до Vite\nОновлені пакети",
-        "zh-cn": "适配器现在需要 js-controller >= 6.0.11。\n将 GUI 迁移到 vite\n更新的软件包"
-      },
-      "2.4.5": {
-        "en": "Corrected SelectID Dialog",
-        "de": "Behobener Dialog zur Auswahl",
-        "ru": "Исправленный диалог SelectID",
-        "pt": "Diálogo selecionado corrigido",
-        "nl": "Gecorrigeerd SelectID-dialoogvenster",
-        "fr": "Boîte de dialogue SelectID corrigée",
-        "it": "Dialogo SelectID corretto",
-        "es": "Dialogo SelectID corregido",
-        "pl": "Poprawione okno dialogowe SelectID",
-        "uk": "Корекція ВиберітьД Діалог",
-        "zh-cn": "已更正的选定ID对话框"
       }
     },
     "titleLang": {
