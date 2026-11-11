@@ -121,6 +121,7 @@
   "Stop recording. Recording till %s": "Arrête d'enregistrer. Enregistrement jusqu'à %s",
   "Zoom": "Escalader",
   "min": "min.",
+  "sec": "s",
   "Object ID": "ID d'objet",
   "All": "Tous",
   "Description": "Description",

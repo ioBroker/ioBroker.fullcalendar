@@ -121,6 +121,7 @@
   "Stop recording. Recording till %s": "Зупинити запис. Запис до %s",
   "Zoom": "Масштаб",
   "min": "хвилин",
+  "sec": "сек.",
   "Object ID": "ID об'єкта",
   "All": "все",
   "Description": "опис",

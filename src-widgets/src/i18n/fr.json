@@ -95,6 +95,7 @@
   "Desired value": "Valeur souhaitée",
   "Description": "Description",
   "min": "min.",
+  "sec": "s",
   "default": "défaut",
   "seconds": "secondes",
   "hours": "heures",

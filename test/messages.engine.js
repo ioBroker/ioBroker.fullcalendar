@@ -244,6 +244,40 @@ describe('messages', () => {
         assert.match((await send('changeEvent', {})).error, /Commands: addEvent, updateEvent/);
     });
 
+    it('addCalendar and deleteCalendar', async () => {
+        const house = await send('addCalendar', { name: 'House' });
+        assert.equal(house.error, undefined, house.error);
+        assert.match(house.id, /^fullcalendar\.0\.Calendars\.Calendar-/);
+        assert.deepEqual(db[house.id].common, { name: 'House' });
+        assert.equal(db[house.id].type, 'folder');
+
+        const off = await send('addCalendar', { name: 'Vacation', enabled: false });
+        assert.equal(off.enabled, false);
+        assert.equal(db[off.id].common.enabled, false);
+
+        assert.match((await send('addCalendar', { name: 'garden' })).error, /exists already/);
+        assert.match((await send('addCalendar', { name: 'Default' })).error, /exists already/);
+        assert.match((await send('addCalendar', {})).error, /name/);
+
+        const calendars = (await send('getCalendars', {})).calendars.map(c => c.name);
+        assert.deepEqual(calendars, ['Default', 'Garden', 'House', 'Vacation']);
+
+        // the event is added in the new calendar by its name and deleted with it
+        const event = await send('addEvent', { oid: 'test.0.lamp', value: true, in: '1h', calendar: 'House' });
+        assert.ok(event.id.startsWith(`${house.id}.event-`));
+        const keep = await send('addEvent', { oid: 'test.0.lamp', value: true, in: '1h' });
+
+        const res = await send('deleteCalendar', { calendar: 'house' });
+        assert.deepEqual(res, { result: 'ok', id: house.id, deleted: [event.id] });
+        assert.equal(db[house.id], undefined);
+        assert.equal(db[event.id], undefined);
+        assert.ok(db[keep.id]);
+
+        assert.match((await send('deleteCalendar', { calendar: 'Default' })).error, /cannot be deleted/);
+        assert.match((await send('deleteCalendar', { calendar: 'House' })).error, /Unknown calendar/);
+        assert.match((await send('deleteCalendar', {})).error, /calendar/);
+    });
+
     it('getEventObjects, setEventObject and deleteEventObject of the web component', async () => {
         const event = (id) => ({ _id: id, type: 'schedule', common: { name: 'Lamp' }, native: { start: '2026-11-09T10:00:00' } });
         const main = 'fullcalendar.0.event-wc';

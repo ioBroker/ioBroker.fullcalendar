@@ -10,6 +10,7 @@ export const VIS_WORDS = [
     'Use double click on calendar to add new events.',
     'Zoom',
     'min',
+    'sec',
     'Single event',
     'Double event',
     'Toggle event',

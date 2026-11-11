@@ -96,6 +96,8 @@ sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JS
 | `listEvents`     | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                   | `{events: [execution, …]}`                        |
 | `getCalendars`   | –                                                                                          | `{calendars: [{id, name, enabled}, …]}`           |
 | `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                        | `{id, enabled}`                                   |
+| `addCalendar`    | `name` (unique), optional `enabled` (default `true`)                                       | `{id, name, enabled}`                             |
+| `deleteCalendar` | `calendar` (name or ID): deletes the calendar **with its events**                          | `{result: "ok", id, deleted: [id, …]}`            |
 | `getEventObjects` | optional `calendar` (`<namespace>.Calendars.<id>`) | `{events: [object, …]}`: the schedule objects, for the web component |
 | `setEventObject` | `event` (a schedule object of this instance) | `{result: "ok"}` |
 | `deleteEventObject` | `id` | `{result: "ok"}` |
@@ -137,6 +139,9 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 ### **WORK IN PROGRESS**
 * (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
 * (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
+* (bluefox) Added the messages `addCalendar` and `deleteCalendar`: calendars can be created and deleted by scripts
+* (bluefox) Fixed: the duration of an event is shown in seconds if it is shorter than a minute (not "0.0166 min.")
+* (bluefox) The calendar in the admin tab uses the full height
 
 ### 3.3.1 (2026-10-29)
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)

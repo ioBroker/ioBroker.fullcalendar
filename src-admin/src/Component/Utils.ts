@@ -501,8 +501,25 @@ function floatingUtcToLocal(d: Date): Date {
     );
 }
 
+/**
+ * Duration of an event (`timeOffset`) as text: "30 min.", "1 sec." or "1 min. 30 sec."
+ *
+ * @param ms the duration in milliseconds
+ * @param t translates "min" and "sec" (their texts contain the dot of the abbreviation)
+ */
+function durationText(ms: number, t: (word: string) => string): string {
+    const total = Math.round((Number(ms) || 0) / 1000);
+    const minutes = Math.floor(total / 60);
+    const seconds = total % 60;
+    if (!minutes) {
+        return `${seconds} ${t('sec')}`;
+    }
+    return seconds ? `${minutes} ${t('min')} ${seconds} ${t('sec')}` : `${minutes} ${t('min')}`;
+}
+
 export {
     uuidv4,
+    durationText,
     localToFloatingUtc,
     floatingUtcToLocal,
     cron2obj,

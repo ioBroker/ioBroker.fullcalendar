@@ -95,6 +95,7 @@
   "Desired value": "Бажане значення",
   "Description": "опис",
   "min": "хви.",
+  "sec": "сек.",
   "default": "за замовчуванням",
   "seconds": "секунд",
   "hours": "годин",

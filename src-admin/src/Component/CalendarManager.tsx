@@ -24,6 +24,12 @@ const styles: Record<string, CSSProperties> = {
     calendars: {
         height: '100%',
     },
+    /** Gives the calendar the full height of the splitter pane, like the wrapper in the simulations view */
+    calendarPane: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+    },
     container: {
         display: 'flex',
         width: '100%',
@@ -234,13 +240,15 @@ const CalendarManager = (props: CalendarManagerProps): JSX.Element => {
                                 ))}
                             </SidePanel>
                         </div>
-                        <CalendarContainer
-                            key={calendarPrefix}
-                            systemConfig={props.systemConfig!}
-                            socket={props.socket}
-                            theme={props.theme}
-                            calendarPrefix={calendarPrefix}
-                        />
+                        <div style={styles.calendarPane}>
+                            <CalendarContainer
+                                key={calendarPrefix}
+                                systemConfig={props.systemConfig!}
+                                socket={props.socket}
+                                theme={props.theme}
+                                calendarPrefix={calendarPrefix}
+                            />
+                        </div>
                     </ReactSplit>
                 </div>
             )}

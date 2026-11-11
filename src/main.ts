@@ -148,6 +148,12 @@ const COMMANDS: { command: string; params: string; answer: string }[] = [
     },
     { command: 'getCalendars', params: '-', answer: '{calendars: [{id, name, enabled}\u2026]}' },
     { command: 'enableCalendar', params: 'calendar (name or ID), enabled', answer: '{id, enabled}' },
+    { command: 'addCalendar', params: 'name, optional enabled (default true)', answer: '{id, name, enabled}' },
+    {
+        command: 'deleteCalendar',
+        params: 'calendar (name or ID): deletes the calendar with its events',
+        answer: '{result: "ok", id, deleted: [event id…]}',
+    },
     {
         command: 'getEventObjects',
         params: 'optional calendar (<namespace>.Calendars.<id>)',
@@ -161,6 +167,11 @@ const COMMANDS: { command: string; params: string; answer: string }[] = [
 /** A message parameter is given (not undefined, null or '') */
 function isGiven(value: unknown): boolean {
     return value !== undefined && value !== null && value !== '';
+}
+
+/** The parameter `enabled` of a message: on, unless it is false, "false" or 0 */
+function isEnabledParam(value: unknown): boolean {
+    return value !== false && value !== 'false' && value !== 0;
 }
 
 function stopEvent(adapter: Fullcalendar, event: FullCalendarEvent): void {
@@ -363,10 +374,66 @@ export class Fullcalendar extends Adapter {
         if (id === this.namespace) {
             throw new Error('The default calendar cannot be switched off');
         }
-        const enabled = params.enabled !== false && params.enabled !== 'false' && params.enabled !== 0;
+        const enabled = isEnabledParam(params.enabled);
         await this.extendForeignObjectAsync(id, { common: { enabled } });
         this.log.info(`Calendar "${id}" ${enabled ? 'enabled' : 'disabled'}`);
         return { id, enabled };
+    }
+
+    /**
+     * Create a calendar like the admin does: a folder `<namespace>.Calendars.Calendar-<uuid>`
+     *
+     * @param params the message
+     */
+    private async addCalendar(
+        params: Record<string, unknown>,
+    ): Promise<{ id: string; name: string; enabled: boolean }> {
+        const name = isGiven(params.name) ? show(params.name).trim() : '';
+        if (!name) {
+            throw new Error('Give the "name" of the calendar');
+        }
+        const names = await this.readCalendars();
+        // findCalendar() finds a calendar by its name, so the names must stay unique; "default" is the default calendar
+        if (
+            name.toLowerCase() === 'default' ||
+            Object.values(names).some(known => known.toLowerCase() === name.toLowerCase())
+        ) {
+            throw new Error(`The calendar "${name}" exists already`);
+        }
+        const enabled = isEnabledParam(params.enabled);
+        const id = `${this.namespace}.Calendars.Calendar-${randomUUID()}`;
+        await this.setForeignObjectAsync(id, {
+            type: 'folder',
+            common: enabled ? { name } : { name, enabled: false },
+            native: {},
+        });
+        this.log.info(`Calendar "${name}" created`);
+        return { id, name, enabled };
+    }
+
+    /**
+     * Delete a calendar with its events, like the admin does
+     *
+     * @param params the message
+     */
+    private async deleteCalendar(
+        params: Record<string, unknown>,
+    ): Promise<{ result: 'ok'; id: string; deleted: string[] }> {
+        if (!isGiven(params.calendar)) {
+            throw new Error('Give the "calendar" (name or ID)');
+        }
+        const id = this.findCalendar(params.calendar, await this.readCalendars());
+        if (id === this.namespace) {
+            throw new Error('The default calendar cannot be deleted');
+        }
+        const deleted: string[] = [];
+        for (const event of await this.readEventObjects(id)) {
+            await this.delForeignObjectAsync(event._id);
+            deleted.push(event._id);
+        }
+        await this.delForeignObjectAsync(id);
+        this.log.info(`Calendar "${id}" deleted with ${deleted.length} event(s)`);
+        return { result: 'ok', id, deleted };
     }
 
     /** Name of the calendar of an event, '' = the default calendar */
@@ -1066,6 +1133,12 @@ export class Fullcalendar extends Adapter {
                 }
                 case 'enableCalendar':
                     result = await this.enableCalendar(params);
+                    break;
+                case 'addCalendar':
+                    result = await this.addCalendar(params);
+                    break;
+                case 'deleteCalendar':
+                    result = await this.deleteCalendar(params);
                     break;
                 case 'getEventObjects':
                 case 'setEventObject':

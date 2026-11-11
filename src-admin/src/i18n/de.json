@@ -121,6 +121,7 @@
   "Stop recording. Recording till %s": "Aufnahme beenden. Aufnahme wird um %s automatisch beendet.",
   "Zoom": "Skala",
   "min": "Min.",
+  "sec": "Sek.",
   "Object ID": "Objekt Identifikation",
   "All": "Alle",
   "Description": "Beschreibung",

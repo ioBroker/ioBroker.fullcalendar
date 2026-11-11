@@ -38,6 +38,7 @@ import './styles.css';
 import {
     clientDateToServer,
     cron2obj,
+    durationText,
     floatingUtcToLocal,
     localToFloatingUtc,
     obj2cron,
@@ -299,10 +300,10 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 
                 name = `${event.common.name} → ${startValue}`;
                 if (event.native.type === 'double') {
-                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${endValue}`;
+                    name += ` → ${durationText(event.native.intervals?.[0]?.timeOffset || 0, word => I18n.t(word))} → ${endValue}`;
                 }
                 if (event.native.type === 'toggle') {
-                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
+                    name += ` → ${durationText(event.native.intervals?.[0]?.timeOffset || 0, word => I18n.t(word))} → ${I18n.t('initial')}`;
                 }
             }
 

@@ -121,6 +121,7 @@
   "Stop recording. Recording till %s": "停止录音。记录到 %s",
   "Zoom": "规模",
   "min": "分钟",
+  "sec": "秒",
   "Object ID": "对象ID",
   "All": "全部",
   "Description": "描述",

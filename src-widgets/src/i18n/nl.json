@@ -95,6 +95,7 @@
   "Desired value": "Gewenste waarde",
   "Description": "Beschrijving",
   "min": "min.",
+  "sec": "sec.",
   "default": "standaard",
   "seconds": "seconden",
   "hours": "uren",

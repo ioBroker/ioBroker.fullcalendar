@@ -170,6 +170,23 @@ function valueText(
 }
 
 /**
+ * Duration of an event (`timeOffset`) as text, like `durationText()` of the vis-2 widget: "30 min.", "1 sec." or
+ * "1 min. 30 sec."
+ *
+ * @param ms the duration in milliseconds
+ * @param word the words
+ */
+export function durationText(ms: number, word: ExpandContext['word']): string {
+    const total = Math.round(ms / 1000);
+    const minutes = Math.floor(total / 60);
+    const seconds = total % 60;
+    if (!minutes) {
+        return `${seconds} ${word('sec')}`;
+    }
+    return seconds ? `${minutes} ${word('min')} ${seconds} ${word('sec')}` : `${minutes} ${word('min')}`;
+}
+
+/**
  * The title of an event, as the vis-2 widget writes it: `name → value`, and for a double or toggle event the
  * duration and the second value
  *
@@ -183,11 +200,11 @@ export function getEventTitle(event: CalendarEvent, ctx: ExpandContext): string 
     }
     const states = event.native.states;
     let title = `${name} → ${valueText(event.native.startValue, states, ctx.word)}`;
-    const minutes = (Number(event.native.intervals?.[0]?.timeOffset) || 0) / 60000;
+    const duration = durationText(Number(event.native.intervals?.[0]?.timeOffset) || 0, ctx.word);
     if (event.native.type === 'double') {
-        title += ` → ${minutes} ${ctx.word('min')} → ${valueText(event.native.intervals?.[0]?.value, states, ctx.word)}`;
+        title += ` → ${duration} → ${valueText(event.native.intervals?.[0]?.value, states, ctx.word)}`;
     } else if (event.native.type === 'toggle') {
-        title += ` → ${minutes} ${ctx.word('min')} → ${ctx.word('initial')}`;
+        title += ` → ${duration} → ${ctx.word('initial')}`;
     }
     return title;
 }

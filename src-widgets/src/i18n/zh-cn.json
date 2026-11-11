@@ -95,6 +95,7 @@
   "Desired value": "期望值",
   "Description": "描述",
   "min": "分钟",
+  "sec": "秒",
   "default": "默认",
   "seconds": "秒",
   "hours": "小时",
