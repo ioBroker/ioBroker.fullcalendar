@@ -10,7 +10,7 @@
 import type { WebComponentManifest, WebComponentText } from '@iobroker/web-components';
 
 // with the extension: `vite.config.ts` imports this file, and Vite may load its config natively
-import { ADAPTER, DAY_STEPS, DEFAULT_DAY_STEP, MODULE_FILE, TAG, VIEW_MODES } from './constants.ts';
+import { ADAPTER, DAY_STEPS, DEFAULT_DAY_STEP, MODULE_FILE, SETTING_VIEW_MODES, TAG } from './constants.ts';
 
 export { MANIFEST_FILE, MODULE_FILE, MODULE_PATH, TAG } from './constants.ts';
 
@@ -28,7 +28,7 @@ export const MANIFEST_WORDS = [
     'view_mode',
     'day_step',
     'day_step_minutes',
-    ...VIEW_MODES,
+    ...SETTING_VIEW_MODES,
 ] as const;
 
 export type ManifestWord = (typeof MANIFEST_WORDS)[number];
@@ -130,7 +130,7 @@ export function buildManifest(vis: (key: ManifestWord) => WebComponentText): Web
                     type: 'select',
                     default: 'dayGridMonth',
                     label: vis('view_mode'),
-                    options: VIEW_MODES.map(mode => ({ value: mode, label: vis(mode) })),
+                    options: SETTING_VIEW_MODES.map(mode => ({ value: mode, label: vis(mode) })),
                 },
                 dayStep: {
                     type: 'select',

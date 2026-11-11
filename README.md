@@ -140,6 +140,10 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (bluefox) Added the messages `addCalendar` and `deleteCalendar`: calendars can be created and deleted by scripts
 * (bluefox) Fixed: the duration of an event is shown in seconds if it is shorter than a minute (not "0.0166 min.")
 * (bluefox) The calendar in the admin tab uses the full height
+* (bluefox) The lines of the calendar have the color of the theme instead of a glaring white on a dark background
+* (bluefox) The list ("Agenda") shows 30 days from today on instead of the month from its first day
+* (bluefox) Web component: an event after midnight (e.g. daily 22:30 - 06:30) is shown on the day it starts only, not as a bar through the whole month; the list shows when an event starts, fits a narrow tile, and the toolbar wraps
+* (bluefox) Web component: the new view "Today (list)" for a small tile, e.g. without the toolbar
 
 ### 3.4.1 (2026-11-09)
 * (bluefox) Web component: the time of an event always has minutes, so a full hour no longer looks different from "19:45", and a long title ends with "..." instead of being cut off

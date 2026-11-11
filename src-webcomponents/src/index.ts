@@ -84,6 +84,22 @@ const LOCALES = [deLocale, ruLocale, ptLocale, nlLocale, frLocale, itLocale, esL
 /** The color of a new event, as the widget gives it */
 const NEW_EVENT_COLOR = '#3A87AD';
 
+/**
+ * The lists show the time an event starts only, as the widget does: its duration is in the title, and the end of an
+ * event after midnight would be "0:00". `listMonth` shows 30 days from today on, not a month from its first day, and
+ * says so in the title. A month aligned to the day is not possible: FullCalendar steps back and forth by whole months
+ * then.
+ */
+const VIEWS: CalendarOptions['views'] = {
+    list: {
+        displayEventEnd: false,
+    },
+    listMonth: {
+        duration: { days: 30 },
+        titleFormat: { year: 'numeric', month: 'short', day: 'numeric' },
+    },
+};
+
 const EVENT_TYPES: { type: EventType; word: Word }[] = [
     { type: 'single', word: 'Single event' },
     { type: 'double', word: 'Double event' },
@@ -472,6 +488,10 @@ class FullCalendarElement extends IobWebComponent<Settings> {
                 eventTimeFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false },
                 locales: LOCALES,
                 initialView: view,
+                views: VIEWS,
+                // an event is shown on the day it starts only: a daily one from 22:30 to 06:30 would be a bar
+                // through every day of the month and a second entry "0:00" on every day of the list otherwise
+                nextDayThreshold: '23:59:59',
                 height: '100%',
                 nowIndicator: true,
                 dayMaxEvents: true,

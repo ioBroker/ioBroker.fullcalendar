@@ -43,6 +43,7 @@
   "timeGridWeek": "Semaine",
   "timeGridDay": "Jour",
   "listMonth": "Liste",
+  "listDay": "Aujourd'hui (liste)",
   "hide_left_block_hint": "Masquer l'indice dans le bloc de gauche",
   "hide_top_block_buttons": "Masquer les boutons dans le bloc supérieur",
   "hide_weekends": "Masquer les week-ends",

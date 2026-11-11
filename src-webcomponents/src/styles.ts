@@ -175,8 +175,48 @@ export const STYLES = `
     gap: 0.4em;
     margin-bottom: 0.6em;
 }
+/* in a narrow tile the title shrinks and the buttons of the views wrap, instead of the toolbar getting wider */
+.fc .fc-toolbar-chunk {
+    min-width: 0;
+}
+.fc .fc-button-group {
+    flex-wrap: wrap;
+}
 .fc .fc-toolbar-title {
     font-size: clamp(1.05em, 4.5cqmin, 1.6em);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* the day numbers, the headers and the titles of the list are links of FullCalendar: text in the color of the
+   text, without the frame of the browser around a focused link - except for the keyboard, in the color of the theme */
+.fc a {
+    color: inherit;
+    text-decoration: none;
+}
+.fc a:focus,
+.fc [tabindex]:focus {
+    outline: none;
+}
+.fc a:focus-visible,
+.fc [tabindex]:focus-visible {
+    outline: 2px solid var(--iob-secondary);
+    outline-offset: -2px;
+}
+/* the list in a narrow tile: less space around the cells and titles that break anywhere, so the table is not wider
+   than the tile */
+.fc .fc-list-event-title {
+    overflow-wrap: anywhere;
+}
+@container (max-width: 399px) {
+    .fc .fc-list-table td,
+    .fc .fc-list-day-cushion {
+        padding: 0.45em 0.6em;
+    }
+    .fc .fc-list-event-graphic {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 .fc-direction-ltr .fc-toolbar > * > :not(:first-child) {
     margin-left: 0.4em;

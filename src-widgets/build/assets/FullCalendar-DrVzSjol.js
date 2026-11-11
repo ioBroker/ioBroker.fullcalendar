@@ -17400,22 +17400,22 @@ var Dk = (e11) => {
       n3.destroy();
     };
   }, []), z(`div`, {style: {backgroundColor: n2 || `rgb(58, 135, 178)`, color: `white`, cursor: `pointer`, fontSize: `14px`, padding: `3px 4px 6px 8px`, borderRadius: 4, marginBottom: 20}, ref: r2, children: t2(e11.name)});
-}, jk = {container: {display: `flex`, width: `100%`, flex: 1}, leftBlock: {width: 200}, calendarBlock: {flex: 1, display: `flex`}, calendar: {marginRight: 20, width: `100%`}, leftPaper: {margin: 20}, leftContent: {display: `flex`, flexDirection: `column`, padding: `20px 10px`}, hr: {width: `100%`}, leftMargin: {marginLeft: 4}};
-function Mk(e11) {
+}, jk = {container: {display: `flex`, width: `100%`, flex: 1}, leftBlock: {width: 200}, calendarBlock: {flex: 1, display: `flex`}, calendar: {marginRight: 20, width: `100%`}, leftPaper: {margin: 20}, leftContent: {display: `flex`, flexDirection: `column`, padding: `20px 10px`}, hr: {width: `100%`}, leftMargin: {marginLeft: 4}}, Mk = {listMonth: {duration: {days: 30}, titleFormat: {year: `numeric`, month: `short`, day: `numeric`}}};
+function Nk(e11) {
   if (e11)
     return e11.startsWith(`#`) ? e11.length === 4 ? `#${e11[1]}${e11[1]}${e11[2]}${e11[2]}${e11[3]}${e11[3]}50` : `${e11.substring(0, 7)}50` : e11.startsWith(`rgb(`) ? e11.replace(`rgb(`, `rgba(`).replace(`)`, `, 0.3)`) : e11.startsWith(`rgba(`) ? e11.replace(/,\s?[.\d]+\)$/, `, 0.3)`) : e11;
 }
-function Nk(e11) {
+function Pk(e11) {
   let t2 = e11.getBoundingClientRect(), n2 = e11.getElementsByClassName(`fc-timegrid-slot`);
   for (let e12 = 0; e12 < n2.length; e12++)
     if (n2[e12].getBoundingClientRect().top > t2.top + 100)
       return n2[e12].dataset.time || null;
   return null;
 }
-function Pk(e11) {
+function Fk(e11) {
   return e11.date.second ? `${e11.date.hour}:${e11.date.minute.toString().padStart(2, `0`)}:${e11.date.second.toString().padStart(2, `0`)}` : `${e11.date.hour}:${e11.date.minute.toString().padStart(2, `0`)}`;
 }
-function Fk(e11) {
+function Ik(e11) {
   let [t2, n2] = ae(null), [r2, a2] = ae(null), o2 = t2 ? e11.events.find((e12) => e12?._id === t2) || (r2?._id === t2 ? r2 : null) : null, [s2, c2] = ae(e11.dayStep || parseInt(window.localStorage.getItem(`calendarStep`), 10) || 30), u2 = e11.storageName || `calendar`, d2 = y(null), p2 = y(null), m2 = y(null), h2 = y(null), g2 = y(null), [_2, v2] = ae({start: null, end: null}), b2 = new Date(), x2 = e11.viewMode || window.localStorage.getItem(`${u2}View`) || `dayGridMonth`;
   e11.isSimulation && (b2 = new Date(), x2 = e11.simulation?.native.interval === `day` ? `timeGridDay` : `timeGridWeek`);
   let S2 = Ok;
@@ -17428,8 +17428,8 @@ function Fk(e11) {
         return;
       let r3 = n3.native?.intervals?.[0]?.timeOffset ? n3.native.intervals[0].timeOffset : 30;
       (_a2 = n3.common).color || (_a2.color = `#3a87b2`);
-      let i2 = n3.common.enabled ? n3.common.color : Mk(n3.common.color), a3 = _n.invertColor(n3.common.color, true);
-      n3.common.enabled || (a3 = Mk(a3));
+      let i2 = n3.common.enabled ? n3.common.color : Nk(n3.common.color), a3 = _n.invertColor(n3.common.color, true);
+      n3.common.enabled || (a3 = Nk(a3));
       let o3 = n3.common.name;
       if (n3.native.oid) {
         let e12 = n3.native.startValue;
@@ -17476,8 +17476,11 @@ function Fk(e11) {
     return null;
   let T2 = g2.current ? void 0 : new Date(), E2 = T2 ? `${T2.getHours().toString().padStart(2, `0`)}:${(s2 > T2.getMinutes() ? 0 : T2.getMinutes() - s2).toString().padStart(2, `0`)}:00` : void 0;
   console.log(`SCROLL TIME: ${E2}`);
-  let O2 = d2.current?.getApi().view.type;
-  return V(ee, {children: [z(`style`, {children: e11.theme.palette.mode === `dark` ? `
+  let O2 = d2.current?.getApi().view.type, k2 = `
+.fc {
+    --fc-border-color: ${e11.theme.palette.divider};
+}
+${e11.theme.palette.mode === `dark` ? `
 :root {
     --fc-neutral-bg-color: hsla(0,0%,12%);
     --fc-list-event-hover-bg-color: hsla(0,0%,12%);
@@ -17489,7 +17492,8 @@ function Fk(e11) {
 .fc-col-header-cell {
     background-color: #EEEEEE;
 }
-`}), o2 ? z(Dk, {systemConfig: e11.systemConfig, widget: e11.widget, event: o2, onClose: () => {
+`}`;
+  return V(ee, {children: [z(`style`, {children: k2}), o2 ? z(Dk, {systemConfig: e11.systemConfig, widget: e11.widget, event: o2, onClose: () => {
     n2(null);
     let e12 = g2.current ? new Date(g2.current) : new Date(), t3 = `${e12.getHours().toString().padStart(2, `0`)}:${(s2 > e12.getMinutes() ? 0 : e12.getMinutes() - s2).toString().padStart(2, `0`)}:00`;
     setTimeout(() => d2.current?.getApi().scrollToTime(t3), 200);
@@ -17498,11 +17502,11 @@ function Fk(e11) {
   }, serverTimeZone: e11.serverTimeZone, readOnly: e11.readOnly, t: e11.t, theme: e11.theme, language: e11.language, isSimulation: e11.isSimulation, simulationId: e11.simulationId, simulation: e11.simulation}) : null, V(`div`, {style: jk.container, children: [!e11.hideLeftBlock && !e11.readOnly && V(`div`, {style: jk.leftBlock, children: [z(i, {elevation: 4, style: jk.leftPaper, children: V(`div`, {style: jk.leftContent, children: [z(`h4`, {children: e11.t(`Events`)}), S2.map((t3) => z(Ak, {t: e11.t, type: t3, color: e11.isSimulation ? e11.simulation?.common?.color : void 0}, t3.type)), e11.hideLeftBlockHint ? null : z(`div`, {children: e11.t(`Drag and drop the events above to create a new one.`)}), e11.hideLeftBlockHint ? null : z(`hr`, {style: jk.hr}), e11.hideLeftBlockHint ? null : z(`div`, {children: e11.t(`Use ALT by dragging it to copy the events.`)}), e11.hideLeftBlockHint ? null : z(`hr`, {style: jk.hr}), e11.hideLeftBlockHint ? null : z(`div`, {children: e11.t(`Use double click on calendar to add new events.`)}), e11.hideLeftBlockHint ? null : z(`hr`, {style: jk.hr}), e11.hideLeftBlockHint || O2 === `dayGridMonth` || O2 === `listMonth` ? null : V(D, {fullWidth: true, variant: `standard`, children: [z(ie, {children: e11.t(`Zoom`)}), z(f, {value: s2, onChange: (e12) => {
     let t3 = d2.current?.elRef?.current;
     if (t3) {
-      let e13 = Nk(t3);
+      let e13 = Pk(t3);
       e13 && setTimeout(() => d2.current?.getApi().scrollToTime(e13), 300);
     }
     window.localStorage.setItem(`calendarStep`, e12.target.value.toString()), c2(e12.target.value);
-  }, children: kk.map((t3) => V(ye, {value: t3, children: [t3, z(`span`, {style: jk.leftMargin, children: e11.t(`min`)})]}, t3))})]})]})}), e11.button]}), z(`div`, {style: jk.calendarBlock, children: z(`div`, {style: jk.calendar, children: z(Fg, {ref: d2, plugins: [Fx, b_, pv, $v, xx], weekends: !e11.hideWeekends, headerToolbar: !e11.hideTopBlock && {left: e11.hideTopBlockButtons || e11.isSimulation ? `` : `prev,next today`, center: e11.isSimulation ? `` : `title`, right: e11.hideTopBlockButtons || e11.isSimulation ? `` : `dayGridMonth,timeGridWeek,timeGridDay,listMonth`}, eventTimeFormat: e11.isSimulation ? Pk : void 0, scrollTime: e11.isSimulation && e11.simulationState === `record` ? E2 : void 0, slotDuration: `00:${s2.toString().padStart(2, `0`)}:00`, eventMinHeight: 20, initialView: x2, initialDate: b2, editable: !e11.readOnly, selectable: true, selectMirror: true, nowIndicator: true, dayMaxEvents: true, eventResizableFromStart: !e11.isSimulation, eventDurationEditable: !e11.isSimulation, defaultTimedEventDuration: `00:${s2.toString().padStart(2, `0`)}`, events: C2, height: `calc(100% - 20px)`, locales: [Lx, Rx, zx, Bx, Vx, Hx, Ux, Wx, Gx, Kx], locale: e11.language, datesSet: (t3) => {
+  }, children: kk.map((t3) => V(ye, {value: t3, children: [t3, z(`span`, {style: jk.leftMargin, children: e11.t(`min`)})]}, t3))})]})]})}), e11.button]}), z(`div`, {style: jk.calendarBlock, children: z(`div`, {style: jk.calendar, children: z(Fg, {ref: d2, plugins: [Fx, b_, pv, $v, xx], weekends: !e11.hideWeekends, headerToolbar: !e11.hideTopBlock && {left: e11.hideTopBlockButtons || e11.isSimulation ? `` : `prev,next today`, center: e11.isSimulation ? `` : `title`, right: e11.hideTopBlockButtons || e11.isSimulation ? `` : `dayGridMonth,timeGridWeek,timeGridDay,listMonth`}, eventTimeFormat: e11.isSimulation ? Fk : void 0, scrollTime: e11.isSimulation && e11.simulationState === `record` ? E2 : void 0, slotDuration: `00:${s2.toString().padStart(2, `0`)}:00`, eventMinHeight: 20, initialView: x2, initialDate: b2, editable: !e11.readOnly, selectable: true, selectMirror: true, nowIndicator: true, dayMaxEvents: true, views: Mk, eventResizableFromStart: !e11.isSimulation, eventDurationEditable: !e11.isSimulation, defaultTimedEventDuration: `00:${s2.toString().padStart(2, `0`)}`, events: C2, height: `calc(100% - 20px)`, locales: [Lx, Rx, zx, Bx, Vx, Hx, Ux, Wx, Gx, Kx], locale: e11.language, datesSet: (t3) => {
     (t3.start.toString() !== _2.start?.toString() || t3.end.toString() !== _2.end?.toString()) && (g2.current = null, v2({start: t3.start, end: t3.end})), e11.widget ? (h2.current && clearTimeout(h2.current), h2.current = null, m2.current && clearTimeout(m2.current), m2.current = setTimeout(() => {
       m2.current = null;
       let e12 = () => {
@@ -17564,7 +17568,7 @@ function Fk(e11) {
     e11.isSimulation && (i2.common.color = e11.simulation.common.color || i2.common.color), g2.current = new Date(i2.native.start).getTime(), await e11.setEvent(i2._id, i2), await e11.updateEvents(), a2(i2), setTimeout(() => n2(i2._id), 100);
   }})})})]})]});
 }
-var Ik = class e9 extends g.Component {
+var Lk = class e9 extends g.Component {
   constructor(e11) {
     super(e11), this.state = {list: [{value: `_`, label: e11.t(`default`)}]};
   }
@@ -17580,14 +17584,14 @@ var Ik = class e9 extends g.Component {
   render() {
     return z(f, {variant: `standard`, fullWidth: true, value: this.props.value || `_`, onChange: (e11) => this.props.onChange(e11.target.value === `_` ? `` : e11.target.value), children: this.state.list.map((e11) => z(ye, {value: e11.value, children: e11.label}, e11.value))});
   }
-}, Lk = {content: {display: `flex`, width: `100%`, height: `100%`, overflow: `auto`}}, Rk = class e10 extends window.visRxWidget {
+}, Rk = {content: {display: `flex`, width: `100%`, height: `100%`, overflow: `auto`}}, zk = class e10 extends window.visRxWidget {
   widgetRef = g.createRef();
   subscribed = null;
   constructor(e11) {
     super(e11), this.state = __spreadProps(__spreadValues({}, this.state), {events: [], serverTimeZone: 0});
   }
   static getWidgetInfo() {
-    return {id: `tplFullCalendar`, visSet: `fullcalendar`, visWidgetLabel: `fullcalendar`, visSetLabel: `set_label`, visSetColor: `#112233`, visName: `Full calendar`, visAttrs: [{name: `common`, fields: [{label: `instance`, name: `instance`, type: `instance`, adapter: `fullcalendar`, isShort: true}, {label: `calendar`, name: `calendar`, type: `custom`, component: (t2, n2, r2, i2) => z(Ik, {instance: n2.instance, value: n2.calendar, onChange: (e11) => r2({calendar: e11}), socket: i2.context.socket, t: e10.t}, n2.instance), default: ``}, {label: `read_only`, name: `readOnly`, type: `checkbox`, default: false}, {label: `hide_left_block`, name: `hideLeftBlock`, type: `checkbox`, hidden: (e11) => !!e11.readOnly, default: false}, {label: `hide_left_block_hint`, name: `hideLeftBlockHint`, type: `checkbox`, hidden: (e11) => !!e11.readOnly || !!e11.hideLeftBlock, default: false}, {label: `hide_top_block`, name: `hideTopBlock`, type: `checkbox`, default: false}, {label: `hide_top_block_buttons`, name: `hideTopBlockButtons`, type: `checkbox`, hidden: (e11) => !!e11.hide_top_block, default: false}, {label: `hide_weekends`, name: `hideWeekends`, type: `checkbox`, default: false}, {label: `view_mode`, name: `viewMode`, type: `select`, options: [{label: `full_calendar_dayGridMonth`, value: `dayGridMonth`}, {label: `full_calendar_timeGridWeek`, value: `timeGridWeek`}, {label: `full_calendar_timeGridDay`, value: `timeGridDay`}, {label: `full_calendar_listMonth`, value: `listMonth`}], default: `dayGridMonth`}, {label: `name`, name: `name`, tooltip: `used_only_with_relative`, default: ``, hidden: (e11, t2, n2) => !!n2 && n2.position !== `relative`}, {label: `day_step`, tooltip: `day_step_minutes`, name: `dayStep`, default: 30, type: `select`, noTranslation: true, hidden: (e11) => e11.viewMode !== `timeGridDay` && e11.viewMode !== `timeGridWeek`, options: [{label: `1`, value: 1}, {label: `2`, value: 2}, {label: `3`, value: 3}, {label: `5`, value: 5}, {label: `10`, value: 10}, {label: `15`, value: 15}, {label: `20`, value: 20}, {label: `30`, value: 30}, {label: `60`, value: 60}]}]}], visDefaultStyle: {width: `100%`, height: 355, position: `relative`, absoluteWidth: 500}, visPrev: `widgets/fullcalendar/img/prev_fullcalendar.png`};
+    return {id: `tplFullCalendar`, visSet: `fullcalendar`, visWidgetLabel: `fullcalendar`, visSetLabel: `set_label`, visSetColor: `#112233`, visName: `Full calendar`, visAttrs: [{name: `common`, fields: [{label: `instance`, name: `instance`, type: `instance`, adapter: `fullcalendar`, isShort: true}, {label: `calendar`, name: `calendar`, type: `custom`, component: (t2, n2, r2, i2) => z(Lk, {instance: n2.instance, value: n2.calendar, onChange: (e11) => r2({calendar: e11}), socket: i2.context.socket, t: e10.t}, n2.instance), default: ``}, {label: `read_only`, name: `readOnly`, type: `checkbox`, default: false}, {label: `hide_left_block`, name: `hideLeftBlock`, type: `checkbox`, hidden: (e11) => !!e11.readOnly, default: false}, {label: `hide_left_block_hint`, name: `hideLeftBlockHint`, type: `checkbox`, hidden: (e11) => !!e11.readOnly || !!e11.hideLeftBlock, default: false}, {label: `hide_top_block`, name: `hideTopBlock`, type: `checkbox`, default: false}, {label: `hide_top_block_buttons`, name: `hideTopBlockButtons`, type: `checkbox`, hidden: (e11) => !!e11.hide_top_block, default: false}, {label: `hide_weekends`, name: `hideWeekends`, type: `checkbox`, default: false}, {label: `view_mode`, name: `viewMode`, type: `select`, options: [{label: `full_calendar_dayGridMonth`, value: `dayGridMonth`}, {label: `full_calendar_timeGridWeek`, value: `timeGridWeek`}, {label: `full_calendar_timeGridDay`, value: `timeGridDay`}, {label: `full_calendar_listMonth`, value: `listMonth`}], default: `dayGridMonth`}, {label: `name`, name: `name`, tooltip: `used_only_with_relative`, default: ``, hidden: (e11, t2, n2) => !!n2 && n2.position !== `relative`}, {label: `day_step`, tooltip: `day_step_minutes`, name: `dayStep`, default: 30, type: `select`, noTranslation: true, hidden: (e11) => e11.viewMode !== `timeGridDay` && e11.viewMode !== `timeGridWeek`, options: [{label: `1`, value: 1}, {label: `2`, value: 2}, {label: `3`, value: 3}, {label: `5`, value: 5}, {label: `10`, value: 10}, {label: `15`, value: 15}, {label: `20`, value: 20}, {label: `30`, value: 30}, {label: `60`, value: 60}]}]}], visDefaultStyle: {width: `100%`, height: 355, position: `relative`, absoluteWidth: 500}, visPrev: `widgets/fullcalendar/img/prev_fullcalendar.png`};
   }
   static t(e11, ...t2) {
     return un.t(`full_calendar_${e11}`, ...t2);
@@ -17636,9 +17640,9 @@ var Ik = class e9 extends g.Component {
   renderWidgetBody(t2) {
     super.renderWidgetBody(t2), this.widgetRef.current?.offsetWidth || this.forceUpdate();
     let n2;
-    return n2 = !this.state.rxData.instance && this.state.rxData.instance !== 0 ? z(`div`, {style: Lk.content, ref: this.widgetRef, children: e10.t(`Please select instance`)}) : z(`div`, {style: Lk.content, ref: this.widgetRef, children: z(Fk, {widget: true, systemConfig: this.props.context.systemConfig.common, events: this.state.events || [], socket: this.props.context.socket, calendarPrefix: this.state.rxData.calendar || `fullcalendar.${this.state.rxData.instance}`, changeEvents: this.changeEvents, updateEvents: this.updateEvents, setEvent: this.setEvent, deleteEvent: this.deleteEvent, serverTimeZone: this.state.serverTimeZone || 0, readOnly: this.state.rxData.readOnly || false, hideLeftBlock: this.state.rxData.hideLeftBlock || false, hideTopBlock: this.state.rxData.hideTopBlock || false, hideLeftBlockHint: this.state.rxData.hideLeftBlockHint || false, hideTopBlockButtons: this.state.rxData.hideTopBlockButtons || false, viewMode: this.state.rxData.viewMode, storageName: `fc_${this.props.id}`, hideWeekends: this.state.rxData.hideWeekends || false, t: e10.t, language: un.getLanguage(), dayStep: this.state.rxData.dayStep || 30, theme: this.props.context.theme}, `${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`)}), this.state.rxStyle?.position === `relative` ? this.wrapContent(n2, null, {height: `calc(100% - 24px)`, width: `calc(100% - 24px)`}) : n2;
+    return n2 = !this.state.rxData.instance && this.state.rxData.instance !== 0 ? z(`div`, {style: Rk.content, ref: this.widgetRef, children: e10.t(`Please select instance`)}) : z(`div`, {style: Rk.content, ref: this.widgetRef, children: z(Ik, {widget: true, systemConfig: this.props.context.systemConfig.common, events: this.state.events || [], socket: this.props.context.socket, calendarPrefix: this.state.rxData.calendar || `fullcalendar.${this.state.rxData.instance}`, changeEvents: this.changeEvents, updateEvents: this.updateEvents, setEvent: this.setEvent, deleteEvent: this.deleteEvent, serverTimeZone: this.state.serverTimeZone || 0, readOnly: this.state.rxData.readOnly || false, hideLeftBlock: this.state.rxData.hideLeftBlock || false, hideTopBlock: this.state.rxData.hideTopBlock || false, hideLeftBlockHint: this.state.rxData.hideLeftBlockHint || false, hideTopBlockButtons: this.state.rxData.hideTopBlockButtons || false, viewMode: this.state.rxData.viewMode, storageName: `fc_${this.props.id}`, hideWeekends: this.state.rxData.hideWeekends || false, t: e10.t, language: un.getLanguage(), dayStep: this.state.rxData.dayStep || 30, theme: this.props.context.theme}, `${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`)}), this.state.rxStyle?.position === `relative` ? this.wrapContent(n2, null, {height: `calc(100% - 24px)`, width: `calc(100% - 24px)`}) : n2;
   }
 };
 export {
-  Rk as default
+  zk as default
 };

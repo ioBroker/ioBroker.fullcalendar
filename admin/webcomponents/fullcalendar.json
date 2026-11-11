@@ -270,6 +270,22 @@
                             "uk": "Список",
                             "zh-cn": "列表"
                         }
+                    },
+                    {
+                        "value": "listDay",
+                        "label": {
+                            "en": "Today (list)",
+                            "de": "Heute (Liste)",
+                            "ru": "Сегодня (список)",
+                            "pt": "Hoje (lista)",
+                            "nl": "Vandaag (lijst)",
+                            "fr": "Aujourd'hui (liste)",
+                            "it": "Oggi (elenco)",
+                            "es": "Hoy (lista)",
+                            "pl": "Dziś (lista)",
+                            "uk": "Сьогодні (список)",
+                            "zh-cn": "今天（列表）"
+                        }
                     }
                 ]
             },

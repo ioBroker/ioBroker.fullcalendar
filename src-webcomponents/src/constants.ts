@@ -13,10 +13,13 @@ export const MANIFEST_FILE = 'fullcalendar.json';
 /** Where `tasks.js` puts the module in the admin folder */
 export const MODULE_PATH = `webcomponents/${MODULE_FILE}`;
 
-/** The views of FullCalendar the element offers, as the vis-2 widget does */
+/** The views of FullCalendar the toolbar of the element offers, as the vis-2 widget does */
 export const VIEW_MODES = ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listMonth'] as const;
 
-export type ViewMode = (typeof VIEW_MODES)[number];
+/** The views of the settings: those of the toolbar and the list of today, for a small tile without the toolbar */
+export const SETTING_VIEW_MODES = [...VIEW_MODES, 'listDay'] as const;
+
+export type ViewMode = (typeof SETTING_VIEW_MODES)[number];
 
 /** The scales of the day and week views, in minutes */
 export const DAY_STEPS = [1, 2, 3, 5, 10, 15, 20, 30, 60];
@@ -78,7 +81,7 @@ export function getTarget(settings: CalendarSettings): CalendarTarget | 'chooseI
  * @param settings the settings of the element
  */
 export function getViewMode(settings: CalendarSettings): ViewMode {
-    return VIEW_MODES.find(mode => mode === settings.viewMode) || 'dayGridMonth';
+    return SETTING_VIEW_MODES.find(mode => mode === settings.viewMode) || 'dayGridMonth';
 }
 
 /**

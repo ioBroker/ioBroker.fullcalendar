@@ -142,6 +142,17 @@ const styles: Record<string, CSSProperties> = {
     },
 };
 
+/**
+ * The list ("Terminübersicht") shows 30 days from today on, not a month from its first day, and says so in the title.
+ * A month aligned to the day is not possible: FullCalendar steps back and forth by whole months then.
+ */
+const VIEWS = {
+    listMonth: {
+        duration: { days: 30 },
+        titleFormat: { year: 'numeric', month: 'short', day: 'numeric' },
+    },
+} as const;
+
 function dimColor(color: string | undefined): string | undefined {
     if (!color) {
         return undefined;
@@ -502,11 +513,14 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 
     const currentView = ref.current?.getApi().view.type;
 
-    return (
-        <>
-            <style>
-                {props.theme.palette.mode === 'dark'
-                    ? `
+    // the lines in the color of the theme: the default of FullCalendar (#ddd) is glaring on a dark background
+    const themeCss = `
+.fc {
+    --fc-border-color: ${props.theme.palette.divider};
+}
+${
+    props.theme.palette.mode === 'dark'
+        ? `
 :root {
     --fc-neutral-bg-color: hsla(0,0%,12%);
     --fc-list-event-hover-bg-color: hsla(0,0%,12%);
@@ -515,12 +529,16 @@ function Calendar(props: CalendarProps): JSX.Element | null {
     background-color: #1e1e1e;
 }
 `
-                    : `
+        : `
 .fc-col-header-cell {
     background-color: #EEEEEE;
 }
-`}
-            </style>
+`
+}`;
+
+    return (
+        <>
+            <style>{themeCss}</style>
             {dialogEvent ? (
                 <EventDialog
                     systemConfig={props.systemConfig}
@@ -653,6 +671,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                             selectMirror
                             nowIndicator
                             dayMaxEvents
+                            views={VIEWS}
                             eventResizableFromStart={!props.isSimulation}
                             eventDurationEditable={!props.isSimulation}
                             defaultTimedEventDuration={`00:${step.toString().padStart(2, '0')}`}
