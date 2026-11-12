@@ -43,7 +43,8 @@
     "@iobroker/vis-2-widgets-testing": "^2.0.1",
     "colorette": "^2.0.20",
     "puppeteer": "^25.16.0",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "@iobroker/web-components": "^0.8.0"
   },
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.fullcalendar/issues"
@@ -86,7 +87,7 @@
     "build-wc": "node tasks --wc",
     "lint-wc": "cd src-webcomponents && npm run lint",
     "check-wc": "cd src-webcomponents && npm run check-ts",
-    "build": "node tasks"
+    "build": "node tasks && iob-web-components sync-io-package"
   },
   "license": "MIT"
 }

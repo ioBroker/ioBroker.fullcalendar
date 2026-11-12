@@ -193,7 +193,28 @@
       }
     },
     "webComponents": [
-      "webcomponents/fullcalendar.json"
+      {
+        "manifest": "webcomponents/fullcalendar.json",
+        "tag": "iob-fullcalendar",
+        "name": {
+          "en": "Calendar",
+          "de": "Kalender",
+          "ru": "Календарь",
+          "pt": "Calendário",
+          "nl": "Kalender",
+          "fr": "Calendrier",
+          "it": "Calendario",
+          "es": "Calendario",
+          "pl": "Kalendarz",
+          "uk": "Календар",
+          "zh-cn": "日历"
+        },
+        "icon": "../fullcalendar.png",
+        "size": {
+          "width": 520,
+          "height": 420
+        }
+      }
     ],
     "restartAdapters": [
       "vis-2"
