@@ -1,4 +1,11 @@
 # Older changes
+## 3.3.0 (2026-10-29)
+* (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
+* (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`
+* (bluefox) `deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)
+* (bluefox) Added the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands
+* (bluefox) Documented all messages and parameters in the README
+
 ## 3.2.0 (2026-10-29)
 * (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
 * (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)

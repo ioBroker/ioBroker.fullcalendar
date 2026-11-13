@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "fullcalendar",
-    "version": "3.5.0",
+    "version": "3.5.1",
     "news": {
+      "3.5.1": {
+        "en": "Calendar (admin, vis-2 widget and web component): \"Today\" works also when today is in the view; the list scrolls to today (or to the next day with events), and the day lights up briefly - in the month view its tile, in the week and day view its column",
+        "de": "Kalender (Admin, Vis-2-Widget und Web-Komponente): „Heute“ funktioniert auch in der Ansicht „Heute“. Die Liste scrollt zum heutigen Tag (oder zum nächsten Tag mit Terminen) und der Tag leuchtet kurz auf — in der Monatsansicht die Spalte",
+        "ru": "Календарь (администратор, виджет vis-2 и веб-компонент): «Сегодня» работает также, когда в окне просмотра находится сегодняшний день; список прокручивается на сегодняшний день (или на следующий день с событиями), а день ненадолго загорается — в месяце отображается его плитка, в поле «неделя и день» — столбец",
+        "pt": "Calendário (admin, widget vis-2 e componente web): “Hoje” também funciona na exibição de hoje; a lista rola até hoje (ou até o dia seguinte com eventos) e o dia acende brevemente - no quadro do mês, na coluna da semana e do dia",
+        "nl": "Agenda (admin, vis-2-widget en webcomponent): „Vandaag” werkt ook wanneer vandaag in de weergave staat; de lijst schuift naar vandaag (of naar de volgende dag met gebeurtenissen), en de dag licht kort op - bekijk in de maand de tegel, in de week en dag de kolom",
+        "fr": "Calendrier (admin, widget vis-2 et composant Web) : « Aujourd'hui » fonctionne aussi aujourd'hui ; la liste défile jusqu'à aujourd'hui (ou jusqu'au lendemain avec les événements), et le jour s'illumine brièvement.",
+        "it": "Calendario (admin, widget vis-2 e componente web): «Oggi» funziona anche quando oggi è nella vista; l'elenco scorre fino a oggi (o al giorno dopo con gli eventi) e il giorno si illumina brevemente: nel riquadro del mese",
+        "es": "Calendario (admin, widget vis-2 y componente web): «Hoy» también funciona cuando aparece hoy; la lista se desplaza hasta hoy (o al día siguiente con los eventos) y el día se ilumina brevemente: en el mes, ver su mosaico, en la semana y el día, ver su columna",
+        "pl": "Kalendarz (admin, widget vis-2 i komponent internetowy): „Dzisiaj” działa również wtedy, gdy jest dzisiaj w widoku; lista przewija się do dzisiaj (lub do następnego dnia z wydarzeniami), a dzień świeci się krótko - w widoku miesiąca jego kafelek, w widoku tygodnia i dnia jego kolumna",
+        "uk": "Календар (admin, віджет vis-2 і веб-компонент): «Сьогодні» працює і тоді, коли сьогодні в поданні; список прокручується до сьогоднішнього дня (або на наступний день з подіями), а день спалахує коротко - в місяці перегляд його плитки, в перегляді тижня і дня його стовпчик",
+        "zh-cn": "日历（管理员、vis-2 控件和 Web 组件）：当今天出现在视图中时，“今天” 同样有效；列表滚动到今天（或有事件的第二天），一天会短暂亮起——在月视图中显示其图块，在周和日视图中滚动到其列"
+      },
       "3.5.0": {
         "en": "Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`\nvis-2 widget: in a narrow widget the list and the toolbar fit (no scrolling sideways, the buttons wrap), the day of the list is one line, and styles of the page can no longer put frames around its entries\nvis-2 widget and web component: in a narrow month view the events are dots, so a daily event no longer looks like a bar over the whole week\nvis-2 widget and web component: new option \"Only the names of the events\" hides the values and the duration (\"Watering\" instead of \"Watering → ON → 20 min. → OFF\"); the widget translates ON/OFF, and a repeated double event shows its end\nAdded the message `addCalendar` to create a calendar",
         "de": "Die Kurzform der Webkomponenten-Manifeste (Tag, Name, Symbol, Größe) wurde zu `common.WebComponents` hinzugefügt, sodass Hosts wie Aura die Komponenten vor der Adapterinstallation auflisten können; der Build schreibt es mit `iob-web-components sync-io-package`\nVis-2-Widget: In einem schmalen Widget passen die Liste und die Toolbar (kein seitliches Scrollen, die Buttons umbrechen), der Tag der Liste ist einzeilig und die Seitenstile können ihre Einträge nicht mehr umrahmen\nVis-2-Widget und Webkomponente: In einer engen Monatsansicht sind Termine gepunktet, also keine Bar mehr\nVis-2-Widget und Web-Komponente: Die neue Option „Nur die Namen der Ereignisse“ verbirgt die Werte und die Dauer („Gießen“ statt „Gießen → AN → 20 min. → AUS“); das Widget übersetzt AN/AUS und ein wiederholtes Doppelevent zeigt sein Ende\nFüge `AddCalendar` zum Kalender hinzu",
@@ -80,19 +93,6 @@
         "pl": "Naprawiono biały ekran podczas dodawania zdarzenia w widżecie vis-2 (#444)\nNaprawiono: nagrywanie symulacji zatrzymało się natychmiast po rozpoczęciu (#234)\nNaprawiono: symulacja rejestrowała powtarzające się aktualizacje statusu bez zmiany wartości, np. urządzeń Tasmota lub Sonoff (#285, #235)\nNaprawiono: subskrypcje zatrzymanego nagrania nie zostały usunięte\nDodano: czas trwania zdarzeń „On/Off” i „Toggle” można podać w sekundach, minutach lub godzinach, np. za naciśnięcie przycisku (#354)\nDodano: warunki zdarzeń, np. nie zamykaj migawki, jeśli drzwi są otwarte (#257)\nDodano: kalendarze można wyłączać i włączać, również z komunikatem `EnableCalendar` (#236)",
         "uk": "Виправлено білий екран при додаванні події в віджет vis-2 (#444)\nВиправлено: запис моделювання зупинився відразу після запуску (#234)\nВиправлено: моделювання записувало повторні оновлення статусу без зміни значення, наприклад, пристроїв Tasmota або Sonoff (#285, #235)\nВиправлено: підписки зупиненого запису не були видалені\nДодано: тривалість подій «On/Off» та «Toggle» може бути вказана в секундах, хвилині або годині, наприклад, для натискання кнопки (#354)\nДодано: умови для подій, наприклад, не закривати затвор, якщо двері відкриті (#257)\nДодано: календарі можна вимикати та вмикати, також із повідомленням `enableCalendar` (#236)",
         "zh-cn": "修复了在 vis-2 控件中添加事件时出现白屏的问题 (#444)\n修复：模拟录制在开始后立即停止 (#234)\n修复：模拟在不更改值的情况下记录了重复的状态更新，例如 Tasmota 或 Sonoff 设备的状态更新 (#285, #235)\n修复：已停止录制的订阅未被删除\n新增：“开/关” 和 “切换” 事件的持续时间可以以秒、分钟或小时为单位给出，例如按下按钮 (#354)\n新增：活动条件，例如门开着时不要关闭快门 (#257)\n新增：可以关闭和打开日历，还可以显示消息 `enableCalendar` (#236)"
-      },
-      "3.1.1": {
-        "en": "Fixed display of recurring events after DST change (#448)",
-        "de": "Anzeige von Terminen nach Sommerzeit behoben (#448)",
-        "ru": "Исправлено отображение повторяющихся событий после смены летнего времени (#448)",
-        "pt": "Exibição fixa de eventos recorrentes após o horário de verão (#448)",
-        "nl": "Vaste weergave van terugkerende gebeurtenissen na wijziging van de zomertijd (#448)",
-        "fr": "Affichage fixe des événements récurrents après l'heure d'été (#448)",
-        "it": "Risolto il problema con eventi ricorrenti dopo l'ora legale (#448)",
-        "es": "Pantalla fija de eventos recurrentes tras el cambio de horario (#448)",
-        "pl": "Naprawiono wyświetlanie powtarzających się zdarzeń po zmianie czasu letniego (#448)",
-        "uk": "Виправлено відображення повторюваних подій після зміни літнього часу (#448)",
-        "zh-cn": "修复了 DST 更改后反复出现的事件的显示问题 (#448)"
       }
     },
     "titleLang": {

@@ -137,7 +137,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.5.1 (2026-11-13)
 * (@GermanBluefox) Calendar (admin, vis-2 widget and web component): "Today" works also when today is in the view; the list scrolls to today (or to the next day with events), and the day lights up briefly - in the month view its tile, in the week and day view its column
 
 ### 3.5.0 (2026-11-13)
@@ -158,13 +158,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
 * (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)
 * (@GermanBluefox) Added the message `updateEvent`: move or change an event without deleting and creating it again
-
-### 3.3.0 (2026-10-29)
-* (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
-* (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`
-* (bluefox) `deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)
-* (bluefox) Added the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands
-* (bluefox) Documented all messages and parameters in the README
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
