@@ -104,5 +104,10 @@
   "Operator": "Operator",
   "Value": "Wartość",
   "ON (true)": "WŁĄCZONY (true)",
-  "OFF (false)": "WYŁĄCZONY (false)"
+  "OFF (false)": "WYŁĄCZONY (false)",
+  "ON": "WŁĄCZONY",
+  "OFF": "WYŁĄCZONY",
+  "initial": "wartość początkowa",
+  "hide_values": "Tylko nazwy zdarzeń",
+  "hide_values_tooltip": "Bez wartości i czasu trwania, np. \"Podlewanie\" zamiast \"Podlewanie → WŁĄCZONY → 20 min. → WYŁĄCZONY\""
 }

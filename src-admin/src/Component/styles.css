@@ -4,3 +4,79 @@
 .fc-v-event .fc-event-title-container {
     display: flex;
 }
+
+/* The box of the calendar: the sizes below follow its width, not the one of the window */
+.iob-fullcalendar {
+    container-type: inline-size;
+}
+
+/* The toolbar wraps instead of making the calendar wider than its widget */
+.iob-fullcalendar .fc .fc-toolbar.fc-header-toolbar {
+    flex-wrap: wrap;
+    gap: 0.4em;
+}
+.iob-fullcalendar .fc .fc-toolbar-chunk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4em;
+}
+.iob-fullcalendar .fc-direction-ltr .fc-toolbar > * > :not(:first-child) {
+    margin-left: 0;
+}
+@container (max-width: 599px) {
+    .iob-fullcalendar .fc .fc-toolbar.fc-header-toolbar {
+        justify-content: center;
+        margin-bottom: 0.6em;
+    }
+    .iob-fullcalendar .fc .fc-toolbar-title {
+        font-size: 1.2em;
+    }
+    .iob-fullcalendar .fc .fc-button {
+        padding: 0.3em 0.5em;
+        font-size: 0.9em;
+    }
+}
+
+/*
+ * The list: its date and its events are links of FullCalendar. Styles of the page for links must not give them
+ * frames or move them, and a long title wraps.
+ */
+.iob-fullcalendar .fc .fc-list-day-cushion a,
+.iob-fullcalendar .fc .fc-list-event-title a {
+    display: inline;
+    float: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    box-shadow: none;
+    background: none;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    text-decoration: none;
+}
+.iob-fullcalendar .fc .fc-list-table td,
+.iob-fullcalendar .fc .fc-list-table th,
+.iob-fullcalendar .fc .fc-list-day-cushion {
+    outline: 0;
+    box-shadow: none;
+}
+.iob-fullcalendar .fc .fc-list-event-title {
+    overflow-wrap: anywhere;
+}
+.iob-fullcalendar .fc .fc-list-event-time {
+    white-space: nowrap;
+}
+@container (max-width: 399px) {
+    .iob-fullcalendar .fc .fc-list-day-cushion,
+    .iob-fullcalendar .fc .fc-list-table td {
+        padding: 6px 8px;
+    }
+}

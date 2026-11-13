@@ -104,5 +104,10 @@
   "Operator": "Operator",
   "Value": "Waarde",
   "ON (true)": "AAN (true)",
-  "OFF (false)": "UIT (false)"
+  "OFF (false)": "UIT (false)",
+  "ON": "AAN",
+  "OFF": "UIT",
+  "initial": "beginwaarde",
+  "hide_values": "Alleen de namen van de gebeurtenissen",
+  "hide_values_tooltip": "Zonder de waarden en de duur, bijv. \"Bewatering\" in plaats van \"Bewatering → AAN → 20 min. → UIT\""
 }

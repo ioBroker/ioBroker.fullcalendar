@@ -28,7 +28,7 @@ import zhCnLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { FormControl, Paper, Select, InputLabel, MenuItem } from '@mui/material';
 
-import { Utils, I18n, type IobTheme, type Connection } from '@iobroker/gui-components';
+import { Utils, type IobTheme, type Connection } from '@iobroker/gui-components';
 
 import { RRule } from 'rrule';
 import SunCalc from 'suncalc2';
@@ -107,11 +107,16 @@ const DraggableButton = ({ type, t, color }: DraggableButtonProps): JSX.Element 
     );
 };
 
+/** Below this width of the calendar, the month view shows the events as dots: blocks would look like one bar */
+const NARROW_WIDTH = 600;
+
 const styles: Record<string, CSSProperties> = {
     container: {
         display: 'flex',
         width: '100%',
         flex: 1,
+        // as narrow as the widget: else the calendar is as wide as its toolbar and scrolls sideways
+        minWidth: 0,
     },
     leftBlock: {
         width: 200,
@@ -119,11 +124,17 @@ const styles: Record<string, CSSProperties> = {
     calendarBlock: {
         flex: 1,
         display: 'flex',
+        minWidth: 0,
     },
     calendar: {
         // height: '80%',
         marginRight: 20,
         width: '100%',
+        minWidth: 0,
+    },
+    calendarWidget: {
+        width: '100%',
+        minWidth: 0,
     },
     leftPaper: {
         margin: 20,
@@ -198,6 +209,8 @@ export interface CalendarProps {
     hideLeftBlockHint?: boolean;
     hideTopBlockButtons?: boolean;
     hideWeekends?: boolean;
+    /** Show only the names of the events, without the values and the duration */
+    hideValues?: boolean;
     viewMode?: string;
     updateEvents: () => void | Promise<void>;
     changeEvents?: (events: CalendarEvent[]) => void;
@@ -231,6 +244,8 @@ function Calendar(props: CalendarProps): JSX.Element | null {
     );
     const storageName = props.storageName || 'calendar';
     const ref = useRef<FullCalendar>(null);
+    const boxRef = useRef<HTMLDivElement>(null);
+    const [narrow, setNarrow] = useState(false);
     const dblClick = useRef<number | null>(null);
     const scrollBackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -256,6 +271,8 @@ function Calendar(props: CalendarProps): JSX.Element | null {
     }
 
     // create events
+    // the words of the caller: the widget has its own (with a prefix), the admin others
+    const { t: translate, hideValues } = props;
     const events = useMemo(() => {
         const _events: EventInput[] = [];
 
@@ -277,29 +294,37 @@ function Calendar(props: CalendarProps): JSX.Element | null {
             }
 
             let name: string = event.common.name;
-            if (event.native.oid) {
+            if (event.native.oid && !hideValues) {
                 let startValue: any = event.native.startValue;
                 if (typeof startValue === 'boolean') {
-                    startValue = startValue ? I18n.t('ON') : I18n.t('OFF');
+                    startValue = startValue ? translate('ON') : translate('OFF');
                 } else if (event.native.states && event.native.states[startValue]) {
                     startValue = event.native.states[startValue];
                 }
 
                 let endValue: any = event.native.intervals?.[0]?.value;
                 if (typeof endValue === 'boolean') {
-                    endValue = endValue ? I18n.t('ON') : I18n.t('OFF');
+                    endValue = endValue ? translate('ON') : translate('OFF');
                 } else if (event.native.states && event.native.states[endValue]) {
                     endValue = event.native.states[endValue];
                 }
 
                 name = `${event.common.name} → ${startValue}`;
+                // "min" is "min." already
                 if (event.native.type === 'double') {
-                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${endValue}`;
+                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${translate('min')} → ${endValue}`;
                 }
                 if (event.native.type === 'toggle') {
-                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
+                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${translate('min')} → ${translate('initial')}`;
                 }
             }
+            // a repeated double or toggle event lasts until it writes the second value, as a single one does
+            const seriesDuration =
+                event.native.type === 'double' || event.native.type === 'toggle'
+                    ? Number(event.native.intervals?.[0]?.timeOffset) || 0
+                    : 0;
+            const seriesEnd = (time: Date): Date | undefined =>
+                seriesDuration > 0 ? new Date(time.getTime() + seriesDuration) : undefined;
 
             if (event.native.cron) {
                 const start = serverDateToClient(event.native.cron, 'cron', props.serverTimeZone)!;
@@ -342,9 +367,9 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                             title: name,
                             backgroundColor,
                             textColor,
-                            start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                            start: time,
+                            end: seriesEnd(time),
                             allDay: false,
-                            display: 'block',
                         });
                     });
                 } else if (Array.isArray(cronObject.dows)) {
@@ -377,9 +402,9 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                             title: name,
                             backgroundColor,
                             textColor,
-                            start: time, // new Date(time.getTime() + (time.getTimezoneOffset() * 60000)),
+                            start: time,
+                            end: seriesEnd(time),
                             allDay: false,
-                            display: 'block',
                         });
                     });
                 } else {
@@ -414,7 +439,6 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                         seconds: 0,
                     },
                     title: name,
-                    display: 'block',
                     backgroundColor,
                     textColor,
                     start: serverDateToClient(timeStart, 'date', props.serverTimeZone) || undefined,
@@ -436,7 +460,20 @@ function Calendar(props: CalendarProps): JSX.Element | null {
         props.systemConfig.longitude,
         calendarInterval.end,
         calendarInterval.start,
+        hideValues,
+        translate,
     ]);
+
+    // the width of the calendar: in a narrow one, the blocks of a daily event look like one bar over the week
+    useEffect(() => {
+        const el = boxRef.current;
+        if (!el || typeof ResizeObserver === 'undefined') {
+            return undefined;
+        }
+        const observer = new ResizeObserver(() => setNarrow(el.clientWidth > 0 && el.clientWidth < NARROW_WIDTH));
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         // update periodically the time
@@ -509,6 +546,7 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 :root {
     --fc-neutral-bg-color: hsla(0,0%,12%);
     --fc-list-event-hover-bg-color: hsla(0,0%,12%);
+    --fc-page-bg-color: ${props.theme.palette.background.default};
 }
 .fc-col-header-cell {
     background-color: #1e1e1e;
@@ -621,11 +659,20 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                     </div>
                 )}
                 <div style={styles.calendarBlock}>
-                    <div style={styles.calendar}>
+                    <div
+                        ref={boxRef}
+                        className="iob-fullcalendar"
+                        style={props.widget ? styles.calendarWidget : styles.calendar}
+                    >
                         <FullCalendar
                             ref={ref}
                             plugins={[listPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
                             weekends={!props.hideWeekends}
+                            // colored blocks; in a narrow month view dots, as one block per day looks like a bar
+                            eventDisplay={narrow ? 'list-item' : 'block'}
+                            // the day of the list in one line: the date and the weekday at both sides slip apart
+                            listDayFormat={{ weekday: 'long', day: 'numeric', month: 'long' }}
+                            listDaySideFormat={false}
                             headerToolbar={
                                 props.hideTopBlock
                                     ? false
@@ -639,7 +686,12 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                                   : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                                       }
                             }
-                            eventTimeFormat={props.isSimulation ? formatter : undefined}
+                            // always with minutes: a full hour is "06 Uhr" otherwise, next to "7:30"
+                            eventTimeFormat={
+                                props.isSimulation
+                                    ? formatter
+                                    : { hour: 'numeric', minute: '2-digit', omitZeroMinute: false }
+                            }
                             scrollTime={
                                 props.isSimulation && props.simulationState === 'record' ? scrollTime : undefined
                             }

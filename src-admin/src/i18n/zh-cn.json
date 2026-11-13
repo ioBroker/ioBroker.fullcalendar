@@ -136,5 +136,6 @@
   "OFF (false)": "关 (false)",
   "Inactive calendars do not execute their events": "未激活的日历不会执行其事件",
   "Calendar is inactive. Click to activate": "日历未激活。点击激活",
-  "Deactivate calendar": "停用日历"
+  "Deactivate calendar": "停用日历",
+  "initial": "初始值"
 }

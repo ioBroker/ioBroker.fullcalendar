@@ -104,5 +104,10 @@
   "Operator": "运算符",
   "Value": "值",
   "ON (true)": "开 (true)",
-  "OFF (false)": "关 (false)"
+  "OFF (false)": "关 (false)",
+  "ON": "开",
+  "OFF": "关",
+  "initial": "初始值",
+  "hide_values": "仅显示事件名称",
+  "hide_values_tooltip": "不显示值和时长，例如显示\"浇水\"而不是\"浇水 → 开 → 20 分钟 → 关\""
 }

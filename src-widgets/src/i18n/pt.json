@@ -104,5 +104,10 @@
   "Operator": "Operador",
   "Value": "Valor",
   "ON (true)": "LIGADO (true)",
-  "OFF (false)": "DESLIGADO (false)"
+  "OFF (false)": "DESLIGADO (false)",
+  "ON": "LIGADO",
+  "OFF": "DESLIGADO",
+  "initial": "valor inicial",
+  "hide_values": "Apenas os nomes dos eventos",
+  "hide_values_tooltip": "Sem os valores e a duração, p. ex. \"Rega\" em vez de \"Rega → LIGADO → 20 min. → DESLIGADO\""
 }

@@ -299,10 +299,10 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 
                 name = `${event.common.name} → ${startValue}`;
                 if (event.native.type === 'double') {
-                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${endValue}`;
+                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')} → ${endValue}`;
                 }
                 if (event.native.type === 'toggle') {
-                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')}. → ${I18n.t('initial')}`;
+                    name += ` → ${(event.native.intervals?.[0]?.timeOffset || 0) / 1000 / 60} ${I18n.t('min')} → ${I18n.t('initial')}`;
                 }
             }
 

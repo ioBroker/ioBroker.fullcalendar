@@ -244,6 +244,36 @@ describe('messages', () => {
         assert.match((await send('changeEvent', {})).error, /Commands: addEvent, updateEvent/);
     });
 
+    it('addCalendar creates a calendar that addEvent and getCalendars find by name', async () => {
+        const res = await send('addCalendar', { name: ' Vacation ', color: '#ff0000' });
+        assert.equal(res.error, undefined, res.error);
+        assert.match(res.id, /^fullcalendar\.0\.Calendars\.Calendar-[\da-f-]+$/);
+        assert.equal(res.name, 'Vacation');
+        assert.equal(res.enabled, true);
+        assert.deepEqual(db[res.id], {
+            _id: res.id,
+            type: 'folder',
+            common: { name: 'Vacation', color: '#ff0000' },
+            native: {},
+        });
+
+        const event = await send('addEvent', { oid: 'test.0.lamp', value: true, in: '1h', calendar: 'vacation' });
+        assert.ok(event.id.startsWith(`${res.id}.event-`), event.id);
+
+        const { calendars } = await send('getCalendars', {});
+        assert.deepEqual(calendars.find(c => c.id === res.id), { id: res.id, name: 'Vacation', enabled: true });
+
+        // switched off from the beginning
+        const off = await send('addCalendar', { name: 'Party', enabled: false });
+        assert.equal(off.enabled, false);
+        assert.equal(db[off.id].common.enabled, false);
+        assert.equal((await send('getCalendars', {})).calendars.find(c => c.id === off.id).enabled, false);
+
+        assert.match((await send('addCalendar', { name: 'GARDEN' })).error, /exists already/);
+        assert.match((await send('addCalendar', { name: 'Default' })).error, /exists already/);
+        assert.match((await send('addCalendar', {})).error, /"name" is missing/);
+    });
+
     it('getEventObjects, setEventObject and deleteEventObject of the web component', async () => {
         const event = (id) => ({ _id: id, type: 'schedule', common: { name: 'Lamp' }, native: { start: '2026-11-09T10:00:00' } });
         const main = 'fullcalendar.0.event-wc';

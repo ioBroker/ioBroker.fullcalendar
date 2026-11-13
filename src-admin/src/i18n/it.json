@@ -136,5 +136,6 @@
   "OFF (false)": "SPENTO (false)",
   "Inactive calendars do not execute their events": "I calendari inattivi non eseguono i loro eventi",
   "Calendar is inactive. Click to activate": "Il calendario è inattivo. Fare clic per attivarlo",
-  "Deactivate calendar": "Disattiva calendario"
+  "Deactivate calendar": "Disattiva calendario",
+  "initial": "valore iniziale"
 }

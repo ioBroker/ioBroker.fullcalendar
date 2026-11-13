@@ -104,5 +104,10 @@
   "Operator": "Operatore",
   "Value": "Valore",
   "ON (true)": "ACCESO (true)",
-  "OFF (false)": "SPENTO (false)"
+  "OFF (false)": "SPENTO (false)",
+  "ON": "ACCESO",
+  "OFF": "SPENTO",
+  "initial": "valore iniziale",
+  "hide_values": "Solo i nomi degli eventi",
+  "hide_values_tooltip": "Senza i valori e la durata, ad es. \"Irrigazione\" invece di \"Irrigazione → ACCESO → 20 min. → SPENTO\""
 }

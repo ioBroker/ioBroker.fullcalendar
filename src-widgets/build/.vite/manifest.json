@@ -106,7 +106,7 @@
     "isEntry": true
   },
   "src/FullCalendar.tsx": {
-    "file": "assets/FullCalendar-_1zNh2T3.js",
+    "file": "assets/FullCalendar-DIfccCF1.js",
     "name": "FullCalendar",
     "src": "src/FullCalendar.tsx",
     "isEntry": true,
@@ -118,11 +118,11 @@
       "_useMediaQuery-C07Y22na.js"
     ],
     "css": [
-      "assets/FullCalendar-DRKqq0fW.css"
+      "assets/FullCalendar-CRK14-b7.css"
     ]
   },
   "src/translations.ts": {
-    "file": "assets/translations-Bp3A__c7.js",
+    "file": "assets/translations-DjzlNt3d.js",
     "name": "translations",
     "src": "src/translations.ts",
     "isEntry": true
