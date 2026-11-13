@@ -80,3 +80,22 @@
         padding: 6px 8px;
     }
 }
+
+/*
+ * "Today" lights up the day briefly (`showToday()` in Utils.ts): the day of the list, of the month, the column of the
+ * week. Not below .iob-fullcalendar: the admin uses it too.
+ */
+@keyframes iob-fc-flash {
+    0%,
+    45% {
+        background-color: rgba(255, 193, 7, 0.55);
+        box-shadow: inset 0 0 0 2px rgba(255, 152, 0, 0.9);
+    }
+    100% {
+        background-color: transparent;
+        box-shadow: inset 0 0 0 2px rgba(255, 152, 0, 0);
+    }
+}
+.fc .iob-fc-flash {
+    animation: iob-fc-flash 1.6s ease-out 1;
+}

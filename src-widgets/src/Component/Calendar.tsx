@@ -43,6 +43,9 @@ import {
     obj2cron,
     serverDateToClient,
     uuidv4,
+    getTodayText,
+    showToday,
+    TODAY_BUTTON,
     type CalendarEvent,
     type EventType,
     type Simulation,
@@ -62,6 +65,8 @@ const eventTypes: EventTypeDescription[] = [
 ];
 
 const MINUTES = [1, 2, 3, 5, 10, 15, 20, 30, 60];
+
+const LOCALES = [deLocale, ruLocale, ptLocale, nlLocale, frLocale, itLocale, esLocale, plLocale, ukLocale, zhCnLocale];
 
 interface DraggableButtonProps {
     type: EventTypeDescription;
@@ -250,6 +255,8 @@ function Calendar(props: CalendarProps): JSX.Element | null {
     const scrollBackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastEventTime = useRef<number | null>(null);
+    /** "Today" went to other dates: today is shown when they are there */
+    const todayPending = useRef(false);
 
     const [calendarInterval, setCalendarInterval] = useState<{ start: Date | null; end: Date | null }>({
         start: null,
@@ -538,6 +545,24 @@ function Calendar(props: CalendarProps): JSX.Element | null {
 
     const currentView = ref.current?.getApi().view.type;
 
+    /** "Today": goes to today - also if it is in the view already, where FullCalendar disables its button - and shows it */
+    const goToday = (): void => {
+        const api = ref.current?.getApi();
+        if (!api) {
+            return;
+        }
+        const now = new Date();
+        if (api.view.currentStart <= now && now < api.view.currentEnd) {
+            showToday(boxRef.current, api.view.type);
+        } else {
+            todayPending.current = true;
+            api.today();
+        }
+        if (api.view.type.startsWith('timeGrid')) {
+            api.scrollToTime(`${Math.max(0, now.getHours() - 1)}:00:00`);
+        }
+    };
+
     return (
         <>
             <style>
@@ -678,7 +703,9 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                                     ? false
                                     : {
                                           left:
-                                              props.hideTopBlockButtons || props.isSimulation ? '' : 'prev,next today',
+                                              props.hideTopBlockButtons || props.isSimulation
+                                                  ? ''
+                                                  : `prev,next ${TODAY_BUTTON}`,
                                           center: props.isSimulation ? '' : 'title',
                                           right:
                                               props.hideTopBlockButtons || props.isSimulation
@@ -709,20 +736,19 @@ function Calendar(props: CalendarProps): JSX.Element | null {
                             defaultTimedEventDuration={`00:${step.toString().padStart(2, '0')}`}
                             events={events}
                             height="calc(100% - 20px)"
-                            locales={[
-                                deLocale,
-                                ruLocale,
-                                ptLocale,
-                                nlLocale,
-                                frLocale,
-                                itLocale,
-                                esLocale,
-                                plLocale,
-                                ukLocale,
-                                zhCnLocale,
-                            ]}
+                            locales={LOCALES}
                             locale={props.language}
+                            customButtons={{
+                                [TODAY_BUTTON]: {
+                                    text: getTodayText(LOCALES, props.language),
+                                    click: goToday,
+                                },
+                            }}
                             datesSet={(date: DatesSetArg) => {
+                                if (todayPending.current) {
+                                    todayPending.current = false;
+                                    showToday(boxRef.current, date.view.type);
+                                }
                                 if (
                                     date.start.toString() !== calendarInterval.start?.toString() ||
                                     date.end.toString() !== calendarInterval.end?.toString()

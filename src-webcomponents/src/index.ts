@@ -64,6 +64,7 @@ import {
 import { type CalendarEvent, DEFAULT_COLOR, type EventType, expandEvents, isCalendarEvent } from './events';
 import { getWord, type Word } from './i18n';
 import { getFullCalendarCss, STYLES } from './styles';
+import { getTodayText, showToday, TODAY_BUTTON } from './today';
 
 type Settings = CalendarSettings & WebComponentSettings;
 
@@ -250,6 +251,8 @@ class FullCalendarElement extends IobWebComponent<Settings> {
     /** What the titles of the events depend on besides the events */
     #expandKey = '';
     #lastSelect: { time: number; start: number } | null = null;
+    /** "Today" went to other dates: today is shown when they are there */
+    #todayPending = false;
 
     constructor() {
         super();
@@ -456,10 +459,12 @@ class FullCalendarElement extends IobWebComponent<Settings> {
             headerToolbar: settings.hideTopBlock
                 ? false
                 : {
-                      left: settings.hideTopBlockButtons ? '' : 'prev,next today',
+                      left: settings.hideTopBlockButtons ? '' : `prev,next ${TODAY_BUTTON}`,
                       center: 'title',
                       right: settings.hideTopBlockButtons ? '' : VIEW_MODES.join(','),
                   },
+            // instead of "today", which FullCalendar disables while today is in the view
+            customButtons: { [TODAY_BUTTON]: { text: getTodayText(LOCALES, lang), click: () => this.#goToday() } },
             weekends: !settings.hideWeekends,
             // colored blocks; in a narrow month view dots, as one block per day looks like a bar over the week
             eventDisplay: this.#narrow ? 'list-item' : 'block',
@@ -552,7 +557,30 @@ class FullCalendarElement extends IobWebComponent<Settings> {
         });
     }
 
+    /** "Today": goes to today - also if it is in the view already - and shows it, see `showToday()` */
+    #goToday(): void {
+        const calendar = this.#calendar;
+        if (!calendar || this.editMode) {
+            return;
+        }
+        const now = new Date();
+        const view = calendar.view;
+        if (view.currentStart <= now && now < view.currentEnd) {
+            showToday(this.#calEl, view.type);
+        } else {
+            this.#todayPending = true;
+            calendar.today();
+        }
+        if (calendar.view.type.startsWith('timeGrid')) {
+            calendar.scrollToTime(scrollTimeNow());
+        }
+    }
+
     #onDatesSet(info: DatesSetArg): void {
+        if (this.#todayPending) {
+            this.#todayPending = false;
+            showToday(this.#calEl, info.view.type);
+        }
         this.#currentView = info.view.type;
         this.#zoomEl.classList.toggle('hidden', !this.#currentView.startsWith('timeGrid'));
         // after the user looked at another time, back to now - as the widget does

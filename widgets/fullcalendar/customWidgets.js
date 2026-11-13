@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./assets/FullCalendar-CRK14-b7.css"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./assets/FullCalendar-0tWiEDM3.css"])))=>i.map(i=>d[i]);
 import { t as e } from "./assets/vite-preload-helper-CRzLMJPS.js";
 import { t } from "./assets/dist-BI-Ygd_Z.js";
 import { t as n } from "./assets/helpers-CsBAxMau.js";
@@ -28,7 +28,7 @@ let __tla = (async () => {
   var c = {
     "./FullCalendar": async () => {
       await s(`./FullCalendar`), await Promise.all([]);
-      let t2 = await o(`./FullCalendar`, () => e(() => import("./assets/FullCalendar-DIfccCF1.js").then(async (m2) => {
+      let t2 = await o(`./FullCalendar`, () => e(() => import("./assets/FullCalendar-CZAeONvH.js").then(async (m2) => {
         await m2.__tla;
         return m2;
       }), __vite__mapDeps([0]), import.meta.url)), n2 = t2 && t2.__mf_remote_dependency_pending;

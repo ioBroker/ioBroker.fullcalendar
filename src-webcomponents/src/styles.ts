@@ -252,6 +252,22 @@ export const STYLES = `
 .fc .fc-icon-x {
     --icon: ${ICON_CLOSE};
 }
+
+/* "today" lets the day light up briefly (see today.ts): the day of the list, of the month, the column of the week */
+@keyframes iob-fc-flash {
+    0%,
+    45% {
+        background-color: color-mix(in srgb, var(--iob-warning, #ff9800) 55%, transparent);
+        box-shadow: inset 0 0 0 2px var(--iob-warning, #ff9800);
+    }
+    100% {
+        background-color: transparent;
+        box-shadow: inset 0 0 0 2px transparent;
+    }
+}
+.fc .iob-fc-flash {
+    animation: iob-fc-flash 1.6s ease-out 1;
+}
 `;
 
 let fullCalendarCss: string | null = null;
