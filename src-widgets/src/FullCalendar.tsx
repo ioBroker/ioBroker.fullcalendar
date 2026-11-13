@@ -35,6 +35,7 @@ export interface FullCalendarRxData {
     hideTopBlock?: boolean;
     hideTopBlockButtons?: boolean;
     hideWeekends?: boolean;
+    hideValues?: boolean;
     viewMode?: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listMonth';
     name?: string;
     dayStep?: number;
@@ -137,6 +138,13 @@ export default class FullCalendar extends (window.visRxWidget as typeof VisRxWid
                         {
                             label: 'hide_weekends',
                             name: 'hideWeekends',
+                            type: 'checkbox',
+                            default: false,
+                        },
+                        {
+                            label: 'hide_values',
+                            tooltip: 'hide_values_tooltip',
+                            name: 'hideValues',
                             type: 'checkbox',
                             default: false,
                         },
@@ -361,6 +369,7 @@ export default class FullCalendar extends (window.visRxWidget as typeof VisRxWid
                         viewMode={this.state.rxData.viewMode}
                         storageName={`fc_${this.props.id}`}
                         hideWeekends={this.state.rxData.hideWeekends || false}
+                        hideValues={this.state.rxData.hideValues || false}
                         t={FullCalendar.t}
                         language={I18n.getLanguage()}
                         dayStep={this.state.rxData.dayStep || 30}

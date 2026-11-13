@@ -84,6 +84,8 @@ sendTo('fullcalendar.0', 'addEvent', {
 sendTo('fullcalendar.0', 'updateEvent', { id: 'fullcalendar.0.event-…', start: '09:30', duration: '2m' }, res => log(JSON.stringify(res)));
 // delete all events with this name
 sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JSON.stringify(res)));
+// a new calendar; addEvent finds it by its name
+sendTo('fullcalendar.0', 'addCalendar', { name: 'Garden' }, res => log(JSON.stringify(res))); // {id, name, enabled}
 ```
 
 | Command          | Message                                                                                    | Answer                                            |
@@ -95,6 +97,7 @@ sendTo('fullcalendar.0', 'deleteEvent', { name: 'Birthday Anna' }, res => log(JS
 | `getEvents`      | optional `calendar`                                                                        | `{events: [definition, …]}`                       |
 | `listEvents`     | optional `from`, `to` (default now … 7 days, or `days`), `calendar`, `max`                   | `{events: [execution, …]}`                        |
 | `getCalendars`   | –                                                                                          | `{calendars: [{id, name, enabled}, …]}`           |
+| `addCalendar`    | `name` (new); optional `color`, `icon`, `enabled` (default `true`)                         | `{id, name, enabled}`                             |
 | `enableCalendar` | `calendar` (name or ID), `enabled` (`true`/`false`)                                        | `{id, enabled}`                                   |
 | `getEventObjects` | optional `calendar` (`<namespace>.Calendars.<id>`) | `{events: [object, …]}`: the schedule objects, for the web component |
 | `setEventObject` | `event` (a schedule object of this instance) | `{result: "ok"}` |
@@ -137,6 +140,10 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 
 ### **WORK IN PROGRESS**
 * (@GermanBluefox) Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`
+* (@GermanBluefox) vis-2 widget: in a narrow widget the list and the toolbar fit (no scrolling sideways, the buttons wrap), the day of the list is one line, and styles of the page can no longer put frames around its entries
+* (@GermanBluefox) vis-2 widget and web component: in a narrow month view the events are dots, so a daily event no longer looks like a bar over the whole week
+* (@GermanBluefox) vis-2 widget and web component: new option "Only the names of the events" hides the values and the duration ("Watering" instead of "Watering → ON → 20 min. → OFF"); the widget translates ON/OFF, and a repeated double event shows its end
+* (@GermanBluefox) Added the message `addCalendar` to create a calendar
 
 ### 3.4.1 (2026-11-09)
 * (bluefox) Web component: the time of an event always has minutes, so a full hour no longer looks different from "19:45", and a long title ends with "..." instead of being cut off

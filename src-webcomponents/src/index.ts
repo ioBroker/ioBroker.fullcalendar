@@ -76,6 +76,9 @@ const RELOAD_INTERVAL = 5 * 60_000;
 /** After the user looked at another time, the day and week views scroll back to now after this */
 const SCROLL_BACK_DELAY = 60_000;
 
+/** Below this width of the calendar, the month view shows the events as dots: blocks would look like one bar */
+const NARROW_WIDTH = 600;
+
 /** Two clicks on the same slot within this time are a double click */
 const DOUBLE_CLICK = 500;
 
@@ -219,6 +222,8 @@ class FullCalendarElement extends IobWebComponent<Settings> {
     #draggable: Draggable | null = null;
     #resizeObserver: ResizeObserver | null = null;
     #resizeFrame = 0;
+    /** The calendar is narrow, see `NARROW_WIDTH` */
+    #narrow = false;
     #scrollTimer: ReturnType<typeof setTimeout> | null = null;
 
     /** The language of the texts of the left block */
@@ -304,7 +309,16 @@ class FullCalendarElement extends IobWebComponent<Settings> {
             // FullCalendar follows the size of the window only, not the one of a tile
             this.#resizeObserver = new ResizeObserver(() => {
                 cancelAnimationFrame(this.#resizeFrame);
-                this.#resizeFrame = requestAnimationFrame(() => this.#calendar?.updateSize());
+                this.#resizeFrame = requestAnimationFrame(() => {
+                    const width = this.#calEl.clientWidth;
+                    const narrow = width > 0 && width < NARROW_WIDTH;
+                    if (narrow !== this.#narrow) {
+                        this.#narrow = narrow;
+                        // the display of the events
+                        this.render();
+                    }
+                    this.#calendar?.updateSize();
+                });
             });
             this.#resizeObserver.observe(this.#calEl);
         }
@@ -367,7 +381,7 @@ class FullCalendarElement extends IobWebComponent<Settings> {
 
         // the titles are in the language of the system, the astronomical events at the place of the system
         const config = this.objects['system.config'] as ioBroker.SystemConfigObject | null | undefined;
-        const expandKey = `${lang}|${config?.common.latitude}|${config?.common.longitude}`;
+        const expandKey = `${lang}|${config?.common.latitude}|${config?.common.longitude}|${!!settings.hideValues}`;
         if (expandKey !== this.#expandKey) {
             this.#expandKey = expandKey;
             this.#calendar?.refetchEvents();
@@ -447,6 +461,8 @@ class FullCalendarElement extends IobWebComponent<Settings> {
                       right: settings.hideTopBlockButtons ? '' : VIEW_MODES.join(','),
                   },
             weekends: !settings.hideWeekends,
+            // colored blocks; in a narrow month view dots, as one block per day looks like a bar over the week
+            eventDisplay: this.#narrow ? 'list-item' : 'block',
             slotDuration: { minutes: step },
             defaultTimedEventDuration: { minutes: step },
             editable: canEdit,
@@ -470,6 +486,9 @@ class FullCalendarElement extends IobWebComponent<Settings> {
                 plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
                 // always with minutes: a full hour is "09 Uhr" otherwise, next to "19:45"
                 eventTimeFormat: { hour: 'numeric', minute: '2-digit', omitZeroMinute: false },
+                // the day of the list in one line, as the widget shows it
+                listDayFormat: { weekday: 'long', day: 'numeric', month: 'long' },
+                listDaySideFormat: false,
                 locales: LOCALES,
                 initialView: view,
                 height: '100%',
@@ -529,6 +548,7 @@ class FullCalendarElement extends IobWebComponent<Settings> {
             text: text => this.text(text),
             latitude: config?.common.latitude,
             longitude: config?.common.longitude,
+            hideValues: !!this.settings.hideValues,
         });
     }
 

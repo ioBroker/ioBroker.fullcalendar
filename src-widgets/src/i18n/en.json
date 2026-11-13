@@ -104,5 +104,10 @@
   "Operator": "Operator",
   "Value": "Value",
   "ON (true)": "ON (true)",
-  "OFF (false)": "OFF (false)"
+  "OFF (false)": "OFF (false)",
+  "ON": "ON",
+  "OFF": "OFF",
+  "initial": "initial value",
+  "hide_values": "Only the names of the events",
+  "hide_values_tooltip": "Without the values and the duration, e.g. \"Watering\" instead of \"Watering → ON → 20 min. → OFF\""
 }

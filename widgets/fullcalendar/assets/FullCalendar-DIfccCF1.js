@@ -16492,71 +16492,77 @@ var Ek = (e11) => {
       n3.destroy();
     };
   }, []), z(`div`, { style: { backgroundColor: n2 || `rgb(58, 135, 178)`, color: `white`, cursor: `pointer`, fontSize: `14px`, padding: `3px 4px 6px 8px`, borderRadius: 4, marginBottom: 20 }, ref: r2, children: t2(e11.name) });
-}, Ak = { container: { display: `flex`, width: `100%`, flex: 1 }, leftBlock: { width: 200 }, calendarBlock: { flex: 1, display: `flex` }, calendar: { marginRight: 20, width: `100%` }, leftPaper: { margin: 20 }, leftContent: { display: `flex`, flexDirection: `column`, padding: `20px 10px` }, hr: { width: `100%` }, leftMargin: { marginLeft: 4 } };
-function jk(e11) {
+}, Ak = 600, jk = { container: { display: `flex`, width: `100%`, flex: 1, minWidth: 0 }, leftBlock: { width: 200 }, calendarBlock: { flex: 1, display: `flex`, minWidth: 0 }, calendar: { marginRight: 20, width: `100%`, minWidth: 0 }, calendarWidget: { width: `100%`, minWidth: 0 }, leftPaper: { margin: 20 }, leftContent: { display: `flex`, flexDirection: `column`, padding: `20px 10px` }, hr: { width: `100%` }, leftMargin: { marginLeft: 4 } };
+function Mk(e11) {
   if (e11) return e11.startsWith(`#`) ? e11.length === 4 ? `#${e11[1]}${e11[1]}${e11[2]}${e11[2]}${e11[3]}${e11[3]}50` : `${e11.substring(0, 7)}50` : e11.startsWith(`rgb(`) ? e11.replace(`rgb(`, `rgba(`).replace(`)`, `, 0.3)`) : e11.startsWith(`rgba(`) ? e11.replace(/,\s?[.\d]+\)$/, `, 0.3)`) : e11;
 }
-function Mk(e11) {
+function Nk(e11) {
   let t2 = e11.getBoundingClientRect(), n2 = e11.getElementsByClassName(`fc-timegrid-slot`);
   for (let e12 = 0; e12 < n2.length; e12++) if (n2[e12].getBoundingClientRect().top > t2.top + 100) return n2[e12].dataset.time || null;
   return null;
 }
-function Nk(e11) {
+function Pk(e11) {
   return e11.date.second ? `${e11.date.hour}:${e11.date.minute.toString().padStart(2, `0`)}:${e11.date.second.toString().padStart(2, `0`)}` : `${e11.date.hour}:${e11.date.minute.toString().padStart(2, `0`)}`;
 }
-function Pk(e11) {
+function Fk(e11) {
   var _a2, _b2, _c2;
-  let [t2, n2] = ae(null), [r2, a2] = ae(null), o2 = t2 ? e11.events.find((e12) => (e12 == null ? void 0 : e12._id) === t2) || ((r2 == null ? void 0 : r2._id) === t2 ? r2 : null) : null, [s2, c2] = ae(e11.dayStep || parseInt(window.localStorage.getItem(`calendarStep`), 10) || 30), u2 = e11.storageName || `calendar`, d2 = y(null), p2 = y(null), m2 = y(null), h2 = y(null), g2 = y(null), [_2, v2] = ae({ start: null, end: null }), b2 = /* @__PURE__ */ new Date(), x2 = e11.viewMode || window.localStorage.getItem(`${u2}View`) || `dayGridMonth`;
-  e11.isSimulation && (b2 = /* @__PURE__ */ new Date(), x2 = ((_a2 = e11.simulation) == null ? void 0 : _a2.native.interval) === `day` ? `timeGridDay` : `timeGridWeek`);
-  let S2 = Dk;
-  e11.isSimulation && (S2 = S2.filter((e12) => e12.type === `single`));
-  let C2 = l(() => {
+  let [t2, n2] = ae(null), [r2, a2] = ae(null), o2 = t2 ? e11.events.find((e12) => (e12 == null ? void 0 : e12._id) === t2) || ((r2 == null ? void 0 : r2._id) === t2 ? r2 : null) : null, [s2, c2] = ae(e11.dayStep || parseInt(window.localStorage.getItem(`calendarStep`), 10) || 30), u2 = e11.storageName || `calendar`, d2 = y(null), p2 = y(null), [m2, h2] = ae(false), g2 = y(null), _2 = y(null), v2 = y(null), b2 = y(null), [x2, S2] = ae({ start: null, end: null }), C2 = /* @__PURE__ */ new Date(), T2 = e11.viewMode || window.localStorage.getItem(`${u2}View`) || `dayGridMonth`;
+  e11.isSimulation && (C2 = /* @__PURE__ */ new Date(), T2 = ((_a2 = e11.simulation) == null ? void 0 : _a2.native.interval) === `day` ? `timeGridDay` : `timeGridWeek`);
+  let E2 = Dk;
+  e11.isSimulation && (E2 = E2.filter((e12) => e12.type === `single`));
+  let { t: O2, hideValues: k2 } = e11, A2 = l(() => {
     let t3 = [];
     return e11.events.forEach((n3) => {
-      var _a3, _b3, _c3, _d2, _e2, _f2, _g2, _h2, _i2, _j;
+      var _a3, _b3, _c3, _d2, _e2, _f2, _g2, _h2, _i2, _j, _k2, _l2;
       if (!n3) return;
       let r3 = ((_c3 = (_b3 = (_a3 = n3.native) == null ? void 0 : _a3.intervals) == null ? void 0 : _b3[0]) == null ? void 0 : _c3.timeOffset) ? n3.native.intervals[0].timeOffset : 30;
       (_d2 = n3.common).color || (_d2.color = `#3a87b2`);
-      let i2 = n3.common.enabled ? n3.common.color : jk(n3.common.color), a3 = _n.invertColor(n3.common.color, true);
-      n3.common.enabled || (a3 = jk(a3));
+      let i2 = n3.common.enabled ? n3.common.color : Mk(n3.common.color), a3 = _n.invertColor(n3.common.color, true);
+      n3.common.enabled || (a3 = Mk(a3));
       let o3 = n3.common.name;
-      if (n3.native.oid) {
+      if (n3.native.oid && !k2) {
         let e12 = n3.native.startValue;
-        typeof e12 == `boolean` ? e12 = e12 ? un.t(`ON`) : un.t(`OFF`) : n3.native.states && n3.native.states[e12] && (e12 = n3.native.states[e12]);
+        typeof e12 == `boolean` ? e12 = O2(e12 ? `ON` : `OFF`) : n3.native.states && n3.native.states[e12] && (e12 = n3.native.states[e12]);
         let t4 = (_f2 = (_e2 = n3.native.intervals) == null ? void 0 : _e2[0]) == null ? void 0 : _f2.value;
-        typeof t4 == `boolean` ? t4 = t4 ? un.t(`ON`) : un.t(`OFF`) : n3.native.states && n3.native.states[t4] && (t4 = n3.native.states[t4]), o3 = `${n3.common.name} \u2192 ${e12}`, n3.native.type === `double` && (o3 += ` \u2192 ${(((_h2 = (_g2 = n3.native.intervals) == null ? void 0 : _g2[0]) == null ? void 0 : _h2.timeOffset) || 0) / 1e3 / 60} ${un.t(`min`)}. \u2192 ${t4}`), n3.native.type === `toggle` && (o3 += ` \u2192 ${(((_j = (_i2 = n3.native.intervals) == null ? void 0 : _i2[0]) == null ? void 0 : _j.timeOffset) || 0) / 1e3 / 60} ${un.t(`min`)}. \u2192 ${un.t(`initial`)}`);
+        typeof t4 == `boolean` ? t4 = O2(t4 ? `ON` : `OFF`) : n3.native.states && n3.native.states[t4] && (t4 = n3.native.states[t4]), o3 = `${n3.common.name} \u2192 ${e12}`, n3.native.type === `double` && (o3 += ` \u2192 ${(((_h2 = (_g2 = n3.native.intervals) == null ? void 0 : _g2[0]) == null ? void 0 : _h2.timeOffset) || 0) / 1e3 / 60} ${O2(`min`)} \u2192 ${t4}`), n3.native.type === `toggle` && (o3 += ` \u2192 ${(((_j = (_i2 = n3.native.intervals) == null ? void 0 : _i2[0]) == null ? void 0 : _j.timeOffset) || 0) / 1e3 / 60} ${O2(`min`)} \u2192 ${O2(`initial`)}`);
       }
+      let s3 = (n3.native.type === `double` || n3.native.type === `toggle`) && Number((_l2 = (_k2 = n3.native.intervals) == null ? void 0 : _k2[0]) == null ? void 0 : _l2.timeOffset) || 0, c3 = (e12) => s3 > 0 ? new Date(e12.getTime() + s3) : void 0;
       if (n3.native.cron) {
-        let r4 = $x(n3.native.cron, `cron`, e11.serverTimeZone), s3 = Xx(n3.native.cron);
+        let r4 = $x(n3.native.cron, `cron`, e11.serverTimeZone), s4 = Xx(n3.native.cron);
         r4.setFullYear((/* @__PURE__ */ new Date()).getFullYear() - 1);
-        let c3 = nS(_2.start || /* @__PURE__ */ new Date()), l2 = nS(_2.end || /* @__PURE__ */ new Date());
-        Array.isArray(s3.months) ? new $({ dtstart: nS(r4), until: l2, freq: $.MONTHLY, bymonth: s3.months, bymonthday: Array.isArray(s3.dates) ? s3.dates : void 0 }).between(c3, l2).forEach((r5) => {
-          let s4 = rS(r5), c4 = n3.native.astro ? qx.default.getTimes(s4, e11.systemConfig.latitude, e11.systemConfig.longitude)[n3.native.astro] : s4;
-          n3.native.astro && n3.native.offset && c4.setMinutes(c4.getMinutes() + n3.native.offset), t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: c4.getSeconds() }, title: o3, backgroundColor: i2, textColor: a3, start: c4, allDay: false, display: `block` });
-        }) : Array.isArray(s3.dows) ? new $({ dtstart: nS(r4), until: l2, freq: $.WEEKLY, byweekday: s3.dows.map((e12) => e12 === 0 ? 6 : e12 - 1) }).between(c3, l2).forEach((r5) => {
-          let s4 = rS(r5), c4 = n3.native.astro ? qx.default.getTimes(s4, e11.systemConfig.latitude, e11.systemConfig.longitude)[n3.native.astro] : s4;
-          n3.native.astro && n3.native.offset && c4.setMinutes(c4.getMinutes() + n3.native.offset), t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: c4.getSeconds() }, title: o3, backgroundColor: i2, textColor: a3, start: c4, allDay: false, display: `block` });
+        let l2 = nS(x2.start || /* @__PURE__ */ new Date()), u3 = nS(x2.end || /* @__PURE__ */ new Date());
+        Array.isArray(s4.months) ? new $({ dtstart: nS(r4), until: u3, freq: $.MONTHLY, bymonth: s4.months, bymonthday: Array.isArray(s4.dates) ? s4.dates : void 0 }).between(l2, u3).forEach((r5) => {
+          let s5 = rS(r5), l3 = n3.native.astro ? qx.default.getTimes(s5, e11.systemConfig.latitude, e11.systemConfig.longitude)[n3.native.astro] : s5;
+          n3.native.astro && n3.native.offset && l3.setMinutes(l3.getMinutes() + n3.native.offset), t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: l3.getSeconds() }, title: o3, backgroundColor: i2, textColor: a3, start: l3, end: c3(l3), allDay: false });
+        }) : Array.isArray(s4.dows) ? new $({ dtstart: nS(r4), until: u3, freq: $.WEEKLY, byweekday: s4.dows.map((e12) => e12 === 0 ? 6 : e12 - 1) }).between(l2, u3).forEach((r5) => {
+          let s5 = rS(r5), l3 = n3.native.astro ? qx.default.getTimes(s5, e11.systemConfig.latitude, e11.systemConfig.longitude)[n3.native.astro] : s5;
+          n3.native.astro && n3.native.offset && l3.setMinutes(l3.getMinutes() + n3.native.offset), t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: l3.getSeconds() }, title: o3, backgroundColor: i2, textColor: a3, start: l3, end: c3(l3), allDay: false });
         }) : t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: 0 }, title: o3, backgroundColor: i2, textColor: a3 });
       } else {
-        let s3 = n3.native.astro ? qx.default.getTimes(/* @__PURE__ */ new Date(), e11.systemConfig.latitude, e11.systemConfig.longitude)[n3.native.astro] : n3.native.start;
-        n3.native.astro && n3.native.offset && s3.setMinutes(s3.getMinutes() + n3.native.offset), t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: 0 }, title: o3, display: `block`, backgroundColor: i2, textColor: a3, start: $x(s3, `date`, e11.serverTimeZone) || void 0, end: $x(new Date(new Date(s3).getTime() + r3), `date`, e11.serverTimeZone) || void 0 });
+        let s4 = n3.native.astro ? qx.default.getTimes(/* @__PURE__ */ new Date(), e11.systemConfig.latitude, e11.systemConfig.longitude)[n3.native.astro] : n3.native.start;
+        n3.native.astro && n3.native.offset && s4.setMinutes(s4.getMinutes() + n3.native.offset), t3.push({ extendedProps: { eventId: n3._id, icon: n3.common.icon, type: n3.native.type, seconds: 0 }, title: o3, backgroundColor: i2, textColor: a3, start: $x(s4, `date`, e11.serverTimeZone) || void 0, end: $x(new Date(new Date(s4).getTime() + r3), `date`, e11.serverTimeZone) || void 0 });
       }
     }), t3;
-  }, [e11.events, e11.serverTimeZone, e11.systemConfig.latitude, e11.systemConfig.longitude, _2.end, _2.start]);
+  }, [e11.events, e11.serverTimeZone, e11.systemConfig.latitude, e11.systemConfig.longitude, x2.end, x2.start, k2, O2]);
   if (w(() => {
+    let e12 = p2.current;
+    if (!e12 || typeof ResizeObserver > `u`) return;
+    let t3 = new ResizeObserver(() => h2(e12.clientWidth > 0 && e12.clientWidth < Ak));
+    return t3.observe(e12), () => t3.disconnect();
+  }, []), w(() => {
     if (e11.widget) {
       let e12 = () => {
         var _a3;
         let t3 = (_a3 = d2.current) == null ? void 0 : _a3.getApi();
-        t3 && (console.log(`Scroll to now`), t3.scrollToTime((/* @__PURE__ */ new Date()).getTime())), m2.current ? h2.current = null : h2.current = setTimeout(() => e12, 3e5);
+        t3 && (console.log(`Scroll to now`), t3.scrollToTime((/* @__PURE__ */ new Date()).getTime())), _2.current ? v2.current = null : v2.current = setTimeout(() => e12, 3e5);
       };
       setTimeout(e12, 1e3);
     }
     return () => {
-      h2.current && clearTimeout(h2.current), h2.current = null, m2.current && clearTimeout(m2.current), m2.current = null;
+      v2.current && clearTimeout(v2.current), v2.current = null, _2.current && clearTimeout(_2.current), _2.current = null;
     };
   }, []), w(() => {
-    g2.current = null, setTimeout(() => {
+    b2.current = null, setTimeout(() => {
       var _a3;
       let e12 = /* @__PURE__ */ new Date();
       (_a3 = d2.current) == null ? void 0 : _a3.getApi().scrollToTime(`${e12.getHours().toString().padStart(2, `0`)}:${(s2 > e12.getMinutes() ? 0 : e12.getMinutes() - s2).toString().padStart(2, `0`)}:00`);
@@ -16565,13 +16571,14 @@ function Pk(e11) {
     var _a3, _b3, _c3;
     e11.isSimulation && ((_c3 = (_a3 = d2.current) == null ? void 0 : _a3.getApi()) == null ? void 0 : _c3.changeView(((_b3 = e11.simulation) == null ? void 0 : _b3.native.interval) === `day` ? `timeGridDay` : `timeGridWeek`, /* @__PURE__ */ new Date()));
   }, [e11.isSimulation, (_b2 = e11.simulation) == null ? void 0 : _b2.native.interval]), e11.isSimulation && !e11.simulation) return null;
-  let T2 = g2.current ? void 0 : /* @__PURE__ */ new Date(), E2 = T2 ? `${T2.getHours().toString().padStart(2, `0`)}:${(s2 > T2.getMinutes() ? 0 : T2.getMinutes() - s2).toString().padStart(2, `0`)}:00` : void 0;
-  console.log(`SCROLL TIME: ${E2}`);
-  let O2 = (_c2 = d2.current) == null ? void 0 : _c2.getApi().view.type;
+  let j2 = b2.current ? void 0 : /* @__PURE__ */ new Date(), M2 = j2 ? `${j2.getHours().toString().padStart(2, `0`)}:${(s2 > j2.getMinutes() ? 0 : j2.getMinutes() - s2).toString().padStart(2, `0`)}:00` : void 0;
+  console.log(`SCROLL TIME: ${M2}`);
+  let te2 = (_c2 = d2.current) == null ? void 0 : _c2.getApi().view.type;
   return V(ee, { children: [z(`style`, { children: e11.theme.palette.mode === `dark` ? `
 :root {
     --fc-neutral-bg-color: hsla(0,0%,12%);
     --fc-list-event-hover-bg-color: hsla(0,0%,12%);
+    --fc-page-bg-color: ${e11.theme.palette.background.default};
 }
 .fc-col-header-cell {
     background-color: #1e1e1e;
@@ -16582,42 +16589,42 @@ function Pk(e11) {
 }
 ` }), o2 ? z(Ek, { systemConfig: e11.systemConfig, widget: e11.widget, event: o2, onClose: () => {
     n2(null);
-    let e12 = g2.current ? new Date(g2.current) : /* @__PURE__ */ new Date(), t3 = `${e12.getHours().toString().padStart(2, `0`)}:${(s2 > e12.getMinutes() ? 0 : e12.getMinutes() - s2).toString().padStart(2, `0`)}:00`;
+    let e12 = b2.current ? new Date(b2.current) : /* @__PURE__ */ new Date(), t3 = `${e12.getHours().toString().padStart(2, `0`)}:${(s2 > e12.getMinutes() ? 0 : e12.getMinutes() - s2).toString().padStart(2, `0`)}:00`;
     setTimeout(() => {
       var _a3;
       return (_a3 = d2.current) == null ? void 0 : _a3.getApi().scrollToTime(t3);
     }, 200);
   }, socket: e11.socket, updateEvents: e11.updateEvents, setEvent: e11.setEvent, deleteEvent: (t3) => {
     n2(null), e11.deleteEvent(t3);
-  }, serverTimeZone: e11.serverTimeZone, readOnly: e11.readOnly, t: e11.t, theme: e11.theme, language: e11.language, isSimulation: e11.isSimulation, simulationId: e11.simulationId, simulation: e11.simulation }) : null, V(`div`, { style: Ak.container, children: [!e11.hideLeftBlock && !e11.readOnly && V(`div`, { style: Ak.leftBlock, children: [z(i, { elevation: 4, style: Ak.leftPaper, children: V(`div`, { style: Ak.leftContent, children: [z(`h4`, { children: e11.t(`Events`) }), S2.map((t3) => {
+  }, serverTimeZone: e11.serverTimeZone, readOnly: e11.readOnly, t: e11.t, theme: e11.theme, language: e11.language, isSimulation: e11.isSimulation, simulationId: e11.simulationId, simulation: e11.simulation }) : null, V(`div`, { style: jk.container, children: [!e11.hideLeftBlock && !e11.readOnly && V(`div`, { style: jk.leftBlock, children: [z(i, { elevation: 4, style: jk.leftPaper, children: V(`div`, { style: jk.leftContent, children: [z(`h4`, { children: e11.t(`Events`) }), E2.map((t3) => {
     var _a3, _b3;
     return z(kk, { t: e11.t, type: t3, color: e11.isSimulation ? (_b3 = (_a3 = e11.simulation) == null ? void 0 : _a3.common) == null ? void 0 : _b3.color : void 0 }, t3.type);
-  }), e11.hideLeftBlockHint ? null : z(`div`, { children: e11.t(`Drag and drop the events above to create a new one.`) }), e11.hideLeftBlockHint ? null : z(`hr`, { style: Ak.hr }), e11.hideLeftBlockHint ? null : z(`div`, { children: e11.t(`Use ALT by dragging it to copy the events.`) }), e11.hideLeftBlockHint ? null : z(`hr`, { style: Ak.hr }), e11.hideLeftBlockHint ? null : z(`div`, { children: e11.t(`Use double click on calendar to add new events.`) }), e11.hideLeftBlockHint ? null : z(`hr`, { style: Ak.hr }), e11.hideLeftBlockHint || O2 === `dayGridMonth` || O2 === `listMonth` ? null : V(D, { fullWidth: true, variant: `standard`, children: [z(ie, { children: e11.t(`Zoom`) }), z(f, { value: s2, onChange: (e12) => {
+  }), e11.hideLeftBlockHint ? null : z(`div`, { children: e11.t(`Drag and drop the events above to create a new one.`) }), e11.hideLeftBlockHint ? null : z(`hr`, { style: jk.hr }), e11.hideLeftBlockHint ? null : z(`div`, { children: e11.t(`Use ALT by dragging it to copy the events.`) }), e11.hideLeftBlockHint ? null : z(`hr`, { style: jk.hr }), e11.hideLeftBlockHint ? null : z(`div`, { children: e11.t(`Use double click on calendar to add new events.`) }), e11.hideLeftBlockHint ? null : z(`hr`, { style: jk.hr }), e11.hideLeftBlockHint || te2 === `dayGridMonth` || te2 === `listMonth` ? null : V(D, { fullWidth: true, variant: `standard`, children: [z(ie, { children: e11.t(`Zoom`) }), z(f, { value: s2, onChange: (e12) => {
     var _a3, _b3;
     let t3 = (_b3 = (_a3 = d2.current) == null ? void 0 : _a3.elRef) == null ? void 0 : _b3.current;
     if (t3) {
-      let e13 = Mk(t3);
+      let e13 = Nk(t3);
       e13 && setTimeout(() => {
         var _a4;
         return (_a4 = d2.current) == null ? void 0 : _a4.getApi().scrollToTime(e13);
       }, 300);
     }
     window.localStorage.setItem(`calendarStep`, e12.target.value.toString()), c2(e12.target.value);
-  }, children: Ok.map((t3) => V(ye, { value: t3, children: [t3, z(`span`, { style: Ak.leftMargin, children: e11.t(`min`) })] }, t3)) })] })] }) }), e11.button] }), z(`div`, { style: Ak.calendarBlock, children: z(`div`, { style: Ak.calendar, children: z(Fg, { ref: d2, plugins: [Fx, b_, pv, $v, xx], weekends: !e11.hideWeekends, headerToolbar: !e11.hideTopBlock && { left: e11.hideTopBlockButtons || e11.isSimulation ? `` : `prev,next today`, center: e11.isSimulation ? `` : `title`, right: e11.hideTopBlockButtons || e11.isSimulation ? `` : `dayGridMonth,timeGridWeek,timeGridDay,listMonth` }, eventTimeFormat: e11.isSimulation ? Nk : void 0, scrollTime: e11.isSimulation && e11.simulationState === `record` ? E2 : void 0, slotDuration: `00:${s2.toString().padStart(2, `0`)}:00`, eventMinHeight: 20, initialView: x2, initialDate: b2, editable: !e11.readOnly, selectable: true, selectMirror: true, nowIndicator: true, dayMaxEvents: true, eventResizableFromStart: !e11.isSimulation, eventDurationEditable: !e11.isSimulation, defaultTimedEventDuration: `00:${s2.toString().padStart(2, `0`)}`, events: C2, height: `calc(100% - 20px)`, locales: [Lx, Rx, zx, Bx, Vx, Hx, Ux, Wx, Gx, Kx], locale: e11.language, datesSet: (t3) => {
+  }, children: Ok.map((t3) => V(ye, { value: t3, children: [t3, z(`span`, { style: jk.leftMargin, children: e11.t(`min`) })] }, t3)) })] })] }) }), e11.button] }), z(`div`, { style: jk.calendarBlock, children: z(`div`, { ref: p2, className: `iob-fullcalendar`, style: e11.widget ? jk.calendarWidget : jk.calendar, children: z(Fg, { ref: d2, plugins: [Fx, b_, pv, $v, xx], weekends: !e11.hideWeekends, eventDisplay: m2 ? `list-item` : `block`, listDayFormat: { weekday: `long`, day: `numeric`, month: `long` }, listDaySideFormat: false, headerToolbar: !e11.hideTopBlock && { left: e11.hideTopBlockButtons || e11.isSimulation ? `` : `prev,next today`, center: e11.isSimulation ? `` : `title`, right: e11.hideTopBlockButtons || e11.isSimulation ? `` : `dayGridMonth,timeGridWeek,timeGridDay,listMonth` }, eventTimeFormat: e11.isSimulation ? Pk : { hour: `numeric`, minute: `2-digit`, omitZeroMinute: false }, scrollTime: e11.isSimulation && e11.simulationState === `record` ? M2 : void 0, slotDuration: `00:${s2.toString().padStart(2, `0`)}:00`, eventMinHeight: 20, initialView: T2, initialDate: C2, editable: !e11.readOnly, selectable: true, selectMirror: true, nowIndicator: true, dayMaxEvents: true, eventResizableFromStart: !e11.isSimulation, eventDurationEditable: !e11.isSimulation, defaultTimedEventDuration: `00:${s2.toString().padStart(2, `0`)}`, events: A2, height: `calc(100% - 20px)`, locales: [Lx, Rx, zx, Bx, Vx, Hx, Ux, Wx, Gx, Kx], locale: e11.language, datesSet: (t3) => {
     var _a3, _b3;
-    (t3.start.toString() !== ((_a3 = _2.start) == null ? void 0 : _a3.toString()) || t3.end.toString() !== ((_b3 = _2.end) == null ? void 0 : _b3.toString())) && (g2.current = null, v2({ start: t3.start, end: t3.end })), e11.widget ? (h2.current && clearTimeout(h2.current), h2.current = null, m2.current && clearTimeout(m2.current), m2.current = setTimeout(() => {
-      m2.current = null;
+    (t3.start.toString() !== ((_a3 = x2.start) == null ? void 0 : _a3.toString()) || t3.end.toString() !== ((_b3 = x2.end) == null ? void 0 : _b3.toString())) && (b2.current = null, S2({ start: t3.start, end: t3.end })), e11.widget ? (v2.current && clearTimeout(v2.current), v2.current = null, _2.current && clearTimeout(_2.current), _2.current = setTimeout(() => {
+      _2.current = null;
       let e12 = () => {
         var _a4, _b4;
-        (_b4 = (_a4 = d2.current) == null ? void 0 : _a4.getApi()) == null ? void 0 : _b4.scrollToTime((/* @__PURE__ */ new Date()).getTime()), m2.current ? h2.current = null : h2.current = setTimeout(() => e12, 3e5);
+        (_b4 = (_a4 = d2.current) == null ? void 0 : _a4.getApi()) == null ? void 0 : _b4.scrollToTime((/* @__PURE__ */ new Date()).getTime()), _2.current ? v2.current = null : v2.current = setTimeout(() => e12, 3e5);
       };
       e12();
     }, 6e4)) : window.localStorage.setItem(`${u2}View`, t3.view.type);
   }, eventClick: (e12) => {
-    g2.current = new Date(e12.event.start).getTime(), n2(e12.event.extendedProps.eventId);
+    b2.current = new Date(e12.event.start).getTime(), n2(e12.event.extendedProps.eventId);
   }, eventResize: (t3) => {
     var _a3;
-    g2.current = new Date(t3.event.start).getTime();
+    b2.current = new Date(t3.event.start).getTime();
     let n3 = e11.events.find((e12) => e12._id === t3.event.extendedProps.eventId);
     if ((_a3 = n3 == null ? void 0 : n3.native.intervals) == null ? void 0 : _a3[0].timeOffset) {
       let r3 = JSON.parse(JSON.stringify(n3));
@@ -16625,7 +16632,7 @@ function Pk(e11) {
     } else t3.revert();
   }, eventDrop: async (t3) => {
     var _a3;
-    g2.current = new Date(t3.event.start).getTime();
+    b2.current = new Date(t3.event.start).getTime();
     let n3 = e11.events.find((e12) => e12._id === t3.event.extendedProps.eventId);
     if ((_a3 = n3 == null ? void 0 : n3.native) == null ? void 0 : _a3.cron) {
       let r3 = JSON.parse(JSON.stringify(n3));
@@ -16643,7 +16650,7 @@ function Pk(e11) {
       let n3 = eS(t3.event.start, `cron`, e11.serverTimeZone);
       n3.dows = e11.simulation.native.interval === `day` ? [0, 1, 2, 3, 4, 5, 6] : [t3.event.start.getDay()], n3.dates = `?`, n3.months = `*`, r3.native.cron = Qx(n3), r3.native.record = { states: [], enums: [], start: null, end: null };
     }
-    g2.current = new Date(t3.event.start).getTime(), await e11.setEvent(r3._id, r3), e11.updateEvents(), a2(r3), setTimeout(() => n2(r3._id), 100);
+    b2.current = new Date(t3.event.start).getTime(), await e11.setEvent(r3._id, r3), e11.updateEvents(), a2(r3), setTimeout(() => n2(r3._id), 100);
   }, eventDidMount: (e12) => {
     let t3 = e12.event.extendedProps.icon;
     if (t3) {
@@ -16659,15 +16666,15 @@ function Pk(e11) {
   }, select: async (t3) => {
     if (t3.view.calendar.unselect(), e11.readOnly) return;
     let r3 = t3.end.getTime() - t3.start.getTime();
-    if ((!p2.current || Date.now() - p2.current > 500) && r3 === 18e5) {
-      p2.current = Date.now();
+    if ((!g2.current || Date.now() - g2.current > 500) && r3 === 18e5) {
+      g2.current = Date.now();
       return;
     }
     let i2 = { _id: `${e11.calendarPrefix || e11.simulationId}.event-${tS()}`, common: { name: e11.t(`Single event`), enabled: true, color: `#3A87AD` }, native: { id: Date.now(), start: eS(t3.start, `date`, e11.serverTimeZone), intervals: t3.end && !e11.isSimulation ? [{ value: ``, timeOffset: t3.end.getTime() - t3.start.getTime() }] : void 0, type: t3.end && !e11.isSimulation ? `double` : `single`, oid: ``, startValue: `` }, type: `schedule` };
-    e11.isSimulation && (i2.common.color = e11.simulation.common.color || i2.common.color), g2.current = new Date(i2.native.start).getTime(), await e11.setEvent(i2._id, i2), await e11.updateEvents(), a2(i2), setTimeout(() => n2(i2._id), 100);
+    e11.isSimulation && (i2.common.color = e11.simulation.common.color || i2.common.color), b2.current = new Date(i2.native.start).getTime(), await e11.setEvent(i2._id, i2), await e11.updateEvents(), a2(i2), setTimeout(() => n2(i2._id), 100);
   } }) }) })] })] });
 }
-var Fk = class e9 extends g.Component {
+var Ik = class e9 extends g.Component {
   constructor(e11) {
     super(e11), this.state = { list: [{ value: `_`, label: e11.t(`default`) }] };
   }
@@ -16686,14 +16693,14 @@ var Fk = class e9 extends g.Component {
   render() {
     return z(f, { variant: `standard`, fullWidth: true, value: this.props.value || `_`, onChange: (e11) => this.props.onChange(e11.target.value === `_` ? `` : e11.target.value), children: this.state.list.map((e11) => z(ye, { value: e11.value, children: e11.label }, e11.value)) });
   }
-}, Ik = { content: { display: `flex`, width: `100%`, height: `100%`, overflow: `auto` } }, Lk = class e10 extends window.visRxWidget {
+}, Lk = { content: { display: `flex`, width: `100%`, height: `100%`, overflow: `auto` } }, Rk = class e10 extends window.visRxWidget {
   widgetRef = g.createRef();
   subscribed = null;
   constructor(e11) {
     super(e11), this.state = { ...this.state, events: [], serverTimeZone: 0 };
   }
   static getWidgetInfo() {
-    return { id: `tplFullCalendar`, visSet: `fullcalendar`, visWidgetLabel: `fullcalendar`, visSetLabel: `set_label`, visSetColor: `#112233`, visName: `Full calendar`, visAttrs: [{ name: `common`, fields: [{ label: `instance`, name: `instance`, type: `instance`, adapter: `fullcalendar`, isShort: true }, { label: `calendar`, name: `calendar`, type: `custom`, component: (t2, n2, r2, i2) => z(Fk, { instance: n2.instance, value: n2.calendar, onChange: (e11) => r2({ calendar: e11 }), socket: i2.context.socket, t: e10.t }, n2.instance), default: `` }, { label: `read_only`, name: `readOnly`, type: `checkbox`, default: false }, { label: `hide_left_block`, name: `hideLeftBlock`, type: `checkbox`, hidden: (e11) => !!e11.readOnly, default: false }, { label: `hide_left_block_hint`, name: `hideLeftBlockHint`, type: `checkbox`, hidden: (e11) => !!e11.readOnly || !!e11.hideLeftBlock, default: false }, { label: `hide_top_block`, name: `hideTopBlock`, type: `checkbox`, default: false }, { label: `hide_top_block_buttons`, name: `hideTopBlockButtons`, type: `checkbox`, hidden: (e11) => !!e11.hide_top_block, default: false }, { label: `hide_weekends`, name: `hideWeekends`, type: `checkbox`, default: false }, { label: `view_mode`, name: `viewMode`, type: `select`, options: [{ label: `full_calendar_dayGridMonth`, value: `dayGridMonth` }, { label: `full_calendar_timeGridWeek`, value: `timeGridWeek` }, { label: `full_calendar_timeGridDay`, value: `timeGridDay` }, { label: `full_calendar_listMonth`, value: `listMonth` }], default: `dayGridMonth` }, { label: `name`, name: `name`, tooltip: `used_only_with_relative`, default: ``, hidden: ((e11, t2, n2) => !!n2 && n2.position !== `relative`) }, { label: `day_step`, tooltip: `day_step_minutes`, name: `dayStep`, default: 30, type: `select`, noTranslation: true, hidden: (e11) => e11.viewMode !== `timeGridDay` && e11.viewMode !== `timeGridWeek`, options: [{ label: `1`, value: 1 }, { label: `2`, value: 2 }, { label: `3`, value: 3 }, { label: `5`, value: 5 }, { label: `10`, value: 10 }, { label: `15`, value: 15 }, { label: `20`, value: 20 }, { label: `30`, value: 30 }, { label: `60`, value: 60 }] }] }], visDefaultStyle: { width: `100%`, height: 355, position: `relative`, absoluteWidth: 500 }, visPrev: `widgets/fullcalendar/img/prev_fullcalendar.png` };
+    return { id: `tplFullCalendar`, visSet: `fullcalendar`, visWidgetLabel: `fullcalendar`, visSetLabel: `set_label`, visSetColor: `#112233`, visName: `Full calendar`, visAttrs: [{ name: `common`, fields: [{ label: `instance`, name: `instance`, type: `instance`, adapter: `fullcalendar`, isShort: true }, { label: `calendar`, name: `calendar`, type: `custom`, component: (t2, n2, r2, i2) => z(Ik, { instance: n2.instance, value: n2.calendar, onChange: (e11) => r2({ calendar: e11 }), socket: i2.context.socket, t: e10.t }, n2.instance), default: `` }, { label: `read_only`, name: `readOnly`, type: `checkbox`, default: false }, { label: `hide_left_block`, name: `hideLeftBlock`, type: `checkbox`, hidden: (e11) => !!e11.readOnly, default: false }, { label: `hide_left_block_hint`, name: `hideLeftBlockHint`, type: `checkbox`, hidden: (e11) => !!e11.readOnly || !!e11.hideLeftBlock, default: false }, { label: `hide_top_block`, name: `hideTopBlock`, type: `checkbox`, default: false }, { label: `hide_top_block_buttons`, name: `hideTopBlockButtons`, type: `checkbox`, hidden: (e11) => !!e11.hide_top_block, default: false }, { label: `hide_weekends`, name: `hideWeekends`, type: `checkbox`, default: false }, { label: `hide_values`, tooltip: `hide_values_tooltip`, name: `hideValues`, type: `checkbox`, default: false }, { label: `view_mode`, name: `viewMode`, type: `select`, options: [{ label: `full_calendar_dayGridMonth`, value: `dayGridMonth` }, { label: `full_calendar_timeGridWeek`, value: `timeGridWeek` }, { label: `full_calendar_timeGridDay`, value: `timeGridDay` }, { label: `full_calendar_listMonth`, value: `listMonth` }], default: `dayGridMonth` }, { label: `name`, name: `name`, tooltip: `used_only_with_relative`, default: ``, hidden: ((e11, t2, n2) => !!n2 && n2.position !== `relative`) }, { label: `day_step`, tooltip: `day_step_minutes`, name: `dayStep`, default: 30, type: `select`, noTranslation: true, hidden: (e11) => e11.viewMode !== `timeGridDay` && e11.viewMode !== `timeGridWeek`, options: [{ label: `1`, value: 1 }, { label: `2`, value: 2 }, { label: `3`, value: 3 }, { label: `5`, value: 5 }, { label: `10`, value: 10 }, { label: `15`, value: 15 }, { label: `20`, value: 20 }, { label: `30`, value: 30 }, { label: `60`, value: 60 }] }] }], visDefaultStyle: { width: `100%`, height: 355, position: `relative`, absoluteWidth: 500 }, visPrev: `widgets/fullcalendar/img/prev_fullcalendar.png` };
   }
   static t(e11, ...t2) {
     return un.t(`full_calendar_${e11}`, ...t2);
@@ -16743,9 +16750,9 @@ var Fk = class e9 extends g.Component {
     var _a2, _b2;
     super.renderWidgetBody(t2), ((_a2 = this.widgetRef.current) == null ? void 0 : _a2.offsetWidth) || this.forceUpdate();
     let n2;
-    return n2 = !this.state.rxData.instance && this.state.rxData.instance !== 0 ? z(`div`, { style: Ik.content, ref: this.widgetRef, children: e10.t(`Please select instance`) }) : z(`div`, { style: Ik.content, ref: this.widgetRef, children: z(Pk, { widget: true, systemConfig: this.props.context.systemConfig.common, events: this.state.events || [], socket: this.props.context.socket, calendarPrefix: this.state.rxData.calendar || `fullcalendar.${this.state.rxData.instance}`, changeEvents: this.changeEvents, updateEvents: this.updateEvents, setEvent: this.setEvent, deleteEvent: this.deleteEvent, serverTimeZone: this.state.serverTimeZone || 0, readOnly: this.state.rxData.readOnly || false, hideLeftBlock: this.state.rxData.hideLeftBlock || false, hideTopBlock: this.state.rxData.hideTopBlock || false, hideLeftBlockHint: this.state.rxData.hideLeftBlockHint || false, hideTopBlockButtons: this.state.rxData.hideTopBlockButtons || false, viewMode: this.state.rxData.viewMode, storageName: `fc_${this.props.id}`, hideWeekends: this.state.rxData.hideWeekends || false, t: e10.t, language: un.getLanguage(), dayStep: this.state.rxData.dayStep || 30, theme: this.props.context.theme }, `${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`) }), ((_b2 = this.state.rxStyle) == null ? void 0 : _b2.position) === `relative` ? this.wrapContent(n2, null, { height: `calc(100% - 24px)`, width: `calc(100% - 24px)` }) : n2;
+    return n2 = !this.state.rxData.instance && this.state.rxData.instance !== 0 ? z(`div`, { style: Lk.content, ref: this.widgetRef, children: e10.t(`Please select instance`) }) : z(`div`, { style: Lk.content, ref: this.widgetRef, children: z(Fk, { widget: true, systemConfig: this.props.context.systemConfig.common, events: this.state.events || [], socket: this.props.context.socket, calendarPrefix: this.state.rxData.calendar || `fullcalendar.${this.state.rxData.instance}`, changeEvents: this.changeEvents, updateEvents: this.updateEvents, setEvent: this.setEvent, deleteEvent: this.deleteEvent, serverTimeZone: this.state.serverTimeZone || 0, readOnly: this.state.rxData.readOnly || false, hideLeftBlock: this.state.rxData.hideLeftBlock || false, hideTopBlock: this.state.rxData.hideTopBlock || false, hideLeftBlockHint: this.state.rxData.hideLeftBlockHint || false, hideTopBlockButtons: this.state.rxData.hideTopBlockButtons || false, viewMode: this.state.rxData.viewMode, storageName: `fc_${this.props.id}`, hideWeekends: this.state.rxData.hideWeekends || false, hideValues: this.state.rxData.hideValues || false, t: e10.t, language: un.getLanguage(), dayStep: this.state.rxData.dayStep || 30, theme: this.props.context.theme }, `${this.state.rxData.viewMode}_${this.state.rxData.dayStep || 30}`) }), ((_b2 = this.state.rxStyle) == null ? void 0 : _b2.position) === `relative` ? this.wrapContent(n2, null, { height: `calc(100% - 24px)`, width: `calc(100% - 24px)` }) : n2;
   }
 };
 export {
-  Lk as default
+  Rk as default
 };

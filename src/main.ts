@@ -147,6 +147,11 @@ const COMMANDS: { command: string; params: string; answer: string }[] = [
         answer: '{events: [execution\u2026]}',
     },
     { command: 'getCalendars', params: '-', answer: '{calendars: [{id, name, enabled}\u2026]}' },
+    {
+        command: 'addCalendar',
+        params: 'name; optional: color, icon, enabled (default true)',
+        answer: '{id, name, enabled}',
+    },
     { command: 'enableCalendar', params: 'calendar (name or ID), enabled', answer: '{id, enabled}' },
     {
         command: 'getEventObjects',
@@ -367,6 +372,45 @@ export class Fullcalendar extends Adapter {
         await this.extendForeignObjectAsync(id, { common: { enabled } });
         this.log.info(`Calendar "${id}" ${enabled ? 'enabled' : 'disabled'}`);
         return { id, enabled };
+    }
+
+    /**
+     * Create a calendar: a folder below `Calendars`, as the admin creates it. The name must be new, so that the other
+     * commands can find the calendar by it.
+     *
+     * @param params the message
+     */
+    private async addCalendar(
+        params: Record<string, unknown>,
+    ): Promise<{ id: string; name: string; enabled: boolean }> {
+        const name = typeof params.name === 'string' ? params.name.trim() : '';
+        if (!name) {
+            throw new Error('"name" is missing');
+        }
+        const names = await this.readCalendars();
+        if (
+            name.toLowerCase() === 'default' ||
+            Object.values(names).some(n => n.toLowerCase() === name.toLowerCase())
+        ) {
+            throw new Error(`A calendar "${name}" exists already`);
+        }
+        const enabled = params.enabled !== false && params.enabled !== 'false' && params.enabled !== 0;
+        const common: { name: string; enabled?: boolean; color?: string; icon?: string } = { name };
+        if (!enabled) {
+            common.enabled = false;
+        }
+        if (typeof params.color === 'string' && params.color.trim()) {
+            common.color = params.color.trim();
+        }
+        if (typeof params.icon === 'string' && params.icon.trim()) {
+            common.icon = params.icon.trim();
+        }
+        const id = `${this.namespace}.Calendars.Calendar-${randomUUID()}`;
+        await this.setForeignObjectAsync(id, { type: 'folder', common, native: {} });
+        // the object change arrives later: switched off at once
+        this.updateCalendarState(id, { type: 'folder', common } as unknown as ioBroker.Object);
+        this.log.info(`Calendar "${name}" created`);
+        return { id, name, enabled };
     }
 
     /** Name of the calendar of an event, '' = the default calendar */
@@ -1064,6 +1108,9 @@ export class Fullcalendar extends Adapter {
                     };
                     break;
                 }
+                case 'addCalendar':
+                    result = await this.addCalendar(params);
+                    break;
                 case 'enableCalendar':
                     result = await this.enableCalendar(params);
                     break;

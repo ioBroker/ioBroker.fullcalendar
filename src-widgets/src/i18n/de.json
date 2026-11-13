@@ -104,5 +104,10 @@
   "Operator": "Operator",
   "Value": "Wert",
   "ON (true)": "EIN (true)",
-  "OFF (false)": "AUS (false)"
+  "OFF (false)": "AUS (false)",
+  "ON": "EIN",
+  "OFF": "AUS",
+  "initial": "Ausgangswert",
+  "hide_values": "Nur die Namen der Ereignisse",
+  "hide_values_tooltip": "Ohne die Werte und die Dauer, z. B. \"Bewässerung\" statt \"Bewässerung → EIN → 20 Min. → AUS\""
 }

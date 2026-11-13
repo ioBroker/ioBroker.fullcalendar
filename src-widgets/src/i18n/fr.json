@@ -104,5 +104,10 @@
   "Operator": "Opérateur",
   "Value": "Valeur",
   "ON (true)": "ALLUMÉ (true)",
-  "OFF (false)": "ÉTEINT (false)"
+  "OFF (false)": "ÉTEINT (false)",
+  "ON": "ALLUMÉ",
+  "OFF": "ÉTEINT",
+  "initial": "valeur initiale",
+  "hide_values": "Uniquement les noms des événements",
+  "hide_values_tooltip": "Sans les valeurs ni la durée, p. ex. « Arrosage » au lieu de « Arrosage → ALLUMÉ → 20 min. → ÉTEINT »"
 }

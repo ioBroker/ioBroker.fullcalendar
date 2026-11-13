@@ -57,6 +57,8 @@ export interface ExpandContext {
     /** Of `system.config`, for the astronomical events */
     latitude?: number | null;
     longitude?: number | null;
+    /** The titles are the names only, without the values and the duration */
+    hideValues?: boolean;
 }
 
 /**
@@ -171,14 +173,14 @@ function valueText(
 
 /**
  * The title of an event, as the vis-2 widget writes it: `name → value`, and for a double or toggle event the
- * duration and the second value
+ * duration and the second value; with `hideValues` the name only
  *
  * @param event the event
  * @param ctx the words
  */
 export function getEventTitle(event: CalendarEvent, ctx: ExpandContext): string {
     const name = ctx.text(event.common.name);
-    if (!event.native.oid) {
+    if (!event.native.oid || ctx.hideValues) {
         return name;
     }
     const states = event.native.states;
@@ -234,8 +236,8 @@ export function expandEvents(events: CalendarEvent[], start: Date, end: Date, ct
             borderColor: enabled ? color : dimColor(color),
             textColor: enabled ? textColor : dimColor(textColor),
             classNames: enabled ? [] : ['disabled'],
+            // how: `eventDisplay` of the calendar, which depends on its width
             allDay: false,
-            display: 'block',
             durationEditable: duration > 0,
         };
         const add = (time: Date | null): void => {

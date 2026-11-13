@@ -36,6 +36,8 @@ export type CalendarSettings = {
     hideTopBlock?: boolean;
     hideTopBlockButtons?: boolean;
     hideWeekends?: boolean;
+    /** The titles of the events are their names only, without the values and the duration */
+    hideValues?: boolean;
     viewMode?: string;
     /** One of `DAY_STEPS`, as text: a `select` has text values */
     dayStep?: string;

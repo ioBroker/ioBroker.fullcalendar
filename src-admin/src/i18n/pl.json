@@ -136,5 +136,6 @@
   "OFF (false)": "WYŁĄCZONY (false)",
   "Inactive calendars do not execute their events": "Nieaktywne kalendarze nie wykonują swoich zdarzeń",
   "Calendar is inactive. Click to activate": "Kalendarz jest nieaktywny. Kliknij, aby aktywować",
-  "Deactivate calendar": "Dezaktywuj kalendarz"
+  "Deactivate calendar": "Dezaktywuj kalendarz",
+  "initial": "wartość początkowa"
 }

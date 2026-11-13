@@ -25,6 +25,8 @@ export const MANIFEST_WORDS = [
     'hide_top_block',
     'hide_top_block_buttons',
     'hide_weekends',
+    'hide_values',
+    'hide_values_tooltip',
     'view_mode',
     'day_step',
     'day_step_minutes',
@@ -125,6 +127,12 @@ export function buildManifest(vis: (key: ManifestWord) => WebComponentText): Web
                     type: 'checkbox',
                     default: false,
                     label: vis('hide_weekends'),
+                },
+                hideValues: {
+                    type: 'checkbox',
+                    default: false,
+                    label: vis('hide_values'),
+                    help: vis('hide_values_tooltip'),
                 },
                 viewMode: {
                     type: 'select',

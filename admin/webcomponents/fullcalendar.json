@@ -190,6 +190,36 @@
                     "zh-cn": "隐藏周末"
                 }
             },
+            "hideValues": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Only the names of the events",
+                    "de": "Nur die Namen der Ereignisse",
+                    "ru": "Только названия событий",
+                    "pt": "Apenas os nomes dos eventos",
+                    "nl": "Alleen de namen van de gebeurtenissen",
+                    "fr": "Uniquement les noms des événements",
+                    "it": "Solo i nomi degli eventi",
+                    "es": "Solo los nombres de los eventos",
+                    "pl": "Tylko nazwy zdarzeń",
+                    "uk": "Лише назви подій",
+                    "zh-cn": "仅显示事件名称"
+                },
+                "help": {
+                    "en": "Without the values and the duration, e.g. \"Watering\" instead of \"Watering → ON → 20 min. → OFF\"",
+                    "de": "Ohne die Werte und die Dauer, z. B. \"Bewässerung\" statt \"Bewässerung → EIN → 20 Min. → AUS\"",
+                    "ru": "Без значений и длительности, например \"Полив\" вместо \"Полив → ВКЛ → 20 мин. → ВЫКЛ\"",
+                    "pt": "Sem os valores e a duração, p. ex. \"Rega\" em vez de \"Rega → LIGADO → 20 min. → DESLIGADO\"",
+                    "nl": "Zonder de waarden en de duur, bijv. \"Bewatering\" in plaats van \"Bewatering → AAN → 20 min. → UIT\"",
+                    "fr": "Sans les valeurs ni la durée, p. ex. « Arrosage » au lieu de « Arrosage → ALLUMÉ → 20 min. → ÉTEINT »",
+                    "it": "Senza i valori e la durata, ad es. \"Irrigazione\" invece di \"Irrigazione → ACCESO → 20 min. → SPENTO\"",
+                    "es": "Sin los valores ni la duración, p. ej. \"Riego\" en lugar de \"Riego → ENCENDIDO → 20 min. → APAGADO\"",
+                    "pl": "Bez wartości i czasu trwania, np. \"Podlewanie\" zamiast \"Podlewanie → WŁĄCZONY → 20 min. → WYŁĄCZONY\"",
+                    "uk": "Без значень і тривалості, наприклад \"Полив\" замість \"Полив → УВІМКНЕНО → 20 хв. → ВИМКНЕНО\"",
+                    "zh-cn": "不显示值和时长，例如显示\"浇水\"而不是\"浇水 → 开 → 20 分钟 → 关\""
+                }
+            },
             "viewMode": {
                 "type": "select",
                 "default": "dayGridMonth",

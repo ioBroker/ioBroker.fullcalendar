@@ -104,5 +104,10 @@
   "Operator": "Operador",
   "Value": "Valor",
   "ON (true)": "ENCENDIDO (true)",
-  "OFF (false)": "APAGADO (false)"
+  "OFF (false)": "APAGADO (false)",
+  "ON": "ENCENDIDO",
+  "OFF": "APAGADO",
+  "initial": "valor inicial",
+  "hide_values": "Solo los nombres de los eventos",
+  "hide_values_tooltip": "Sin los valores ni la duración, p. ej. \"Riego\" en lugar de \"Riego → ENCENDIDO → 20 min. → APAGADO\""
 }
