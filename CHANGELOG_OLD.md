@@ -1,4 +1,13 @@
 # Older changes
+## 3.2.0 (2026-10-29)
+* (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
+* (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)
+* (bluefox) Fixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)
+* (bluefox) Fixed: the subscriptions of a stopped recording were not removed
+* (bluefox) Added: the duration of "On/Off" and "Toggle" events can be given in seconds, minutes or hours, e.g. for a push button (#354)
+* (bluefox) Added: conditions for events, e.g. do not close the shutter if the door is open (#257)
+* (bluefox) Added: calendars can be switched off and on, also with the message `enableCalendar` (#236)
+
 ## 3.1.1 (2026-10-29)
 * (GermanBluefox) Fixed display of recurring events after DST change (#448)
 

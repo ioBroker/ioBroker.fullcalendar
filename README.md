@@ -137,8 +137,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 3.5.0 (2026-11-13)
 * (@GermanBluefox) Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`
 * (@GermanBluefox) vis-2 widget: in a narrow widget the list and the toolbar fit (no scrolling sideways, the buttons wrap), the day of the list is one line, and styles of the page can no longer put frames around its entries
 * (@GermanBluefox) vis-2 widget and web component: in a narrow month view the events are dots, so a daily event no longer looks like a bar over the whole week
@@ -163,15 +162,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 * (bluefox) `deleteEvent` deletes a list of events (`ids`) or all events with a name (`name`)
 * (bluefox) Added the messages `getEvent` and `getCommands`, an unknown command answers with the list of the commands
 * (bluefox) Documented all messages and parameters in the README
-
-### 3.2.0 (2026-10-29)
-* (bluefox) Fixed white screen when adding an event in the vis-2 widget (#444)
-* (bluefox) Fixed: the recording of a simulation stopped immediately after the start (#234)
-* (bluefox) Fixed: the simulation recorded repeated status updates without a change of the value, e.g. of Tasmota or Sonoff devices (#285, #235)
-* (bluefox) Fixed: the subscriptions of a stopped recording were not removed
-* (bluefox) Added: the duration of "On/Off" and "Toggle" events can be given in seconds, minutes or hours, e.g. for a push button (#354)
-* (bluefox) Added: conditions for events, e.g. do not close the shutter if the door is open (#257)
-* (bluefox) Added: calendars can be switched off and on, also with the message `enableCalendar` (#236)
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
