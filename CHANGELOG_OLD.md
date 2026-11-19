@@ -1,4 +1,9 @@
 # Older changes
+## 3.3.1 (2026-10-29)
+* (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
+* (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)
+* (@GermanBluefox) Added the message `updateEvent`: move or change an event without deleting and creating it again
+
 ## 3.3.0 (2026-10-29)
 * (bluefox) Fixed: `addEvent` ignored `type` and `durationSec`, a "double" event was saved as "single"
 * (bluefox) Added recurring events to `addEvent`: `recurring` (daily, weekly, monthly, yearly) or an iCal `rrule`
