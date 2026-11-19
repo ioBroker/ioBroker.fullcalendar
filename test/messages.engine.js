@@ -3,6 +3,7 @@
 // `npx mocha test/messages.engine.js --exit` after `npm run build-backend`.
 const assert = require('node:assert/strict');
 const { EventEmitter } = require('node:events');
+const { readFileSync } = require('node:fs');
 
 const clone = obj => (obj === undefined || obj === null ? null : JSON.parse(JSON.stringify(obj)));
 
@@ -242,6 +243,34 @@ describe('messages', () => {
         const commands = await send('getCommands', {});
         assert.ok(commands.commands.find(cmd => cmd.command === 'updateEvent'));
         assert.match((await send('changeEvent', {})).error, /Commands: addEvent, updateEvent/);
+    });
+
+    it('help names every command of onMessage, and getCommands has the same table', async () => {
+        const res = await send('help', {});
+        assert.equal(typeof res.help, 'string');
+        const commands = res.commands.map(cmd => cmd.command);
+        assert.equal(new Set(commands).size, commands.length);
+        assert.ok(res.commands.every(cmd => typeof cmd.write === 'boolean'));
+        assert.equal(res.commands.find(cmd => cmd.command === 'addEvent').write, true);
+        assert.equal(res.commands.find(cmd => cmd.command === 'listEvents').write, false);
+
+        // the cases of onMessage
+        const source = readFileSync(`${__dirname}/../src/main.ts`, 'utf8');
+        const handler = source.slice(
+            source.indexOf('private async onMessage('),
+            source.indexOf('private async onEventObjectMessage('),
+        );
+        const cases = [...handler.matchAll(/case '([^']+)':/g)].map(m => m[1]);
+        assert.deepEqual([...commands].sort(), [...cases].sort());
+
+        for (const command of commands.filter(c => c !== 'help')) {
+            assert.match(res.help, new RegExp(`\\b${command}\\b`), `help does not name ${command}`);
+        }
+        assert.deepEqual(res.help.split('\n').filter(line => line.length > 120), []);
+
+        const table = (await send('getCommands', {})).commands;
+        assert.deepEqual(table.map(cmd => cmd.command), commands);
+        assert.ok(table.every(cmd => cmd.description && cmd.params && cmd.answer));
     });
 
     it('addCalendar creates a calendar that addEvent and getCalendars find by name', async () => {

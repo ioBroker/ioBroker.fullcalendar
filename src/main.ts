@@ -22,6 +22,7 @@ import {
     type EventInfo,
     type Occurrence,
 } from './lib/agenda';
+import { COMMANDS, HELP } from './lib/help';
 
 const adapterName = require('../package.json').name.split('.').pop();
 
@@ -113,55 +114,6 @@ const YYYY_MM_DDTHH_mm_ss = 'YYYY_MM_DDTHH_mm_ss'.length;
 
 /** Upper bound for `getObjectView` range queries */
 const MAX_KEY = '\u9999';
-
-/** The messages of the adapter, the answer of `getCommands` and the reference in the README */
-const COMMANDS: { command: string; params: string; answer: string }[] = [
-    {
-        command: 'addEvent',
-        params:
-            'oid, value, start (local time "2026-10-29T07:30" or ms) or in (delay: seconds, "90s", "30m", "2h"); ' +
-            'optional: duration or durationSec (then type "double", endValue default: opposite of a boolean value), ' +
-            'type ("single", "double", "toggle"), endValue, recurring ("daily", "weekly", "monthly", "yearly") ' +
-            'with weekdays (0 = Sunday or "MO"\u2026), monthDays, months, or rrule ("FREQ=YEARLY", "FREQ=WEEKLY;BYDAY=MO,FR"), ' +
-            'name, calendar (name or ID), color',
-        answer: '{id, name, type, start, ts, cron?}: start/ts = first execution',
-    },
-    {
-        command: 'updateEvent',
-        params:
-            'id, and every parameter of addEvent to change (the others stay): start or in moves a one-shot event, ' +
-            'of a series it changes the time of day; recurring/rrule make it a series, recurring: false (with start ' +
-            'or in) a one-shot event; enabled; calendar moves it (new id)',
-        answer: '{id, name, type, enabled, start, ts, cron?}: start/ts = next execution, null if none',
-    },
-    {
-        command: 'deleteEvent',
-        params: 'id, ids (a list) and/or name (all events with this name), optional calendar for name',
-        answer: '{result: "ok", deleted: [id\u2026], notFound?: [id\u2026]}',
-    },
-    { command: 'getEvent', params: 'id', answer: '{event: definition}' },
-    { command: 'getEvents', params: 'optional calendar', answer: '{events: [definition\u2026]}' },
-    {
-        command: 'listEvents',
-        params: 'optional from, to (default now \u2026 7 days, or days), calendar, max',
-        answer: '{events: [execution\u2026]}',
-    },
-    { command: 'getCalendars', params: '-', answer: '{calendars: [{id, name, enabled}\u2026]}' },
-    {
-        command: 'addCalendar',
-        params: 'name; optional: color, icon, enabled (default true)',
-        answer: '{id, name, enabled}',
-    },
-    { command: 'enableCalendar', params: 'calendar (name or ID), enabled', answer: '{id, enabled}' },
-    {
-        command: 'getEventObjects',
-        params: 'optional calendar (<namespace>.Calendars.<id>)',
-        answer: '{events: [object\u2026]}: the schedule objects, for the web component',
-    },
-    { command: 'setEventObject', params: 'event (a schedule object of this instance)', answer: '{result: "ok"}' },
-    { command: 'deleteEventObject', params: 'id', answer: '{result: "ok"}' },
-    { command: 'getCommands', params: '-', answer: '{commands: [{command, params, answer}\u2026]}' },
-];
 
 /** A message parameter is given (not undefined, null or '') */
 function isGiven(value: unknown): boolean {
@@ -1058,7 +1010,10 @@ export class Fullcalendar extends Adapter {
         return { events: events.slice(0, max) };
     }
 
-    /** Messages: see `COMMANDS` (also the answer of `getCommands`). Errors come back as {error}. */
+    /**
+     * Messages: see `COMMANDS` in lib/help.ts (also the answer of `getCommands`, and with `HELP` of `help`).
+     * Errors come back as {error}.
+     */
     private async onMessage(msg: ioBroker.Message): Promise<void> {
         if (!msg?.command) {
             return;
@@ -1067,6 +1022,9 @@ export class Fullcalendar extends Adapter {
         let result: unknown;
         try {
             switch (msg.command) {
+                case 'help':
+                    result = { help: HELP, commands: COMMANDS.map(({ command, write }) => ({ command, write })) };
+                    break;
                 case 'addEvent':
                     result = await this.addEvent(params);
                     break;
