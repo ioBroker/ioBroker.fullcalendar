@@ -1023,7 +1023,12 @@ export class Fullcalendar extends Adapter {
         try {
             switch (msg.command) {
                 case 'help':
-                    result = { help: HELP, commands: COMMANDS.map(({ command, write }) => ({ command, write })) };
+                    result = {
+                        help: HELP,
+                        commands: COMMANDS.map(({ command, write, standard }) =>
+                            standard ? { command, write, standard } : { command, write },
+                        ),
+                    };
                     break;
                 case 'addEvent':
                     result = await this.addEvent(params);
@@ -1083,6 +1088,7 @@ export class Fullcalendar extends Adapter {
                 default:
                     result = {
                         error: `Unknown command "${msg.command}". Commands: ${COMMANDS.map(c => c.command).join(', ')}`,
+                        reason: 'NOT_SUPPORTED',
                     };
             }
         } catch (e) {

@@ -102,8 +102,8 @@ sendTo('fullcalendar.0', 'addCalendar', { name: 'Garden' }, res => log(JSON.stri
 | `getEventObjects` | optional `calendar` (`<namespace>.Calendars.<id>`) | `{events: [object, …]}`: the schedule objects, for the web component |
 | `setEventObject` | `event` (a schedule object of this instance) | `{result: "ok"}` |
 | `deleteEventObject` | `id` | `{result: "ok"}` |
-| `getCommands`    | –                                                                                          | `{commands: [{command, description, params, answer, write}, …]}` (`write`: the command changes something) |
-| `help`           | –                                                                                          | `{help, commands: [{command, write}, …]}`: `help` is a description of all messages for AI agents (e.g. pi-agent) |
+| `getCommands`    | –                                                                                          | `{commands: [{command, description, params, answer, write, standard?}, …]}` (`write`: the command changes something) |
+| `help`           | –                                                                                          | `{help, commands: [{command, write, standard?}, …]}`: `help` is a description of all messages for AI agents (e.g. pi-agent) |
 
 Parameters of `addEvent`:
 
@@ -128,7 +128,9 @@ Parameters of `addEvent`:
 - `enabled: false` / `true` switches it off or on.
 - `calendar` moves it to another calendar. The event gets a new ID then, the answer has it.
 
-Errors come back as `{error}`, an unknown command answers with the list of the commands. A new event appears in the calendar like one created by hand and can be edited there. Recurring events run at whole minutes.
+`addEvent`, `updateEvent`, `deleteEvent`, `getEvents` and `getCalendars` are the standard commands `calendar.*` of the shared catalog of ioBroker adapters: `help` marks them with `standard` (e.g. `standard: "calendar.addEvent"`), so a script or an AI agent can call every calendar adapter the same way.
+
+Errors come back as `{error}`, an unknown command answers with the list of the commands (and `reason: "NOT_SUPPORTED"`). A new event appears in the calendar like one created by hand and can be edited there. Recurring events run at whole minutes.
 
 ## Todo
 - Week and day must scroll to the current time
@@ -138,6 +140,9 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the standard commands of the shared catalog: calendar.addEvent, calendar.updateEvent, calendar.deleteEvent, calendar.getEvents, calendar.getCalendars (marked with `standard` in the answer of `help`)
+
 ### 3.6.0 (2026-11-19)
 * (@GermanBluefox) Added the message `help`: a description of all messages for AI agents (e.g. pi-agent), built from the table of `getCommands`, which has `description` and `write` now; and `common.supportedMessages.help`
 

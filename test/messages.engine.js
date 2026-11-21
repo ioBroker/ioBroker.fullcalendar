@@ -242,7 +242,29 @@ describe('messages', () => {
 
         const commands = await send('getCommands', {});
         assert.ok(commands.commands.find(cmd => cmd.command === 'updateEvent'));
-        assert.match((await send('changeEvent', {})).error, /Commands: addEvent, updateEvent/);
+        const unknown = await send('changeEvent', {});
+        assert.match(unknown.error, /Commands: addEvent, updateEvent/);
+        assert.equal(unknown.reason, 'NOT_SUPPORTED');
+    });
+
+    it('help marks the commands of the shared catalog with standard', async () => {
+        const res = await send('help', {});
+        const marked = Object.fromEntries(res.commands.filter(cmd => cmd.standard).map(cmd => [cmd.command, cmd.standard]));
+        assert.deepEqual(marked, {
+            addEvent: 'calendar.addEvent',
+            updateEvent: 'calendar.updateEvent',
+            deleteEvent: 'calendar.deleteEvent',
+            getEvents: 'calendar.getEvents',
+            getCalendars: 'calendar.getCalendars',
+        });
+        // without a mark, no standard key at all
+        assert.ok(res.commands.filter(cmd => !marked[cmd.command]).every(cmd => !('standard' in cmd)));
+        // the write flag of a standard command matches the catalog: only the reading ones are false
+        for (const cmd of res.commands.filter(c => c.standard)) {
+            assert.equal(cmd.write, !['getEvents', 'getCalendars'].includes(cmd.command), cmd.command);
+        }
+        assert.match(res.help, /addEvent, updateEvent, deleteEvent, getEvents, getCalendars are the standard commands/);
+        assert.match(res.help, /shared catalog/);
     });
 
     it('help names every command of onMessage, and getCommands has the same table', async () => {

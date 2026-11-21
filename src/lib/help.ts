@@ -13,6 +13,8 @@ export interface CommandInfo {
     answer: string;
     /** the command changes something (an event, a calendar, an object) */
     write: boolean;
+    /** the command of the shared catalog of ioBroker adapters it follows, e.g. `calendar.addEvent` */
+    standard?: string;
 }
 
 /** The messages of the adapter, the answer of `getCommands` and the reference in the README */
@@ -28,6 +30,7 @@ export const COMMANDS: CommandInfo[] = [
             'name, calendar (name or ID), color',
         answer: '{id, name, type, start, ts, cron?}: start/ts = first execution',
         write: true,
+        standard: 'calendar.addEvent',
     },
     {
         command: 'updateEvent',
@@ -38,6 +41,7 @@ export const COMMANDS: CommandInfo[] = [
             'or in) a one-shot event; enabled; calendar moves it (new id)',
         answer: '{id, name, type, enabled, start, ts, cron?}: start/ts = next execution, null if none',
         write: true,
+        standard: 'calendar.updateEvent',
     },
     {
         command: 'deleteEvent',
@@ -45,6 +49,7 @@ export const COMMANDS: CommandInfo[] = [
         params: 'id, ids (a list) and/or name (all events with this name, any case), optional calendar for name',
         answer: '{result: "ok", deleted: [id…], notFound?: [id…]}',
         write: true,
+        standard: 'calendar.deleteEvent',
     },
     {
         command: 'getEvent',
@@ -59,6 +64,7 @@ export const COMMANDS: CommandInfo[] = [
         params: 'optional calendar',
         answer: '{events: [definition…]}',
         write: false,
+        standard: 'calendar.getEvents',
     },
     {
         command: 'listEvents',
@@ -73,6 +79,7 @@ export const COMMANDS: CommandInfo[] = [
         params: '-',
         answer: '{calendars: [{id, name, enabled}…]}',
         write: false,
+        standard: 'calendar.getCalendars',
     },
     {
         command: 'addCalendar',
@@ -114,14 +121,14 @@ export const COMMANDS: CommandInfo[] = [
         command: 'getCommands',
         description: 'all messages as a table (command, description, params, answer, write)',
         params: '-',
-        answer: '{commands: [{command, description, params, answer, write}…]}',
+        answer: '{commands: [{command, description, params, answer, write, standard?}…]}',
         write: false,
     },
     {
         command: 'help',
         description: 'a description of all messages for AI agents',
         params: '-',
-        answer: '{help, commands: [{command, write}…]}',
+        answer: '{help, commands: [{command, write, standard?}…]}',
         write: false,
     },
 ];
@@ -166,6 +173,12 @@ export const HELP = [
     '(series), astro?, offset?, durationSec?, endValue?, condition?, next}; an execution (listEvents) is {id, name,',
     'calendar, time, ts, oid, value, valueText?, endTime?, endValue?, toggleBack?, recurring}. calendar "" = default.',
     'type "double" writes endValue after the duration, "toggle" switches back after it. Errors come back as {error}.',
+    ...wrap(
+        `${COMMANDS.filter(c => c.standard)
+            .map(c => c.command)
+            .join(', ')} are the standard commands calendar.* of the shared catalog of ioBroker adapters ` +
+            '(marked with standard in commands): other calendar adapters answer them the same way.',
+    ),
     '',
     'Commands (sendTo fullcalendar.0):',
     ...COMMANDS.filter(c => c.command !== 'help' && !WEB_COMPONENT.includes(c.command)).flatMap(c =>
