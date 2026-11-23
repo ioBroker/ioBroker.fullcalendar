@@ -1,4 +1,8 @@
 # Older changes
+## 3.4.0 (2026-11-09)
+* (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
+* (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
+
 ## 3.3.1 (2026-10-29)
 * (@GermanBluefox) Added the admin >= 7.6.17 dependency, the translated name of the admin tab and the uk translations (#557)
 * (@GermanBluefox) The adapter timers (`this.setTimeout`/`this.setInterval`) are used instead of the plain ones (#557)

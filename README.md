@@ -140,7 +140,7 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.7.0 (2026-11-23)
 * (@GermanBluefox) Added the standard commands of the shared catalog: calendar.addEvent, calendar.updateEvent, calendar.deleteEvent, calendar.getEvents, calendar.getCalendars (marked with `standard` in the answer of `help`)
 
 ### 3.6.0 (2026-11-19)
@@ -158,10 +158,6 @@ Errors come back as `{error}`, an unknown command answers with the list of the c
 
 ### 3.4.1 (2026-11-09)
 * (bluefox) Web component: the time of an event always has minutes, so a full hour no longer looks different from "19:45", and a long title ends with "..." instead of being cut off
-
-### 3.4.0 (2026-11-09)
-* (bluefox) Added the web component `<iob-fullcalendar>` for Aura, devices and other hosts of web components (`common.webComponents`)
-* (bluefox) Added the messages `getEventObjects`, `setEventObject` and `deleteEventObject` for the web component
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
